@@ -1,0 +1,5 @@
+module DGest
+typeinfo DGestapp.qmltypes
+prefer :/DGest/
+Main 1.0 qml/Main.qml
+

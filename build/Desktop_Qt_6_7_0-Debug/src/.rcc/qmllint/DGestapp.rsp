@@ -1,0 +1,10 @@
+--bare
+-I
+/home/akram/dervox/DGestDesktop/build/Desktop_Qt_6_7_0-Debug/src
+-I
+/opt/Qt/6.7.0/gcc_64/./qml
+--resource
+/home/akram/dervox/DGestDesktop/build/Desktop_Qt_6_7_0-Debug/src/.rcc/qmake_DGest.qrc
+--resource
+/home/akram/dervox/DGestDesktop/build/Desktop_Qt_6_7_0-Debug/src/.rcc/DGestapp_raw_qml_0.qrc
+/home/akram/dervox/DGestDesktop/src/qml/Main.qml

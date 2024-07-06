@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/">
+    <file alias="/DGest">/home/akram/dervox/DGestDesktop/build/Desktop_Qt_6_7_0-Debug/src/DGest</file>
+
+  </qresource>
+</RCC>

@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/DGest/">
+    <file alias="qml/Main.qml">/home/akram/dervox/DGestDesktop/src/qml/Main.qml</file>
+  </qresource>
+</RCC>
+
