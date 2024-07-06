@@ -1,9 +1,24 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QtQml>
+#include <KLocalizedContext>
+#include <KLocalizedString>
+#include <QQuickStyle>
+#include <Kirigami/Platform/PlatformTheme>
+#include <KColorSchemeManager>
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
+
+    KLocalizedString::setApplicationDomain("Managements");
+    QCoreApplication::setOrganizationName(QStringLiteral("Dervox"));
+    QCoreApplication::setOrganizationDomain(QStringLiteral("Dervox.com"));
+    QCoreApplication::setApplicationName(QStringLiteral("DGest"));
+
+    if (qEnvironmentVariableIsEmpty("QT_QUICK_CONTROLS_STYLE")) {
+        QQuickStyle::setStyle(QStringLiteral("org.kde.desktop"));
+    }
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/DGest/qml/Main.qml"));
