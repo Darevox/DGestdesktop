@@ -21,6 +21,7 @@ int main(int argc, char *argv[])
     }
 
     QQmlApplicationEngine engine;
+    engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
     const QUrl url(QStringLiteral("qrc:/DGest/qml/Main.qml"));
     QObject::connect(
         &engine,

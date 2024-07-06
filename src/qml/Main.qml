@@ -1,8 +1,7 @@
 import QtQuick
-
-Window {
-    width: 640
-    height: 480
-    visible: true
-    title: qsTr("Hello World")
+import QtQuick.Controls as Controls
+import org.kde.kirigami as Kirigami
+Kirigami.ApplicationWindow {
+    title: "Clock"
+    pageStack.initialPage: Qt.resolvedUrl("qrc:/DGest/qml/pages/Login.qml")
 }
