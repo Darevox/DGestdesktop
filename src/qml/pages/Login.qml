@@ -82,11 +82,11 @@ Kirigami.Page {
                 //     Layout.margins: 20
                 // Kirigami.Theme.backgroundColor:   Kirigami.Theme.highlightColor
                 //  Kirigami.Theme.textColor:  Kirigami.Theme.highlightedTextColor
-            }
-            Controls.Label {
-                text: "Forgot your passowrd ?"
-                elide: Text.elideLeft
-            }
+             }
+            // Controls.Label {
+            //     text: "Forgot your passowrd ?"
+            //     elide: Text.elideLeft
+            // }
 
 
         }

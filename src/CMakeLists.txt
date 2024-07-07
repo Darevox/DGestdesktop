@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(ECM   REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH})
 
-find_package(Qt6 6.4 REQUIRED COMPONENTS Quick QuickControls2)
+find_package(Qt6 6.4 REQUIRED COMPONENTS Quick QuickControls2 Network)
 find_package(KF6  REQUIRED COMPONENTS   Kirigami
     I18n
     CoreAddons
@@ -27,6 +27,7 @@ qt_add_qml_module(DGestapp
     qml/Main.qml
     QML_FILES qml/pages/Login.qml
     RESOURCES qml/resources/logo.svg
+    SOURCES api/abstractapi.h api/abstractapi.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -41,7 +42,7 @@ set_target_properties(DGestapp PROPERTIES
 )
 
 target_link_libraries(DGestapp
-    PRIVATE Qt6::Quick Qt6::QuickControls2
+    PRIVATE Qt6::Quick Qt6::QuickControls2 Qt6::Network
     KF6::Kirigami
     KF6::I18n
     KF6::CoreAddons

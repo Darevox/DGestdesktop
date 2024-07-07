@@ -6,7 +6,7 @@
 #include <QQuickStyle>
 #include <Kirigami/Platform/PlatformTheme>
 #include <KColorSchemeManager>
-
+#include <api/abstractapi.h>
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
