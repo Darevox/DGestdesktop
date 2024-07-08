@@ -3,10 +3,11 @@ import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
 import QtQuick.Layouts
 Kirigami.Page {
-    title: "Login"
+    title: "Signup"
     header: Kirigami.ApplicationHeaderStyle.None
     globalToolBarStyle: Kirigami.ApplicationHeaderStyle.None
     footer:  Kirigami.ApplicationHeaderStyle.None
+
     Kirigami.InlineMessage {
         id:statusMessage
         anchors.top: parent.top
@@ -19,32 +20,20 @@ Kirigami.Page {
     Rectangle{
         id:loginContainer
         width: Math.min(parent.width * 2/3, 400)
-        height: Math.min(parent.height * 3/4, 600)
+        height: Math.min(parent.height * 3/4, 400)
         anchors.centerIn: parent
         color:Kirigami.Theme.alternateBackgroundColor
         radius: 4
 
-
-        Image {
-            id: logoImageSmall
-            width: loginContainer.width
-            anchors.left: loginContainer.left
-            anchors.right: loginContainer.right
-            height: 120
-            opacity: 1
-            anchors.top: loginContainer.top
-            anchors.topMargin: 30
-            source: "qrc:/DGest/qml/resources/logo.svg"
-            fillMode: Image.PreserveAspectFit
-        }
         Kirigami.Heading {
             id:welcomeHeading
-            anchors.top: logoImageSmall.bottom
+            anchors.top: loginContainer.top
             horizontalAlignment: Text.AlignHCenter
-            text: "Welcome back !"
+            text: "Create an account"
             level: 1
             anchors.margins: 20
             anchors.horizontalCenter: parent.horizontalCenter
+
         }
         Kirigami.FormLayout {
             id:loginLayout
@@ -52,9 +41,15 @@ Kirigami.Page {
             anchors.top: welcomeHeading.bottom
             anchors.left: loginContainer.left
             anchors.right: loginContainer.right
+          //  anchors.bottom: loginContainer.bottom
             anchors.margins: 20
-            anchors.horizontalCenter: loginContainer.horizontalCenter
+            // anchors.horizontalCenter: loginContainer.horizontalCenter
 
+            Controls.TextField {
+                id:nameField
+                padding: 10
+                placeholderText:  "Name"
+            }
             Controls.TextField {
                 id:emailField
                 padding: 10
@@ -80,9 +75,27 @@ Kirigami.Page {
                     }
                 }
             }
-            Controls.CheckBox {
-                text: "Keep me signed in"
+            Kirigami.ActionTextField {
+                id:c_passwordField
+                padding: 10
+                placeholderText:  "Confirm password"
+                echoMode:TextInput.Password
+                rightActions: Kirigami.Action {
+                    icon.name: "password-show-on"
+                    visible: true
+                    onTriggered: {
+                        if(icon.name=="password-show-on"){
+                            c_passwordField.echoMode=TextInput.Normal
+                            icon.name="password-show-off"
+                        }
+                        else{
+                            c_passwordField.echoMode=TextInput.Password
+                            icon.name="password-show-on"
+                        }
+                    }
+                }
             }
+
 
 
             // Kirigami.Separator {
@@ -95,73 +108,60 @@ Kirigami.Page {
             //     text: "Login using social media ."
             //     elide: Text.elideLeft
             // }
-
-        }
-        Controls.BusyIndicator{
-            id:loadingLoginBusyIndicator
-            anchors.centerIn: parent
-            running: false
-        }
-        ColumnLayout{
-            id:controlLoginLayout
-            anchors.top: loginLayout.bottom
-            anchors.left: loginContainer.left
-            anchors.right: loginContainer.right
-            //  anchors.bottom: loginContainer.bottom
-            anchors.margins: 20
-
             Controls.Button{
                 id:loginBtn
                 text:"Continue"
                 Layout.fillWidth: true
                 anchors.horizontalCenter: loginContainer.horizontalCenter
                 onClicked: {
-                    api.login(emailField.text,passwordField.text)
+                    api.registerUser(nameField.text,emailField.text,passwordField.text,c_passwordField.text)
                     loadingLoginBusyIndicator.running=true
                     enabled=false
                     loginLayout.enabled=false
-
                 }
 
                 //     Layout.margins: 20
                 // Kirigami.Theme.backgroundColor:   Kirigami.Theme.highlightColor
                 //  Kirigami.Theme.textColor:  Kirigami.Theme.highlightedTextColor
             }
-
         }
         RowLayout{
-            anchors.top: controlLoginLayout.bottom
+            anchors.top: loginLayout.bottom
             anchors.margins: 20
             anchors.horizontalCenter: loginContainer.horizontalCenter
             Layout.fillWidth: true
             Controls.Label {
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-                text: "Dont't have an account ?"
+                text: "Already have an account ?"
             }
             Controls.Label {
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
 
                 id: linkLabel
-                text: "<a href='#'>Sign Up</a>"
+                text: "<a href='#'>Sign In</a>"
                 textFormat: Text.RichText
                 onLinkActivated: {
                     applicationWindow().pageStack.pop()
-                    applicationWindow().pageStack.push(Qt.resolvedUrl("qrc:/DGest/qml/pages/Signup.qml"))
+                    applicationWindow().pageStack.push(Qt.resolvedUrl("qrc:/DGest/qml/pages/Login.qml"))
                 }
             }
         }
-
+        Controls.BusyIndicator{
+            id:loadingLoginBusyIndicator
+            anchors.centerIn: parent
+            running: false
+        }
     }
     Connections {
         target: api
-        function onLoginResult(result) {
+        function onRegisterResult(result) {
             if (result.success) {
-                console.log("Login successful:", result.data.accessToken);
+                console.log("Register successful:", result.data.accessToken);
                 statusMessage.type= Kirigami.MessageType.Information
                 statusMessage.visible=true
-                statusMessage.text="Login successful"
+                statusMessage.text="Register successful"
             } else {
-                console.log("Login failed. Error:", result.error);
+                console.log("Register failed. Error:", result.error);
                 try {
                     var errorObject = JSON.parse(result.error);
                     if (errorObject.errors) {
@@ -174,17 +174,8 @@ Kirigami.Page {
                         statusMessage.type = Kirigami.MessageType.Warning;
                         statusMessage.visible = true;
                         statusMessage.text = errorMessage;
-                        loadingLoginBusyIndicator.running=false
-                        loginLayout.enabled=true
-                        loginBtn.enabled=true
                     } else {
                         console.log("Unknown error:", result.error);
-                        statusMessage.type = Kirigami.MessageType.Warning;
-                        statusMessage.visible = true;
-                        statusMessage.text = result.error;
-                        loadingLoginBusyIndicator.running=false
-                        loginLayout.enabled=true
-                        loginBtn.enabled=true
                     }
                 } catch (e) {
                     // If parsing fails, check if the error is from NetworkError
@@ -207,21 +198,16 @@ Kirigami.Page {
                         statusMessage.type = Kirigami.MessageType.Warning;
                         statusMessage.visible = true;
                         statusMessage.text = "Network error: "+networkErrorMessage;
-                        loadingLoginBusyIndicator.running=false
-                        loginLayout.enabled=true
-                        loginBtn.enabled=true
                     } else {
                         console.log("Failed to parse error JSON, using raw error:", result.error);
                         statusMessage.type = Kirigami.MessageType.Warning;
                         statusMessage.visible = true;
                         statusMessage.text = result.error;
-                        loadingLoginBusyIndicator.running=false
-                        loginLayout.enabled=true
-                        loginBtn.enabled=true
                     }
                 }
             }
         }
     }
+
 }
 

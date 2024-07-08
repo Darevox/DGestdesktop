@@ -28,6 +28,8 @@ qt_add_qml_module(DGestapp
     QML_FILES qml/pages/Login.qml
     RESOURCES qml/resources/logo.svg
     SOURCES api/abstractapi.h api/abstractapi.cpp
+    SOURCES api/dgestapi.h api/dgestapi.cpp
+    QML_FILES qml/pages/Signup.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

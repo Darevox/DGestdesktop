@@ -6,7 +6,8 @@
 #include <QQuickStyle>
 #include <Kirigami/Platform/PlatformTheme>
 #include <KColorSchemeManager>
-#include <api/abstractapi.h>
+#include <api/dgestapi.h>
+#include <QNetworkAccessManager>
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
@@ -21,6 +22,12 @@ int main(int argc, char *argv[])
     }
 
     QQmlApplicationEngine engine;
+    QNetworkAccessManager *networkManager = new QNetworkAccessManager();
+    DGestApi *dgestApi = new DGestApi(networkManager);
+
+    // Register the DGestApi instance as a context property
+    engine.rootContext()->setContextProperty("api", dgestApi);
+
     engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
     const QUrl url(QStringLiteral("qrc:/DGest/qml/Main.qml"));
     QObject::connect(
