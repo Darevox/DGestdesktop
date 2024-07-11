@@ -131,7 +131,7 @@ Kirigami.ApplicationWindow {
                     icon.name: "documentinfo"
                     onClicked: {
                         rootWindow.pageStack.pop()
-                        rootWindow.pageStack.push("qrc:/DGest/qml/pages/AboutApp.qml")
+                        rootWindow.pageStack.push("qrc:/DGest/qml/pages/Settings.qml")
                     }
                 }
             }

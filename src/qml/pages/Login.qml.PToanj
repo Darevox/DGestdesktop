@@ -1,0 +1,303 @@
+import QtQuick
+import QtQuick.Controls as Controls
+import org.kde.kirigami as Kirigami
+import QtQuick.Layouts
+Kirigami.Page {
+    title: "Login"
+    header: Kirigami.ApplicationHeaderStyle.None
+    globalToolBarStyle: Kirigami.ApplicationHeaderStyle.None
+    footer:  Kirigami.ApplicationHeaderStyle.None
+    Kirigami.InlineMessage {
+        id:statusMessage
+        anchors.top: parent.top
+        width: parent.width
+        // text: "Argh!!! Something went wrong!!"
+        // type: Kirigami.MessageType.Error
+        visible: false
+        showCloseButton: true
+    }
+    Rectangle{
+        id:loginContainer
+        width: Math.min(parent.width * 2/3, 400)
+        height: Math.min(parent.height * 3/4, 600)
+        anchors.centerIn: parent
+        color:Kirigami.Theme.alternateBackgroundColor
+        radius: 4
+
+
+        Image {
+            id: logoImageSmall
+            width: loginContainer.width
+            anchors.left: loginContainer.left
+            anchors.right: loginContainer.right
+            height: 120
+            opacity: 1
+            anchors.top: loginContainer.top
+            anchors.topMargin: 30
+            source: "qrc:/DGest/qml/resources/logo.svg"
+            fillMode: Image.PreserveAspectFit
+        }
+        Kirigami.Heading {
+            id:welcomeHeading
+            anchors.top: logoImageSmall.bottom
+            horizontalAlignment: Text.AlignHCenter
+            text: "Welcome back !"
+            level: 1
+            anchors.margins: 20
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+        Kirigami.FormLayout {
+            id:loginLayout
+            wideMode: false
+            anchors.top: welcomeHeading.bottom
+            anchors.left: loginContainer.left
+            anchors.right: loginContainer.right
+            anchors.margins: 20
+            anchors.horizontalCenter: loginContainer.horizontalCenter
+
+            Controls.TextField {
+                id:emailField
+                padding: 10
+                placeholderText:  "Email"
+            }
+            Kirigami.ActionTextField {
+                id:passwordField
+                padding: 10
+                placeholderText:  "Password"
+                echoMode:TextInput.Password
+                rightActions: Kirigami.Action {
+                    icon.name: "password-show-on"
+                    visible: true
+                    onTriggered: {
+                        if(icon.name=="password-show-on"){
+                            passwordField.echoMode=TextInput.Normal
+                            icon.name="password-show-off"
+                        }
+                        else{
+                            passwordField.echoMode=TextInput.Password
+                            icon.name="password-show-on"
+                        }
+                    }
+                }
+            }
+            Controls.CheckBox {
+                text: "Keep me signed in"
+            }
+
+
+            // Kirigami.Separator {
+            //     Kirigami.FormData.isSection: true
+            // }
+
+            // Controls.Label {
+            //     Layout.fillWidth: true
+            //     horizontalAlignment: Text.AlignHCenter
+            //     text: "Login using social media ."
+            //     elide: Text.elideLeft
+            // }
+
+        }
+        Controls.BusyIndicator{
+            id:loadingLoginBusyIndicator
+            anchors.centerIn: parent
+            running: false
+        }
+        ColumnLayout{
+            id:controlLoginLayout
+            anchors.top: loginLayout.bottom
+            anchors.left: loginContainer.left
+            anchors.right: loginContainer.right
+            //  anchors.bottom: loginContainer.bottom
+            anchors.margins: 20
+
+            Controls.Button{
+                id:loginBtn
+                text:"Continue"
+                Layout.fillWidth: true
+                anchors.horizontalCenter: loginContainer.horizontalCenter
+                onClicked: {
+                    api.login(emailField.text,passwordField.text)
+                    loadingLoginBusyIndicator.running=true
+                    enabled=false
+                    loginLayout.enabled=false
+
+                }
+
+                //     Layout.margins: 20
+                // Kirigami.Theme.backgroundColor:   Kirigami.Theme.highlightColor
+                //  Kirigami.Theme.textColor:  Kirigami.Theme.highlightedTextColor
+            }
+
+        }
+        RowLayout{
+            anchors.top: controlLoginLayout.bottom
+            anchors.margins: 20
+            anchors.horizontalCenter: loginContainer.horizontalCenter
+            Layout.fillWidth: true
+            Controls.Label {
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+                text: "Dont't have an account ?"
+            }
+            Controls.Label {
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+
+                id: linkLabel
+                text: "<a href='#'>Sign Up</a>"
+                textFormat: Text.RichText
+                onLinkActivated: {
+                    applicationWindow().pageStack.pop()
+                    applicationWindow().pageStack.push(Qt.resolvedUrl("qrc:/DGest/qml/pages/Signup.qml"))
+                }
+            }
+        }
+
+    }
+    Connections {
+        target: api
+        function onLoginResult(result) {
+            if (result.success) {
+                console.log("Login successful :",result.data.accessToken);
+                statusMessage.type= Kirigami.MessageType.Information
+                statusMessage.visible=true
+                statusMessage.text="Login successful"
+                if(api.isLoggedIn()){
+                    applicationWindow().pageStack.pop()
+                    applicationWindow().pageStack.push(Qt.resolvedUrl("qrc:/DGest/qml/pages/Welcome.qml"))
+                }
+            } else {
+                console.log("Login failed. Error:", result.error);
+                try {
+                    var errorObject = JSON.parse(result.error);
+                    if (errorObject.errors) {
+                        var messages = [];
+                        for (var key in errorObject.errors) {
+                            messages = messages.concat(errorObject.errors[key]);
+                        }
+                        var errorMessage = messages.join(", ");
+                        console.log("Error messages:", errorMessage);
+                        statusMessage.type = Kirigami.MessageType.Warning;
+                        statusMessage.visible = true;
+                        statusMessage.text = errorMessage;
+                        loadingLoginBusyIndicator.running=false
+                        loginLayout.enabled=true
+                        loginBtn.enabled=true
+                    } else {
+                        console.log("Unknown error:", result.error);
+                        statusMessage.type = Kirigami.MessageType.Warning;
+                        statusMessage.visible = true;
+                        statusMessage.text = result.error;
+                        loadingLoginBusyIndicator.running=false
+                        loginLayout.enabled=true
+                        loginBtn.enabled=true
+                    }
+                } catch (e) {
+                    // If parsing fails, check if the error is from NetworkError
+                    if (result.errorCode !== undefined) {
+                        var networkErrorMessages = {
+                            0: "Connection refused",
+                            1: "Remote host closed",
+                            2: "Host not found",
+                            3: "Timeout",
+                            4: "Operation canceled",
+                            5: "SSL handshake failed",
+                            6: "Temporary network failure",
+                            7: "Network session failed",
+                            8: "Background request not allowed",
+                            9: "Too many redirects",
+                            10: "Insecure redirect",
+                        };
+                        var networkErrorMessage = networkErrorMessages[result.errorCode] || "Unknown network error";
+                        console.log("Network error:", networkErrorMessage);
+                        statusMessage.type = Kirigami.MessageType.Warning;
+                        statusMessage.visible = true;
+                        statusMessage.text = "Network error: "+networkErrorMessage;
+                        loadingLoginBusyIndicator.running=false
+                        loginLayout.enabled=true
+                        loginBtn.enabled=true
+                    } else {
+                        console.log("Failed to parse error JSON, using raw error:", result.error);
+                        statusMessage.type = Kirigami.MessageType.Warning;
+                        statusMessage.visible = true;
+                        statusMessage.text = result.error;
+                        loadingLoginBusyIndicator.running=false
+                        loginLayout.enabled=true
+                        loginBtn.enabled=true
+                    }
+                }
+            }
+        }
+        function onGetUserInfoResult(result) {
+            if (result.success) {
+
+                var jsonString = JSON.stringify(result.data); // Convert JSON object to string
+                console.log("GetUser result:", jsonString); // Print JSON string to console
+
+                statusMessage.type = Kirigami.MessageType.Information;
+                statusMessage.visible = true;
+                statusMessage.text = "GetUser: " + jsonString;
+
+            } else {
+                console.log("Login failed. Error:", result.error);
+                try {
+                    var errorObject = JSON.parse(result.error);
+                    if (errorObject.errors) {
+                        var messages = [];
+                        for (var key in errorObject.errors) {
+                            messages = messages.concat(errorObject.errors[key]);
+                        }
+                        var errorMessage = messages.join(", ");
+                        console.log("Error messages:", errorMessage);
+                        statusMessage.type = Kirigami.MessageType.Warning;
+                        statusMessage.visible = true;
+                        statusMessage.text = errorMessage;
+                        loadingLoginBusyIndicator.running=false
+                        loginLayout.enabled=true
+                        loginBtn.enabled=true
+                    } else {
+                        console.log("Unknown error:", result.error);
+                        statusMessage.type = Kirigami.MessageType.Warning;
+                        statusMessage.visible = true;
+                        statusMessage.text = result.error;
+                        loadingLoginBusyIndicator.running=false
+                        loginLayout.enabled=true
+                        loginBtn.enabled=true
+                    }
+                } catch (e) {
+                    // If parsing fails, check if the error is from NetworkError
+                    if (result.errorCode !== undefined) {
+                        var networkErrorMessages = {
+                            0: "Connection refused",
+                            1: "Remote host closed",
+                            2: "Host not found",
+                            3: "Timeout",
+                            4: "Operation canceled",
+                            5: "SSL handshake failed",
+                            6: "Temporary network failure",
+                            7: "Network session failed",
+                            8: "Background request not allowed",
+                            9: "Too many redirects",
+                            10: "Insecure redirect",
+                        };
+                        var networkErrorMessage = networkErrorMessages[result.errorCode] || "Unknown network error";
+                        console.log("Network error:", networkErrorMessage);
+                        statusMessage.type = Kirigami.MessageType.Warning;
+                        statusMessage.visible = true;
+                        statusMessage.text = "Network error: "+networkErrorMessage;
+                        loadingLoginBusyIndicator.running=false
+                        loginLayout.enabled=true
+                        loginBtn.enabled=true
+                    } else {
+                        console.log("Failed to parse error JSON, using raw error:", result.error);
+                        statusMessage.type = Kirigami.MessageType.Warning;
+                        statusMessage.visible = true;
+                        statusMessage.text = result.error;
+                        loadingLoginBusyIndicator.running=false
+                        loginLayout.enabled=true
+                        loginBtn.enabled=true
+                    }
+                }
+            }
+        }
+    }
+}
+
