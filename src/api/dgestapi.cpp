@@ -6,9 +6,11 @@ DGestApi::DGestApi(QNetworkAccessManager *netManager, QObject *parent)
 //, m_settings("YourCompany", "DGestApp")
 {
     m_token = m_settings.value("auth_token").toString();
+    m_rememberme = m_settings.value("remember_me").toBool();
     setApiHost("http://127.0.0.1:8000"); // Set your actual API host here
 }
-QFuture<NetworkApi::LoginResult> DGestApi::login(const QString &email, const QString &password)
+
+QFuture<NetworkApi::LoginResult> DGestApi::login(const QString &email, const QString &password, const bool &rememberme)
 {
     QNetworkRequest request = createRequest("/api/v1/login");
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
@@ -18,28 +20,15 @@ QFuture<NetworkApi::LoginResult> DGestApi::login(const QString &email, const QSt
     json["password"] = password;
     QJsonDocument doc(json);
 
-    return  post<NetworkApi::LoginResult>(std::move(request), doc.toJson(), [this](QNetworkReply *reply) {
-        if (reply->error() == QNetworkReply::NoError) {
-            QJsonDocument response = QJsonDocument::fromJson(reply->readAll());
-            QString token = response.object()["accessToken"].toString();
-            saveToken(token);
-            emitResult("loginResult", true, response.object());
-            return NetworkApi::LoginResult(token);
+    return post<NetworkApi::LoginResult>(std::move(request), doc.toJson(), [this, rememberme](QNetworkReply *reply) {
+        auto result = handleResponse<NetworkApi::LoginResult>(reply, "loginResult");
+        if (std::holds_alternative<QString>(result)) {
+            saveRemembeMe(rememberme);
         }
-        NetworkApi::Error error{reply->error(), reply->errorString()};
-        QByteArray responseBytes = reply->readAll();
-        QJsonDocument responseDoc = QJsonDocument::fromJson(responseBytes);
-        if (!responseBytes.isEmpty() && responseDoc.isObject()) {
-            // If there is a response body, include it in the error handling
-            emitResult("loginResult", false, responseDoc.object());
-        } else {
-            // If there is no response body, just pass the error
-            emitResult("loginResult", false, error);
-        }
-        return NetworkApi::LoginResult(error);
+        return result;
     });
-
 }
+
 QFuture<NetworkApi::RegisterResult> DGestApi::registerUser(const QString &name, const QString &email, const QString &password, const QString &c_password)
 {
     QNetworkRequest request = createRequest("/api/v1/register");
@@ -53,53 +42,32 @@ QFuture<NetworkApi::RegisterResult> DGestApi::registerUser(const QString &name, 
     QJsonDocument doc(json);
 
     return post<NetworkApi::RegisterResult>(std::move(request), doc.toJson(), [this](QNetworkReply *reply) {
-        if (reply->error() == QNetworkReply::NoError) {
-            QJsonDocument response = QJsonDocument::fromJson(reply->readAll());
-            QString token = response.object()["accessToken"].toString();
-            saveToken(token);
-            emitResult("registerResult", true, response.object());
-            return NetworkApi::RegisterResult(response.object());
-        }
-        NetworkApi::Error error{reply->error(), reply->errorString()};
-        QByteArray responseBytes = reply->readAll();
-        QJsonDocument responseDoc = QJsonDocument::fromJson(responseBytes);
-        if (!responseBytes.isEmpty() && responseDoc.isObject()) {
-            // If there is a response body, include it in the error handling
-            emitResult("registerResult", false, responseDoc.object());
-        } else {
-            // If there is no response body, just pass the error
-            emitResult("registerResult", false, error);
-        }
-        return NetworkApi::RegisterResult(error);
+        return handleResponse<NetworkApi::RegisterResult>(reply, "registerResult");
     });
-
 }
 
 QFuture<NetworkApi::ApiResult> DGestApi::logout()
 {
-    QNetworkRequest request = createRequest("/v1/logout");
+    QNetworkRequest request = createRequest("/api/v1/logout");
     request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
 
     return get<NetworkApi::ApiResult>(std::move(request), [this](QNetworkReply *reply) {
-        if (reply->error() == QNetworkReply::NoError) {
+        auto result = handleResponse<NetworkApi::ApiResult>(reply, "logoutResult");
+        if (std::holds_alternative<std::monostate>(result)) {
             saveToken("");
-            return NetworkApi::ApiResult(NetworkApi::Success{});
         }
-        return NetworkApi::ApiResult(NetworkApi::Error{reply->error(), reply->errorString()});
+        return result;
     });
 }
 
 QFuture<NetworkApi::UserInfoResult> DGestApi::getUserInfo()
 {
-    QNetworkRequest request = createRequest("/v1/user");
+    QNetworkRequest request = createRequest("/api/v1/user");
+    request.setRawHeader("Accept", "application/json");
     request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
 
-    return get<NetworkApi::UserInfoResult>(std::move(request), [](QNetworkReply *reply) {
-        if (reply->error() == QNetworkReply::NoError) {
-            QJsonDocument response = QJsonDocument::fromJson(reply->readAll());
-            return NetworkApi::UserInfoResult(response.object());
-        }
-        return NetworkApi::UserInfoResult(NetworkApi::Error{reply->error(), reply->errorString()});
+    return get<NetworkApi::UserInfoResult>(std::move(request), [this](QNetworkReply *reply) {
+        return handleResponse<NetworkApi::UserInfoResult>(reply, "getUserInfoResult");
     });
 }
 
@@ -117,6 +85,17 @@ void DGestApi::saveToken(const QString &token)
 QString DGestApi::getToken() const
 {
     return m_token;
+}
+
+bool DGestApi::getRemembeMe() const
+{
+    return !m_token.isEmpty() && m_rememberme;
+}
+
+void DGestApi::saveRemembeMe(const bool &rememberme)
+{
+    m_rememberme = rememberme;
+    m_settings.setValue("remember_me", rememberme);
 }
 
 QNetworkRequest DGestApi::createRequest(const QString &path) const

@@ -25,7 +25,7 @@ public:
     void setApiHost(const QString &host);
     QString apiHost() const;
 
-    virtual QFuture<LoginResult> login(const QString &email, const QString &password) = 0;
+    virtual QFuture<LoginResult> login(const QString &email, const QString &password, const bool &rememberme) = 0;
     virtual QFuture<RegisterResult> registerUser(const QString &name, const QString &email, const QString &password, const QString &c_password) = 0;
     virtual QFuture<ApiResult> logout() = 0;
     virtual QFuture<UserInfoResult> getUserInfo() = 0;
