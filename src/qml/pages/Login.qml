@@ -3,6 +3,7 @@ import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
 import QtQuick.Layouts
 Kirigami.Page {
+    id:loginPage
     title: "Login"
     header: Kirigami.ApplicationHeaderStyle.None
     globalToolBarStyle: Kirigami.ApplicationHeaderStyle.None
@@ -23,7 +24,7 @@ Kirigami.Page {
         anchors.centerIn: parent
         color:Kirigami.Theme.alternateBackgroundColor
         radius: 4
-
+        visible: false
 
         Image {
             id: logoImageSmall
@@ -81,7 +82,11 @@ Kirigami.Page {
                 }
             }
             Controls.CheckBox {
+                id:keepSignedIn
                 text: "Keep me signed in"
+                onCheckStateChanged: {
+                    console.log(keepSignedIn.checked)
+                }
             }
 
 
@@ -116,11 +121,10 @@ Kirigami.Page {
                 Layout.fillWidth: true
                 anchors.horizontalCenter: loginContainer.horizontalCenter
                 onClicked: {
-                    api.login(emailField.text,passwordField.text)
-                    loadingLoginBusyIndicator.running=true
+                    api.login(emailField.text,passwordField.text,keepSignedIn.checked)
+                    loadingBusyIndicator.running=true
                     enabled=false
                     loginLayout.enabled=false
-
                 }
 
                 //     Layout.margins: 20
@@ -154,74 +158,113 @@ Kirigami.Page {
     }
     Connections {
         target: api
+
+        // Slot for handling login result
         function onLoginResult(result) {
+            handleApiResult(result, "Login");
+
             if (result.success) {
-                console.log("Login successful:", result.data.accessToken);
-                statusMessage.type= Kirigami.MessageType.Information
-                statusMessage.visible=true
-                statusMessage.text="Login successful"
-            } else {
-                console.log("Login failed. Error:", result.error);
-                try {
-                    var errorObject = JSON.parse(result.error);
-                    if (errorObject.errors) {
-                        var messages = [];
-                        for (var key in errorObject.errors) {
-                            messages = messages.concat(errorObject.errors[key]);
-                        }
-                        var errorMessage = messages.join(", ");
-                        console.log("Error messages:", errorMessage);
-                        statusMessage.type = Kirigami.MessageType.Warning;
-                        statusMessage.visible = true;
-                        statusMessage.text = errorMessage;
-                        loadingLoginBusyIndicator.running=false
-                        loginLayout.enabled=true
-                        loginBtn.enabled=true
-                    } else {
-                        console.log("Unknown error:", result.error);
-                        statusMessage.type = Kirigami.MessageType.Warning;
-                        statusMessage.visible = true;
-                        statusMessage.text = result.error;
-                        loadingLoginBusyIndicator.running=false
-                        loginLayout.enabled=true
-                        loginBtn.enabled=true
-                    }
-                } catch (e) {
-                    // If parsing fails, check if the error is from NetworkError
-                    if (result.errorCode !== undefined) {
-                        var networkErrorMessages = {
-                            0: "Connection refused",
-                            1: "Remote host closed",
-                            2: "Host not found",
-                            3: "Timeout",
-                            4: "Operation canceled",
-                            5: "SSL handshake failed",
-                            6: "Temporary network failure",
-                            7: "Network session failed",
-                            8: "Background request not allowed",
-                            9: "Too many redirects",
-                            10: "Insecure redirect",
-                        };
-                        var networkErrorMessage = networkErrorMessages[result.errorCode] || "Unknown network error";
-                        console.log("Network error:", networkErrorMessage);
-                        statusMessage.type = Kirigami.MessageType.Warning;
-                        statusMessage.visible = true;
-                        statusMessage.text = "Network error: "+networkErrorMessage;
-                        loadingLoginBusyIndicator.running=false
-                        loginLayout.enabled=true
-                        loginBtn.enabled=true
-                    } else {
-                        console.log("Failed to parse error JSON, using raw error:", result.error);
-                        statusMessage.type = Kirigami.MessageType.Warning;
-                        statusMessage.visible = true;
-                        statusMessage.text = result.error;
-                        loadingLoginBusyIndicator.running=false
-                        loginLayout.enabled=true
-                        loginBtn.enabled=true
-                    }
-                }
+                console.log("Login successful:", result.data);
+                // Handle successful login
+                // Example: Redirect to another page
+                applicationWindow().pageStack.pop()
+                applicationWindow().pageStack.push(Qt.resolvedUrl("qrc:/DGest/qml/pages/Welcome.qml"));
+            }
+        }
+
+        // Slot for handling get user info result
+        function onGetUserInfoResult(result) {
+            handleApiResult(result, "GetUserInfo");
+
+            if (result.success) {
+                console.log("GetUserInfo successful:", result.data);
+                applicationWindow().pageStack.pop()
+                applicationWindow().pageStack.push(Qt.resolvedUrl("qrc:/DGest/qml/pages/Welcome.qml"));
+
             }
         }
     }
-}
 
+    // Function to handle generic errors and validation errors
+    function handleApiResult(result, actionName) {
+        if (result.success) {
+            console.log(actionName + " successful2:", result.data);
+            // Handle successful action (login, get user info, etc.)
+        } else {
+            console.error(actionName + " result.error failed:", result.error);
+            console.error(actionName + " result.errorCode failed:", result.errorCode);
+            if(result.errorCode===1){
+                applicationWindow().pageStack.pop()
+                applicationWindow().pageStack.push(Qt.resolvedUrl("qrc:/DGest/qml/pages/Welcome.qml"));
+            }
+            if (result.validationErrors) {
+                handleValidationErrors(result.validationErrors);
+            } else {
+                // Handle other errors if needed
+                handleGenericError(result.errorCode, result.error);
+            }
+        }
+        resetUIState();
+    }
+
+    // Function to handle validation errors
+    function handleValidationErrors(validationErrors) {
+        var jsonString = JSON.stringify(validationErrors); // Convert JSON object to string
+        var messages = [];
+        for (var key in validationErrors) {
+            messages = messages.concat(validationErrors[key]);
+        }
+        var errorMessage = messages.join(", ");
+        console.log("Validation errors:", jsonString);
+
+        updateStatusMessage(errorMessage, Kirigami.MessageType.Warning);
+    }
+
+    // Function to handle generic errors
+    function handleGenericError(errorCode, errorMessage) {
+        console.log("Error: " + errorMessage);
+        updateStatusMessage(errorMessage, Kirigami.MessageType.Warning);
+    }
+
+    // Function to update status message
+    function updateStatusMessage(text, type) {
+        statusMessage.type = type;
+        statusMessage.visible = true;
+        statusMessage.text = text;
+    }
+
+    // Function to reset UI state
+    function resetUIState() {
+        loginLayout.enabled = true;
+        loginBtn.enabled = true;
+        loadingBusyIndicator.running = false;
+        loginContainer.visible = true;
+    }
+
+
+    function checkLoginStatus(){
+        if(api.getRemembeMe()&&api.isLoggedIn()){
+            loadingBusyIndicator.running=true
+            api.getUserInfo();
+        }
+        else{
+            loadingBusyIndicator.running=false
+            loginContainer.visible=true
+        }
+    }
+    Controls.BusyIndicator{
+        id:loadingBusyIndicator
+        anchors.centerIn: parent
+        running: false
+    }
+    Timer {
+        id: loginCheckTimer
+        interval: 300 // 2 seconds
+        repeat: false
+        onTriggered: checkLoginStatus()
+    }
+    Component.onCompleted: {
+        loginCheckTimer.start()
+    }
+
+}

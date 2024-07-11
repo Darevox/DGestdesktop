@@ -41,7 +41,7 @@ Kirigami.Page {
             anchors.top: welcomeHeading.bottom
             anchors.left: loginContainer.left
             anchors.right: loginContainer.right
-          //  anchors.bottom: loginContainer.bottom
+            //  anchors.bottom: loginContainer.bottom
             anchors.margins: 20
             // anchors.horizontalCenter: loginContainer.horizontalCenter
 
@@ -160,6 +160,10 @@ Kirigami.Page {
                 statusMessage.type= Kirigami.MessageType.Information
                 statusMessage.visible=true
                 statusMessage.text="Register successful"
+                if(api.isLoggedIn()){
+                    applicationWindow().pageStack.pop()
+                    applicationWindow().pageStack.push(Qt.resolvedUrl("qrc:/DGest/qml/pages/Welcome.qml"))
+                }
             } else {
                 console.log("Register failed. Error:", result.error);
                 try {
