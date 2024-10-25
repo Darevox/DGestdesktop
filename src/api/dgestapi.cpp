@@ -7,7 +7,7 @@ DGestApi::DGestApi(QNetworkAccessManager *netManager, QObject *parent)
 {
     m_token = m_settings.value("auth_token").toString();
     m_rememberme = m_settings.value("remember_me").toBool();
-    setApiHost("http://127.0.0.1:8000"); // Set your actual API host here
+    setApiHost("https://dim.dervox.com"); // Set your actual API host here
 }
 
 QFuture<NetworkApi::LoginResult> DGestApi::login(const QString &email, const QString &password, const bool &rememberme)

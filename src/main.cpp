@@ -6,14 +6,14 @@
 #include <QQuickStyle>
 #include <Kirigami/Platform/PlatformTheme>
 #include <KColorSchemeManager>
-#include <api/dgestapi.h>
+#include <api/userapi.h>
 #include <QNetworkAccessManager>
-
+#include <QLoggingCategory>
 #include <KAboutData>
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
-
+  QLoggingCategory::setFilterRules("*.debug=true");
     KLocalizedString::setApplicationDomain("Managements");
     QCoreApplication::setOrganizationName(QStringLiteral("Dervox"));
     QCoreApplication::setOrganizationDomain(QStringLiteral("Dervox.com"));
@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
     QNetworkAccessManager *networkManager = new QNetworkAccessManager();
-    DGestApi *dgestApi = new DGestApi(networkManager);
+    NetworkApi::UserApi *userapi = new NetworkApi::UserApi(networkManager);
     qmlRegisterSingletonType(
         "org.kde.about",        // <========== used in the import
         1, 0, "About",          // <========== C++ object exported as a QML type
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
         }
         );
     // Register the DGestApi instance as a context property
-    engine.rootContext()->setContextProperty("api", dgestApi);
+    engine.rootContext()->setContextProperty("api", userapi);
 
     engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
     const QUrl url(QStringLiteral("qrc:/DGest/qml/Main.qml"));

@@ -14,15 +14,23 @@ Kirigami.ScrollablePage {
     actions:[
         Kirigami.Action{
             icon.name: "notifications"
+            onTriggered:{
+                applicationWindow().gnotification.showNotification("",
+                                                                         "Operation completed successfully", // message
+                                                                         Kirigami.MessageType.Positive, // message type
+                                                                         "short", // timeout
+                                                                         "Undo", // action text
+                                                                         function() { console.log("Undo clicked") }
+                                                                         )
+
+            }
         },
         Kirigami.Action{
             icon.name: "notifications"
         }
-
     ]
 
     Controls.Label {
-        // Center label horizontally and vertically within parent object
         anchors.centerIn: parent
         text: i18n("Hello World!")
     }

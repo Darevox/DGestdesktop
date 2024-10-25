@@ -8,6 +8,7 @@ Kirigami.ApplicationWindow {
     id: rootWindow
     title: "DGest"
     //header: Kirigami.ApplicationHeaderStyle.None
+    property alias gnotification: notification
 
     property var currentHeader: null
     function loadHeader() {
@@ -15,7 +16,7 @@ Kirigami.ApplicationWindow {
             currentHeader = headerComponent.createObject(rootWindow)
             rootWindow.header = currentHeader
         }
-       // currentGlobalDrawer.open()
+        // currentGlobalDrawer.open()
     }
     function destroyHeader() {
         if (currentHeader !== null) {
@@ -32,46 +33,34 @@ Kirigami.ApplicationWindow {
         }
         currentGlobalDrawer.open()
     }
-
-    // Kirigami.InlineMessage {
-    //     id:statusMessage
-    //     anchors.top: header.bottom
-    //     width: parent.width
-    //     text: "You are offline please check your connection"
-    //      type: Kirigami.MessageType.Warning
-    //     visible: true
-    //     showCloseButton: true
-    //     icon.source: "offline"
-    //     actions: [
-    //         Kirigami.Action {
-    //             text: qsTr("Refresh")
-    //             icon.name: "refreshstructure"
-    //         }
-    //     ]
-
-    // }
     Component{
         id: headerComponent
         RowLayout{
-                Layout.margins: 5
-                Item{
-                    Layout.fillWidth: true
-                }
-                Controls.ToolButton {
-                    id:notfi2
-                    Layout.alignment: Qt.AlignRight
-                    icon.name: "notifications"
-                    onClicked: showPassiveNotification("BEEP!")
-                }
-                Kcomponents.AvatarButton {
-                    Layout.margins: 5
-                    Layout.alignment: Qt.AlignRight
-                    name: "akram chaima"
-                    implicitWidth: Kirigami.Units.iconSizes.medium
-                    implicitHeight: Kirigami.Units.iconSizes.medium
-                    onClicked: menuDialog.open()
-                }
+            Layout.margins: 5
+            Item{
+                Layout.fillWidth: true
             }
+            Controls.ToolButton {
+                id:notfi2
+                Layout.alignment: Qt.AlignRight
+                icon.name: "notifications"
+                onClicked: notification.showNotification("",
+                                                         "Operation completed successfully", // message
+                                                         Kirigami.MessageType.Positive, // message type
+                                                         "short", // timeout
+                                                         "Undo", // action text
+                                                         function() { console.log("Undo clicked") }
+                                                         )
+            }
+            Kcomponents.AvatarButton {
+                Layout.margins: 5
+                Layout.alignment: Qt.AlignRight
+                name: api.getUserName()
+                implicitWidth: Kirigami.Units.iconSizes.medium
+                implicitHeight: Kirigami.Units.iconSizes.medium
+                onClicked: menuDialog.open()
+            }
+        }
     }
     Component{
         id: globalDrawerComponent
@@ -146,15 +135,23 @@ Kirigami.ApplicationWindow {
         contentHeader:  RowLayout {
             Layout.fillWidth: true
             Kcomponents.Avatar {
+                id:avatarUser
                 Layout.margins: Kirigami.Units.largeSpacing
                 Layout.alignment: Qt.AlignHCenter
-                name: "akram chaima"
+                name:  "User"
             }
             Kirigami.Heading {
-                text: "akram chaima"
+                id:userName
+                text:  "User"
                 level: 3
             }
-
+            Connections {
+                target: api
+                function onUserInfoReceived() {
+                    userName.text= api.getUserName()
+                    avatarUser.name= api.getUserName()
+                }
+            }
         }
         actions: [
             Kirigami.Action {
@@ -181,69 +178,21 @@ Kirigami.ApplicationWindow {
             rootWindow.globalDrawer = null
         }
     }
-
     Connections {
         target: api
-
-        // Slot for handling login result
-        function onLogoutResult(result) {
-            handleApiResult(result, "Logout");
-            if (result.success) {
-                console.log("Logout successful:", result.data);
-                if(!api.isLoggedIn()){
-                    destroyHeader()
-                    destroyGlobalDrawer()
-                    applicationWindow().pageStack.pop()
-                    applicationWindow().pageStack.push(Qt.resolvedUrl("qrc:/DGest/qml/pages/Login.qml"))
-                }
-            }
+        function onLogoutSuccess() {
+            resetUIState()
+            destroyHeader()
+            destroyGlobalDrawer()
+            applicationWindow().pageStack.pop()
+            applicationWindow().pageStack.push(Qt.resolvedUrl("qrc:/DGest/qml/pages/Login.qml"))
         }
-
-    }
-    // Function to handle generic errors and validation errors
-    function handleApiResult(result, actionName) {
-        if (result.success) {
-            console.log(actionName + " successful:", result.data);
-            // Handle successful action (login, get user info, etc.)
-        } else {
-            console.error(actionName + " result.error failed:", result.error);
-            console.error(actionName + " result.errorCode failed:", result.errorCode);
-            if (result.validationErrors) {
-                handleValidationErrors(result.validationErrors);
-            } else {
-                handleGenericError(result.errorCode, result.error);
-            }
+        function onLogoutError() {
+            console.log("GetUserInfo  failed:", arguments[0]);
+            //   updateStatusMessage("Get UserInfo failed: " + arguments[0], Kirigami.MessageType.Warning);
+            resetUIState();
         }
-        resetUIState();
     }
-
-    // Function to handle validation errors
-    function handleValidationErrors(validationErrors) {
-        var jsonString = JSON.stringify(validationErrors); // Convert JSON object to string
-        var messages = [];
-        for (var key in validationErrors) {
-            messages = messages.concat(validationErrors[key]);
-        }
-        var errorMessage = messages.join(", ");
-        console.log("Validation errors:", jsonString);
-
-        updateStatusMessage(errorMessage, Kirigami.MessageType.Warning);
-    }
-
-    // Function to handle generic errors
-    function handleGenericError(errorCode, errorMessage) {
-        console.log("Error: " + errorMessage);
-        updateStatusMessage(errorMessage, Kirigami.MessageType.Warning);
-    }
-
-    // Function to update status message
-    function updateStatusMessage(text, type) {
-        statusMessage.type = type;
-        statusMessage.visible = true;
-        statusMessage.text = text;
-    }
-
-    // Function to reset UI state
     function resetUIState() {
         loadingBusyIndicator.running = false;
     }
@@ -251,5 +200,8 @@ Kirigami.ApplicationWindow {
         id:loadingBusyIndicator
         anchors.centerIn: parent
         running: false
+    }
+    DNotification{
+        id:notification
     }
 }

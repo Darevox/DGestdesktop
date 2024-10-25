@@ -8,7 +8,7 @@ find_package(ECM   REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH})
 
 find_package(Qt6 6.4 REQUIRED COMPONENTS Quick QuickControls2 Network)
-find_package(KF6  REQUIRED COMPONENTS   Kirigami
+find_package(KF6  REQUIRED COMPONENTS Kirigami
     I18n
     CoreAddons
     ColorScheme
@@ -28,12 +28,14 @@ qt_add_qml_module(DGestapp
     QML_FILES qml/pages/Login.qml
     RESOURCES qml/resources/logo.svg
     SOURCES api/abstractapi.h api/abstractapi.cpp
-    SOURCES api/dgestapi.h api/dgestapi.cpp
+    #SOURCES api/dgestapi.h api/dgestapi.cpp
     QML_FILES qml/pages/Signup.qml
     QML_FILES qml/pages/Welcome.qml
     QML_FILES qml/components/VNavigationTabBar.qml
     QML_FILES qml/pages/AboutApp.qml
     QML_FILES qml/pages/Settings.qml
+    SOURCES api/userapi.h api/userapi.cpp
+    QML_FILES qml/components/DNotification.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

@@ -12,8 +12,6 @@ Kirigami.Page {
         id:statusMessage
         anchors.top: parent.top
         width: parent.width
-        // text: "Argh!!! Something went wrong!!"
-        // type: Kirigami.MessageType.Error
         visible: false
         showCloseButton: true
     }
@@ -33,18 +31,14 @@ Kirigami.Page {
             level: 1
             anchors.margins: 20
             anchors.horizontalCenter: parent.horizontalCenter
-
         }
         Kirigami.FormLayout {
-            id:loginLayout
+            id:signUpLayout
             wideMode: false
             anchors.top: welcomeHeading.bottom
             anchors.left: loginContainer.left
             anchors.right: loginContainer.right
-            //  anchors.bottom: loginContainer.bottom
             anchors.margins: 20
-            // anchors.horizontalCenter: loginContainer.horizontalCenter
-
             Controls.TextField {
                 id:nameField
                 padding: 10
@@ -95,38 +89,21 @@ Kirigami.Page {
                     }
                 }
             }
-
-
-
-            // Kirigami.Separator {
-            //     Kirigami.FormData.isSection: true
-            // }
-
-            // Controls.Label {
-            //     Layout.fillWidth: true
-            //     horizontalAlignment: Text.AlignHCenter
-            //     text: "Login using social media ."
-            //     elide: Text.elideLeft
-            // }
             Controls.Button{
-                id:loginBtn
+                id:signUpBtn
                 text:"Continue"
                 Layout.fillWidth: true
                 anchors.horizontalCenter: loginContainer.horizontalCenter
                 onClicked: {
                     api.registerUser(nameField.text,emailField.text,passwordField.text,c_passwordField.text)
-                    loadingLoginBusyIndicator.running=true
+                    loadingBusyIndicator.running=true
                     enabled=false
-                    loginLayout.enabled=false
+                    signUpLayout.enabled=false
                 }
-
-                //     Layout.margins: 20
-                // Kirigami.Theme.backgroundColor:   Kirigami.Theme.highlightColor
-                //  Kirigami.Theme.textColor:  Kirigami.Theme.highlightedTextColor
             }
         }
         RowLayout{
-            anchors.top: loginLayout.bottom
+            anchors.top: signUpLayout.bottom
             anchors.margins: 20
             anchors.horizontalCenter: loginContainer.horizontalCenter
             Layout.fillWidth: true
@@ -146,72 +123,47 @@ Kirigami.Page {
                 }
             }
         }
-        Controls.BusyIndicator{
-            id:loadingLoginBusyIndicator
-            anchors.centerIn: parent
-            running: false
-        }
     }
-    Connections {
+    Connections{
         target: api
-        function onRegisterResult(result) {
-            if (result.success) {
-                console.log("Register successful:", result.data.accessToken);
-                statusMessage.type= Kirigami.MessageType.Information
-                statusMessage.visible=true
-                statusMessage.text="Register successful"
-                if(api.isLoggedIn()){
-                    applicationWindow().pageStack.pop()
-                    applicationWindow().pageStack.push(Qt.resolvedUrl("qrc:/DGest/qml/pages/Welcome.qml"))
-                }
-            } else {
-                console.log("Register failed. Error:", result.error);
-                try {
-                    var errorObject = JSON.parse(result.error);
-                    if (errorObject.errors) {
-                        var messages = [];
-                        for (var key in errorObject.errors) {
-                            messages = messages.concat(errorObject.errors[key]);
-                        }
-                        var errorMessage = messages.join(", ");
-                        console.log("Error messages:", errorMessage);
-                        statusMessage.type = Kirigami.MessageType.Warning;
-                        statusMessage.visible = true;
-                        statusMessage.text = errorMessage;
-                    } else {
-                        console.log("Unknown error:", result.error);
-                    }
-                } catch (e) {
-                    // If parsing fails, check if the error is from NetworkError
-                    if (result.errorCode !== undefined) {
-                        var networkErrorMessages = {
-                            0: "Connection refused",
-                            1: "Remote host closed",
-                            2: "Host not found",
-                            3: "Timeout",
-                            4: "Operation canceled",
-                            5: "SSL handshake failed",
-                            6: "Temporary network failure",
-                            7: "Network session failed",
-                            8: "Background request not allowed",
-                            9: "Too many redirects",
-                            10: "Insecure redirect",
-                        };
-                        var networkErrorMessage = networkErrorMessages[result.errorCode] || "Unknown network error";
-                        console.log("Network error:", networkErrorMessage);
-                        statusMessage.type = Kirigami.MessageType.Warning;
-                        statusMessage.visible = true;
-                        statusMessage.text = "Network error: "+networkErrorMessage;
-                    } else {
-                        console.log("Failed to parse error JSON, using raw error:", result.error);
-                        statusMessage.type = Kirigami.MessageType.Warning;
-                        statusMessage.visible = true;
-                        statusMessage.text = result.error;
-                    }
-                }
-            }
+        function onRegisterSuccess() {
+            updateStatusMessage("SignUp successful, Redirecting ...", Kirigami.MessageType.Positive);
+            api.login(emailField.text, passwordField.text, false);
         }
+        function onUserInfoReceived() {
+            updateStatusMessage("Login successful", Kirigami.MessageType.Positive);
+            applicationWindow().pageStack.pop()
+            applicationWindow().pageStack.push(Qt.resolvedUrl("qrc:/DGest/qml/pages/Welcome.qml"))
+        }
+        function onUserInfoError() {
+            console.log("GetUserInfo  failed:", arguments[0]);
+            updateStatusMessage("Get UserInfo failed: " + arguments[0], Kirigami.MessageType.Warning);
+            resetUIState();
+        }
+        function onRegisterError() {
+            console.log("SignUp failed:", arguments[0]);
+            updateStatusMessage("SignUp failed: " + arguments[0], Kirigami.MessageType.Warning);
+            loadingBusyIndicator.running = false;
+            resetUIState();
+        }
+
     }
+    function updateStatusMessage(message, type) {
+        statusMessage.type = type;
+        statusMessage.visible = true;
+        statusMessage.text = message;
+    }
+    function resetUIState() {
+        signUpLayout.enabled = true;
+        signUpBtn.enabled = true;
+        loadingBusyIndicator.running = false;
+    }
+    Controls.BusyIndicator{
+        id:loadingBusyIndicator
+        anchors.centerIn: parent
+        running: false
+    }
+
 
 }
 
