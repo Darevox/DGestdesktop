@@ -6,7 +6,7 @@ namespace NetworkApi {
 
 UserApi::UserApi(QNetworkAccessManager *netManager, QObject *parent)
     : AbstractApi(netManager, parent)
-    , m_settings("YourCompany", "YourApp")
+    , m_settings("Dervox", "DGest")
     , m_rememberMe(false)
 {
     m_token = m_settings.value("auth/token").toString();
@@ -30,7 +30,8 @@ QFuture<void> UserApi::login(const QString &email, const QString &password, bool
             getUserInfo();
             emit loginSuccess(response.data.value());
         } else {
-            emit loginError(response.error->message);
+            QString errorMessageDetails = getErrorMessages(response.error->details);
+            emit loginError(response.error->message, response.error->status,errorMessageDetails);
         }
     });
 
@@ -99,7 +100,7 @@ QFuture<void> UserApi::getUserInfo() {
             m_user.email = userData["email"].toString(); // Save the user's email
             emit userInfoReceived(response.data.value());
         } else {
-            emit userInfoError(response.error->message);
+            emit userInfoError(response.error->message,response.error->status);
         }
     });
 
@@ -122,7 +123,8 @@ bool UserApi::getRememberMe() const {
 
 void UserApi::saveToken(const QString &token) {
     m_token = token;
-    if (m_rememberMe) {
+    bool rememberMe = getRememberMe();
+    if (rememberMe) {
         m_settings.setValue("auth/token", token);
     } else {
         m_settings.remove("auth/token");

@@ -41,13 +41,13 @@ private:
 signals:
     // New signals to emit for QML interaction
     void loginSuccess(const QString &token);
-    void loginError(const QString &message);
+    void loginError(const QString &message ,ApiStatus status , QString errorMessageDetails);
     void registerSuccess();
     void registerError(const QString &message);
     void logoutSuccess();
     void logoutError(const QString &message);
     void userInfoReceived(const QJsonObject &userInfo);
-    void userInfoError(const QString &message);
+    void userInfoError(const QString &message , ApiStatus status);
 
     void loginStateChanged(bool loggedIn);
 };

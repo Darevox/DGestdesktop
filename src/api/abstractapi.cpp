@@ -22,7 +22,6 @@ void AbstractApi::setApiHost(const QString &host) {
 QString AbstractApi::apiHost() const {
     return m_apiHost;
 }
-
 QUrl AbstractApi::apiUrl(const QString &path) const {
     QString fullPath = path.startsWith('/') ? path : QString("/%1").arg(path);
     return QUrl(m_apiHost + fullPath);

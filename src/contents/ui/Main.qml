@@ -1,14 +1,24 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Controls as Controls
+import QtQuick.Controls as QQC2
 import org.kde.kirigami as Kirigami
 import org.kde.kirigamiaddons.components as Kcomponents
+import com.dervox.ColorSchemeManager 1.0
+import com.dervox.ApiStatusHandler 1.0
+
 import "components"
+import "pages"
+import "pages/user"
+
 Kirigami.ApplicationWindow {
     id: rootWindow
     title: "DGest"
     //header: Kirigami.ApplicationHeaderStyle.None
     property alias gnotification: notification
+    property alias  gaboutDialog: aboutDialog
+    property alias  gprofileDialog: profileDialog
+    property alias  gColorSchemeModel: colorSchemeModel
+    property alias  gApiStatusHandler: apiStatusHandler
 
     property var currentHeader: null
     function loadHeader() {
@@ -35,33 +45,53 @@ Kirigami.ApplicationWindow {
     }
     Component{
         id: headerComponent
-        RowLayout{
-            Layout.margins: 5
-            Item{
-                Layout.fillWidth: true
-            }
-            Controls.ToolButton {
-                id:notfi2
-                Layout.alignment: Qt.AlignRight
-                icon.name: "notifications"
-                onClicked: notification.showNotification("",
-                                                         "Operation completed successfully", // message
-                                                         Kirigami.MessageType.Positive, // message type
-                                                         "short", // timeout
-                                                         "Undo", // action text
-                                                         function() { console.log("Undo clicked") }
-                                                         )
-            }
-            Kcomponents.AvatarButton {
-                Layout.margins: 5
-                Layout.alignment: Qt.AlignRight
-                name: api.getUserName()
-                implicitWidth: Kirigami.Units.iconSizes.medium
-                implicitHeight: Kirigami.Units.iconSizes.medium
-                onClicked: menuDialog.open()
+        Rectangle{
+            Kirigami.Theme.colorSet: Kirigami.Theme.View
+            Kirigami.Theme.inherit: false
+            color: Kirigami.Theme.backgroundColor
+
+            implicitWidth: toolBarGlobal.implicitWidth
+            implicitHeight: toolBarGlobal.implicitHeight
+            RowLayout{
+                id:toolBarGlobal
+                anchors.fill:parent
+                Item{
+                    Layout.fillWidth: true
+                }
+                QQC2.ToolButton {
+                    id:notfi2
+                    Layout.alignment: Qt.AlignRight
+                    icon.name: "notifications"
+                    onClicked: {
+                        if(!rootWindow.globalDrawer.collapsed)
+                            rootWindow.globalDrawer.collapsed=true
+
+                        if(notificationDrawer.opened)
+                            notificationDrawer.close()
+                        else
+                            notificationDrawer.open()
+                    }
+                    /*notification.showNotification("",
+                                                                 "Operation completed successfully", // message
+                                                                 Kirigami.MessageType.Positive, // message type
+                                                                 "short", // timeout
+                                                                 "Undo", // action text
+                                                                 function() { console.log("Undo clicked") }
+                                                                 )*/
+                }
+                Kcomponents.AvatarButton {
+                    Layout.margins: 5
+                    Layout.alignment: Qt.AlignRight
+                    name: api.getUserName()
+                    implicitWidth: Kirigami.Units.iconSizes.medium
+                    implicitHeight: Kirigami.Units.iconSizes.medium
+                    onClicked: menuDialog.open()
+                }
             }
         }
+
     }
+
     Component{
         id: globalDrawerComponent
         Kirigami.GlobalDrawer {
@@ -77,7 +107,7 @@ Kirigami.ApplicationWindow {
                 RowLayout {
                     Layout.fillWidth: true
                     Layout.margins: Kirigami.Units.smallSpacing
-                    Controls.ToolButton {
+                    QQC2.ToolButton {
                         icon.name: "application-menu"
                         visible: globalDrawer.collapsible
                         checked: !globalDrawer.collapsed
@@ -97,37 +127,11 @@ Kirigami.ApplicationWindow {
                 Layout.fillHeight: true
                 drawerCollapsed: globalDrawerMain.collapsed
             }
-            footer:RowLayout {
-                visible: !globalDrawer.collapsed
-                spacing: Kirigami.Units.smallSpacing
-                Item{
-                    Layout.fillWidth: true
-                }
-                Kirigami.Icon {
-                    Layout.margins: Kirigami.Units.largeSpacing
-                    source: "shape-cuboid"
-                }
-
-                Kirigami.Heading {
-                    //Layout.margins: Kirigami.Units.largeSpacing
-                    text: "DGest"
-                    level: 3
-                    Layout.fillWidth: true
-                }
-
-                Controls.ToolButton {
-                    spacing: Kirigami.Units.smallSpacing
-                    icon.name: "documentinfo"
-                    onClicked: {
-                        rootWindow.pageStack.pop()
-                        rootWindow.pageStack.push("qrc:/DGest/qml/pages/Settings.qml")
-                    }
-                }
-            }
         }
     }
     footer:  Kirigami.ApplicationHeaderStyle.None
-    pageStack.initialPage: Qt.resolvedUrl("qrc:/DGest/qml/pages/Login.qml")
+    pageStack.initialPage: Qt.resolvedUrl("qrc:/DGest/contents/ui/pages/user/Login.qml")
+
     Kirigami.MenuDialog {
         id: menuDialog
         title: i18n("Profile")
@@ -158,6 +162,10 @@ Kirigami.ApplicationWindow {
                 icon.name: "user-identity"
                 text: i18n("Profile..")
                 tooltip: i18n("View profile")
+                onTriggered:{
+                    profileDialog.active=true
+
+                }
             },
             Kirigami.Action {
                 icon.name: "draw-arrow-back"
@@ -185,7 +193,7 @@ Kirigami.ApplicationWindow {
             destroyHeader()
             destroyGlobalDrawer()
             applicationWindow().pageStack.pop()
-            applicationWindow().pageStack.push(Qt.resolvedUrl("qrc:/DGest/qml/pages/Login.qml"))
+            applicationWindow().pageStack.push(Qt.resolvedUrl("qrc:/DGest/contents/ui/pages/user/Login.qml"))
         }
         function onLogoutError() {
             console.log("GetUserInfo  failed:", arguments[0]);
@@ -196,7 +204,7 @@ Kirigami.ApplicationWindow {
     function resetUIState() {
         loadingBusyIndicator.running = false;
     }
-    Controls.BusyIndicator{
+    QQC2.BusyIndicator{
         id:loadingBusyIndicator
         anchors.centerIn: parent
         running: false
@@ -204,4 +212,83 @@ Kirigami.ApplicationWindow {
     DNotification{
         id:notification
     }
+    Loader {
+        id: profileDialog
+        active: false
+        asynchronous: true
+        sourceComponent: Profile {}
+
+        onLoaded: {
+            item.open()
+        }
+
+        Connections {
+            target: profileDialog.item
+            function onClosed() {
+                profileDialog.active = false
+            }
+        }
+    }
+    Loader {
+        id: aboutDialog
+        active: false
+        asynchronous: true
+        sourceComponent: AboutApp{}
+
+        onLoaded: {
+            item.open()
+        }
+
+        Connections {
+            target: aboutDialog.item
+            function onClosed() {
+                aboutDialog.active = false
+            }
+        }
+    }
+    Kirigami.OverlayDrawer {
+        id: notificationDrawer
+        edge: Qt.RightEdge
+        modal: true
+        handleVisible : false
+        width:  Kirigami.Units.gridUnit * 24
+
+
+        contentItem: ColumnLayout {
+            RowLayout {
+                Layout.alignment: Qt.AlignTop
+                Layout.fillWidth: true
+                Layout.margins: Kirigami.Units.smallSpacing
+                QQC2.ToolButton {
+                    icon.name: "dialog-close"
+                    onClicked:{
+                        notificationDrawer.close()
+                    }
+                }
+                Item{
+                    Layout.fillWidth: true
+                }
+                Kirigami.Heading {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: "Notification"
+                    level: 2
+                }
+                Item{
+                    Layout.fillWidth: true
+                }
+                Item{
+                    Layout.fillWidth: true
+                }
+
+
+            }
+        }
+    }
+    ColorSchemeModel {
+        id: colorSchemeModel
+    }
+    ApiStatusHandler{
+      id:apiStatusHandler
+    }
+
 }

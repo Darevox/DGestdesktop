@@ -1,14 +1,13 @@
 import QtQuick
-import QtQuick.Controls as Controls
+import QtQuick.Controls as QQC2
 import org.kde.kirigami as Kirigami
 import QtQuick.Layouts
-
 Kirigami.Page {
-    id:loginPage
-    title: "Login"
+    title: "Signup"
     header: Kirigami.ApplicationHeaderStyle.None
     globalToolBarStyle: Kirigami.ApplicationHeaderStyle.None
     footer:  Kirigami.ApplicationHeaderStyle.None
+
     Kirigami.InlineMessage {
         id:statusMessage
         anchors.top: parent.top
@@ -19,43 +18,33 @@ Kirigami.Page {
     Rectangle{
         id:loginContainer
         width: Math.min(parent.width * 2/3, 400)
-        height: Math.min(parent.height * 3/4, 600)
+        height: Math.min(parent.height * 3/4, 400)
         anchors.centerIn: parent
         color:Kirigami.Theme.alternateBackgroundColor
         radius: 4
-        visible: false
 
-        Image {
-            id: logoImageSmall
-            width: loginContainer.width
-            anchors.left: loginContainer.left
-            anchors.right: loginContainer.right
-            height: 120
-            opacity: 1
-            anchors.top: loginContainer.top
-            anchors.topMargin: 30
-            source: "qrc:/DGest/qml/resources/logo.svg"
-            fillMode: Image.PreserveAspectFit
-        }
         Kirigami.Heading {
             id:welcomeHeading
-            anchors.top: logoImageSmall.bottom
+            anchors.top: loginContainer.top
             horizontalAlignment: Text.AlignHCenter
-            text: "Welcome back !"
+            text: "Create an account"
             level: 1
             anchors.margins: 20
             anchors.horizontalCenter: parent.horizontalCenter
         }
         Kirigami.FormLayout {
-            id:loginLayout
+            id:signUpLayout
             wideMode: false
             anchors.top: welcomeHeading.bottom
             anchors.left: loginContainer.left
             anchors.right: loginContainer.right
             anchors.margins: 20
-            anchors.horizontalCenter: loginContainer.horizontalCenter
-
-            Controls.TextField {
+            QQC2.TextField {
+                id:nameField
+                padding: 10
+                placeholderText:  "Name"
+            }
+            QQC2.TextField {
                 id:emailField
                 padding: 10
                 placeholderText:  "Email"
@@ -80,125 +69,101 @@ Kirigami.Page {
                     }
                 }
             }
-            Controls.CheckBox {
-                id:keepSignedIn
-                text: "Keep me signed in"
-                onCheckStateChanged: {
-                    console.log(keepSignedIn.checked)
+            Kirigami.ActionTextField {
+                id:c_passwordField
+                padding: 10
+                placeholderText:  "Confirm password"
+                echoMode:TextInput.Password
+                rightActions: Kirigami.Action {
+                    icon.name: "password-show-on"
+                    visible: true
+                    onTriggered: {
+                        if(icon.name=="password-show-on"){
+                            c_passwordField.echoMode=TextInput.Normal
+                            icon.name="password-show-off"
+                        }
+                        else{
+                            c_passwordField.echoMode=TextInput.Password
+                            icon.name="password-show-on"
+                        }
+                    }
                 }
             }
-        }
-        Controls.BusyIndicator{
-            id:loadingLoginBusyIndicator
-            anchors.centerIn: parent
-            running: false
-        }
-        ColumnLayout{
-            id:controlLoginLayout
-            anchors.top: loginLayout.bottom
-            anchors.left: loginContainer.left
-            anchors.right: loginContainer.right
-            //  anchors.bottom: loginContainer.bottom
-            anchors.margins: 20
-
-            Controls.Button{
-                id:loginBtn
+            QQC2.Button{
+                id:signUpBtn
                 text:"Continue"
                 Layout.fillWidth: true
                 anchors.horizontalCenter: loginContainer.horizontalCenter
                 onClicked: {
-                    loginLayout.enabled = false;
-                    loginBtn.enabled = false;
-                    loadingBusyIndicator.running = true;
-                    api.login(emailField.text, passwordField.text, keepSignedIn.checked);
+                    api.registerUser(nameField.text,emailField.text,passwordField.text,c_passwordField.text)
+                    loadingBusyIndicator.running=true
+                    enabled=false
+                    signUpLayout.enabled=false
                 }
             }
-
         }
         RowLayout{
-            anchors.top: controlLoginLayout.bottom
+            anchors.top: signUpLayout.bottom
             anchors.margins: 20
             anchors.horizontalCenter: loginContainer.horizontalCenter
             Layout.fillWidth: true
-            Controls.Label {
+            QQC2.Label {
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-                text: "Dont't have an account ?"
+                text: "Already have an account ?"
             }
-            Controls.Label {
+            QQC2.Label {
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
 
                 id: linkLabel
-                text: "<a href='#'>Sign Up</a>"
+                text: "<a href='#'>Sign In</a>"
                 textFormat: Text.RichText
                 onLinkActivated: {
                     applicationWindow().pageStack.pop()
-                    applicationWindow().pageStack.push(Qt.resolvedUrl("qrc:/DGest/qml/pages/Signup.qml"))
+                    applicationWindow().pageStack.push(Qt.resolvedUrl("qrc:/DGest/contents/ui/pages/user//Login.qml"))
                 }
             }
         }
-
     }
-    Connections {
+    Connections{
         target: api
-        // function onLoginSuccess() {
-        //     console.log("Login successful:", arguments[0]);
-        //     updateStatusMessage("Login successful", Kirigami.MessageType.Positive);
-        //     applicationWindow().pageStack.replace(Qt.resolvedUrl("qrc:/DGest/qml/pages/Welcome.qml"));
-        //     resetUIState();
-        // }
-        function onLoginError() {
-            console.log("Login failed:", arguments[0]);
-            updateStatusMessage("Login failed: " + arguments[0], Kirigami.MessageType.Warning);
-            resetUIState();
+        function onRegisterSuccess() {
+            updateStatusMessage("SignUp successful, Redirecting ...", Kirigami.MessageType.Positive);
+            api.login(emailField.text, passwordField.text, false);
         }
         function onUserInfoReceived() {
             updateStatusMessage("Login successful", Kirigami.MessageType.Positive);
-            applicationWindow().pageStack.replace(Qt.resolvedUrl("qrc:/DGest/qml/pages/Welcome.qml"));
-            resetUIState();
+            applicationWindow().pageStack.pop()
+            applicationWindow().pageStack.push(Qt.resolvedUrl("qrc:/DGest/contents/ui/pages/Welcome.qml"))
         }
         function onUserInfoError() {
             console.log("GetUserInfo  failed:", arguments[0]);
             updateStatusMessage("Get UserInfo failed: " + arguments[0], Kirigami.MessageType.Warning);
             resetUIState();
         }
-    }
+        function onRegisterError() {
+            console.log("SignUp failed:", arguments[0]);
+            updateStatusMessage("SignUp failed: " + arguments[0], Kirigami.MessageType.Warning);
+            loadingBusyIndicator.running = false;
+            resetUIState();
+        }
 
+    }
     function updateStatusMessage(message, type) {
         statusMessage.type = type;
         statusMessage.visible = true;
         statusMessage.text = message;
     }
-
     function resetUIState() {
-        loginLayout.enabled = true;
-        loginBtn.enabled = true;
+        signUpLayout.enabled = true;
+        signUpBtn.enabled = true;
         loadingBusyIndicator.running = false;
     }
-    Controls.BusyIndicator{
+    QQC2.BusyIndicator{
         id:loadingBusyIndicator
         anchors.centerIn: parent
         running: false
     }
-    Timer {
-        id: loginCheckTimer
-        interval: 300
-        repeat: false
-        onTriggered: checkLoginStatus()
-    }
 
-    function checkLoginStatus() {
-        if (api.getRememberMe() && api.isLoggedIn()) {
-               console.log("checkLoginStatus 1 ")
-            loadingBusyIndicator.running = true;
-            api.getUserInfo();
-        } else {
-            console.log("checkLoginStatus 2 ")
-            loadingBusyIndicator.running = false;
-            loginContainer.visible = true;
-        }
-    }
 
-    Component.onCompleted: {
-        loginCheckTimer.start();
-    }
 }
+

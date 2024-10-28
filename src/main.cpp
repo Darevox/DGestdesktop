@@ -10,6 +10,8 @@
 #include <QNetworkAccessManager>
 #include <QLoggingCategory>
 #include <KAboutData>
+#include <colorschememanager.h>
+
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
@@ -35,9 +37,10 @@ int main(int argc, char *argv[])
         );
     // Register the DGestApi instance as a context property
     engine.rootContext()->setContextProperty("api", userapi);
-
+    qmlRegisterType<ColorSchemeManager>("com.dervox.ColorSchemeManager", 1, 0, "ColorSchemeModel");
+    qmlRegisterType( QUrl(QStringLiteral("qrc:/DGest/contents/ui/pages/ApiStatusHandler.qml")), "com.dervox.ApiStatusHandler", 1, 0, "ApiStatusHandler" );
     engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
-    const QUrl url(QStringLiteral("qrc:/DGest/qml/Main.qml"));
+    const QUrl url(QStringLiteral("qrc:/DGest/contents/ui/Main.qml"));
     QObject::connect(
         &engine,
         &QQmlApplicationEngine::objectCreationFailed,

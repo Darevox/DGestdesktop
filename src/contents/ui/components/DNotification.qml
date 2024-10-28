@@ -50,7 +50,7 @@ Item {
                      finalIconName = "dialog-error"
                      break;
                  default:
-                     finalIconName = "dialog-information"
+                     finalIconName = "documentinfo"
                      break;
              }
          }

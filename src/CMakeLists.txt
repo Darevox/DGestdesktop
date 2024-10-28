@@ -24,18 +24,23 @@ qt_add_qml_module(DGestapp
     URI DGest
     VERSION 1.0
     QML_FILES
-    qml/Main.qml
-    QML_FILES qml/pages/Login.qml
-    RESOURCES qml/resources/logo.svg
+    contents/ui/Main.qml
+    QML_FILES contents/ui/pages/user/Login.qml
+    RESOURCES contents/ui/resources/logo.svg
     SOURCES api/abstractapi.h api/abstractapi.cpp
     #SOURCES api/dgestapi.h api/dgestapi.cpp
-    QML_FILES qml/pages/Signup.qml
-    QML_FILES qml/pages/Welcome.qml
-    QML_FILES qml/components/VNavigationTabBar.qml
-    QML_FILES qml/pages/AboutApp.qml
-    QML_FILES qml/pages/Settings.qml
+    QML_FILES contents/ui/pages/user/Signup.qml
+    QML_FILES contents/ui/pages/Welcome.qml
+    QML_FILES contents/ui/components/VNavigationTabBar.qml
+    QML_FILES contents/ui/pages/AboutApp.qml
+    QML_FILES contents/ui/pages/Settings.qml
     SOURCES api/userapi.h api/userapi.cpp
-    QML_FILES qml/components/DNotification.qml
+    QML_FILES contents/ui/components/DNotification.qml
+    QML_FILES contents/ui/pages/user/Profile.qml
+    SOURCES colorschememanager.h colorschememanager.cpp
+    QML_FILES contents/ui/components/SkeletonLoaders.qml
+    QML_FILES contents/ui/pages/NoPage.qml
+    QML_FILES contents/ui/pages/ApiStatusHandler.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
