@@ -1,4 +1,4 @@
-#include <QGuiApplication>
+#include <QApplication>  // Changed from QGuiApplication
 #include <QQmlApplicationEngine>
 #include <QtQml>
 #include <KLocalizedContext>
@@ -11,11 +11,12 @@
 #include <QLoggingCategory>
 #include <KAboutData>
 #include <colorschememanager.h>
+#include <traymanager.h>
 
 int main(int argc, char *argv[])
 {
-    QGuiApplication app(argc, argv);
-  QLoggingCategory::setFilterRules("*.debug=true");
+    QApplication app(argc, argv);
+    QLoggingCategory::setFilterRules("*.debug=true");
     KLocalizedString::setApplicationDomain("Managements");
     QCoreApplication::setOrganizationName(QStringLiteral("Dervox"));
     QCoreApplication::setOrganizationDomain(QStringLiteral("Dervox.com"));
@@ -28,6 +29,7 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     QNetworkAccessManager *networkManager = new QNetworkAccessManager();
     NetworkApi::UserApi *userapi = new NetworkApi::UserApi(networkManager);
+    TrayManager trayManager;
     qmlRegisterSingletonType(
         "org.kde.about",        // <========== used in the import
         1, 0, "About",          // <========== C++ object exported as a QML type
@@ -37,8 +39,10 @@ int main(int argc, char *argv[])
         );
     // Register the DGestApi instance as a context property
     engine.rootContext()->setContextProperty("api", userapi);
+    engine.rootContext()->setContextProperty("trayManager", &trayManager);
     qmlRegisterType<ColorSchemeManager>("com.dervox.ColorSchemeManager", 1, 0, "ColorSchemeModel");
     qmlRegisterType( QUrl(QStringLiteral("qrc:/DGest/contents/ui/pages/ApiStatusHandler.qml")), "com.dervox.ApiStatusHandler", 1, 0, "ApiStatusHandler" );
+
     engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
     const QUrl url(QStringLiteral("qrc:/DGest/contents/ui/Main.qml"));
     QObject::connect(
@@ -48,6 +52,14 @@ int main(int argc, char *argv[])
         []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
     engine.load(url);
+
+    // Move window setup after engine.load()
+    if (!engine.rootObjects().isEmpty()) {
+        QQuickWindow* window = qobject_cast<QQuickWindow*>(engine.rootObjects().first());
+        if (window) {
+            trayManager.setMainWindow(window);
+        }
+    }
 
     return app.exec();
 }

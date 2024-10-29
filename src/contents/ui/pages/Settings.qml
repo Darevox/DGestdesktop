@@ -49,6 +49,8 @@ FormCard.FormCardPage {
         FormCard.FormCheckDelegate {
             id: checkbox
             text: i18nc("@option:check", "Show Tray Icon")
+            checked: trayManager.showInTray
+            onCheckedChanged: trayManager.showInTray = checked
             onToggled: {
                 if (checkState) {
                     console.info("A tray icon appears on your system!")

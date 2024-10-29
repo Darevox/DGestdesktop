@@ -7,12 +7,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(ECM   REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH})
 
-find_package(Qt6 6.4 REQUIRED COMPONENTS Quick QuickControls2 Network)
+find_package(Qt6 6.4 REQUIRED COMPONENTS Quick QuickControls2 Network )
 find_package(KF6  REQUIRED COMPONENTS Kirigami
     I18n
     CoreAddons
     ColorScheme
     IconThemes
+    StatusNotifierItem
 )
 qt_standard_project_setup()
 qt_policy(SET QTP0001 OLD)
@@ -41,6 +42,7 @@ qt_add_qml_module(DGestapp
     QML_FILES contents/ui/components/SkeletonLoaders.qml
     QML_FILES contents/ui/pages/NoPage.qml
     QML_FILES contents/ui/pages/ApiStatusHandler.qml
+    SOURCES traymanager.h traymanager.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -61,6 +63,7 @@ target_link_libraries(DGestapp
     KF6::CoreAddons
     KF6::ColorScheme
     KF6::IconThemes
+    KF6::StatusNotifierItem
 )
 
 include(GNUInstallDirs)
