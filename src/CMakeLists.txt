@@ -43,6 +43,8 @@ qt_add_qml_module(DGestapp
     QML_FILES contents/ui/pages/NoPage.qml
     QML_FILES contents/ui/pages/ApiStatusHandler.qml
     SOURCES traymanager.h traymanager.cpp
+    SOURCES api/subscriptionapi.h api/subscriptionapi.cpp
+    QML_FILES contents/ui/pages/ExpiredSubscription.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

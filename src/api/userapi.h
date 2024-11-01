@@ -28,9 +28,11 @@ public:
 
     Q_INVOKABLE QString getUserName() const { return m_user.name; }
     Q_INVOKABLE QString getUserEmail() const { return m_user.email; }
+   Q_INVOKABLE void saveToken(const QString &token);
+
 
 private:
-    void saveToken(const QString &token);
+   // void saveToken(const QString &token);
     void saveRememberMe(bool rememberMe);
 
     QSettings m_settings;

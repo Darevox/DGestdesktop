@@ -7,8 +7,12 @@ import "../../components"
 Kirigami.PromptDialog {
     id: profileDialog
     property bool isLoading: false
+    property bool isLoadingPlan: false
     property string userFullName: ""
     property string userEmail: ""
+    property string planName: ""
+    property string planStatus: ""
+    property string planExpiredDate: ""
 
     title: "Profile"
     preferredWidth: Kirigami.Units.gridUnit * 24
@@ -28,16 +32,43 @@ Kirigami.PromptDialog {
     }
 
     FormCard.FormCard {
+        visible:!isLoadingPlan
         FormCard.FormTextDelegate {
-            text: i18n("Current plan : ") + "sss"
-            description: "Expired on : " + "2090"
+            text: i18n("Current plan : ") +  profileDialog.planName
+            description: "Expired on : " + profileDialog.planExpiredDate
+        }
+        FormCard.FormTextDelegate {
+            text: i18n("Plan Status : ") +  profileDialog.planStatus
 
         }
         FormCard.FormButtonDelegate {
             id: upgradeButton
             icon.name: "go-up-symbolic"
             text: i18n("Upgrade plan")
-            onClicked: root.pageStack.layers.push(aboutkde)
+            onClicked: Qt.openUrlExternally("https://dim.dervox.com")
+        }
+    }
+    FormCard.FormCard {
+        visible:isLoadingPlan
+        FormCard.FormSectionText {
+            SkeletonLoaders{
+                height:20
+                width:parent.width
+            }
+
+        }
+        FormCard.FormSectionText {
+            SkeletonLoaders{
+                height:20
+                width:parent.width
+            }
+
+        }
+        FormCard.FormSectionText {
+            SkeletonLoaders{
+                height:20
+                width:parent.width
+            }
         }
     }
     FormCard.FormHeader {
@@ -55,7 +86,7 @@ Kirigami.PromptDialog {
             id: editProfileButton
             icon.name: "user-info-symbolic"
             text: i18n("Edit profile")
-            onClicked: root.pageStack.layers.push(aboutkde)
+            onClicked: Qt.openUrlExternally("https://dim.dervox.com")
         }
 
     }
@@ -83,6 +114,7 @@ Kirigami.PromptDialog {
     }
     function getProfile(){
         api.getUserInfo();
+        subscriptionApi.getStatus();
     }
 
     Connections {
@@ -91,11 +123,22 @@ Kirigami.PromptDialog {
             profileDialog.userFullName= api.getUserName()
             profileDialog.userEmail= api.getUserEmail()
             profileDialog.isLoading=false
+        }
 
+    }
+    Connections {
+        target: subscriptionApi
+        function onStatusReceived() {
+            profileDialog.planName= subscriptionApi.getType()
+            profileDialog.planExpiredDate= subscriptionApi.getExpirationDate()
+            profileDialog.planStatus= subscriptionApi.getStatusString()
+            profileDialog.isLoadingPlan=false
         }
     }
     Component.onCompleted :{
         profileDialog.isLoading=true
+        profileDialog.isLoadingPlan=true
+        isLoadingPlan
         getProfile()
     }
 }

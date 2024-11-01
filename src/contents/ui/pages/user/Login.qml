@@ -128,18 +128,9 @@ Kirigami.Page {
             Layout.fillWidth: true
             QQC2.Label {
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-                text: "Dont't have an account ?"
-            }
-            QQC2.Label {
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-
                 id: linkLabel
-                text: "<a href='#'>Sign Up</a>"
-                textFormat: Text.RichText
-                onLinkActivated: {
-                    applicationWindow().pageStack.pop()
-                    applicationWindow().pageStack.push(Qt.resolvedUrl("qrc:/DGest/contents/ui/pages/user/Signup.qml"))
-                }
+                text: "Dont't have an account  ? <a href=\"https://dim.dervox.com\">Sign Up!<a/>"
+                onLinkActivated: Qt.openUrlExternally(link)
             }
         }
 
@@ -163,7 +154,10 @@ Kirigami.Page {
         }
 
         function onUserInfoReceived() {
-            applicationWindow().pageStack.replace(Qt.resolvedUrl("qrc:/DGest/contents/ui/pages/Welcome.qml"))
+            let token = api.getToken();
+            subscriptionApi.getStatus(token);
+
+            // applicationWindow().pageStack.replace(Qt.resolvedUrl("qrc:/DGest/contents/ui/pages/Welcome.qml"))
         }
 
         function onUserInfoError(message, status, errorMessageDetails) {
@@ -172,6 +166,10 @@ Kirigami.Page {
             if(messagetype==Kirigami.MessageType.Error){
                 loginPage.showNoPage=true
                 noPage.isRequasting=false
+            }
+            else if(messagetype = Kirigami.MessageType.Warning ){
+                api.saveToken("");
+                applicationWindow().pageStack.replace(Qt.resolvedUrl("qrc:/DGest/contents/ui/pages/user/Login.qml"))
             }
             else {
                 updateStatusMessage( message + " " + errorMessageDetails,status)
@@ -200,7 +198,19 @@ Kirigami.Page {
         repeat: false
         onTriggered: checkLoginStatus()
     }
-
+    Connections {
+        target: subscriptionApi
+        function onStatusReceived() {
+            console.log("WWWWWWWWWWW")
+            let statusPlan = subscriptionApi.getStatusString()
+            if(statusPlan !="active"){
+             expiredDialog.active = true
+            }
+            else {
+                applicationWindow().pageStack.replace(Qt.resolvedUrl("qrc:/DGest/contents/ui/pages/Welcome.qml"))
+            }
+        }
+    }
     function checkLoginStatus() {
         if (api.getRememberMe() && api.isLoggedIn()) {
             console.log("checkLoginStatus 1 ")
@@ -212,8 +222,27 @@ Kirigami.Page {
             loginContainer.visible = true;
         }
     }
+    Loader {
+        id: expiredDialog
+        active: false
+        asynchronous: true
+        sourceComponent: ExpiredSubscription {}
 
+        onLoaded: {
+            item.open()
+        }
+
+        Connections {
+            target: expiredDialog.item
+            function onClosed() {
+                api.logout();
+                resetUIState();
+                expiredDialog.active = false
+            }
+        }
+    }
     Component.onCompleted: {
         loginCheckTimer.start();
     }
+
 }

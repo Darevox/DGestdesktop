@@ -7,6 +7,7 @@
 #include <Kirigami/Platform/PlatformTheme>
 #include <KColorSchemeManager>
 #include <api/userapi.h>
+#include <api/subscriptionapi.h>
 #include <QNetworkAccessManager>
 #include <QLoggingCategory>
 #include <KAboutData>
@@ -29,6 +30,7 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     QNetworkAccessManager *networkManager = new QNetworkAccessManager();
     NetworkApi::UserApi *userapi = new NetworkApi::UserApi(networkManager);
+    NetworkApi::SubscriptionApi *subscriptionApi = new NetworkApi::SubscriptionApi(networkManager);
     TrayManager trayManager;
     qmlRegisterSingletonType(
         "org.kde.about",        // <========== used in the import
@@ -39,6 +41,8 @@ int main(int argc, char *argv[])
         );
     // Register the DGestApi instance as a context property
     engine.rootContext()->setContextProperty("api", userapi);
+    engine.rootContext()->setContextProperty("subscriptionApi", subscriptionApi);
+
     engine.rootContext()->setContextProperty("trayManager", &trayManager);
     qmlRegisterType<ColorSchemeManager>("com.dervox.ColorSchemeManager", 1, 0, "ColorSchemeModel");
     qmlRegisterType( QUrl(QStringLiteral("qrc:/DGest/contents/ui/pages/ApiStatusHandler.qml")), "com.dervox.ApiStatusHandler", 1, 0, "ApiStatusHandler" );
