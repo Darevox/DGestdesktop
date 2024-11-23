@@ -4,7 +4,7 @@ ColorSchemeManager::ColorSchemeManager(QObject *parent)
     : QAbstractListModel{parent}, m_activeSchemeIndex{-1}
 {
     m_schemeManager = new KColorSchemeManager(this);
-    QString theme = m_schemeManager->activeSchemeName();
+    QString theme = m_schemeManager->activeSchemeId();
     QModelIndex schemeIndex  = m_schemeManager->indexForScheme(theme);
     if (schemeIndex.isValid()) {
         m_activeSchemeIndex = schemeIndex.row();
