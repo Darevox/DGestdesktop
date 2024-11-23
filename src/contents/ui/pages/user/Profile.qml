@@ -114,7 +114,7 @@ Kirigami.PromptDialog {
     }
     function getProfile(){
         api.getUserInfo();
-        subscriptionApi.getStatus();
+        subscriptionApi.getStatus("");
     }
 
     Connections {

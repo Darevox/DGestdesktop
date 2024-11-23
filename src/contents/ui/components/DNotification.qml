@@ -15,7 +15,7 @@ Item {
         if (Kirigami.Settings.isMobile) {
             return applicationWindow().width - Kirigami.Units.largeSpacing * 4
         } else {
-            return Math.min(Kirigami.Units.gridUnit * 25, applicationWindow().width / 1.5)
+            return Math.min(Kirigami.Units.gridUnit * 25, applicationWindow().width / 2)
         }
     }
 
@@ -37,23 +37,23 @@ Item {
             interval = timeout;
         }
         // Get default icon based on message type if no icon provided
-         let finalIconName = iconName;
-         if (!iconName || iconName === "") {
-             switch (messageType) {
-                 case Kirigami.MessageType.Positive:
-                     finalIconName = "dialog-ok"
-                     break;
-                 case Kirigami.MessageType.Warning:
-                     finalIconName = "dialog-warning"
-                     break;
-                 case Kirigami.MessageType.Error:
-                     finalIconName = "dialog-error"
-                     break;
-                 default:
-                     finalIconName = "documentinfo"
-                     break;
-             }
-         }
+        let finalIconName = iconName;
+        if (!iconName || iconName === "") {
+            switch (messageType) {
+            case Kirigami.MessageType.Positive:
+                finalIconName = "dialog-ok"
+                break;
+            case Kirigami.MessageType.Warning:
+                finalIconName = "dialog-warning"
+                break;
+            case Kirigami.MessageType.Error:
+                finalIconName = "dialog-error"
+                break;
+            default:
+                finalIconName = "documentinfo"
+                break;
+            }
+        }
         const callBackWrapperObj = callBackWrapper.createObject(listView, { callBack })
 
         notificationsModel.append({
@@ -102,7 +102,7 @@ Item {
             right: parent.right
             bottom: parent.bottom
             rightMargin: root.rightMargin
-            bottomMargin: Kirigami.Units.largeSpacing
+            bottomMargin: Kirigami.Units.largeSpacing *10
         }
 
         width: root.maximumNotificationWidth
@@ -207,7 +207,7 @@ Item {
 
             contentItem: RowLayout {
                 id: mainLayout
-                spacing: Kirigami.Units.mediumSpacing
+                spacing: Kirigami.Units.smallSpacing
 
                 TapHandler {
                     acceptedButtons: Qt.LeftButton
@@ -241,10 +241,11 @@ Item {
                     Layout.alignment: Qt.AlignVCenter
                 }
 
-                QQC2.Button {
+                QQC2.ToolButton {
                     id: actionButton
-                    text: model.actionButtonText
-                    visible: text.length > 0
+                    //   text: model.actionButtonText
+                    icon.name:model.actionButtonText
+                    // visible: model.actionButtonText > 0
                     Layout.alignment: Qt.AlignVCenter
                     onClicked: {
                         const callBack = model.callBackWrapper.callBack
@@ -267,7 +268,7 @@ Item {
                 }
                 radius: Kirigami.Units.cornerRadius
                 color: Kirigami.Theme.backgroundColor
-                opacity: 0.9
+                opacity: 1
             }
         }
     }

@@ -4,6 +4,7 @@ project(DGest VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+
 find_package(ECM   REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH})
 
@@ -14,6 +15,7 @@ find_package(KF6  REQUIRED COMPONENTS Kirigami
     ColorScheme
     IconThemes
     StatusNotifierItem
+    Prison
 )
 qt_standard_project_setup()
 qt_policy(SET QTP0001 OLD)
@@ -45,6 +47,19 @@ qt_add_qml_module(DGestapp
     SOURCES traymanager.h traymanager.cpp
     SOURCES api/subscriptionapi.h api/subscriptionapi.cpp
     QML_FILES contents/ui/pages/ExpiredSubscription.qml
+    SOURCES api/productapi.h api/productapi.cpp
+    SOURCES model/productmodel.h model/productmodel.cpp
+    QML_FILES contents/ui/pages/product/Products.qml
+    QML_FILES contents/ui/components/PaginationBar.qml
+    QML_FILES contents/ui/pages/product/ProductDetails.qml
+    SOURCES model/productunitmodel.h model/productunitmodel.cpp
+    QML_FILES contents/ui/components/DFormTextFieldDelegate.qml
+    QML_FILES contents/ui/components/DKTableView.qml
+    QML_FILES
+    QML_FILES contents/ui/pages/product/Barcode.qml
+    QML_FILES
+    SOURCES model/barcodemodel.h model/barcodemodel.cpp
+    QML_FILES contents/ui/pages/product/BarcodePrint.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -66,6 +81,8 @@ target_link_libraries(DGestapp
     KF6::ColorScheme
     KF6::IconThemes
     KF6::StatusNotifierItem
+    KF6::Prison
+
 )
 
 include(GNUInstallDirs)

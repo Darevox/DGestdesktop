@@ -156,7 +156,7 @@ Kirigami.Page {
         function onUserInfoReceived() {
             let token = api.getToken();
             subscriptionApi.getStatus(token);
-
+            productApi.saveToken(token);
             // applicationWindow().pageStack.replace(Qt.resolvedUrl("qrc:/DGest/contents/ui/pages/Welcome.qml"))
         }
 

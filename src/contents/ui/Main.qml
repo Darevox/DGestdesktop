@@ -18,6 +18,8 @@ Kirigami.ApplicationWindow {
     property alias  gaboutDialog: aboutDialog
     property alias  gprofileDialog: profileDialog
     property alias  gColorSchemeModel: colorSchemeModel
+   // property alias  gProductModel: productModel
+
     property alias  gApiStatusHandler: apiStatusHandler
 
     property var currentHeader: null
@@ -287,8 +289,13 @@ Kirigami.ApplicationWindow {
     ColorSchemeModel {
         id: colorSchemeModel
     }
+
+
+    // ProductModel {
+    //     id: productModel
+    // }
     ApiStatusHandler{
-      id:apiStatusHandler
+        id:apiStatusHandler
     }
 
 }

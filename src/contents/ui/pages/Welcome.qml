@@ -11,15 +11,15 @@ Kirigami.ScrollablePage {
     globalToolBarStyle: Kirigami.ApplicationHeaderStyle.ToolBar
     footer:  Kirigami.ApplicationHeaderStyle.None
     actions:[
+
         Kirigami.Action{
             icon.name: "notifications"
             onTriggered:{
                 applicationWindow().gnotification.showNotification("",
-                                                                   "Operation completed successfully", // message
+                                                                   "Operssation completed successfully", // message
                                                                    Kirigami.MessageType.Positive, // message type
-                                                                   "short", // timeout
-                                                                   "Undo", // action text
-                                                                   function() { console.log("Undo clicked") }
+                                                                   "short",
+                                                                   "dialog-close"
                                                                    )
 
             }
@@ -37,6 +37,5 @@ Kirigami.ScrollablePage {
     Component.onCompleted: {
         applicationWindow().loadGlobalDrawer()
         applicationWindow().loadHeader()
-
     }
 }

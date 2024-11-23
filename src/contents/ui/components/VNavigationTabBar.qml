@@ -18,7 +18,7 @@ ListView {
         ListElement {
             name: "Cashier"
             icon: "view-financial-account-cash"
-            pathPage: "qrc:/DGest/contents/ui/pages/Cashier.qml"
+            pathPage: "qrc:/DGest/contents/ui/pages/product/Products.qml"
         }
         ListElement {
             name: "Stock"
