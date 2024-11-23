@@ -100,17 +100,8 @@ Kirigami.PromptDialog {
             text: qsTr("Cancel")
             icon.name: "dialog-cancel"
             onTriggered: {
-                applicationWindow().gnotification.showNotification("",
-                                                                   "Product Added successfully", // message
-                                                                   Kirigami.MessageType.Positive, // message type
-                                                                   "short",
-                                                                   "dialog-close"
-                                                                   )
-               // productDialog.close()
+                productDialog.close()
             }
-
-
-
         }
     ]
     GridLayout{

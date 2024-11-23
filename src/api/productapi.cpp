@@ -333,7 +333,7 @@ Product ProductApi::productFromJson(const QJsonObject &json) const
     product.quantity = json["quantity"].toInt();
     product.productUnitId = json["product_unit_id"].toInt();
     product.sku = json["sku"].toString();
-    product.barcode = json["barcode"].toString();
+    //product.barcode = json["barcode"].toString();
     product.minStockLevel = json["min_stock_level"].toInt();
     product.maxStockLevel = json["max_stock_level"].toInt();
     product.reorderPoint = json["reorder_point"].toInt();
@@ -372,7 +372,7 @@ QJsonObject ProductApi::productToJson(const Product &product) const
     }
 
     json["sku"] = product.sku;
-    json["barcode"] = product.barcode;
+    //json["barcode"] = product.barcode;
     json["min_stock_level"] = product.minStockLevel;
     json["max_stock_level"] = product.maxStockLevel;
     json["reorder_point"] = product.reorderPoint;
@@ -409,7 +409,7 @@ QVariantMap ProductApi::productToVariantMap(const Product &product) const
     map["quantity"] = product.quantity;
     map["productUnitId"] = product.productUnitId;
     map["sku"] = product.sku;
-    map["barcode"] = product.barcode;
+   // map["barcode"] = product.barcode;
     map["minStockLevel"] = product.minStockLevel;
     map["maxStockLevel"] = product.maxStockLevel;
     map["reorderPoint"] = product.reorderPoint;
