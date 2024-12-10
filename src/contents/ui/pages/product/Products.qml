@@ -23,6 +23,43 @@ Kirigami.Page {
     rightPadding: 10
     Kirigami.Theme.colorSet: Kirigami.Theme.View
     Kirigami.Theme.inherit: false
+    Kirigami.PlaceholderMessage {
+        id: emptyStateMessage
+        anchors.centerIn: parent
+        z:99
+        width: parent.width - (Kirigami.Units.largeSpacing * 4)
+        visible: !productModel.loading && productModel.rowCount === 0
+        text: {
+            if (lowStockCheckBox.checked && searchField.text !== "") {
+                icon.name="package"
+                return i18n("There are no low stock products matching '%1'", searchField.text)
+            }
+            if (lowStockCheckBox.checked) {
+                 icon.name="package"
+                return i18n("There are no products with low stock")
+            }
+            if (searchField.text !== "") {
+                 icon.name= "search-symbolic"
+                return i18n("There are no products matching '%1'", searchField.text)
+            }
+            return i18n("There are no products. Please add a new product.")
+        }
+        icon.name: "package"
+
+        helpfulAction: (lowStockCheckBox.checked || searchField.text !== "")
+            ? null
+            : Qt.createQmlObject(`
+                import org.kde.kirigami as Kirigami
+                Kirigami.Action {
+                    icon.name: "list-add"
+                    text: "Add product"
+                    onTriggered: {
+                        productDetailsDialog.productId = 0
+                        productDetailsDialog.active = true
+                    }
+                }
+            `, emptyStateMessage)
+    }
     actions: [
         Kirigami.Action {
             icon.name: "list-add-symbolic"
@@ -81,6 +118,7 @@ Kirigami.Page {
             }
         }
         QQC2.CheckBox {
+            id : lowStockCheckBox
             text: "Show Low Stock Only"
             onCheckedChanged: productModel.filterLowStock(checked)
         }
@@ -90,11 +128,12 @@ Kirigami.Page {
         }
 
     }
+
     QQC2.ScrollView {
         anchors.fill:parent
         contentWidth : view.width
         contentItem:DKTableView {
-
+            visible: productModel.rowCount > 0
             id: view
             enabled: !productModel.loading
             model: productModel

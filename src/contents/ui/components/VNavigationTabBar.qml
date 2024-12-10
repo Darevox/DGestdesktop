@@ -23,7 +23,7 @@ ListView {
         ListElement {
             name: "Stock"
             icon: "package"
-            pathPage: "qrc:/DGest/contents/ui/pages/Stock.qml"
+            pathPage: "qrc:/DGest/contents/ui/pages/product/Products.qml"
         }
         ListElement {
             name: "Sales"

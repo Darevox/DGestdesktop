@@ -22,7 +22,7 @@ class ProductModel : public QAbstractTableModel
     Q_PROPERTY(QString sortDirection READ sortDirection WRITE setSortDirection NOTIFY sortDirectionChanged)
     Q_PROPERTY(QString searchQuery READ searchQuery WRITE setSearchQuery NOTIFY searchQueryChanged)
     Q_PROPERTY(bool hasCheckedItems READ hasCheckedItems NOTIFY hasCheckedItemsChanged)
-
+Q_PROPERTY(int rowCount READ rowCount NOTIFY rowCountChanged)
 public:
     enum ProductRoles {
         IdRole = Qt::UserRole + 1,
@@ -99,7 +99,7 @@ signals:
     void productDeleted();
     void stockUpdated();
     void hasCheckedItemsChanged();
-
+    void rowCountChanged();
 private slots:
     void handleProductsReceived(const PaginatedProducts &products);
     void handleProductError(const QString &message, ApiStatus status);

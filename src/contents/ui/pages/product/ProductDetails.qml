@@ -122,149 +122,6 @@ Kirigami.PromptDialog {
                 label: qsTr("Description")
                 text:  ""
             }
-
-            DFormTextFieldDelegate {
-                id: priceField
-                label: qsTr("Price")
-                text: "0"
-
-                // Property to store clean value as integer
-                property int cleanValue: 0
-
-                // Only allow digits
-                validator: RegularExpressionValidator {
-                    regularExpression: /^\d+$/
-                }
-
-                // Input validation - only allow numbers
-                inputMethodHints: Qt.ImhDigitsOnly
-
-                // onTextChanged: {
-                //     // Store cursor position
-                //     let cursorPosition1 = priceField.cursorPosition
-
-                //     // Remove .00 and any non-digits
-                //     let newValue = text.replace(/\.00$/, '').replace(/\D/g, '')
-
-                //     if (newValue === "") {
-                //         text = "0.00"
-                //         cleanValue = 0
-                //         priceField.cursorPosition = 1
-                //         return
-                //     }
-
-                //     // Update cleanValue as integer
-                //     cleanValue = parseInt(newValue)
-
-                //     // Don't trigger another text change if it already ends with .00
-                //     if (!text.endsWith('.00')) {
-                //         text = newValue + ".00"
-                //         // Set cursor position before .00
-                //         priceField.cursorPosition = newValue.length
-                //     } else {
-                //         // Ensure cursor doesn't go past the dot
-                //         if (cursorPosition1 > newValue.length) {
-                //             priceField.cursorPosition = newValue.length
-                //         }
-                //     }
-                // }
-
-                // // Handle cursor position changes
-                // onCursorPositionChanged: {
-                //     let valueLength = cleanValue.toString().length
-                //     // If cursor is after the dot, move it before the dot
-                //     if (cursorPosition > valueLength) {
-                //         priceField.cursorPosition = valueLength
-                //     }
-                // }
-
-                // // Handle focus changes
-                // onFocusChanged: {
-                //     priceField.cursorPosition = cleanValue.toString().length
-                // }
-
-                // onActiveFocusChanged: {
-                //     if (activeFocus) {
-                //         priceField.cursorPosition = cleanValue.toString().length
-                //     }
-                // }
-
-                // // Function to get value as integer
-                // function getValue() {
-                //     return cleanValue
-                // }
-            }
-            DFormTextFieldDelegate {
-                id: purchase_priceField
-                label: qsTr("Purchase Price")
-                text: "0"
-
-                // Property to store clean value as integer
-                property int cleanValue: 0
-
-                // Only allow digits
-                validator: RegularExpressionValidator {
-                    regularExpression: /^\d+$/
-                }
-
-                // Input validation - only allow numbers
-                inputMethodHints: Qt.ImhDigitsOnly
-
-                // onTextChanged: {
-                //     // Store cursor position
-                //     let cursorPosition1 = purchase_priceField.cursorPosition
-
-                //     // Remove .00 and any non-digits
-                //     let newValue = text.replace(/\.00$/, '').replace(/\D/g, '')
-
-                //     if (newValue === "") {
-                //         text = "0.00"
-                //         cleanValue = 0
-                //         priceField.cursorPosition = 1
-                //         return
-                //     }
-
-                //     // Update cleanValue as integer
-                //     cleanValue = parseInt(newValue)
-
-                //     // Don't trigger another text change if it already ends with .00
-                //     if (!text.endsWith('.00')) {
-                //         text = newValue + ".00"
-                //         // Set cursor position before .00
-                //         purchase_priceField.cursorPosition = newValue.length
-                //     } else {
-                //         // Ensure cursor doesn't go past the dot
-                //         if (cursorPosition1 > newValue.length) {
-                //             purchase_priceField.cursorPosition = newValue.length
-                //         }
-                //     }
-                // }
-
-                // // Handle cursor position changes
-                // onCursorPositionChanged: {
-                //     let valueLength = cleanValue.toString().length
-                //     // If cursor is after the dot, move it before the dot
-                //     if (cursorPosition > valueLength) {
-                //         purchase_priceField.cursorPosition = valueLength
-                //     }
-                // }
-
-                // // Handle focus changes
-                // onFocusChanged: {
-                //     purchase_priceField.cursorPosition = cleanValue.toString().length
-                // }
-
-                // onActiveFocusChanged: {
-                //     if (activeFocus) {
-                //         purchase_priceField.cursorPosition = cleanValue.toString().length
-                //     }
-                // }
-
-                // // Function to get value as integer
-                // function getValue() {
-                //     return cleanValue
-                // }
-            }
             FormCard.FormSpinBoxDelegate {
                 id: quantityField
                 label: qsTr("Quantity")
@@ -273,7 +130,62 @@ Kirigami.PromptDialog {
                 to: 999999
                 stepSize: 1
             }
+            DFormTextFieldDelegate {
+                id: purchase_priceField
+                label: qsTr("Purchase Price")
+                text: "0"
 
+                // Property to store clean value as integer
+                // Only allow digits
+                validator: RegularExpressionValidator {
+                    regularExpression: /^\d+$/
+                }
+
+                // Input validation - only allow numbers
+                inputMethodHints: Qt.ImhDigitsOnly
+            }
+            FormCard.FormTextDelegate {
+                leading: purchase_priceField
+                text: {
+                    var price = Number(priceField.text) || 0           // Selling Price
+                    var purchasePrice = Number(purchase_priceField.text) || 0  // Purchase Price
+                    var profit = price - purchasePrice
+                    return "Selling Price: " + price.toFixed(2)
+                }
+                description: {
+                    var price = Number(priceField.text) || 0           // Selling Price
+                    var purchasePrice = Number(purchase_priceField.text) || 0  // Purchase Price
+                    var profit = price - purchasePrice
+                    return "Profit: " + profit.toFixed(2)
+                }
+            }
+            DFormTextFieldDelegate {
+                id: priceField
+                label: qsTr("Price")
+                text: "0"
+                // Only allow digits
+                validator: RegularExpressionValidator {
+                    regularExpression: /^\d+$/
+                }
+                inputMethodHints: Qt.ImhDigitsOnly
+            }
+
+            FormCard.FormTextDelegate {
+                leading: priceField
+                text: {
+                    return "Profit Margin: "
+                }
+                description: {
+                    var price = Number(priceField.text) || 0
+                    var purchasePrice = Number(purchase_priceField.text) || 0
+
+                    // Avoid division by zero
+                    if (price === 0) return "0 %"
+
+                    var profitMargin = ((price - purchasePrice) / price) * 100
+                    return  profitMargin.toFixed(2) + " %"
+                }
+            }
             FormCard.FormComboBoxDelegate {
                 id: unitCombo
                 text: i18nc("@label:listbox", "Product Unit")
