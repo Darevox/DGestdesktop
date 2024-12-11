@@ -43,7 +43,6 @@ Kirigami.PromptDialog {
             productUnitId: unitVlaue, // unitCombo.unitId ,//unitCombo.currentIndex,
             expiredDate: expiredDateField.value instanceof Date && !isNaN(expiredDateField.value.getTime()) ? expiredDateField.value.toISOString() : null,
             sku: skuField.text,
-            barcode: barcodeField.text,
             minStockLevel: minStockField.value,
             maxStockLevel: maxStockField.value,
             reorderPoint: reorderPointField.value,
@@ -241,18 +240,11 @@ Kirigami.PromptDialog {
                 label: qsTr("SKU")
                 text:  ""
             }
-            FormCard.FormTextFieldDelegate {
-                id: barcodeField
-                label: qsTr("Barcode")
-                text: ""
-            }
             FormCard.FormButtonDelegate{
-                leading:barcodeField
                 text:"Setup Barcode"
                 description:"View & print"
                 icon.name:"view-barcode"
                 onClicked :{
-
                     // barcodeDialogLoader.priceText = priceField.text
                     // barcodeDialogLoader.contentEditText = barcodeField.text
                     barcodeDialogLoader.productId =  productDialog.dialogProductId
@@ -300,7 +292,6 @@ Kirigami.PromptDialog {
         unitCombo.setCurrentIndexById(product.unit.id ||-1);
         expiredDateField.value = new Date(product.expiredDate) || undefined;
         skuField.text = product.sku || "";
-        barcodeField.text = product.barcode  || "";
         minStockField.value = product.minStockLevel || 0;
         maxStockField.value = product.maxStockLevel || 0;
         reorderPointField.value = product.reorderPoint || 0;
@@ -374,7 +365,6 @@ Kirigami.PromptDialog {
         priceField.statusMessage = ""
         purchase_priceField.statusMessage = ""
         skuField.statusMessage = ""
-        barcodeField.statusMessage = ""
         locationField.statusMessage = ""
     }
 
@@ -398,7 +388,6 @@ Kirigami.PromptDialog {
             'price': priceField,
             'purchase_price': purchase_priceField,
             'sku': skuField,
-            'barcode': barcodeField,
             'location': locationField
         }
 
@@ -421,7 +410,6 @@ Kirigami.PromptDialog {
         unitCombo.setCurrentIndexById(-1);
         expiredDateField.value =  undefined;
         skuField.text = "";
-        barcodeField.text = "";
         minStockField.value = 0;
         maxStockField.value = 0;
         reorderPointField.value = 0;

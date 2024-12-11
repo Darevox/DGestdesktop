@@ -6,17 +6,23 @@
 #include <QQuickStyle>
 #include <Kirigami/Platform/PlatformTheme>
 #include <KColorSchemeManager>
-#include <api/userapi.h>
-#include <api/subscriptionapi.h>
 #include <QNetworkAccessManager>
 #include <QLoggingCategory>
 #include <KAboutData>
 #include <colorschememanager.h>
 #include <traymanager.h>
+
+#include <api/userapi.h>
+#include <api/subscriptionapi.h>
 #include <api/productapi.h>
+#include <api/activitylogapi.h>
+
+
 #include <model/productmodel.h>
 #include <model/productunitmodel.h>
 #include <model/barcodemodel.h>
+#include <model/activitylogmodel.h>
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -36,9 +42,14 @@ int main(int argc, char *argv[])
     NetworkApi::UserApi *userapi = new NetworkApi::UserApi(networkManager);
     NetworkApi::SubscriptionApi *subscriptionApi = new NetworkApi::SubscriptionApi(networkManager);
     NetworkApi::ProductApi *productApi = new NetworkApi::ProductApi(networkManager);
+    NetworkApi::ActivityLogApi *activityLogApi = new NetworkApi::ActivityLogApi(networkManager);
+
+
+
     NetworkApi::ProductModel *productModel = new NetworkApi::ProductModel();
     NetworkApi::ProductUnitModel *productUnitModel = new NetworkApi::ProductUnitModel();
     NetworkApi::BarcodeModel *barcodeModel = new NetworkApi::BarcodeModel();
+    NetworkApi::ActivityLogModel *activityLogModel = new NetworkApi::ActivityLogModel();
 
     // TrayManager trayManager;
     qmlRegisterSingletonType(
@@ -52,9 +63,12 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("api", userapi);
     engine.rootContext()->setContextProperty("subscriptionApi", subscriptionApi);
     engine.rootContext()->setContextProperty("productApi", productApi);
+    engine.rootContext()->setContextProperty("activityLogApi", activityLogApi);
+
     engine.rootContext()->setContextProperty("productModel", productModel);
     engine.rootContext()->setContextProperty("productUnitModel", productUnitModel);
     engine.rootContext()->setContextProperty("barcodeModel", barcodeModel);
+    engine.rootContext()->setContextProperty("activityLogModel", activityLogModel);
 
     //   engine.rootContext()->setContextProperty("trayManager", &trayManager);
 
@@ -71,10 +85,15 @@ int main(int argc, char *argv[])
                                                              "ProductUnitRoles",
                                                              QStringLiteral("Cannot create instances of ProductUnitModel"));
     qmlRegisterUncreatableType<NetworkApi::BarcodeModel>("com.dervox.BarcodeModel",
+                                                         1,
+                                                         0,
+                                                         "BarcodeRoles",
+                                                         QStringLiteral("Cannot create instances of BarcodeModel"));
+    qmlRegisterUncreatableType<NetworkApi::ActivityLogModel>("com.dervox.ActivityLogModel",
                                                              1,
                                                              0,
-                                                             "BarcodeRoles",
-                                                             QStringLiteral("Cannot create instances of BarcodeModel"));
+                                                             "ActivityLogRoles",
+                                                             QStringLiteral("Cannot create instances of ActivityLogModel"));
 
     qmlRegisterType( QUrl(QStringLiteral("qrc:/DGest/contents/ui/pages/ApiStatusHandler.qml")), "com.dervox.ApiStatusHandler", 1, 0, "ApiStatusHandler" );
 

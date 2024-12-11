@@ -26,6 +26,11 @@ ListView {
             pathPage: "qrc:/DGest/contents/ui/pages/product/Products.qml"
         }
         ListElement {
+            name: "Activity Log"
+            icon: "view-calendar-list"
+            pathPage: "qrc:/DGest/contents/ui/pages/activitylog/ActivityLog.qml"
+        }
+        ListElement {
             name: "Sales"
             icon: "view-financial-account-savings"
             pathPage: "qrc:/DGest/contents/ui/pages/Sales.qml"

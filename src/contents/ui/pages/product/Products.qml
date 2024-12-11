@@ -35,11 +35,11 @@ Kirigami.Page {
                 return i18n("There are no low stock products matching '%1'", searchField.text)
             }
             if (lowStockCheckBox.checked) {
-                 icon.name="package"
+                icon.name="package"
                 return i18n("There are no products with low stock")
             }
             if (searchField.text !== "") {
-                 icon.name= "search-symbolic"
+                icon.name= "search-symbolic"
                 return i18n("There are no products matching '%1'", searchField.text)
             }
             return i18n("There are no products. Please add a new product.")
@@ -47,18 +47,18 @@ Kirigami.Page {
         icon.name: "package"
 
         helpfulAction: (lowStockCheckBox.checked || searchField.text !== "")
-            ? null
-            : Qt.createQmlObject(`
-                import org.kde.kirigami as Kirigami
-                Kirigami.Action {
-                    icon.name: "list-add"
-                    text: "Add product"
-                    onTriggered: {
-                        productDetailsDialog.productId = 0
-                        productDetailsDialog.active = true
-                    }
-                }
-            `, emptyStateMessage)
+                       ? null
+                       : Qt.createQmlObject(`
+                                            import org.kde.kirigami as Kirigami
+                                            Kirigami.Action {
+                                            icon.name: "list-add"
+                                            text: "Add product"
+                                            onTriggered: {
+                                            productDetailsDialog.productId = 0
+                                            productDetailsDialog.active = true
+                                            }
+                                            }
+                                            `, emptyStateMessage)
     }
     actions: [
         Kirigami.Action {
@@ -128,12 +128,46 @@ Kirigami.Page {
         }
 
     }
+    GridLayout {
+        anchors.fill: parent
+        visible: productModel.loading
+        columns: 8
+        rows: 8
+        columnSpacing: parent.width * 0.01
+        rowSpacing: parent.height * 0.02
 
+        Repeater {
+            model: 8 * 8
+            SkeletonLoaders {
+                // Determine width based on row and column index
+                property int rowIndex: Math.floor(index / 8)
+                property int columnIndex: index % 8
+
+                Layout.preferredWidth:
+                    columnIndex === 1 ? view.width * 0.05 :  // Column 1 small
+                                        columnIndex === 2 ? view.width * 0.09 :  // Column 2 normal
+                                                            columnIndex === 4 ?
+                                                                (rowIndex === 0 ? view.width * 0.11 :
+                                                                                  rowIndex === 1 ? view.width * 0.11 :
+                                                                                                   rowIndex === 2 ? view.width * 0.11 :
+                                                                                                                    rowIndex === 3 ? view.width * 0.11 :
+                                                                                                                                     rowIndex === 4 ? view.width * 0.11 :
+                                                                                                                                                      rowIndex === 5 ? view.width * 0.11 :
+                                                                                                                                                                       rowIndex === 6 ? view.width * 0.11 :
+                                                                                                                                                                                        view.width * 0.11) :
+                                                                (columnIndex === 6 || columnIndex === 7 || columnIndex === 8) ? view.width * 0.10 :
+                                                                                                                                view.width * 0.09  // Default width for other columns
+
+                Layout.preferredHeight: 20
+            }
+        }
+    }
     QQC2.ScrollView {
         anchors.fill:parent
         contentWidth : view.width
+        visible:!productModel.loading&& productModel.rowCount > 0
         contentItem:DKTableView {
-            visible: productModel.rowCount > 0
+
             id: view
             enabled: !productModel.loading
             model: productModel

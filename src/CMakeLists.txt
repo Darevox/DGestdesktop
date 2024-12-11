@@ -60,6 +60,9 @@ qt_add_qml_module(DGestapp
     QML_FILES
     SOURCES model/barcodemodel.h model/barcodemodel.cpp
     QML_FILES contents/ui/pages/product/BarcodePrint.qml
+    SOURCES api/activitylogapi.h api/activitylogapi.cpp
+    SOURCES model/activitylogmodel.h model/activitylogmodel.cpp
+    QML_FILES contents/ui/pages/activitylog/ActivityLog.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
