@@ -63,6 +63,13 @@ qt_add_qml_module(DGestapp
     SOURCES api/activitylogapi.h api/activitylogapi.cpp
     SOURCES model/activitylogmodel.h model/activitylogmodel.cpp
     QML_FILES contents/ui/pages/activitylog/ActivityLog.qml
+    SOURCES api/supplierapi.h api/supplierapi.cpp
+    SOURCES api/cashsourceapi.h api/cashsourceapi.cpp
+    SOURCES api/saleapi.h api/saleapi.cpp
+    SOURCES api/purchaseapi.h api/purchaseapi.cpp
+    SOURCES api/clientapi.h api/clientapi.cpp
+    SOURCES api/invoiceapi.h api/invoiceapi.cpp
+    SOURCES api/cashtransactionapi.h api/cashtransactionapi.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

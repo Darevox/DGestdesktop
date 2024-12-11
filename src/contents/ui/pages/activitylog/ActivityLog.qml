@@ -274,7 +274,7 @@ Kirigami.Page {
         contentWidth: view.width
         visible: !activityLogModel.loading && activityLogModel.rowCount > 0
 
-        DKTableView {
+        Tables.KTableView {
             id: view
             enabled: !activityLogModel.loading
             model: activityLogModel

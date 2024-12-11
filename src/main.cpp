@@ -16,7 +16,13 @@
 #include <api/subscriptionapi.h>
 #include <api/productapi.h>
 #include <api/activitylogapi.h>
-
+#include <api/supplierapi.h>
+#include <api/cashsourceapi.h>
+#include <api/saleapi.h>
+#include <api/purchaseapi.h>
+#include <api/clientapi.h>
+#include <api/invoiceapi.h>
+#include <api/cashtransactionapi.h>
 
 #include <model/productmodel.h>
 #include <model/productunitmodel.h>
@@ -43,8 +49,13 @@ int main(int argc, char *argv[])
     NetworkApi::SubscriptionApi *subscriptionApi = new NetworkApi::SubscriptionApi(networkManager);
     NetworkApi::ProductApi *productApi = new NetworkApi::ProductApi(networkManager);
     NetworkApi::ActivityLogApi *activityLogApi = new NetworkApi::ActivityLogApi(networkManager);
-
-
+    NetworkApi::SupplierApi *supplierApi = new NetworkApi::SupplierApi(networkManager);
+    NetworkApi::CashSourceApi *cashSourceApi = new NetworkApi::CashSourceApi(networkManager);
+    NetworkApi::SaleApi *saleApi = new NetworkApi::SaleApi(networkManager);
+    NetworkApi::PurchaseApi *purchaseApi = new NetworkApi::PurchaseApi(networkManager);
+    NetworkApi::ClientApi *clientApi = new NetworkApi::ClientApi(networkManager);
+    NetworkApi::InvoiceApi *invoiceApi = new NetworkApi::InvoiceApi(networkManager);
+    NetworkApi::CashTransactionApi *cashTransactionApi = new NetworkApi::CashTransactionApi(networkManager);
 
     NetworkApi::ProductModel *productModel = new NetworkApi::ProductModel();
     NetworkApi::ProductUnitModel *productUnitModel = new NetworkApi::ProductUnitModel();
@@ -64,6 +75,13 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("subscriptionApi", subscriptionApi);
     engine.rootContext()->setContextProperty("productApi", productApi);
     engine.rootContext()->setContextProperty("activityLogApi", activityLogApi);
+    engine.rootContext()->setContextProperty("supplierApi", supplierApi);
+    engine.rootContext()->setContextProperty("cashSourceApi", supplierApi);
+    engine.rootContext()->setContextProperty("saleApi", saleApi);
+    engine.rootContext()->setContextProperty("purchaseApi", purchaseApi);
+    engine.rootContext()->setContextProperty("clientApi", clientApi);
+    engine.rootContext()->setContextProperty("invoiceApi", invoiceApi);
+    engine.rootContext()->setContextProperty("cashTransactionApi", cashTransactionApi);
 
     engine.rootContext()->setContextProperty("productModel", productModel);
     engine.rootContext()->setContextProperty("productUnitModel", productUnitModel);
