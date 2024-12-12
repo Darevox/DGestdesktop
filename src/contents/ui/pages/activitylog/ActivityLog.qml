@@ -43,15 +43,18 @@ Kirigami.Page {
         edge: Qt.RightEdge
         modal: true
         handleVisible : false
-        width:  Kirigami.Units.gridUnit * 24
+        width:  Kirigami.Units.gridUnit * 30
 
 
-        contentItem: ColumnLayout {
+        ColumnLayout {
             spacing: Kirigami.Units.largeSpacing
+            Kirigami.Heading{
+                text:"Filtering"
 
+            }
             FormCard.FormCard {
                 Layout.fillWidth: true
-                Layout.preferredWidth: Kirigami.Units.gridUnit * 30
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 24
 
                 FormCard.FormComboBoxDelegate {
                     id: logTypeCombo
@@ -96,7 +99,7 @@ Kirigami.Page {
 
             FormCard.FormCard {
                 Layout.fillWidth: true
-                Layout.preferredWidth: Kirigami.Units.gridUnit * 30
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 24
 
                 FormCard.FormDateTimeDelegate {
                     id: startDateField
@@ -108,13 +111,19 @@ Kirigami.Page {
                             activityLogModel.filterByDateRange(value, endDateField.value)
                         }
                     }
+                    Component.onCompleted : {
+                        let oneMonthAgo = new Date()
+                        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
+                        value = oneMonthAgo
+
+                    }
                 }
 
                 FormCard.FormDateTimeDelegate {
                     id: endDateField
                     dateTimeDisplay: FormCard.FormDateTimeDelegate.DateTimeDisplay.Date
                     text: i18nc("@label:listbox", "End Date")
-                    value: undefined
+                    value:  new Date()
                     onValueChanged: {
                         if (value && startDateField.value) {
                             activityLogModel.filterByDateRange(startDateField.value, value)
@@ -125,7 +134,7 @@ Kirigami.Page {
 
             FormCard.FormCard {
                 Layout.fillWidth: true
-                Layout.preferredWidth: Kirigami.Units.gridUnit * 30
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 24
 
                 FormCard.FormButtonDelegate {
                     text: i18n("Apply Filters")
@@ -143,8 +152,12 @@ Kirigami.Page {
                         logTypeCombo.currentIndex = 0
                         modelTypeCombo.currentIndex = 0
                         userIdentifierField.text = ""
-                        startDateField.value = undefined
-                        endDateField.value = undefined
+                        let oneMonthAgo = new Date()
+                        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
+                        startDateField.value = oneMonthAgo
+
+                        // Set end date to current date/time
+                        endDateField.value = new Date()
                         activityLogModel.clearFilters()
                     }
                 }

@@ -34,7 +34,13 @@ struct Sale {
     QList<SaleItem> items;
     bool checked = false;
 };
-
+struct SalePayment {
+    int cash_source_id;
+    double amount;
+    QString payment_method;
+    QString reference_number;
+    QString notes;
+};
 struct PaginatedSales {
     QList<Sale> data;
     int currentPage;

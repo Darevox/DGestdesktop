@@ -39,16 +39,17 @@ public:
 
     // CRUD operations
     Q_INVOKABLE QFuture<void> getSuppliers(const QString &search = QString(),
-                                          const QString &sortBy = "created_at",
-                                          const QString &sortDirection = "desc",
-                                          int page = 1);
+                                           const QString &sortBy = "created_at",
+                                           const QString &sortDirection = "desc",
+                                           int page = 1);
     Q_INVOKABLE QFuture<void> getSupplier(int id);
     Q_INVOKABLE QFuture<void> createSupplier(const Supplier &supplier);
     Q_INVOKABLE QFuture<void> updateSupplier(int id, const Supplier &supplier);
     Q_INVOKABLE QFuture<void> deleteSupplier(int id);
 
     bool isLoading() const { return m_isLoading; }
-
+    Q_INVOKABLE QString getToken() const;
+    Q_INVOKABLE void saveToken(const QString &token);
 signals:
     // Success signals
     void suppliersReceived(const PaginatedSuppliers &suppliers);
@@ -72,7 +73,7 @@ private:
     QJsonObject supplierToJson(const Supplier &supplier) const;
     PaginatedSuppliers paginatedSuppliersFromJson(const QJsonObject &json) const;
     QVariantMap supplierToVariantMap(const Supplier &supplier) const;
-
+    QSettings m_settings;
     bool m_isLoading = false;
     void setLoading(bool loading) {
         if (m_isLoading != loading) {

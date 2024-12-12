@@ -18,7 +18,7 @@ ListView {
         ListElement {
             name: "Cashier"
             icon: "view-financial-account-cash"
-            pathPage: "qrc:/DGest/contents/ui/pages/product/Products.qml"
+            pathPage: "qrc:/DGest/contents/ui/pages/cashsource/CashSource.qml"
         }
         ListElement {
             name: "Stock"
@@ -48,7 +48,7 @@ ListView {
         ListElement {
             name: "Suppliers"
             icon: "kr_setjumpback"
-            pathPage: "qrc:/DGest/contents/ui/pages/Suppliers.qml"
+            pathPage: "qrc:/DGest/contents/ui/pages/supplier/Supplier.qml"
         }
         ListElement {
             name: "Accounts"

@@ -28,6 +28,11 @@
 #include <model/productunitmodel.h>
 #include <model/barcodemodel.h>
 #include <model/activitylogmodel.h>
+#include <model/salemodel.h>
+#include <model/purchasemodel.h>
+#include <model/clientmodel.h>
+#include <model/suppliermodel.h>
+#include <model/cashsourcemodel.h>
 
 int main(int argc, char *argv[])
 {
@@ -57,10 +62,16 @@ int main(int argc, char *argv[])
     NetworkApi::InvoiceApi *invoiceApi = new NetworkApi::InvoiceApi(networkManager);
     NetworkApi::CashTransactionApi *cashTransactionApi = new NetworkApi::CashTransactionApi(networkManager);
 
+
     NetworkApi::ProductModel *productModel = new NetworkApi::ProductModel();
     NetworkApi::ProductUnitModel *productUnitModel = new NetworkApi::ProductUnitModel();
     NetworkApi::BarcodeModel *barcodeModel = new NetworkApi::BarcodeModel();
     NetworkApi::ActivityLogModel *activityLogModel = new NetworkApi::ActivityLogModel();
+    NetworkApi::SaleModel *saleModel = new NetworkApi::SaleModel();
+    NetworkApi::PurchaseModel *purchaseModel = new NetworkApi::PurchaseModel();
+    NetworkApi::SupplierModel *supplierModel = new NetworkApi::SupplierModel();
+    NetworkApi::CashSourceModel *cashSourceModel = new NetworkApi::CashSourceModel();
+
 
     // TrayManager trayManager;
     qmlRegisterSingletonType(
@@ -76,7 +87,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("productApi", productApi);
     engine.rootContext()->setContextProperty("activityLogApi", activityLogApi);
     engine.rootContext()->setContextProperty("supplierApi", supplierApi);
-    engine.rootContext()->setContextProperty("cashSourceApi", supplierApi);
+    engine.rootContext()->setContextProperty("cashSourceApi", cashSourceApi);
     engine.rootContext()->setContextProperty("saleApi", saleApi);
     engine.rootContext()->setContextProperty("purchaseApi", purchaseApi);
     engine.rootContext()->setContextProperty("clientApi", clientApi);
@@ -87,6 +98,10 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("productUnitModel", productUnitModel);
     engine.rootContext()->setContextProperty("barcodeModel", barcodeModel);
     engine.rootContext()->setContextProperty("activityLogModel", activityLogModel);
+    engine.rootContext()->setContextProperty("saleModel", saleModel);
+    engine.rootContext()->setContextProperty("purchaseModel", purchaseModel);
+    engine.rootContext()->setContextProperty("supplierModel", supplierModel);
+    engine.rootContext()->setContextProperty("cashSourceModel", cashSourceModel);
 
     //   engine.rootContext()->setContextProperty("trayManager", &trayManager);
 
@@ -112,7 +127,26 @@ int main(int argc, char *argv[])
                                                              0,
                                                              "ActivityLogRoles",
                                                              QStringLiteral("Cannot create instances of ActivityLogModel"));
-
+    qmlRegisterUncreatableType<NetworkApi::SaleModel>("com.dervox.SaleModel",
+                                                      1,
+                                                      0,
+                                                      "SaleRoles",
+                                                      QStringLiteral("Cannot create instances of SaleModel"));
+    qmlRegisterUncreatableType<NetworkApi::PurchaseModel>("com.dervox.PurchaseModel",
+                                                          1,
+                                                          0,
+                                                          "PurchaseRoles",
+                                                          QStringLiteral("Cannot create instances of PurchaseModel"));
+    qmlRegisterUncreatableType<NetworkApi::SupplierModel>("com.dervox.SupplierModel",
+                                                          1,
+                                                          0,
+                                                          "SupplierRoles",
+                                                          QStringLiteral("Cannot create instances of SupplierModel"));
+    qmlRegisterUncreatableType<NetworkApi::CashSourceModel>("com.dervox.CashSourceModel",
+                                                          1,
+                                                          0,
+                                                          "CashSourceRoles",
+                                                          QStringLiteral("Cannot create instances of CashSourceModel"));
     qmlRegisterType( QUrl(QStringLiteral("qrc:/DGest/contents/ui/pages/ApiStatusHandler.qml")), "com.dervox.ApiStatusHandler", 1, 0, "ApiStatusHandler" );
 
 

@@ -8,6 +8,7 @@ namespace NetworkApi {
 
 SupplierApi::SupplierApi(QNetworkAccessManager *netManager, QObject *parent)
     : AbstractApi(netManager, parent)
+    , m_settings("Dervox", "DGest")
 {
 }
 
@@ -15,7 +16,7 @@ QFuture<void> SupplierApi::getSuppliers(const QString &search, const QString &so
                                        const QString &sortDirection, int page)
 {
     setLoading(true);
-    QString path = "/api/suppliers";
+    QString path = "/api/v1/suppliers";
 
     QStringList queryParts;
     if (!search.isEmpty())
@@ -52,7 +53,7 @@ QFuture<void> SupplierApi::getSuppliers(const QString &search, const QString &so
 QFuture<void> SupplierApi::getSupplier(int id)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QString("/api/suppliers/%1").arg(id));
+    QNetworkRequest request = createRequest(QString("/api/v1/suppliers/%1").arg(id));
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->get(request);
@@ -73,7 +74,7 @@ QFuture<void> SupplierApi::getSupplier(int id)
 QFuture<void> SupplierApi::createSupplier(const Supplier &supplier)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest("/api/suppliers");
+    QNetworkRequest request = createRequest("/api/v1/suppliers");
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
     QJsonObject jsonData = supplierToJson(supplier);
@@ -97,7 +98,7 @@ QFuture<void> SupplierApi::createSupplier(const Supplier &supplier)
 QFuture<void> SupplierApi::updateSupplier(int id, const Supplier &supplier)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QString("/api/suppliers/%1").arg(id));
+    QNetworkRequest request = createRequest(QString("/api/v1/suppliers/%1").arg(id));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
     QJsonObject jsonData = supplierToJson(supplier);
@@ -121,7 +122,7 @@ QFuture<void> SupplierApi::updateSupplier(int id, const Supplier &supplier)
 QFuture<void> SupplierApi::deleteSupplier(int id)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QString("/api/suppliers/%1").arg(id));
+    QNetworkRequest request = createRequest(QString("/api/v1/suppliers/%1").arg(id));
 
     auto future = makeRequest<std::monostate>([=]() {
         return m_netManager->deleteResource(request);
@@ -199,6 +200,13 @@ QVariantMap SupplierApi::supplierToVariantMap(const Supplier &supplier) const
     map["status"] = supplier.status;
     map["balance"] = supplier.balance;
     return map;
+}
+QString SupplierApi::getToken() const {
+    return m_settings.value("auth/token").toString();
+}
+
+void SupplierApi::saveToken(const QString &token) {
+    m_token = token;
 }
 
 } // namespace NetworkApi

@@ -14,6 +14,9 @@ struct CashSource {
     QString description;
     QString type;
     double balance;
+    double initial_balance;  // Add this field
+    QString account_number;  // Add this field
+    QString bank_name;      // Add this field
     QString status;
     bool is_default;
     bool checked = false;

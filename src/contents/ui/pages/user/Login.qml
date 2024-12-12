@@ -157,7 +157,9 @@ Kirigami.Page {
             let token = api.getToken();
             subscriptionApi.getStatus(token);
             productApi.saveToken(token);
-             activityLogApi.saveToken(token);
+            activityLogApi.saveToken(token);
+            supplierApi.saveToken(token);
+            cashSourceApi.saveToken(token);
             // applicationWindow().pageStack.replace(Qt.resolvedUrl("qrc:/DGest/contents/ui/pages/Welcome.qml"))
         }
 
@@ -205,7 +207,7 @@ Kirigami.Page {
             console.log("WWWWWWWWWWW")
             let statusPlan = subscriptionApi.getStatusString()
             if(statusPlan !="active"){
-             expiredDialog.active = true
+                expiredDialog.active = true
             }
             else {
                 applicationWindow().pageStack.replace(Qt.resolvedUrl("qrc:/DGest/contents/ui/pages/Welcome.qml"))

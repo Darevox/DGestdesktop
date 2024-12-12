@@ -70,6 +70,20 @@ qt_add_qml_module(DGestapp
     SOURCES api/clientapi.h api/clientapi.cpp
     SOURCES api/invoiceapi.h api/invoiceapi.cpp
     SOURCES api/cashtransactionapi.h api/cashtransactionapi.cpp
+    SOURCES model/salemodel.h model/salemodel.cpp
+    SOURCES model/purchasemodel.h model/purchasemodel.cpp
+    SOURCES model/clientmodel.h model/clientmodel.cpp
+    SOURCES model/suppliermodel.h model/suppliermodel.cpp
+    SOURCES model/cashsourcemodel.h model/cashsourcemodel.cpp
+    SOURCES model/cashtransactionmodel.h model/cashtransactionmodel.cpp
+    SOURCES model/invoicemodel.h model/invoicemodel.cpp
+    QML_FILES contents/ui/pages/supplier/Supplier.qml
+    QML_FILES contents/ui/pages/supplier/SupplierDetails.qml
+    QML_FILES contents/ui/pages/cashsource/CashSource.qml
+    QML_FILES contents/ui/pages/cashsource/CashSourceDetails.qml
+    QML_FILES contents/ui/pages/cashsource/TransactionDialog.qml
+    QML_FILES contents/ui/pages/cashsource/TransferDialog.qml
+    QML_FILES contents/ui/components/DKTableViewAbstract.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
