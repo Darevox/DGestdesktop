@@ -33,6 +33,7 @@
 #include <model/clientmodel.h>
 #include <model/suppliermodel.h>
 #include <model/cashsourcemodel.h>
+#include <model/cashtransactionmodel.h>
 
 int main(int argc, char *argv[])
 {
@@ -71,6 +72,7 @@ int main(int argc, char *argv[])
     NetworkApi::PurchaseModel *purchaseModel = new NetworkApi::PurchaseModel();
     NetworkApi::SupplierModel *supplierModel = new NetworkApi::SupplierModel();
     NetworkApi::CashSourceModel *cashSourceModel = new NetworkApi::CashSourceModel();
+    NetworkApi::CashTransactionModel *cashTransactionModel = new NetworkApi::CashTransactionModel();
 
 
     // TrayManager trayManager;
@@ -102,6 +104,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("purchaseModel", purchaseModel);
     engine.rootContext()->setContextProperty("supplierModel", supplierModel);
     engine.rootContext()->setContextProperty("cashSourceModel", cashSourceModel);
+    engine.rootContext()->setContextProperty("cashTransactionModel", cashTransactionModel);
 
     //   engine.rootContext()->setContextProperty("trayManager", &trayManager);
 
@@ -147,6 +150,11 @@ int main(int argc, char *argv[])
                                                           0,
                                                           "CashSourceRoles",
                                                           QStringLiteral("Cannot create instances of CashSourceModel"));
+    qmlRegisterUncreatableType<NetworkApi::CashTransactionModel>("com.dervox.CashTransactionModel",
+                                                          1,
+                                                          0,
+                                                          "CashTransactionRoles",
+                                                          QStringLiteral("Cannot create instances of CashTransactionModel"));
     qmlRegisterType( QUrl(QStringLiteral("qrc:/DGest/contents/ui/pages/ApiStatusHandler.qml")), "com.dervox.ApiStatusHandler", 1, 0, "ApiStatusHandler" );
 
 

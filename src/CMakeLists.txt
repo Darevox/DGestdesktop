@@ -84,6 +84,11 @@ qt_add_qml_module(DGestapp
     QML_FILES contents/ui/pages/cashsource/TransactionDialog.qml
     QML_FILES contents/ui/pages/cashsource/TransferDialog.qml
     QML_FILES contents/ui/components/DKTableViewAbstract.qml
+    QML_FILES contents/ui/pages/cashTransaction/CashTransaction.qml
+    QML_FILES contents/ui/pages/cashTransaction/CashTransactionDetails.qml
+    QML_FILES contents/ui/pages/purchase/Purchase.qml
+    QML_FILES contents/ui/pages/purchase/PurchaseDetails.qml
+    QML_FILES contents/ui/pages/purchase/ProductSelectorDialog.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

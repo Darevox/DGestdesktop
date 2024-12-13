@@ -21,6 +21,11 @@ ListView {
             pathPage: "qrc:/DGest/contents/ui/pages/cashsource/CashSource.qml"
         }
         ListElement {
+            name: "Cash Transaction"
+            icon: "view-financial-account-reopen"
+            pathPage: "qrc:/DGest/contents/ui/pages/cashTransaction/CashTransaction.qml"
+        }
+        ListElement {
             name: "Stock"
             icon: "package"
             pathPage: "qrc:/DGest/contents/ui/pages/product/Products.qml"
@@ -38,7 +43,7 @@ ListView {
         ListElement {
             name: "Purchases"
             icon: "view-financial-account-investment"
-            pathPage: "qrc:/DGest/contents/ui/pages/Purchases.qml"
+            pathPage: "qrc:/DGest/contents/ui/pages/purchase/Purchase.qml"
         }
         ListElement {
             name: "Clients"

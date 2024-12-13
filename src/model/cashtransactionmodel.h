@@ -21,10 +21,10 @@ class CashTransactionModel : public QAbstractTableModel
     Q_PROPERTY(QString sortDirection READ sortDirection WRITE setSortDirection NOTIFY sortDirectionChanged)
     Q_PROPERTY(QString searchQuery READ searchQuery WRITE setSearchQuery NOTIFY searchQueryChanged)
     Q_PROPERTY(QString transactionType READ transactionType WRITE setTransactionType NOTIFY transactionTypeChanged)
-    Q_PROPERTY(QString category READ category WRITE setCategory NOTIFY categoryChanged)
     Q_PROPERTY(int cashSourceId READ cashSourceId WRITE setCashSourceId NOTIFY cashSourceIdChanged)
     Q_PROPERTY(bool hasCheckedItems READ hasCheckedItems NOTIFY hasCheckedItemsChanged)
     Q_PROPERTY(int rowCount READ rowCount NOTIFY rowCountChanged)
+    Q_PROPERTY(QVariantMap summary READ summary NOTIFY summaryChanged)
 
 public:
     enum CashTransactionRoles {
@@ -32,13 +32,13 @@ public:
         ReferenceNumberRole,
         TransactionDateRole,
         CashSourceIdRole,
-        TransactionTypeRole,
+        TypeRole,
         AmountRole,
         CategoryRole,
         PaymentMethodRole,
         DescriptionRole,
         CashSourceRole,
-        RelatedDocumentRole,
+        TransferDestinationRole,
         CheckedRole
     };
     Q_ENUM(CashTransactionRoles)
@@ -64,23 +64,17 @@ public:
     QString sortDirection() const { return m_sortDirection; }
     QString searchQuery() const { return m_searchQuery; }
     QString transactionType() const { return m_transactionType; }
-    QString category() const { return m_category; }
     int cashSourceId() const { return m_cashSourceId; }
     bool hasCheckedItems() const { return m_hasCheckedItems; }
+    QVariantMap summary() const { return m_summary; }
 
     // Q_INVOKABLE methods for QML
     Q_INVOKABLE void refresh();
     Q_INVOKABLE void loadPage(int page);
-    Q_INVOKABLE void createTransaction(const QVariantMap &transactionData);
-    Q_INVOKABLE void updateTransaction(int id, const QVariantMap &transactionData);
-    Q_INVOKABLE void deleteTransaction(int id);
+    Q_INVOKABLE void loadTransactionsBySource(int sourceId, int page = 1);
     Q_INVOKABLE QVariantMap getTransaction(int row) const;
-    Q_INVOKABLE void createTransfer(const QVariantMap &transferData);
-    Q_INVOKABLE void loadCategories();
-    Q_INVOKABLE void getCashFlow(const QString &period = "month", int cashSourceId = 0);
-    Q_INVOKABLE void generateReport(const QDateTime &startDate,
-                                  const QDateTime &endDate,
-                                  int cashSourceId = 0);
+    Q_INVOKABLE void updateSummary(const QDateTime &startDate = QDateTime(),
+                                  const QDateTime &endDate = QDateTime());
 
     // Selection methods
     Q_INVOKABLE void setChecked(int row, bool checked);
@@ -93,7 +87,6 @@ public slots:
     void setSortDirection(const QString &direction);
     void setSearchQuery(const QString &query);
     void setTransactionType(const QString &type);
-    void setCategory(const QString &category);
     void setCashSourceId(int id);
 
 signals:
@@ -106,28 +99,16 @@ signals:
     void sortDirectionChanged();
     void searchQueryChanged();
     void transactionTypeChanged();
-    void categoryChanged();
     void cashSourceIdChanged();
-    void transactionCreated();
-    void transactionUpdated();
-    void transactionDeleted();
-    void transferCreated();
-    void categoriesLoaded(const QVariantList &categories);
-    void cashFlowReceived(const QVariantMap &cashFlow);
-    void reportGenerated(const QString &reportUrl);
     void hasCheckedItemsChanged();
     void rowCountChanged();
+    void summaryChanged();
 
 private slots:
     void handleTransactionsReceived(const PaginatedCashTransactions &transactions);
-    void handleTransactionError(const QString &message, ApiStatus status);
-    void handleTransactionCreated(const CashTransaction &transaction);
-    void handleTransactionUpdated(const CashTransaction &transaction);
-    void handleTransactionDeleted(int id);
-    void handleTransferCreated(const QVariantMap &transfer);
-    void handleCategoriesReceived(const QVariantList &categories);
-    void handleCashFlowReceived(const QVariantMap &cashFlow);
-    void handleReportGenerated(const QString &reportUrl);
+    void handleTransactionsBySourceReceived(const PaginatedCashTransactions &transactions);
+    void handleSummaryReceived(const QVariantMap &summary);
+    void handleApiError(const QString &message, ApiStatus status);
 
 private:
     CashTransactionApi* m_api;
@@ -141,15 +122,12 @@ private:
     QString m_sortDirection;
     QString m_searchQuery;
     QString m_transactionType;
-    QString m_category;
     int m_cashSourceId;
     bool m_hasCheckedItems;
+    QVariantMap m_summary;
 
     void setLoading(bool loading);
     void setErrorMessage(const QString &message);
-    CashTransaction transactionFromVariantMap(const QVariantMap &map) const;
-    QVariantMap transactionToVariantMap(const CashTransaction &transaction) const;
-    TransactionTransfer transferFromVariantMap(const QVariantMap &map) const;
     void updateHasCheckedItems();
 };
 

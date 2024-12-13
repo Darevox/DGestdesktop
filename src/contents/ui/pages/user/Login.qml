@@ -160,6 +160,8 @@ Kirigami.Page {
             activityLogApi.saveToken(token);
             supplierApi.saveToken(token);
             cashSourceApi.saveToken(token);
+            cashTransactionApi.saveToken(token);
+            purchaseApi.saveToken(token);
             // applicationWindow().pageStack.replace(Qt.resolvedUrl("qrc:/DGest/contents/ui/pages/Welcome.qml"))
         }
 
