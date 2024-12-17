@@ -162,6 +162,10 @@ Kirigami.Page {
             cashSourceApi.saveToken(token);
             cashTransactionApi.saveToken(token);
             purchaseApi.saveToken(token);
+            clientApi.saveToken(token);
+            saleApi.saveToken(token);
+            invoiceApi.saveToken(token);
+            dashboardAnalyticsApi.saveToken(token);
             // applicationWindow().pageStack.replace(Qt.resolvedUrl("qrc:/DGest/contents/ui/pages/Welcome.qml"))
         }
 

@@ -151,7 +151,7 @@ Supplier SupplierApi::supplierFromJson(const QJsonObject &json) const
     supplier.tax_number = json["tax_number"].toString();
     supplier.notes = json["notes"].toString();
     supplier.status = json["status"].toString();
-    supplier.balance = json["balance"].toDouble();
+    supplier.balance = json["balance"].toString().toDouble();
     return supplier;
 }
 

@@ -30,9 +30,20 @@ Kirigami.PromptDialog {
         visible: false
     }
 
-    function updateProduct(){
-        let unitVlaue = unitCombo.unitId
-        console.log("unitCombo.unitVlaue  ",unitVlaue )
+
+    function updateProduct() {
+        let packages = [];
+        for (let i = 0; i < packagesModel.count; i++) {
+
+            let pkg = packagesModel.get(i);
+            packages.push({
+                              name: pkg.name,
+                              pieces_per_package: pkg.pieces_per_package,
+                              purchase_price: pkg.purchase_price,
+                              selling_price: pkg.selling_price,
+                              barcode: pkg.barcode
+                          });
+        }
         let updatedProduct = {
             name: nameField.text,
             description: descriptionField.text,
@@ -40,14 +51,18 @@ Kirigami.PromptDialog {
             price: priceField.text,
             purchase_price: purchase_priceField.text,
             quantity: quantityField.value,
-            productUnitId: unitVlaue, // unitCombo.unitId ,//unitCombo.currentIndex,
-            expiredDate: expiredDateField.value instanceof Date && !isNaN(expiredDateField.value.getTime()) ? expiredDateField.value.toISOString() : null,
+            productUnitId: unitCombo.unitId,
+            expiredDate: expiredDateField.value instanceof Date && !isNaN(expiredDateField.value.getTime())
+                         ? expiredDateField.value.toISOString()
+                         : null,
             sku: skuField.text,
             minStockLevel: minStockField.value,
             maxStockLevel: maxStockField.value,
             reorderPoint: reorderPointField.value,
-            location: locationField.text
-        }
+            location: locationField.text,
+            packages: packages
+        };
+            console.log("Final product data:", JSON.stringify(updatedProduct));
         return updatedProduct;
     }
     customFooterActions: [
@@ -280,6 +295,165 @@ Kirigami.PromptDialog {
 
 
         }
+
+        FormCard.FormCard {
+            Layout.fillWidth: true
+
+            Kirigami.Heading {
+                text: i18n("Product Packages")
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: Kirigami.Units.smallSpacing
+
+                QQC2.Button {
+                    text: i18n("Add Package")
+                    icon.name: "list-add"
+                    onClicked: packageDialog.open()
+                }
+
+                ListView {
+                    id: packagesList
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Math.min(contentHeight + 60, 200)
+                    model: ListModel { id: packagesModel }
+                    clip: true
+
+                    delegate: Rectangle {
+                        width: parent.width
+                        height: 50
+                        color: index % 2 === 0 ? Kirigami.Theme.backgroundColor : Kirigami.Theme.alternateBackgroundColor
+
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.margins: Kirigami.Units.smallSpacing
+
+                            QQC2.Label {
+                                text: model.name
+                                Layout.preferredWidth: 150
+                            }
+                            QQC2.Label {
+                                text: i18n("%1 pieces", model.pieces_per_package)
+                                Layout.preferredWidth: 100
+                            }
+                            QQC2.Label {
+                                text: i18n("Purchase: %1", model.purchase_price)
+                                Layout.preferredWidth: 100
+                            }
+                            QQC2.Label {
+                                text: i18n("Selling: %1", model.selling_price)
+                                Layout.preferredWidth: 100
+                            }
+                            Item { Layout.fillWidth: true }
+                            QQC2.ToolButton {
+                                icon.name: "edit-entry"
+                                onClicked: editPackage(index)
+                            }
+                            QQC2.ToolButton {
+                                icon.name: "list-remove"
+                                onClicked: deletePackage(index)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    Kirigami.Dialog {
+        id: packageDialog
+        title: editingPackageIndex >= 0 ? i18n("Edit Package") : i18n("Add Package")
+        standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
+
+        property int editingPackageIndex: -1
+
+        FormCard.FormCard {
+            FormCard.FormTextFieldDelegate {
+                id: packageNameField
+                label: i18n("Package Name")
+                placeholderText: i18n("e.g., Box, Pack")
+            }
+
+            FormCard.FormSpinBoxDelegate {
+                id: packageQuantityField
+                label: i18n("Pieces per Package")
+                from: 1
+                to: 999999
+                value: 1
+            }
+
+            FormCard.FormSpinBoxDelegate {
+                id: packagePurchasePriceField
+                label: i18n("Purchase Price")
+                from: 0
+                to: 999999
+                value: 0
+            }
+
+            FormCard.FormSpinBoxDelegate {
+                id: packageSellingPriceField
+                label: i18n("Selling Price")
+                from: 0
+                to: 999999
+                value: 0
+            }
+
+            FormCard.FormTextFieldDelegate {
+                id: packageBarcodeField
+                label: i18n("Barcode (Optional)")
+            }
+        }
+
+        onAccepted: {
+            if (editingPackageIndex >= 0) {
+                packagesModel.set(editingPackageIndex, {
+                                      name: packageNameField.text,
+                                      pieces_per_package: packageQuantityField.value,
+                                      purchase_price: packagePurchasePriceField.value,
+                                      selling_price: packageSellingPriceField.value,
+                                      barcode: packageBarcodeField.text
+                                  });
+            } else {
+                packagesModel.append({
+                                         name: packageNameField.text,
+                                         pieces_per_package: packageQuantityField.value,
+                                         purchase_price: packagePurchasePriceField.value,
+                                         selling_price: packageSellingPriceField.value,
+                                         barcode: packageBarcodeField.text
+                                     });
+            }
+            clearPackageDialog();
+        }
+
+        onRejected: {
+            clearPackageDialog();
+        }
+    }
+
+    function clearPackageDialog() {
+        packageDialog.editingPackageIndex = -1;
+        packageNameField.text = "";
+        packageQuantityField.value = 1;
+        packagePurchasePriceField.value = 0;
+        packageSellingPriceField.value = 0;
+        packageBarcodeField.text = "";
+    }
+
+    function editPackage(index) {
+        let pkg = packagesModel.get(index);
+        packageDialog.editingPackageIndex = index;
+        packageNameField.text = pkg.name;
+        packageQuantityField.value = pkg.pieces_per_package;
+        packagePurchasePriceField.value = pkg.purchase_price;
+        packageSellingPriceField.value = pkg.selling_price;
+        packageBarcodeField.text = pkg.barcode || "";
+        packageDialog.open();
+    }
+
+    function deletePackage(index) {
+        packagesModel.remove(index);
     }
     function loadData(product){
         nameField.text = product.name  || "";
@@ -296,6 +470,18 @@ Kirigami.PromptDialog {
         maxStockField.value = product.maxStockLevel || 0;
         reorderPointField.value = product.reorderPoint || 0;
         locationField.text = product.location || "";
+        packagesModel.clear();
+        if (product.packages) {
+            product.packages.forEach(pkg => {
+                                         packagesModel.append({
+                                                                  name: pkg.name,
+                                                                  pieces_per_package: pkg.pieces_per_package,
+                                                                  purchase_price: pkg.purchase_price,
+                                                                  selling_price: pkg.selling_price,
+                                                                  barcode: pkg.barcode || ""
+                                                              });
+                                     });
+        }
     }
     Connections {
         target: productApi

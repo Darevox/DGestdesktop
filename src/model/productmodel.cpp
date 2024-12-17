@@ -108,6 +108,20 @@ QVariant ProductModel::data(const QModelIndex &index, int role) const
         case SkuRole: return product.sku;
             // case BarcodeRole: return product.barcode;
         case MinStockLevelRole: return product.minStockLevel;
+        case PackagesRole: {
+            QVariantList packages;
+            for (const auto &package : product.packages) {
+                QVariantMap packageMap;
+                packageMap["id"] = package.id;
+                packageMap["name"] = package.name;
+                packageMap["pieces_per_package"] = package.pieces_per_package;
+                packageMap["purchase_price"] = package.purchase_price;
+                packageMap["selling_price"] = package.selling_price;
+                packageMap["barcode"] = package.barcode;
+                packages.append(packageMap);
+            }
+            return packages;
+        }
             // case MaxStockLevelRole: return product.maxStockLevel;
             // case ReorderPointRole: return product.reorderPoint;
             // case LocationRole: return product.location;
@@ -158,6 +172,7 @@ QHash<int, QByteArray> ProductModel::roleNames() const
     roles[SkuRole] = "sku";
     //roles[BarcodeRole] = "barcode";
     roles[MinStockLevelRole] = "minStockLevel";
+    roles[PackagesRole] = "packages";
     roles[CheckedRole] = "checked";
     // roles[MaxStockLevelRole] = "maxStockLevel";
     // roles[ReorderPointRole] = "reorderPoint";
@@ -307,6 +322,7 @@ void ProductModel::setSearchQuery(const QString &query)
 void ProductModel::handleProductsReceived(const PaginatedProducts& products)
 {
     beginResetModel();
+
     m_products = products.data;
     endResetModel();
 
@@ -433,6 +449,19 @@ Product ProductModel::productFromVariantMap(const QVariantMap &map) const
         product.unit.id = unitMap.value("id", 0).toInt();
         product.unit.name = unitMap.value("name").toString();
     }
+    if (map.contains("packages")) {
+        QVariantList packagesList = map["packages"].toList();
+        for (const QVariant &packageVar : packagesList) {
+            QVariantMap packageMap = packageVar.toMap();
+            ProductPackageProduct package;
+            package.name = packageMap["name"].toString();
+            package.pieces_per_package = packageMap["pieces_per_package"].toInt();
+            package.purchase_price = packageMap["purchase_price"].toDouble();
+            package.selling_price = packageMap["selling_price"].toDouble();
+            package.barcode = packageMap["barcode"].toString();
+            product.packages.append(package);
+        }
+    }
 
     return product;
 }
@@ -461,7 +490,17 @@ QVariantMap ProductModel::productToVariantMap(const Product &product) const
     unitMap["id"] = product.unit.id;
     unitMap["name"] = product.unit.name;
     map["unit"] = unitMap;
-
+    QVariantList packagesList;
+    for (const ProductPackageProduct &package : product.packages) {
+        QVariantMap packageMap;
+        packageMap["name"] = package.name;
+        packageMap["pieces_per_package"] = package.pieces_per_package;
+        packageMap["purchase_price"] = package.purchase_price;
+        packageMap["selling_price"] = package.selling_price;
+        packageMap["barcode"] = package.barcode;
+        packagesList.append(packageMap);
+    }
+    map["packages"] = packagesList;
     return map;
 }
 // Add setData method to support checking

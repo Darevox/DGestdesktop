@@ -9,38 +9,43 @@
 namespace NetworkApi {
 
 struct SaleItem {
-    int id;
-    int product_id;
+    int id = 0;
+    int product_id = 0;
     QString product_name;
-    int quantity;
-    double unit_price;
-    double total_price;
+    int quantity = 0;
+    double unit_price = 0.0;
+    double total_price = 0.0;
+    double tax_rate = 0.0;
+    double tax_amount = 0.0;
+    double discount_amount = 0.0;
     QString notes;
-    QVariantMap product; // Will hold detailed product information
+    QVariantMap product;
+    bool is_package = false;
+       int package_id = 0;
+       int total_pieces = 0;
+       QVariantMap package;
 };
 
 struct Sale {
-    int id;
+    int id = 0;
+    int team_id = 0;
+    int client_id = 0;
+    int cash_source_id = 0;
     QString reference_number;
+    double total_amount = 0.0;
+    double paid_amount = 0.0;
+    double tax_amount = 0.0;
+    double discount_amount = 0.0;
+    QString payment_status = "unpaid";
+    QString status = "pending";
     QDateTime sale_date;
-    int client_id;
-    QVariantMap client;
-    QString status;
-    QString payment_status;
-    double total_amount;
-    double paid_amount;
-    double remaining_amount;
+    QDateTime due_date;
     QString notes;
+    QVariantMap client;
     QList<SaleItem> items;
     bool checked = false;
 };
-struct SalePayment {
-    int cash_source_id;
-    double amount;
-    QString payment_method;
-    QString reference_number;
-    QString notes;
-};
+
 struct PaginatedSales {
     QList<Sale> data;
     int currentPage;
@@ -99,7 +104,7 @@ signals:
     void invoiceGenerated(const QVariantMap &invoice);
     void summaryReceived(const QVariantMap &summary);
 
-    // Error signals for each operation
+    // Error signals
     void errorSalesReceived(const QString &message, ApiStatus status, const QString &details);
     void errorSaleReceived(const QString &message, ApiStatus status, const QString &details);
     void errorSaleCreated(const QString &message, ApiStatus status, const QString &details);
@@ -112,6 +117,7 @@ signals:
     void isLoadingChanged();
 
 private:
+    // Helper methods for JSON conversion
     Sale saleFromJson(const QJsonObject &json) const;
     SaleItem saleItemFromJson(const QJsonObject &json) const;
     QJsonObject saleToJson(const Sale &sale) const;

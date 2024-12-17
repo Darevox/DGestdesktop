@@ -23,6 +23,8 @@
 #include <api/clientapi.h>
 #include <api/invoiceapi.h>
 #include <api/cashtransactionapi.h>
+#include <api/dashboardanalyticsapi.h>
+
 
 #include <model/productmodel.h>
 #include <model/productunitmodel.h>
@@ -34,6 +36,8 @@
 #include <model/suppliermodel.h>
 #include <model/cashsourcemodel.h>
 #include <model/cashtransactionmodel.h>
+#include <model/invoicemodel.h>
+#include <model/dashboardmodel.h>
 
 int main(int argc, char *argv[])
 {
@@ -62,6 +66,7 @@ int main(int argc, char *argv[])
     NetworkApi::ClientApi *clientApi = new NetworkApi::ClientApi(networkManager);
     NetworkApi::InvoiceApi *invoiceApi = new NetworkApi::InvoiceApi(networkManager);
     NetworkApi::CashTransactionApi *cashTransactionApi = new NetworkApi::CashTransactionApi(networkManager);
+    NetworkApi::DashboardAnalyticsApi *dashboardAnalyticsApi = new NetworkApi::DashboardAnalyticsApi(networkManager);
 
 
     NetworkApi::ProductModel *productModel = new NetworkApi::ProductModel();
@@ -73,6 +78,9 @@ int main(int argc, char *argv[])
     NetworkApi::SupplierModel *supplierModel = new NetworkApi::SupplierModel();
     NetworkApi::CashSourceModel *cashSourceModel = new NetworkApi::CashSourceModel();
     NetworkApi::CashTransactionModel *cashTransactionModel = new NetworkApi::CashTransactionModel();
+    NetworkApi::ClientModel *clientModel = new NetworkApi::ClientModel();
+    NetworkApi::InvoiceModel *invoiceModel = new NetworkApi::InvoiceModel();
+    NetworkApi::DashboardModel *dashboardModel = new NetworkApi::DashboardModel();
 
 
     // TrayManager trayManager;
@@ -95,6 +103,8 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("clientApi", clientApi);
     engine.rootContext()->setContextProperty("invoiceApi", invoiceApi);
     engine.rootContext()->setContextProperty("cashTransactionApi", cashTransactionApi);
+    engine.rootContext()->setContextProperty("dashboardAnalyticsApi", dashboardAnalyticsApi);
+
 
     engine.rootContext()->setContextProperty("productModel", productModel);
     engine.rootContext()->setContextProperty("productUnitModel", productUnitModel);
@@ -105,7 +115,9 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("supplierModel", supplierModel);
     engine.rootContext()->setContextProperty("cashSourceModel", cashSourceModel);
     engine.rootContext()->setContextProperty("cashTransactionModel", cashTransactionModel);
-
+    engine.rootContext()->setContextProperty("clientModel", clientModel);
+    engine.rootContext()->setContextProperty("invoiceModel", invoiceModel);
+    engine.rootContext()->setContextProperty("dashboardModel", dashboardModel);
     //   engine.rootContext()->setContextProperty("trayManager", &trayManager);
 
     qmlRegisterType<ColorSchemeManager>("com.dervox.ColorSchemeManager", 1, 0, "ColorSchemeModel");
@@ -146,15 +158,26 @@ int main(int argc, char *argv[])
                                                           "SupplierRoles",
                                                           QStringLiteral("Cannot create instances of SupplierModel"));
     qmlRegisterUncreatableType<NetworkApi::CashSourceModel>("com.dervox.CashSourceModel",
-                                                          1,
-                                                          0,
-                                                          "CashSourceRoles",
-                                                          QStringLiteral("Cannot create instances of CashSourceModel"));
+                                                            1,
+                                                            0,
+                                                            "CashSourceRoles",
+                                                            QStringLiteral("Cannot create instances of CashSourceModel"));
     qmlRegisterUncreatableType<NetworkApi::CashTransactionModel>("com.dervox.CashTransactionModel",
-                                                          1,
-                                                          0,
-                                                          "CashTransactionRoles",
-                                                          QStringLiteral("Cannot create instances of CashTransactionModel"));
+                                                                 1,
+                                                                 0,
+                                                                 "CashTransactionRoles",
+                                                                 QStringLiteral("Cannot create instances of CashTransactionModel"));
+    qmlRegisterUncreatableType<NetworkApi::ClientModel>("com.dervox.ClientModel",
+                                                        1,
+                                                        0,
+                                                        "ClientRoles",
+                                                        QStringLiteral("Cannot create instances of ClientModel"));
+    qmlRegisterUncreatableType<NetworkApi::InvoiceModel>("com.dervox.InvoiceModel",
+                                                         1,
+                                                         0,
+                                                         "InvoiceRoles",
+                                                         QStringLiteral("Cannot create instances of InvoiceModel"));
+
     qmlRegisterType( QUrl(QStringLiteral("qrc:/DGest/contents/ui/pages/ApiStatusHandler.qml")), "com.dervox.ApiStatusHandler", 1, 0, "ApiStatusHandler" );
 
 

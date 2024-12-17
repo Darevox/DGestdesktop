@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(ECM   REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH})
 
-find_package(Qt6 6.4 REQUIRED COMPONENTS Quick QuickControls2 Network )
+find_package(Qt6 6.4 REQUIRED COMPONENTS Quick QuickControls2 Network Pdf Concurrent)
 find_package(KF6  REQUIRED COMPONENTS Kirigami
     I18n
     CoreAddons
@@ -16,6 +16,7 @@ find_package(KF6  REQUIRED COMPONENTS Kirigami
     IconThemes
     StatusNotifierItem
     Prison
+    QuickCharts
 )
 qt_standard_project_setup()
 qt_policy(SET QTP0001 OLD)
@@ -89,6 +90,28 @@ qt_add_qml_module(DGestapp
     QML_FILES contents/ui/pages/purchase/Purchase.qml
     QML_FILES contents/ui/pages/purchase/PurchaseDetails.qml
     QML_FILES contents/ui/pages/purchase/ProductSelectorDialog.qml
+    QML_FILES contents/ui/pages/client/Client.qml
+    QML_FILES contents/ui/pages/client/ClientDetails.qml
+    QML_FILES contents/ui/pages/client/ClientSalesDialog.qml
+    QML_FILES contents/ui/pages/client/ClientPaymentsDialog.qml
+    QML_FILES contents/ui/pages/client/ClientStatisticsDialog.qml
+    QML_FILES contents/ui/pages/sale/Sale.qml
+    QML_FILES contents/ui/pages/sale/SaleDetails.qml
+    QML_FILES contents/ui/pages/sale/ProductSelectorDialog.qml
+    QML_FILES contents/ui/pages/invoice/Invoice.qml
+    QML_FILES contents/ui/pages/invoice/InvoiceDetails.qml
+    QML_FILES contents/ui/pages/invoice/AddPaymentDialog.qml
+    QML_FILES contents/ui/pages/invoice/InvoiceItemDialog.qml
+    QML_FILES contents/ui/pages/invoice/ViewPdfDialog.qml
+    QML_FILES contents/ui/pages/invoice/InvoiceSummaryCard.qml
+    SOURCES api/dashboardanalyticsapi.h api/dashboardanalyticsapi.cpp
+    SOURCES model/dashboardmodel.h model/dashboardmodel.cpp
+    QML_FILES contents/ui/pages/dashboard/LineChartCard.qml
+    QML_FILES contents/ui/pages/dashboard/StatsCard.qml
+    QML_FILES contents/ui/pages/dashboard/TopItemsCard.qml
+    QML_FILES contents/ui/pages/dashboard/DateRangeSelector.qml
+    QML_FILES contents/ui/pages/dashboard/Dashboard.qml
+    QML_FILES contents/ui/pages/dashboard/PieChartCard.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -103,7 +126,7 @@ set_target_properties(DGestapp PROPERTIES
 )
 
 target_link_libraries(DGestapp
-    PRIVATE Qt6::Quick Qt6::QuickControls2 Qt6::Network
+    PRIVATE Qt6::Quick Qt6::QuickControls2 Qt6::Network Qt6::Pdf  Qt6::Concurrent
     KF6::Kirigami
     KF6::I18n
     KF6::CoreAddons
@@ -111,6 +134,7 @@ target_link_libraries(DGestapp
     KF6::IconThemes
     KF6::StatusNotifierItem
     KF6::Prison
+    KF6::QuickCharts
 
 )
 

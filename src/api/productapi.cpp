@@ -270,8 +270,8 @@ QFuture<void> ProductApi::removeProductBarcode(int productId, int barcodeId)
     setLoading(true);
 
     QNetworkRequest request = createRequest(
-        QString("/api/v1/products/%1/barcodes/%2").arg(productId).arg(barcodeId)
-    );
+                QString("/api/v1/products/%1/barcodes/%2").arg(productId).arg(barcodeId)
+                );
     request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<std::monostate>([=]() {
@@ -294,8 +294,8 @@ QFuture<void> ProductApi::getProductBarcodes(int productId)
     setLoading(true);
 
     QNetworkRequest request = createRequest(
-        QString("/api/v1/products/%1/barcodes").arg(productId)
-    );
+                QString("/api/v1/products/%1/barcodes").arg(productId)
+                );
     request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
@@ -342,7 +342,20 @@ Product ProductApi::productFromJson(const QJsonObject &json) const
     if (json.contains("unit")) {
         product.unit = productUnitFromJson(json["unit"].toObject());
     }
-
+    if (json.contains("packages") && json["packages"].isArray()) {
+        QJsonArray packagesArray = json["packages"].toArray();
+        for (const QJsonValue &value : packagesArray) {
+            QJsonObject packageObj = value.toObject();
+            ProductPackageProduct package;
+            package.id = packageObj["id"].toInt();
+            package.name = packageObj["name"].toString();
+            package.pieces_per_package = packageObj["pieces_per_package"].toInt();
+            package.purchase_price = packageObj["purchase_price"].toDouble();
+            package.selling_price = packageObj["selling_price"].toDouble();
+            package.barcode = packageObj["barcode"].toString();
+            product.packages.append(package);
+        }
+    }
     return product;
 }
 
@@ -377,6 +390,26 @@ QJsonObject ProductApi::productToJson(const Product &product) const
     json["max_stock_level"] = product.maxStockLevel;
     json["reorder_point"] = product.reorderPoint;
     json["location"] = product.location;
+    qDebug() << "Converting product to JSON";
+    qDebug() << "Packages count:" << product.packages.size();
+
+    if (!product.packages.isEmpty()) {
+        qDebug() << "Creating packages array";
+        QJsonArray packagesArray;
+        for (const ProductPackageProduct &package : product.packages) {
+            QJsonObject packageObj;
+            packageObj["name"] = package.name;
+            packageObj["pieces_per_package"] = package.pieces_per_package;
+            packageObj["purchase_price"] = package.purchase_price;
+            packageObj["selling_price"] = package.selling_price;
+            packageObj["barcode"] = package.barcode;
+            packagesArray.append(packageObj);
+            qDebug() << "Added package:" << packageObj;
+        }
+        json["packages"] = packagesArray;
+    }
+
+    qDebug() << "Final JSON:" << json;
     return json;
 }
 
@@ -409,7 +442,7 @@ QVariantMap ProductApi::productToVariantMap(const Product &product) const
     map["quantity"] = product.quantity;
     map["productUnitId"] = product.productUnitId;
     map["sku"] = product.sku;
-   // map["barcode"] = product.barcode;
+    // map["barcode"] = product.barcode;
     map["minStockLevel"] = product.minStockLevel;
     map["maxStockLevel"] = product.maxStockLevel;
     map["reorderPoint"] = product.reorderPoint;
@@ -420,7 +453,18 @@ QVariantMap ProductApi::productToVariantMap(const Product &product) const
     unitMap["id"] = product.unit.id;
     unitMap["name"] = product.unit.name;
     map["unit"] = unitMap;
-
+    QVariantList packagesList;
+    for (const ProductPackageProduct &package : product.packages) {
+        QVariantMap packageMap;
+        packageMap["id"] = package.id;           // Make sure to include the ID
+        packageMap["name"] = package.name;
+        packageMap["pieces_per_package"] = package.pieces_per_package;
+        packageMap["purchase_price"] = package.purchase_price;
+        packageMap["selling_price"] = package.selling_price;
+        packageMap["barcode"] = package.barcode;
+        packagesList.append(packageMap);
+    }
+    map["packages"] = packagesList;
     return map;
 }
 QString ProductApi::getToken() const {

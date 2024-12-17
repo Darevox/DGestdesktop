@@ -1,4 +1,3 @@
-// invoicemodel.cpp
 #include "invoicemodel.h"
 
 namespace NetworkApi {
@@ -10,7 +9,7 @@ InvoiceModel::InvoiceModel(QObject *parent)
     , m_totalItems(0)
     , m_currentPage(1)
     , m_totalPages(1)
-    , m_sortField("invoice_date")
+    , m_sortField("issue_date")
     , m_sortDirection("desc")
     , m_hasCheckedItems(false)
 {
@@ -48,7 +47,7 @@ int InvoiceModel::columnCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
-    return 7; // Date, Reference, Client, Status, Payment Status, Total, Paid
+    return 7; // Date, Reference, Invoiceable, Status, Total, Paid, Actions
 }
 
 QVariant InvoiceModel::data(const QModelIndex &index, int role) const
@@ -60,32 +59,29 @@ QVariant InvoiceModel::data(const QModelIndex &index, int role) const
 
     if (role == Qt::DisplayRole || role == Qt::EditRole) {
         switch (index.column()) {
-        case 0: return invoice.invoice_date;
+        case 0: return invoice.issue_date;
         case 1: return invoice.reference_number;
-        case 2: return invoice.client.value("name").toString();
+        case 2: return invoice.invoiceable_type + " #" + QString::number(invoice.invoiceable_id);
         case 3: return invoice.status;
-        case 4: return invoice.payment_status;
-        case 5: return invoice.total_amount;
-        case 6: return invoice.paid_amount;
+        case 4: return invoice.total_amount;
+        case 5: return invoice.getPaidAmount();
+        case 6: return ""; // Actions column
         }
     } else {
         switch (role) {
         case IdRole: return invoice.id;
+        case TeamIdRole: return invoice.team_id;
         case ReferenceNumberRole: return invoice.reference_number;
-        case InvoiceDateRole: return invoice.invoice_date;
-        case DueDateRole: return invoice.due_date;
-        case ClientIdRole: return invoice.client_id;
-        case ClientRole: return invoice.client;
-        case StatusRole: return invoice.status;
-        case PaymentStatusRole: return invoice.payment_status;
-        case SubtotalRole: return invoice.subtotal;
-        case TaxRateRole: return invoice.tax_rate;
-        case TaxAmountRole: return invoice.tax_amount;
+        case InvoiceableTypeRole: return invoice.invoiceable_type;
+        case InvoiceableIdRole: return invoice.invoiceable_id;
         case TotalAmountRole: return invoice.total_amount;
-        case PaidAmountRole: return invoice.paid_amount;
-        case RemainingAmountRole: return invoice.remaining_amount;
+        case TaxAmountRole: return invoice.tax_amount;
+        case DiscountAmountRole: return invoice.discount_amount;
+        case StatusRole: return invoice.status;
+        case IssueDateRole: return invoice.issue_date;
+        case DueDateRole: return invoice.due_date;
         case NotesRole: return invoice.notes;
-        case TermsConditionsRole: return invoice.terms_conditions;
+        case MetaDataRole: return invoice.meta_data;
         case ItemsRole: {
             QVariantList items;
             for (const auto &item : invoice.items) {
@@ -104,21 +100,18 @@ QHash<int, QByteArray> InvoiceModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
     roles[IdRole] = "id";
+    roles[TeamIdRole] = "teamId";
     roles[ReferenceNumberRole] = "referenceNumber";
-    roles[InvoiceDateRole] = "invoiceDate";
-    roles[DueDateRole] = "dueDate";
-    roles[ClientIdRole] = "clientId";
-    roles[ClientRole] = "client";
-    roles[StatusRole] = "status";
-    roles[PaymentStatusRole] = "paymentStatus";
-    roles[SubtotalRole] = "subtotal";
-    roles[TaxRateRole] = "taxRate";
-    roles[TaxAmountRole] = "taxAmount";
+    roles[InvoiceableTypeRole] = "invoiceableType";
+    roles[InvoiceableIdRole] = "invoiceableId";
     roles[TotalAmountRole] = "totalAmount";
-    roles[PaidAmountRole] = "paidAmount";
-    roles[RemainingAmountRole] = "remainingAmount";
+    roles[TaxAmountRole] = "taxAmount";
+    roles[DiscountAmountRole] = "discountAmount";
+    roles[StatusRole] = "status";
+    roles[IssueDateRole] = "issueDate";
+    roles[DueDateRole] = "dueDate";
     roles[NotesRole] = "notes";
-    roles[TermsConditionsRole] = "termsConditions";
+    roles[MetaDataRole] = "metaData";
     roles[ItemsRole] = "items";
     roles[CheckedRole] = "checked";
     return roles;
@@ -133,11 +126,11 @@ QVariant InvoiceModel::headerData(int section, Qt::Orientation orientation, int 
         switch (section) {
         case 0: return tr("Date");
         case 1: return tr("Reference");
-        case 2: return tr("Client");
+        case 2: return tr("Invoiceable");
         case 3: return tr("Status");
-        case 4: return tr("Payment Status");
-        case 5: return tr("Total");
-        case 6: return tr("Paid");
+        case 4: return tr("Total");
+        case 5: return tr("Paid");
+        case 6: return tr("Actions");
         }
     }
     return QVariant();
@@ -162,8 +155,7 @@ void InvoiceModel::refresh()
         return;
 
     setLoading(true);
-    m_api->getInvoices(m_searchQuery, m_sortField, m_sortDirection, m_currentPage,
-                       m_status, m_paymentStatus);
+    m_api->getInvoices(m_searchQuery, m_sortField, m_sortDirection, m_currentPage, m_status, m_paymentStatus);
 }
 
 void InvoiceModel::loadPage(int page)
@@ -209,7 +201,6 @@ QVariantMap InvoiceModel::getInvoice(int row) const
 
     return invoiceToVariantMap(m_invoices.at(row));
 }
-// invoicemodel.cpp (continued)
 
 void InvoiceModel::addPayment(int id, const QVariantMap &paymentData)
 {
@@ -265,7 +256,6 @@ void InvoiceModel::getSummary(const QString &period)
     m_api->getSummary(period);
 }
 
-// Selection methods
 void InvoiceModel::setChecked(int row, bool checked)
 {
     if (row >= 0 && row < m_invoices.count()) {
@@ -317,7 +307,6 @@ void InvoiceModel::toggleAllInvoicesChecked()
     updateHasCheckedItems();
 }
 
-// Slots
 void InvoiceModel::setSortField(const QString &field)
 {
     if (m_sortField != field) {
@@ -383,7 +372,7 @@ void InvoiceModel::handleInvoicesReceived(const PaginatedInvoices &invoices)
     setErrorMessage(QString());
 
     updateHasCheckedItems();
-    emit dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
+    emit rowCountChanged();
 }
 
 void InvoiceModel::handleInvoiceError(const QString &message, ApiStatus status)
@@ -409,7 +398,7 @@ void InvoiceModel::handleInvoiceUpdated(const Invoice &invoice)
         if (m_invoices[i].id == invoice.id) {
             m_invoices[i] = invoice;
             QModelIndex index = createIndex(i, 0);
-            emit dataChanged(index, index);
+            emit dataChanged(index, createIndex(i, columnCount() - 1));
             break;
         }
     }
@@ -462,7 +451,7 @@ void InvoiceModel::handleInvoiceMarkedAsSent(const QVariantMap &invoice)
     setLoading(false);
     setErrorMessage(QString());
     emit invoiceMarkedAsSent();
-    refresh(); // Refresh to update status
+    refresh();
 }
 
 void InvoiceModel::handleInvoiceMarkedAsPaid(const QVariantMap &invoice)
@@ -470,7 +459,7 @@ void InvoiceModel::handleInvoiceMarkedAsPaid(const QVariantMap &invoice)
     setLoading(false);
     setErrorMessage(QString());
     emit invoiceMarkedAsPaid();
-    refresh(); // Refresh to update payment status
+    refresh();
 }
 
 void InvoiceModel::handleSummaryReceived(const QVariantMap &summary)
@@ -501,21 +490,18 @@ Invoice InvoiceModel::invoiceFromVariantMap(const QVariantMap &map) const
 {
     Invoice invoice;
     invoice.id = map["id"].toInt();
+    invoice.team_id = map["teamId"].toInt();
     invoice.reference_number = map["referenceNumber"].toString();
-    invoice.invoice_date = map["invoiceDate"].toDateTime();
-    invoice.due_date = map["dueDate"].toDateTime();
-    invoice.client_id = map["clientId"].toInt();
-    invoice.client = map["client"].toMap();
-    invoice.status = map["status"].toString();
-    invoice.payment_status = map["paymentStatus"].toString();
-    invoice.subtotal = map["subtotal"].toDouble();
-    invoice.tax_rate = map["taxRate"].toDouble();
-    invoice.tax_amount = map["taxAmount"].toDouble();
+    invoice.invoiceable_type = map["invoiceableType"].toString();
+    invoice.invoiceable_id = map["invoiceableId"].toInt();
     invoice.total_amount = map["totalAmount"].toDouble();
-    invoice.paid_amount = map["paidAmount"].toDouble();
-    invoice.remaining_amount = map["remainingAmount"].toDouble();
+    invoice.tax_amount = map["taxAmount"].toDouble();
+    invoice.discount_amount = map["discountAmount"].toDouble();
+    invoice.status = map["status"].toString();
+    invoice.issue_date = map["issueDate"].toDateTime();
+    invoice.due_date = map["dueDate"].toDateTime();
     invoice.notes = map["notes"].toString();
-    invoice.terms_conditions = map["termsConditions"].toString();
+    invoice.meta_data = map["metaData"].toMap();
 
     QVariantList itemsList = map["items"].toList();
     for (const QVariant &itemVar : itemsList) {
@@ -529,21 +515,18 @@ QVariantMap InvoiceModel::invoiceToVariantMap(const Invoice &invoice) const
 {
     QVariantMap map;
     map["id"] = invoice.id;
+    map["teamId"] = invoice.team_id;
     map["referenceNumber"] = invoice.reference_number;
-    map["invoiceDate"] = invoice.invoice_date;
-    map["dueDate"] = invoice.due_date;
-    map["clientId"] = invoice.client_id;
-    map["client"] = invoice.client;
-    map["status"] = invoice.status;
-    map["paymentStatus"] = invoice.payment_status;
-    map["subtotal"] = invoice.subtotal;
-    map["taxRate"] = invoice.tax_rate;
-    map["taxAmount"] = invoice.tax_amount;
+    map["invoiceableType"] = invoice.invoiceable_type;
+    map["invoiceableId"] = invoice.invoiceable_id;
     map["totalAmount"] = invoice.total_amount;
-    map["paidAmount"] = invoice.paid_amount;
-    map["remainingAmount"] = invoice.remaining_amount;
+    map["taxAmount"] = invoice.tax_amount;
+    map["discountAmount"] = invoice.discount_amount;
+    map["status"] = invoice.status;
+    map["issueDate"] = invoice.issue_date;
+    map["dueDate"] = invoice.due_date;
     map["notes"] = invoice.notes;
-    map["termsConditions"] = invoice.terms_conditions;
+    map["metaData"] = invoice.meta_data;
 
     QVariantList itemsList;
     for (const auto &item : invoice.items) {
@@ -606,4 +589,3 @@ void InvoiceModel::updateHasCheckedItems()
 }
 
 } // namespace NetworkApi
-

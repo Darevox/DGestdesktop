@@ -13,7 +13,7 @@ ListView {
         ListElement {
             name: "Dashboard"
             icon: "dashboard-show"
-            pathPage: "qrc:/DGest/contents/ui/pages/Welcome.qml"
+            pathPage: "qrc:/DGest/contents/ui/pages/dashboard/Dashboard.qml"
         }
         ListElement {
             name: "Cashier"
@@ -24,6 +24,11 @@ ListView {
             name: "Cash Transaction"
             icon: "view-financial-account-reopen"
             pathPage: "qrc:/DGest/contents/ui/pages/cashTransaction/CashTransaction.qml"
+        }
+        ListElement {
+            name: "Invoices"
+            icon: "view-financial-account-checking"
+            pathPage: "qrc:/DGest/contents/ui/pages/invoice/Invoice.qml"
         }
         ListElement {
             name: "Stock"
@@ -38,7 +43,7 @@ ListView {
         ListElement {
             name: "Sales"
             icon: "view-financial-account-savings"
-            pathPage: "qrc:/DGest/contents/ui/pages/Sales.qml"
+            pathPage: "qrc:/DGest/contents/ui/pages/sale/Sale.qml"
         }
         ListElement {
             name: "Purchases"
@@ -48,7 +53,7 @@ ListView {
         ListElement {
             name: "Clients"
             icon: "group"
-            pathPage: "qrc:/DGest/contents/ui/pages/Clients.qml"
+            pathPage: "qrc:/DGest/contents/ui/pages/client/Client.qml"
         }
         ListElement {
             name: "Suppliers"

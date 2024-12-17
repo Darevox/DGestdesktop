@@ -7,33 +7,57 @@
 #include <QJsonArray>
 
 namespace NetworkApi {
+struct ProductPackage {
+    int id;
+    QString name;
+    int pieces_per_package;
+    double purchase_price;
+    double selling_price;
+    QString barcode;
+};
 
 struct PurchaseItem {
-    int id;
-    int product_id;
+    int id = 0;
+    int product_id = 0;
     QString product_name;
-    int quantity;
-    double unit_price;
-    double total_price;
+    int quantity = 0;
+    double unit_price = 0.0;
+    double selling_price = 0.0;  // Add this
+    double total_price = 0.0;
+    double tax_rate = 0.0;
+    double tax_amount = 0.0;
+    double discount_amount = 0.0;
     QString notes;
-    QVariantMap product; // Will hold detailed product information
+    QVariantMap product;
+    int package_id;
+    bool update_prices = false;  // Add this
+    bool is_package;
+    ProductPackage package;
+    bool update_package_prices = false;  // Add this
+    double package_purchase_price = 0.0; // Add this
+    double package_selling_price = 0.0;  // Add this
 };
 
 struct Purchase {
-    int id;
+    int id = 0;
+    int team_id = 0;
+    int supplier_id = 0;
+    int cash_source_id = 0;
     QString reference_number;
+    double total_amount = 0.0;
+    double paid_amount = 0.0;
+    double tax_amount = 0.0;
+    double discount_amount = 0.0;
+    QString payment_status = "unpaid";
+    QString status = "pending";
     QDateTime purchase_date;
-    int supplier_id;
-    QVariantMap supplier;
-    QString status;
-    QString payment_status;
-    double total_amount;
-    double paid_amount;
-    double remaining_amount;
+    QDateTime due_date;
     QString notes;
+    QVariantMap supplier;
     QList<PurchaseItem> items;
     bool checked = false;
 };
+
 
 struct PaginatedPurchases {
     QList<Purchase> data;
@@ -60,11 +84,11 @@ public:
 
     // CRUD operations
     Q_INVOKABLE QFuture<void> getPurchases(const QString &search = QString(),
-                                          const QString &sortBy = "purchase_date",
-                                          const QString &sortDirection = "desc",
-                                          int page = 1,
-                                          const QString &status = QString(),
-                                          const QString &paymentStatus = QString());
+                                           const QString &sortBy = "purchase_date",
+                                           const QString &sortDirection = "desc",
+                                           int page = 1,
+                                           const QString &status = QString(),
+                                           const QString &paymentStatus = QString());
 
     Q_INVOKABLE QFuture<void> getPurchase(int id);
     Q_INVOKABLE QFuture<void> createPurchase(const Purchase &purchase);

@@ -82,7 +82,7 @@ QFuture<void> ClientApi::getClients(const QString &search, const QString &sortBy
                                    const QString &status)
 {
     setLoading(true);
-    QString path = "/api/clients";
+    QString path = "/api/v1/clients";
 
     QStringList queryParts;
     if (!search.isEmpty())
@@ -122,7 +122,7 @@ QFuture<void> ClientApi::getClients(const QString &search, const QString &sortBy
 QFuture<void> ClientApi::getClient(int id)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QString("/api/clients/%1").arg(id));
+    QNetworkRequest request = createRequest(QString("/api/v1/clients/%1").arg(id));
     request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
@@ -144,7 +144,7 @@ QFuture<void> ClientApi::getClient(int id)
 QFuture<void> ClientApi::createClient(const Client &client)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest("/api/clients");
+    QNetworkRequest request = createRequest("/api/v1/clients");
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
 
@@ -169,7 +169,7 @@ QFuture<void> ClientApi::createClient(const Client &client)
 QFuture<void> ClientApi::updateClient(int id, const Client &client)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QString("/api/clients/%1").arg(id));
+    QNetworkRequest request = createRequest(QString("/api/v1/clients/%1").arg(id));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
 
@@ -194,7 +194,7 @@ QFuture<void> ClientApi::updateClient(int id, const Client &client)
 QFuture<void> ClientApi::deleteClient(int id)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QString("/api/clients/%1").arg(id));
+    QNetworkRequest request = createRequest(QString("/api/v1/clients/%1").arg(id));
     request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<std::monostate>([=]() {
@@ -215,7 +215,7 @@ QFuture<void> ClientApi::deleteClient(int id)
 QFuture<void> ClientApi::getSales(int id, int page)
 {
     setLoading(true);
-    QString path = QString("/api/clients/%1/sales").arg(id);
+    QString path = QString("/api/v1/clients/%1/sales").arg(id);
     if (page > 0) {
         path += QString("?page=%1").arg(page);
     }
@@ -241,7 +241,7 @@ QFuture<void> ClientApi::getSales(int id, int page)
 QFuture<void> ClientApi::getPayments(int id, int page)
 {
     setLoading(true);
-    QString path = QString("/api/clients/%1/payments").arg(id);
+    QString path = QString("/api/v1/clients/%1/payments").arg(id);
     if (page > 0) {
         path += QString("?page=%1").arg(page);
     }
@@ -267,7 +267,7 @@ QFuture<void> ClientApi::getPayments(int id, int page)
 QFuture<void> ClientApi::getStatistics(int id)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QString("/api/clients/%1/statistics").arg(id));
+    QNetworkRequest request = createRequest(QString("/api/v1/clients/%1/statistics").arg(id));
     request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {

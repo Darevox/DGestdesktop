@@ -78,7 +78,6 @@ QVariant PurchaseModel::data(const QModelIndex &index, int role) const
         case PaymentStatusRole: return purchase.payment_status;
         case TotalAmountRole: return purchase.total_amount;
         case PaidAmountRole: return purchase.paid_amount;
-        case RemainingAmountRole: return purchase.remaining_amount;
         case NotesRole: return purchase.notes;
         case ItemsRole: return QVariant::fromValue(purchase.items);
         case CheckedRole: return purchase.checked;
@@ -99,7 +98,6 @@ QHash<int, QByteArray> PurchaseModel::roleNames() const
     roles[PaymentStatusRole] = "paymentStatus";
     roles[TotalAmountRole] = "totalAmount";
     roles[PaidAmountRole] = "paidAmount";
-    roles[RemainingAmountRole] = "remainingAmount";
     roles[NotesRole] = "notes";
     roles[ItemsRole] = "items";
     roles[CheckedRole] = "checked";
@@ -439,30 +437,55 @@ void PurchaseModel::setErrorMessage(const QString &message)
 Purchase PurchaseModel::purchaseFromVariantMap(const QVariantMap &map) const
 {
     Purchase purchase;
-    purchase.id = map["id"].toInt();
-    purchase.reference_number = map["referenceNumber"].toString();
-    purchase.purchase_date = map["purchaseDate"].toDateTime();
-    purchase.supplier_id = map["supplierId"].toInt();
-    purchase.status = map["status"].toString();
-    purchase.payment_status = map["paymentStatus"].toString();
-    purchase.total_amount = map["totalAmount"].toDouble();
-    purchase.paid_amount = map["paidAmount"].toDouble();
-    purchase.remaining_amount = map["remainingAmount"].toDouble();
-    purchase.notes = map["notes"].toString();
-    purchase.supplier = map["supplier"].toMap();
+    purchase.supplier_id = map["supplier_id"].toInt();
+    purchase.cash_source_id = map["cash_source_id"].toInt();
+    purchase.purchase_date = QDateTime::fromString(map["purchase_date"].toString(), Qt::ISODate);
+
+    if (map.contains("due_date")) {
+        purchase.due_date = QDateTime::fromString(map["due_date"].toString(), Qt::ISODate);
+    }
+
+    if (map.contains("notes")) {
+        purchase.notes = map["notes"].toString();
+    }
 
     QVariantList itemsList = map["items"].toList();
     for (const QVariant &itemVar : itemsList) {
         QVariantMap itemMap = itemVar.toMap();
         PurchaseItem item;
-        item.id = itemMap["id"].toInt();
-        item.product_id = itemMap["productId"].toInt();
-        item.product_name = itemMap["productName"].toString();
+        item.product_id = itemMap["product_id"].toInt();
         item.quantity = itemMap["quantity"].toInt();
-        item.unit_price = itemMap["unitPrice"].toDouble();
-        item.total_price = itemMap["totalPrice"].toDouble();
-        item.notes = itemMap["notes"].toString();
-        item.product = itemMap["product"].toMap();
+        item.unit_price = itemMap["unit_price"].toDouble();
+        item.tax_rate = itemMap["tax_rate"].toDouble();
+        item.update_prices = itemMap["update_prices"].toBool();
+        item.selling_price = itemMap["selling_price"].toDouble();
+
+        // Add package-related fields
+        item.is_package = itemMap["is_package"].toBool();
+        item.package_id = itemMap["package_id"].toInt();
+        item.update_package_prices = itemMap["update_package_prices"].toBool();
+        item.package_purchase_price = itemMap["package_purchase_price"].toDouble();
+        item.package_selling_price = itemMap["package_selling_price"].toDouble();
+
+        if (itemMap.contains("discount_amount")) {
+            item.discount_amount = itemMap["discount_amount"].toDouble();
+        }
+
+        if (itemMap.contains("notes")) {
+            item.notes = itemMap["notes"].toString();
+        }
+
+        // Handle package information if present
+        if (itemMap.contains("package") && !itemMap["package"].isNull()) {
+            QVariantMap packageMap = itemMap["package"].toMap();
+            item.package.id = packageMap["id"].toInt();
+            item.package.name = packageMap["name"].toString();
+            item.package.pieces_per_package = packageMap["pieces_per_package"].toInt();
+            item.package.purchase_price = packageMap["purchase_price"].toDouble();
+            item.package.selling_price = packageMap["selling_price"].toDouble();
+            item.package.barcode = packageMap["barcode"].toString();
+        }
+
         purchase.items.append(item);
     }
 
@@ -475,11 +498,11 @@ QVariantMap PurchaseModel::purchaseToVariantMap(const Purchase &purchase) const
     map["referenceNumber"] = purchase.reference_number;
     map["purchaseDate"] = purchase.purchase_date;
     map["supplierId"] = purchase.supplier_id;
+    map["cash_source_id"] = purchase.cash_source_id;
     map["status"] = purchase.status;
     map["paymentStatus"] = purchase.payment_status;
     map["totalAmount"] = purchase.total_amount;
     map["paidAmount"] = purchase.paid_amount;
-    map["remainingAmount"] = purchase.remaining_amount;
     map["notes"] = purchase.notes;
     map["supplier"] = purchase.supplier;
 
@@ -494,6 +517,26 @@ QVariantMap PurchaseModel::purchaseToVariantMap(const Purchase &purchase) const
         itemMap["totalPrice"] = item.total_price;
         itemMap["notes"] = item.notes;
         itemMap["product"] = item.product;
+
+        // Add package-related fields
+        itemMap["is_package"] = item.is_package;
+        itemMap["package_id"] = item.package_id;
+        itemMap["update_package_prices"] = item.update_package_prices;
+        itemMap["package_purchase_price"] = item.package_purchase_price;
+        itemMap["package_selling_price"] = item.package_selling_price;
+
+        // Include package information if present
+        if (item.is_package) {
+            QVariantMap packageMap;
+            packageMap["id"] = item.package.id;
+            packageMap["name"] = item.package.name;
+            packageMap["pieces_per_package"] = item.package.pieces_per_package;
+            packageMap["purchase_price"] = item.package.purchase_price;
+            packageMap["selling_price"] = item.package.selling_price;
+            packageMap["barcode"] = item.package.barcode;
+            itemMap["package"] = packageMap;
+        }
+
         itemsList.append(itemMap);
     }
     map["items"] = itemsList;

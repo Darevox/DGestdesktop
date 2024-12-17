@@ -22,7 +22,7 @@ class ProductModel : public QAbstractTableModel
     Q_PROPERTY(QString sortDirection READ sortDirection WRITE setSortDirection NOTIFY sortDirectionChanged)
     Q_PROPERTY(QString searchQuery READ searchQuery WRITE setSearchQuery NOTIFY searchQueryChanged)
     Q_PROPERTY(bool hasCheckedItems READ hasCheckedItems NOTIFY hasCheckedItemsChanged)
-Q_PROPERTY(int rowCount READ rowCount NOTIFY rowCountChanged)
+    Q_PROPERTY(int rowCount READ rowCount NOTIFY rowCountChanged)
 public:
     enum ProductRoles {
         IdRole = Qt::UserRole + 1,
@@ -40,6 +40,7 @@ public:
         MaxStockLevelRole,
         ReorderPointRole,
         LocationRole,
+        PackagesRole,
         CheckedRole = Qt::UserRole + 20
     };
     Q_ENUM(ProductRoles)

@@ -11,7 +11,14 @@ struct ProductUnit {
     int id;
     QString name;
 };
-
+struct ProductPackageProduct {
+    int id;
+    QString name;
+    int pieces_per_package;
+    double purchase_price;
+    double selling_price;
+    QString barcode;
+};
 struct Product {
     int id;
     QString reference;
@@ -29,6 +36,7 @@ struct Product {
     double reorderPoint;
     QString location;
     ProductUnit unit;
+    QList<ProductPackageProduct> packages;
     bool checked = false;
 };
 
@@ -102,6 +110,7 @@ private:
     QJsonObject productToJson(const Product &product) const;
     PaginatedProducts paginatedProductsFromJson(const QJsonObject &json) const;
     QVariantMap productToVariantMap(const Product &product) const;
+    Product productFromVariant(const QVariantMap &data) const;
     QSettings m_settings;
 
     bool m_isLoading = false;

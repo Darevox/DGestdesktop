@@ -78,7 +78,6 @@ QVariant SaleModel::data(const QModelIndex &index, int role) const
         case PaymentStatusRole: return sale.payment_status;
         case TotalAmountRole: return sale.total_amount;
         case PaidAmountRole: return sale.paid_amount;
-        case RemainingAmountRole: return sale.remaining_amount;
         case NotesRole: return sale.notes;
         case ItemsRole: return QVariant::fromValue(sale.items);
         case CheckedRole: return sale.checked;
@@ -100,7 +99,6 @@ QHash<int, QByteArray> SaleModel::roleNames() const
     roles[PaymentStatusRole] = "paymentStatus";
     roles[TotalAmountRole] = "totalAmount";
     roles[PaidAmountRole] = "paidAmount";
-    roles[RemainingAmountRole] = "remainingAmount";
     roles[NotesRole] = "notes";
     roles[ItemsRole] = "items";
     roles[CheckedRole] = "checked";
@@ -164,7 +162,8 @@ void SaleModel::createSale(const QVariantMap &saleData)
         return;
 
     setLoading(true);
-    m_api->createSale(saleFromVariantMap(saleData));
+    Sale sale = saleFromVariantMap(saleData);
+    m_api->createSale(sale);
 }
 
 void SaleModel::updateSale(int id, const QVariantMap &saleData)
@@ -173,9 +172,10 @@ void SaleModel::updateSale(int id, const QVariantMap &saleData)
         return;
 
     setLoading(true);
-    m_api->updateSale(id, saleFromVariantMap(saleData));
+    Sale sale = saleFromVariantMap(saleData);
+    sale.id = id;
+    m_api->updateSale(id, sale);
 }
-
 void SaleModel::deleteSale(int id)
 {
     if (!m_api)
@@ -440,32 +440,68 @@ void SaleModel::setErrorMessage(const QString &message)
 Sale SaleModel::saleFromVariantMap(const QVariantMap &map) const
 {
     Sale sale;
-    sale.id = map["id"].toInt();
-    sale.reference_number = map["referenceNumber"].toString();
-    sale.sale_date = map["saleDate"].toDateTime();
-    sale.client_id = map["clientId"].toInt();
-    sale.status = map["status"].toString();
-    sale.payment_status = map["paymentStatus"].toString();
-    sale.total_amount = map["totalAmount"].toDouble();
-    sale.paid_amount = map["paidAmount"].toDouble();
-    sale.remaining_amount = map["remainingAmount"].toDouble();
-    sale.notes = map["notes"].toString();
-    sale.client = map["client"].toMap();
 
-    QVariantList itemsList = map["items"].toList();
-    for (const QVariant &itemVar : itemsList) {
-        QVariantMap itemMap = itemVar.toMap();
-        SaleItem item;
-        item.id = itemMap["id"].toInt();
-        item.product_id = itemMap["productId"].toInt();
-        item.product_name = itemMap["productName"].toString();
-        item.quantity = itemMap["quantity"].toInt();
-        item.unit_price = itemMap["unitPrice"].toDouble();
-        item.total_price = itemMap["totalPrice"].toDouble();
-        item.notes = itemMap["notes"].toString();
-        item.product = itemMap["product"].toMap();
-        sale.items.append(item);
+    // Required fields
+    sale.cash_source_id = map["cash_source_id"].toInt();
+    sale.sale_date = map["sale_date"].toDateTime();
+
+    // Optional fields
+    if (map.contains("client_id") && !map["client_id"].isNull()) {
+        sale.client_id = map["client_id"].toInt();
     }
+
+    if (map.contains("due_date") && !map["due_date"].isNull()) {
+        sale.due_date = map["due_date"].toDateTime();
+    }
+
+    // Items
+    QVariantList itemsList = map["items"].toList();
+      for (const QVariant &itemVar : itemsList) {
+          QVariantMap itemMap = itemVar.toMap();
+          SaleItem item;
+          item.product_id = itemMap["product_id"].toInt();
+          item.quantity = itemMap["quantity"].toInt();
+          item.unit_price = itemMap["unit_price"].toString().toDouble();
+          item.tax_rate = itemMap["tax_rate"].toString().toDouble();
+          item.is_package = itemMap["is_package"].toBool();
+          item.total_pieces = itemMap["total_pieces"].toInt();
+
+          if (item.is_package) {
+              item.package_id = itemMap["package_id"].toInt();
+          }
+
+          // Calculate amounts
+          double subtotal = item.quantity * item.unit_price;
+          item.tax_amount = (subtotal * item.tax_rate) / 100.0;
+          item.total_price = subtotal + item.tax_amount;
+
+          if (itemMap.contains("discount_amount")) {
+              item.discount_amount = itemMap["discount_amount"].toString().toDouble();
+              item.total_price -= item.discount_amount;
+          }
+
+          item.notes = itemMap["notes"].toString();
+          sale.items.append(item);
+      }
+
+    // Additional fields
+    sale.notes = map["notes"].toString();
+    sale.status = map["status"].toString();
+
+    // Calculate totals
+    double subtotal = 0.0;
+    double totalTax = 0.0;
+    double totalDiscount = 0.0;
+
+    for (const SaleItem &item : sale.items) {
+        subtotal += item.quantity * item.unit_price;
+        totalTax += item.tax_amount;
+        totalDiscount += item.discount_amount;
+    }
+
+    sale.total_amount = subtotal + totalTax - totalDiscount;
+    sale.tax_amount = totalTax;
+    sale.discount_amount = totalDiscount;
 
     return sale;
 }
@@ -473,27 +509,52 @@ Sale SaleModel::saleFromVariantMap(const QVariantMap &map) const
 QVariantMap SaleModel::saleToVariantMap(const Sale &sale) const
 {
     QVariantMap map;
-    map["id"] = sale.id;
-    map["referenceNumber"] = sale.reference_number;
-    map["saleDate"] = sale.sale_date;
-    map["clientId"] = sale.client_id;
-    map["status"] = sale.status;
-    map["paymentStatus"] = sale.payment_status;
-    map["totalAmount"] = sale.total_amount;
-    map["paidAmount"] = sale.paid_amount;
-    map["remainingAmount"] = sale.remaining_amount;
-    map["notes"] = sale.notes;
-    map["client"] = sale.client;
 
+    // Basic information
+    map["id"] = sale.id;
+    map["team_id"] = sale.team_id;
+    map["cash_source_id"] = sale.cash_source_id;
+    map["reference_number"] = sale.reference_number;
+
+    // Client information (if exists)
+    if (sale.client_id > 0) {
+        map["client_id"] = sale.client_id;
+        map["client"] = sale.client;
+    }
+
+    // Dates
+    map["sale_date"] = sale.sale_date;
+    if (sale.due_date.isValid()) {
+        map["due_date"] = sale.due_date;
+    }
+
+    // Amounts
+    map["total_amount"] = sale.total_amount;
+    map["paid_amount"] = sale.paid_amount;
+    map["tax_amount"] = sale.tax_amount;
+    map["discount_amount"] = sale.discount_amount;
+    map["remaining_amount"] = sale.total_amount - sale.paid_amount;
+
+    // Status
+    map["status"] = sale.status;
+    map["payment_status"] = sale.payment_status;
+
+    // Notes
+    map["notes"] = sale.notes;
+
+    // Items
     QVariantList itemsList;
     for (const SaleItem &item : sale.items) {
         QVariantMap itemMap;
         itemMap["id"] = item.id;
-        itemMap["productId"] = item.product_id;
-        itemMap["productName"] = item.product_name;
+        itemMap["product_id"] = item.product_id;
+        itemMap["product_name"] = item.product_name;
         itemMap["quantity"] = item.quantity;
-        itemMap["unitPrice"] = item.unit_price;
-        itemMap["totalPrice"] = item.total_price;
+        itemMap["unit_price"] = item.unit_price;
+        itemMap["tax_rate"] = item.tax_rate;
+        itemMap["tax_amount"] = item.tax_amount;
+        itemMap["discount_amount"] = item.discount_amount;
+        itemMap["total_price"] = item.total_price;
         itemMap["notes"] = item.notes;
         itemMap["product"] = item.product;
         itemsList.append(itemMap);

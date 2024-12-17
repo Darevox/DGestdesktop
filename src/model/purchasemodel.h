@@ -36,7 +36,6 @@ public:
         PaymentStatusRole,
         TotalAmountRole,
         PaidAmountRole,
-        RemainingAmountRole,
         NotesRole,
         ItemsRole,
         CheckedRole

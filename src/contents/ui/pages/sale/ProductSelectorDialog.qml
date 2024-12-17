@@ -28,65 +28,65 @@ Kirigami.Dialog {
         }
 
         QQC2.Button {
-            id: addSelect
-            text: i18n("Add Selected")
-            icon.name: "list-add"
-            enabled: productModel.hasCheckedItems
-            property var selectedProducts: []
-            property int pendingRequests: 0
+              id: addSelect
+              text: i18n("Add Selected")
+              icon.name: "list-add"
+              enabled: productModel.hasCheckedItems
+              property var selectedProducts: []
+              property int pendingRequests: 0
 
-            function addSelectedProducts() {
-                console.log("Selected products before emitting:", JSON.stringify(selectedProducts)) // Debug
-                dialog.productsSelected(selectedProducts) // Use the collected products
-                dialog.close()
-            }
+              function addSelectedProducts() {
+                  console.log("Selected products before emitting:", JSON.stringify(selectedProducts))
+                  dialog.productsSelected(selectedProducts)
+                  dialog.close()
+              }
 
-            onClicked: {
-                selectedProducts = [] // Clear previous selections
-                pendingRequests = 0
+              onClicked: {
+                  selectedProducts = []
+                  pendingRequests = 0
 
-                for (let i = 0; i < productModel.rowCount; i++) {
-                    if (productModel.data(productModel.index(i, 0), ProductRoles.CheckedRole)) {
-                        let productId = productModel.data(productModel.index(i, 0), ProductRoles.IdRole)
-                        console.log("Fetching product ID:", productId) // Debug
-                        pendingRequests++
-                        productApi.getProduct(productId)
-                    }
-                }
-                console.log("Initial pending requests:", pendingRequests) // Debug
-            }
+                  for (let i = 0; i < productModel.rowCount; i++) {
+                      if (productModel.data(productModel.index(i, 0), ProductRoles.CheckedRole)) {
+                          let productId = productModel.data(productModel.index(i, 0), ProductRoles.IdRole)
+                          console.log("Fetching product ID:", productId)
+                          pendingRequests++
+                          productApi.getProduct(productId)
+                      }
+                  }
+                  console.log("Initial pending requests:", pendingRequests)
+              }
 
-            Connections {
-                target: productApi
-                function onProductReceived(product) {
-                    console.log("Received product:", JSON.stringify(product)) // Debug
+              Connections {
+                  target: productApi
+                  function onProductReceived(product) {
+                      console.log("Received product:", JSON.stringify(product))
 
-                    addSelect.selectedProducts.push({
-                        id: product.id,
-                        name: product.name,
-                        price: product.price,
-                        purchase_price: product.purchase_price,
-                        quantity: 1,
-                        maxQuantity: product.quantity,
-                        packages: product.packages || []
-                    })
+                      addSelect.selectedProducts.push({
+                          id: product.id,
+                          name: product.name,
+                          price: product.price,
+                          quantity: 1,
+                          maxQuantity: product.quantity,
+                          packages: product.packages || [],
+                          product: product  // Include the full product object
+                      })
 
-                    addSelect.pendingRequests--
-                    console.log("Remaining requests:", addSelect.pendingRequests) // Debug
+                      addSelect.pendingRequests--
+                      console.log("Remaining requests:", addSelect.pendingRequests)
 
-                    if (addSelect.pendingRequests === 0) {
-                        console.log("All products loaded, final array:",
-                                  JSON.stringify(addSelect.selectedProducts)) // Debug
-                        addSelect.addSelectedProducts()
-                    }
-                }
+                      if (addSelect.pendingRequests === 0) {
+                          console.log("All products loaded, final array:",
+                                    JSON.stringify(addSelect.selectedProducts))
+                          addSelect.addSelectedProducts()
+                      }
+                  }
 
-                function onProductError(error) {
-                    console.error("Error fetching product:", error)
-                    addSelect.pendingRequests--
-                }
-            }
-        }
+                  function onProductError(error) {
+                      console.error("Error fetching product:", error)
+                      addSelect.pendingRequests--
+                  }
+              }
+          }
 
     }
 
