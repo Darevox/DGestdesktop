@@ -112,6 +112,7 @@ qt_add_qml_module(DGestapp
     QML_FILES contents/ui/pages/dashboard/DateRangeSelector.qml
     QML_FILES contents/ui/pages/dashboard/Dashboard.qml
     QML_FILES contents/ui/pages/dashboard/PieChartCard.qml
+    QML_FILES contents/ui/components/DStatusBadge.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

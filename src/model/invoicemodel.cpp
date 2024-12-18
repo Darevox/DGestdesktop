@@ -47,7 +47,7 @@ int InvoiceModel::columnCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
-    return 7; // Date, Reference, Invoiceable, Status, Total, Paid, Actions
+    return 6; // Date, Reference, Invoiceable, Status, Total, Paid, Actions
 }
 
 QVariant InvoiceModel::data(const QModelIndex &index, int role) const

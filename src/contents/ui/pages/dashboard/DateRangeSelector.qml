@@ -28,9 +28,9 @@ RowLayout {
             { text: i18n("Past 24h"), period: "24hours" },
             { text: i18n("Week"), period: "weekly" },
             { text: i18n("Month"), period: "monthly" },
-            { text: i18n("Year"), period: "yearly" },
-            { text: i18n("All Time"), period: "all" },
-            { text: i18n("Custom"), period: "custom" }
+            { text: i18n("Year"), period: "yearly" }
+            // { text: i18n("All Time"), period: "all" },
+            // { text: i18n("Custom"), period: "custom" }
         ]
 
         Button {
@@ -42,57 +42,57 @@ RowLayout {
         }
     }
 
-    Rectangle {
-        visible: periodGroup.checkedButton?.period === "custom"
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-        color: Kirigami.Theme.backgroundColor
-        // border.color: Kirigami.Theme.disabledTextColor
-        Kdateandtime.DatePopup{
-            id: startDateFieldPopUp
-        }
-        Kdateandtime.DatePopup {
-            id: endDateFieldPopUp
-        }
+    // Rectangle {
+    //     visible: periodGroup.checkedButton?.period === "custom"
+    //     Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+    //     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+    //     color: Kirigami.Theme.backgroundColor
+    //     // border.color: Kirigami.Theme.disabledTextColor
+    //     Kdateandtime.DatePopup{
+    //         id: startDateFieldPopUp
+    //     }
+    //     Kdateandtime.DatePopup {
+    //         id: endDateFieldPopUp
+    //     }
 
-        RowLayout {
-            anchors.fill: parent
-            anchors.margins: Kirigami.Units.smallSpacing
+    //     RowLayout {
+    //         anchors.fill: parent
+    //         anchors.margins: Kirigami.Units.smallSpacing
 
-            TextField {
-                id: startDateField
-                placeholderText: i18n("Start Date")
-                Layout.fillWidth: true
-                text:  Qt.formatDate(startDateFieldPopUp.value, "yyyy-MM-dd")
-                horizontalAlignment: TextInput.AlignHCenter
-                MouseArea{
-                    anchors.fill:parent
-                    onClicked:startDateFieldPopUp.open()
-                }
-            }
-            Label {
-                text: "–"
-            }
-            TextField {
-                id: endDateField
-                placeholderText: i18n("End Date")
-                Layout.fillWidth: true
-                text:  Qt.formatDate(endDateFieldPopUp.value, "yyyy-MM-dd")
-                horizontalAlignment: TextInput.AlignHCenter
-                MouseArea{
-                    anchors.fill:parent
-                    onClicked:endDateFieldPopUp.open()
-                }
-            }
-            Button{
+    //         TextField {
+    //             id: startDateField
+    //             placeholderText: i18n("Start Date")
+    //             Layout.fillWidth: true
+    //             text:  Qt.formatDate(startDateFieldPopUp.value, "yyyy-MM-dd")
+    //             horizontalAlignment: TextInput.AlignHCenter
+    //             MouseArea{
+    //                 anchors.fill:parent
+    //                 onClicked:startDateFieldPopUp.open()
+    //             }
+    //         }
+    //         Label {
+    //             text: "–"
+    //         }
+    //         TextField {
+    //             id: endDateField
+    //             placeholderText: i18n("End Date")
+    //             Layout.fillWidth: true
+    //             text:  Qt.formatDate(endDateFieldPopUp.value, "yyyy-MM-dd")
+    //             horizontalAlignment: TextInput.AlignHCenter
+    //             MouseArea{
+    //                 anchors.fill:parent
+    //                 onClicked:endDateFieldPopUp.open()
+    //             }
+    //         }
+    //         Button{
 
-                text : "Get Status"
-                onClicked: setPeriod("custom")
+    //             text : "Get Status"
+    //             onClicked: setPeriod("custom")
 
 
-            }
-        }
-    }
+    //         }
+    //     }
+    // }
 
     function setPeriod(period) {
         let start = new Date()
@@ -138,12 +138,12 @@ RowLayout {
             start.setHours(0, 0, 0)
             end.setHours(23, 59, 59)
             break
-        case "custom":
-            start = startDateFieldPopUp.value
-            end = endDateFieldPopUp.value
-            start.setHours(0, 0, 0)
-            end.setHours(23, 59, 59)
-            break
+        // case "custom":
+        //     start = startDateFieldPopUp.value
+        //     end = endDateFieldPopUp.value
+        //     start.setHours(0, 0, 0)
+        //     end.setHours(23, 59, 59)
+        //     break
         }
 
         // Update model timeframe and dates

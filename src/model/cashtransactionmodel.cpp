@@ -14,6 +14,8 @@ CashTransactionModel::CashTransactionModel(QObject *parent)
     , m_sortDirection("desc")
     , m_cashSourceId(0)
     , m_hasCheckedItems(false)
+    , m_minAmount(0)
+    , m_maxAmount(0)
 {
 }
 
@@ -52,7 +54,7 @@ int CashTransactionModel::columnCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
-    return 7; // Date, Reference, Type, Category, Amount, Description
+    return 5; // Date, Reference, Type, Category, Amount, Description
 }
 
 QVariant CashTransactionModel::data(const QModelIndex &index, int role) const
@@ -134,7 +136,8 @@ void CashTransactionModel::refresh()
 
     setLoading(true);
     m_api->getTransactions(m_searchQuery, m_sortField, m_sortDirection,
-                          m_currentPage, m_transactionType, m_cashSourceId);
+                           m_currentPage, m_transactionType, m_cashSourceId,
+                           m_minAmount, m_maxAmount, m_startDate, m_endDate);
 }
 
 void CashTransactionModel::loadPage(int page)
@@ -350,7 +353,49 @@ void CashTransactionModel::setCashSourceId(int id)
         refresh();
     }
 }
+void CashTransactionModel::setMinAmount(double amount)
+{
+    if (m_minAmount != amount) {
+        m_minAmount = amount;
+        emit minAmountChanged();
+        m_currentPage = 1; // Reset to first page when changing filter
+        emit currentPageChanged();
+        refresh();
+    }
+}
 
+void CashTransactionModel::setMaxAmount(double amount)
+{
+    if (m_maxAmount != amount) {
+        m_maxAmount = amount;
+        emit maxAmountChanged();
+        m_currentPage = 1; // Reset to first page when changing filter
+        emit currentPageChanged();
+        refresh();
+    }
+}
+
+void CashTransactionModel::setStartDate(const QDateTime &date)
+{
+    if (m_startDate != date) {
+        m_startDate = date;
+        emit startDateChanged();
+        m_currentPage = 1; // Reset to first page when changing filter
+        emit currentPageChanged();
+        refresh();
+    }
+}
+
+void CashTransactionModel::setEndDate(const QDateTime &date)
+{
+    if (m_endDate != date) {
+        m_endDate = date;
+        emit endDateChanged();
+        m_currentPage = 1; // Reset to first page when changing filter
+        emit currentPageChanged();
+        refresh();
+    }
+}
 void CashTransactionModel::updateHasCheckedItems()
 {
     bool hasChecked = false;

@@ -25,7 +25,10 @@ class CashTransactionModel : public QAbstractTableModel
     Q_PROPERTY(bool hasCheckedItems READ hasCheckedItems NOTIFY hasCheckedItemsChanged)
     Q_PROPERTY(int rowCount READ rowCount NOTIFY rowCountChanged)
     Q_PROPERTY(QVariantMap summary READ summary NOTIFY summaryChanged)
-
+    Q_PROPERTY(double minAmount READ minAmount WRITE setMinAmount NOTIFY minAmountChanged)
+    Q_PROPERTY(double maxAmount READ maxAmount WRITE setMaxAmount NOTIFY maxAmountChanged)
+    Q_PROPERTY(QDateTime startDate READ startDate WRITE setStartDate NOTIFY startDateChanged)
+    Q_PROPERTY(QDateTime endDate READ endDate WRITE setEndDate NOTIFY endDateChanged)
 public:
     enum CashTransactionRoles {
         IdRole = Qt::UserRole + 1,
@@ -74,13 +77,19 @@ public:
     Q_INVOKABLE void loadTransactionsBySource(int sourceId, int page = 1);
     Q_INVOKABLE QVariantMap getTransaction(int row) const;
     Q_INVOKABLE void updateSummary(const QDateTime &startDate = QDateTime(),
-                                  const QDateTime &endDate = QDateTime());
+                                   const QDateTime &endDate = QDateTime());
 
     // Selection methods
     Q_INVOKABLE void setChecked(int row, bool checked);
     Q_INVOKABLE QVariantList getCheckedTransactionIds() const;
     Q_INVOKABLE void clearAllChecked();
     Q_INVOKABLE void toggleAllTransactionsChecked();
+
+
+    double minAmount() const { return m_minAmount; }
+    double maxAmount() const { return m_maxAmount; }
+    QDateTime startDate() const { return m_startDate; }
+    QDateTime endDate() const { return m_endDate; }
 
 public slots:
     void setSortField(const QString &field);
@@ -89,6 +98,10 @@ public slots:
     void setTransactionType(const QString &type);
     void setCashSourceId(int id);
 
+    void setMinAmount(double amount);
+    void setMaxAmount(double amount);
+    void setStartDate(const QDateTime &date);
+    void setEndDate(const QDateTime &date);
 signals:
     void loadingChanged();
     void errorMessageChanged();
@@ -103,6 +116,11 @@ signals:
     void hasCheckedItemsChanged();
     void rowCountChanged();
     void summaryChanged();
+
+    void minAmountChanged();
+    void maxAmountChanged();
+    void startDateChanged();
+    void endDateChanged();
 
 private slots:
     void handleTransactionsReceived(const PaginatedCashTransactions &transactions);
@@ -129,6 +147,11 @@ private:
     void setLoading(bool loading);
     void setErrorMessage(const QString &message);
     void updateHasCheckedItems();
+
+    double m_minAmount;
+    double m_maxAmount;
+    QDateTime m_startDate;
+    QDateTime m_endDate;
 };
 
 } // namespace NetworkApi

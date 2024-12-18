@@ -45,7 +45,7 @@ int CashSourceModel::columnCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
-    return 5; // ID, Name, Type, Balance, Status
+    return 7; // ID, Name, Type, Balance, Status
 }
 
 QVariant CashSourceModel::data(const QModelIndex &index, int role) const
@@ -71,7 +71,7 @@ QVariant CashSourceModel::data(const QModelIndex &index, int role) const
         case DescriptionRole: return source.description;
         case TypeRole: return source.type;
         case BalanceRole: return source.balance;
-        case InitialBalanceRole: return source.initial_balance;
+        case InitialBalanceRole: return  QString::number(source.initial_balance, 'f', 2);
         case AccountNumberRole: return source.account_number;
         case BankNameRole: return source.bank_name;
         case StatusRole: return source.status;
@@ -92,8 +92,8 @@ QHash<int, QByteArray> CashSourceModel::roleNames() const
     roles[TypeRole] = "type";
     roles[BalanceRole] = "balance";
     roles[InitialBalanceRole] = "initialBalance";
-    roles[AccountNumberRole] = "accountNumber";
-    roles[BankNameRole] = "bankName";
+    roles[AccountNumberRole] = "account_number";
+    roles[BankNameRole] = "bank_name";
     roles[StatusRole] = "status";
     roles[IsDefaultRole] = "isDefault";
     roles[CheckedRole] = "checked";
@@ -440,7 +440,7 @@ CashSource CashSourceModel::cashSourceFromVariantMap(const QVariantMap &map) con
     source.description = map["description"].toString();
     source.type = map["type"].toString();
     source.balance = map["balance"].toDouble();
-    source.initial_balance = map["initial_balance"].toDouble();  // Make sure this is handled
+    source.initial_balance = map["initial_balance"].toString().toDouble();  // Make sure this is handled
     source.account_number = map["account_number"].toString();
     source.bank_name = map["bank_name"].toString();
     source.status = map["status"].toString();

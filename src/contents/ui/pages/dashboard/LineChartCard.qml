@@ -22,10 +22,11 @@ Kirigami.AbstractCard {
 
     // Determine if chart should be visible based on timeframe and data
     property bool shouldShowChart: {
-        if (timeframe === "daily") {
-            return false; // Only show trend number for today
-        }
-        return showChart && chartData.length > 0;
+        // if (timeframe === "daily") {
+        //     return false; // Only show trend number for today
+        // }
+        // return showChart && chartData.length > 0;
+        return true;
     }
 
     // Calculate effective period for x-axis

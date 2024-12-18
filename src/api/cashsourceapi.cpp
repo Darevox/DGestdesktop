@@ -117,15 +117,15 @@ QVariantMap CashSourceApi::transactionToVariantMap(const QJsonObject &json) cons
     // Include related cash source if present
     if (json.contains("cash_source")) {
         map["cash_source"] = cashSourceToVariantMap(
-            cashSourceFromJson(json["cash_source"].toObject())
-        );
+                    cashSourceFromJson(json["cash_source"].toObject())
+                    );
     }
 
     // Include destination cash source for transfers
     if (json.contains("transfer_destination")) {
         map["transfer_destination"] = cashSourceToVariantMap(
-            cashSourceFromJson(json["transfer_destination"].toObject())
-        );
+                    cashSourceFromJson(json["transfer_destination"].toObject())
+                    );
     }
 
     return map;
@@ -254,7 +254,7 @@ QFuture<void> CashSourceApi::updateCashSource(int id, const CashSource &source)
             qDebug() << "Message:" << response.error->message;
             qDebug() << "Details:" << response.error->details;
             emit errorCashSourceUpdated(response.error->message, response.error->status,
-                                     QJsonDocument(response.error->details).toJson());
+                                        QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -317,7 +317,7 @@ QFuture<void> CashSourceApi::deposit(int id, double amount, const QString &notes
             qDebug() << "Message:" << response.error->message;
             qDebug() << "Details:" << response.error->details;
             emit errorDeposit(response.error->message, response.error->status,
-                            QJsonDocument(response.error->details).toJson());
+                              QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -360,7 +360,7 @@ QFuture<void> CashSourceApi::withdraw(int id, double amount, const QString &note
             qDebug() << "Message:" << response.error->message;
             qDebug() << "Details:" << response.error->details;
             emit errorWithdrawal(response.error->message, response.error->status,
-                               QJsonDocument(response.error->details).toJson());
+                                 QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -407,7 +407,7 @@ QFuture<void> CashSourceApi::transfer(const TransferData &transferData)
             qDebug() << "Message:" << response.error->message;
             qDebug() << "Details:" << response.error->details;
             emit errorTransfer(response.error->message, response.error->status,
-                             QJsonDocument(response.error->details).toJson());
+                               QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });

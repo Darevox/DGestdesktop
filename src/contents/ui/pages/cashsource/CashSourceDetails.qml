@@ -14,25 +14,29 @@ Kirigami.PromptDialog {
     property int dialogSourceId: 0
     property bool isCreateAnother: false
     property bool isEditing: dialogSourceId > 0
-    header: ColumnLayout {
-        Kirigami.Heading {
-            text: sourceDialog.title
-            level: 1
-        }
+    property bool isTransaction: false
+    // title :  isEditing ?
+    //              qsTr("Editing cash source details") :
+    //              qsTr("Create a new cash source to manage your finances")
+    // header: ColumnLayout {
+    //     Kirigami.Heading {
+    //         text: sourceDialog.title
+    //         level: 1
+    //     }
 
-        QQC2.Label {
-            text: isEditing ?
-                      qsTr("Editing cash source details") :
-                      qsTr("Create a new cash source to manage your finances")
-            wrapMode: Text.WordWrap
-            Layout.fillWidth: true
-            opacity: 0.7
-        }
-    }
+    //     QQC2.Label {
+    //         text: isEditing ?
+    //                   qsTr("Editing cash source details") :
+    //                   qsTr("Create a new cash source to manage your finances")
+    //         wrapMode: Text.WordWrap
+    //         Layout.fillWidth: true
+    //         opacity: 0.7
+    //     }
+    // }
     QQC2.BusyIndicator {
         id: busyIndicator
         anchors.centerIn: parent
-        running: cashSourceModel.loading
+        running: cashSourceApi.isLoading
         visible: running
         z: 999
     }
@@ -43,7 +47,41 @@ Kirigami.PromptDialog {
         showCloseButton: true
         visible: false
     }
+    // Transaction buttons with better visual hierarchy
 
+    footerLeadingComponent : ColumnLayout {
+        visible: isEditing
+        spacing: Kirigami.Units.largeSpacing
+
+        Kirigami.Heading {
+            text: qsTr("Transactions")
+            level: 3
+        }
+
+        RowLayout {
+            spacing: Kirigami.Units.largeSpacing
+
+            QQC2.Button {
+                text: qsTr("Deposit")
+                icon.name: "list-add-money"
+                highlighted: true
+                onClicked: depositDialog.open()
+            }
+
+            QQC2.Button {
+                text: qsTr("Withdraw")
+                icon.name: "list-remove-money"
+                onClicked: withdrawDialog.open()
+            }
+
+            QQC2.Button {
+                text: qsTr("Transfer")
+                icon.name: "transfer"
+                visible: false // TODO: Implement transfer functionality
+                onClicked: transferDialog.open()
+            }
+        }
+    }
     GridLayout {
         columns: 1
         FormCard.FormCard {
@@ -70,6 +108,7 @@ Kirigami.PromptDialog {
                 textRole: "text"
                 valueRole: "value"
                 enabled: !isEditing // Can't change type after creation
+                currentIndex : 0
             }
 
             // Initial Balance (only shown when creating)
@@ -105,7 +144,6 @@ Kirigami.PromptDialog {
                 text: "0.00"
                 readOnly: true
                 visible: isEditing
-
                 // Add a small info icon and tooltip
                 // trailing: Kirigami.Icon {
                 //     source: "help-info"
@@ -152,13 +190,14 @@ Kirigami.PromptDialog {
             FormCard.FormComboBoxDelegate {
                 id: statusField
                 //   label: qsTr("Status")
-                description: qsTr("Set the operational status")
+                text: qsTr("Set the operational status")
                 model: [
                     { text: qsTr("Active"), value: "active" },
                     { text: qsTr("Inactive"), value: "inactive" }
                 ]
                 textRole: "text"
                 valueRole: "value"
+                currentIndex : 0
             }
 
             FormCard.FormSwitchDelegate {
@@ -166,43 +205,11 @@ Kirigami.PromptDialog {
                 text: qsTr("Set as Default")
                 description: qsTr("Make this the default cash source")
                 checked: false
+                visible:false
             }
         }
 
-        // Transaction buttons with better visual hierarchy
-        ColumnLayout {
-            visible: isEditing
-            spacing: Kirigami.Units.largeSpacing
 
-            Kirigami.Heading {
-                text: qsTr("Transactions")
-                level: 3
-            }
-
-            RowLayout {
-                spacing: Kirigami.Units.largeSpacing
-
-                QQC2.Button {
-                    text: qsTr("Deposit")
-                    icon.name: "list-add-money"
-                    highlighted: true
-                    onClicked: depositDialog.open()
-                }
-
-                QQC2.Button {
-                    text: qsTr("Withdraw")
-                    icon.name: "list-remove-money"
-                    onClicked: withdrawDialog.open()
-                }
-
-                QQC2.Button {
-                    text: qsTr("Transfer")
-                    icon.name: "transfer"
-                    visible: false // TODO: Implement transfer functionality
-                    onClicked: transferDialog.open()
-                }
-            }
-        }
     }
 
     TransactionDialog {
@@ -225,7 +232,7 @@ Kirigami.PromptDialog {
         Kirigami.Action {
             text: isEditing ? qsTr("Save Changes") : qsTr("Create Cash Source")
             icon.name: isEditing ? "document-save" : "list-add-symbolic"
-            enabled: !cashSourceModel.loading && nameField.text.trim() !== "" // Basic validation
+            enabled: !cashSourceApi.isLoading && nameField.text.trim() !== "" // Basic validation
             onTriggered: {
                 isCreateAnother = false
                 let sourceData = getSourceData()
@@ -243,7 +250,7 @@ Kirigami.PromptDialog {
             text: qsTr("Create & Add Another")
             icon.name: "list-add-symbolic"
             visible: !isEditing
-            enabled: !cashSourceModel.loading
+            enabled: !cashSourceApi.isLoading
             onTriggered: {
                 isCreateAnother = true
                 let sourceData = getSourceData()
@@ -254,10 +261,10 @@ Kirigami.PromptDialog {
             text: qsTr("Delete")
             icon.name: "edit-delete"
             visible: isEditing
-            enabled: !cashSourceModel.loading
+            enabled: !cashSourceApi.isLoading
             onTriggered: {
-                // Add confirmation dialog
-                // showDeleteConfirmation()
+                deleteDialog.cashSourceToDelete = dialogSourceId
+                deleteDialog.open()
             }
         },
         Kirigami.Action {
@@ -271,10 +278,8 @@ Kirigami.PromptDialog {
         target: cashSourceApi
 
         function onCashSourceReceived(source) {
-            console.log("APPIIIIIIIIII")
             loadData(source)
         }
-
 
         function onCashSourceCreated() {
             if (!isCreateAnother) {
@@ -291,16 +296,20 @@ Kirigami.PromptDialog {
                 inlineMsg.type = Kirigami.MessageType.Positive
                 clearFields()
             }
+            cashSourceModel.refresh()
         }
 
         function onCashSourceUpdated() {
-            applicationWindow().gnotification.showNotification("",
-                                                               "Cash source updated successfully",
-                                                               Kirigami.MessageType.Positive,
-                                                               "short",
-                                                               "dialog-close"
-                                                               )
-            sourceDialog.close()
+            if(!isTransaction){
+                applicationWindow().gnotification.showNotification("",
+                                                                   "Cash source updated successfully",
+                                                                   Kirigami.MessageType.Positive,
+                                                                   "short",
+                                                                   "dialog-close"
+                                                                   )
+                sourceDialog.close()
+            }
+            cashSourceModel.refresh()
         }
 
         function onCashSourceDeleted() {
@@ -311,43 +320,92 @@ Kirigami.PromptDialog {
                                                                "dialog-close"
                                                                )
             sourceDialog.close()
+
         }
 
         function onDepositCompleted() {
-            applicationWindow().gnotification.showNotification("",
-                                                               "Deposit completed successfully",
-                                                               Kirigami.MessageType.Positive,
-                                                               "short",
-                                                               "dialog-close"
-                                                               )
+            isTransaction=true
+            inlineMsg.text= "Deposit completed successfully"
+            inlineMsg.visible=true
+            inlineMsg.type= Kirigami.MessageType.Positive
             depositDialog.close()
-            let source = cashSourceModel.getCashSource(dialogSourceId)
-            if (source) {
-                loadData(source)
-            }
+            cashSourceApi.getCashSource(dialogSourceId)
+            // let source = cashSourceModel.getCashSource(dialogSourceId)
+            // if (source) {
+            //     loadData(source)
+            // }
+            cashSourceModel.refresh()
         }
 
         function onWithdrawalCompleted() {
-            applicationWindow().gnotification.showNotification("",
-                                                               "Withdrawal completed successfully",
-                                                               Kirigami.MessageType.Positive,
-                                                               "short",
-                                                               "dialog-close"
-                                                               )
+            isTransaction=true
             withdrawDialog.close()
-            let source = cashSourceModel.getCashSource(dialogSourceId)
-            if (source) {
-                loadData(source)
-            }
+            inlineMsg.text= "Withdrawal completed successfully"
+            inlineMsg.visible=true
+            inlineMsg.type= Kirigami.MessageType.Positive
+            cashSourceApi.getCashSource(dialogSourceId)
+            // let source = cashSourceModel.getCashSource(dialogSourceId)
+            // if (source) {
+            //     loadData(source)
+            // }
+            cashSourceModel.refresh()
         }
 
-        function onErrorMessageChanged() {
-            if (cashSourceModel.errorMessage) {
-                inlineMsg.text = cashSourceModel.errorMessage
-                inlineMsg.visible = true
-                inlineMsg.type = Kirigami.MessageType.Error
+        function onErrorCashSourceReceived(message, status, details){
+            if (status === 1) { // Validation error
+                handleValidationErrors(details)
             }
+            else{
+
+                inlineMsg.text= message
+                inlineMsg.visible=true
+                inlineMsg.type= Kirigami.MessageType.Error
+
+            }
+
         }
+
+        function onErrorCashSourceCreated(message, status, details){
+            if (status === 1) { // Validation error
+                handleValidationErrors(details)
+            }
+            else{
+
+                inlineMsg.text= message
+                inlineMsg.visible=true
+                inlineMsg.type= Kirigami.MessageType.Error
+
+            }
+
+        }
+
+        function onErrorCashSourceUpdated(message, status, details){
+            if (status === 1) { // Validation error
+                handleValidationErrors(details)
+            }
+            else{
+
+                inlineMsg.text= message
+                inlineMsg.visible=true
+                inlineMsg.type= Kirigami.MessageType.Error
+
+            }
+
+        }
+
+        function onErrorCashSourceDeleted(message, status, details){
+            if (status === 1) { // Validation error
+                handleValidationErrors(details)
+            }
+            else{
+                inlineMsg.text= message
+                inlineMsg.visible=true
+                inlineMsg.type= Kirigami.MessageType.Error
+
+            }
+
+        }
+
     }
 
     function loadData(source) {
@@ -361,8 +419,8 @@ Kirigami.PromptDialog {
 
         initialBalanceField.text = source.initialBalance?.toFixed(2) || "0.00"
         balanceField.text = source.balance?.toFixed(2) || "0.00"
-        accountNumberField.text = source.accountNumber || ""
-        bankNameField.text = source.bankName || ""
+        accountNumberField.text = source.account_number || ""
+        bankNameField.text = source.bank_name || ""
         descriptionField.text = source.description || ""
 
         // Find the correct index for status
@@ -380,9 +438,38 @@ Kirigami.PromptDialog {
         accountNumberField.statusMessage = ""
         bankNameField.statusMessage = ""
         descriptionField.statusMessage = ""
-        inlineMsg.visible = false
+        //inlineMsg.visible = false
     }
+    function handleValidationErrors(errorDetails) {
+        clearStatusMessages()
 
+        let errorObj = {}
+        try {
+            errorObj = JSON.parse(errorDetails)
+        } catch (e) {
+            console.error("Error parsing validation details:", e)
+            return
+        }
+
+        // Map of field names to their corresponding form components
+        const fieldMap = {
+            'name': nameField,
+            'initial_balance': initialBalanceField,
+            //'balance': balanceField,
+            'account_number': accountNumberField,
+            'bank_name': bankNameField,
+            'description': descriptionField
+        }
+
+        // Set error messages for each field that has validation errors
+        Object.keys(errorObj).forEach(fieldName => {
+                                          const field = fieldMap[fieldName]
+                                          if (field) {
+                                              field.statusMessage = errorObj[fieldName][0]
+                                              field.status = Kirigami.MessageType.Error
+                                          }
+                                      })
+    }
     function clearFields() {
         // Clear all fields and reset to default values
         nameField.text = ""
@@ -417,6 +504,16 @@ Kirigami.PromptDialog {
         }
 
         return data
+    }
+    Kirigami.PromptDialog {
+        id: deleteDialog
+        property int cashSourceToDelete: -1
+        title: i18n("Delete Cash Source")
+        subtitle: i18n("Are you sure you'd like to delete this Cash Source?")
+        standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
+        onAccepted: {
+            cashSourceApi.deleteCashSource(cashSourceToDelete)
+        }
     }
 
     onDialogSourceIdChanged:{

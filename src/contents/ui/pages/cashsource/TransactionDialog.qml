@@ -17,7 +17,12 @@ Kirigami.Dialog {
 
     ColumnLayout {
         spacing: Kirigami.Units.largeSpacing
-
+        Kirigami.InlineMessage {
+            id: inlineMsgDialog
+            Layout.fillWidth: true
+            showCloseButton: true
+            visible: false
+        }
         FormCard.FormCard {
             Layout.fillWidth: true
 
@@ -47,7 +52,7 @@ Kirigami.Dialog {
             onTriggered: {
                 if (validateInput()) {
                     dialog.transactionAccepted(parseFloat(amountField.text), notesField.text)
-                    dialog.close()
+                  //  dialog.close()
                 }
             }
         },
@@ -74,7 +79,20 @@ Kirigami.Dialog {
         amountField.text = ""
         notesField.text = ""
     }
+    Connections {
+        target: cashSourceApi
+        function onErrorWithdrawal(message, status, details){
+                inlineMsgDialog.text= message
+                inlineMsgDialog.visible=true
+                inlineMsgDialog.type= Kirigami.MessageType.Error
+        }
+        function onErrorDeposit(message, status, details){
+                inlineMsgDialog.text= message
+                inlineMsgDialog.visible=true
+                inlineMsgDialog.type= Kirigami.MessageType.Error
+        }
 
+    }
     onOpened: {
         clearFields()
     }

@@ -25,13 +25,13 @@ Kirigami.PromptDialog {
     QQC2.BusyIndicator {
         id: busyIndicator
         anchors.centerIn: parent
-        running: cashSourceModel.loading
+        running: cashSourceApi.isLoading
         visible: running
         z: 999
     }
 
     Kirigami.InlineMessage {
-        id: inlineMsg
+        id: inlineMsgDialogDialog
         Layout.fillWidth: true
         showCloseButton: true
         visible: false
@@ -107,11 +107,6 @@ Kirigami.PromptDialog {
                 }
             }
 
-
-
-
-
-
             // Amount
             FormCard.FormTextFieldDelegate {
                 id: amountField
@@ -151,8 +146,8 @@ Kirigami.PromptDialog {
         Kirigami.Action {
             text: qsTr("Transfer")
             icon.name: "transfer"
-            enabled: !cashSourceModel.loading &&
-                     destinationField.currentValue !== -1 &&
+            enabled: !cashSourceApi.isLoading &&
+                     destinationField.currentIndex !== -1 &&
                      amountField.text !== "" &&
                      parseFloat(amountField.text) > 0 &&
                      parseFloat(amountField.text) <= sourceBalance
@@ -183,7 +178,7 @@ Kirigami.PromptDialog {
         let errors = []
 
         // Clear previous error messages
-        inlineMsg.visible = false
+        inlineMsgDialogDialog.visible = false
         amountField.statusMessage = ""
 
         // Validate destination
@@ -211,9 +206,9 @@ Kirigami.PromptDialog {
         }
 
         if (!isValid) {
-            inlineMsg.type = Kirigami.MessageType.Error
-            inlineMsg.text = errors.join("\n")
-            inlineMsg.visible = true
+            inlineMsgDialogDialog.type = Kirigami.MessageType.Error
+            inlineMsgDialogDialog.text = errors.join("\n")
+            inlineMsgDialogDialog.visible = true
         }
 
         return isValid
@@ -223,10 +218,28 @@ Kirigami.PromptDialog {
         destinationField.currentIndex = -1
         amountField.text = ""
         notesField.text = ""
-        inlineMsg.visible = false
+        inlineMsgDialogDialog.visible = false
         amountField.statusMessage = ""
     }
+    Connections {
+        target: cashSourceApi
+        function onErrorTransfer(message, status, details){
+                inlineMsgDialogDialog.text= message
+                inlineMsgDialogDialog.visible=true
+                inlineMsgDialogDialog.type= Kirigami.MessageType.Error
+        }
+        function onTransferCompleted() {
+            transferDialog.close()
+            applicationWindow().gnotification.showNotification("",
+                                                               "Transfer completed successfully", // message
+                                                               Kirigami.MessageType.Positive, // message type
+                                                               "short",
+                                                               "dialog-close"
+                                                               )
+            cashSourceModel.refresh()
+        }
 
+    }
     onOpened: {
         clearFields()
     }

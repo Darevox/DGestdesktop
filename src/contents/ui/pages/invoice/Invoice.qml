@@ -142,8 +142,8 @@ Kirigami.Page {
             if (statusCombo.currentValue && searchField.text !== "") {
                 icon.name = "document-edit"
                 return i18n("There are no %1 invoices matching '%2'",
-                           statusCombo.currentValue,
-                           searchField.text)
+                            statusCombo.currentValue,
+                            searchField.text)
             }
             if (statusCombo.currentValue) {
                 icon.name = "document-edit"
@@ -158,18 +158,18 @@ Kirigami.Page {
         icon.name: "document-edit"
 
         helpfulAction: (statusCombo.currentValue || searchField.text !== "")
-            ? null
-            : Qt.createQmlObject(`
-                import org.kde.kirigami as Kirigami
-                Kirigami.Action {
-                    icon.name: "list-add"
-                    text: "Create Invoice"
-                    onTriggered: {
-                        invoiceDetailsDialog.invoiceId = 0
-                        invoiceDetailsDialog.active = true
-                    }
-                }
-            `, emptyStateMessage)
+                       ? null
+                       : Qt.createQmlObject(`
+                                            import org.kde.kirigami as Kirigami
+                                            Kirigami.Action {
+                                            icon.name: "list-add"
+                                            text: "Create Invoice"
+                                            onTriggered: {
+                                            invoiceDetailsDialog.invoiceId = 0
+                                            invoiceDetailsDialog.active = true
+                                            }
+                                            }
+                                            `, emptyStateMessage)
     }
 
     // Page actions
@@ -242,20 +242,69 @@ Kirigami.Page {
             alternatingRows: true
             sortOrder: invoiceModel.sortDirection === "asc" ? Qt.AscendingOrder : Qt.DescendingOrder
             sortRole: InvoiceRoles.IssueDateRole  // Updated from InvoiceDateRole
-
             onCellDoubleClicked: function(row) {
                 let invoiceId = view.model.data(view.model.index(row, 0), InvoiceRoles.IdRole)
                 invoiceDetailsDialog.invoiceId = invoiceId
                 invoiceDetailsDialog.active = true
             }
+            property var nonSortableColumns: {
+                return {
+                    [ InvoiceRoles.ReferenceNumberRole]: "referenceNumber",
+                    [InvoiceRoles.CheckedRole]: "checked",
+                    [InvoiceRoles.InvoiceableTypeRole]: "invoiceableType",
+                    [ InvoiceRoles.StatusRole]: "status",
+                    [  InvoiceRoles.TotalAmountRole]: "totalAmount",
+                }
+            }
+
+            // Modified onColumnClicked function
+            onColumnClicked: function (index, headerComponent) {
+                // Check if the column is sortable
+                if (Object.keys(nonSortableColumns).includes(String(headerComponent.role)) ||
+                        Object.values(nonSortableColumns).includes(headerComponent.textRole)) {
+                    return; // Exit if column shouldn't be sortable
+                }
+
+                if (view.sortRole !== headerComponent.role) {
+                    invoiceModel.sortField = headerComponent.textRole
+                    invoiceModel.sortDirection = "asc"
+                    view.sortRole = headerComponent.role;
+                    view.sortOrder = Qt.AscendingOrder;
+                } else {
+                    invoiceModel.sortDirection = view.sortOrder === Qt.AscendingOrder ? "desc" : "asc"
+                    view.sortOrder = invoiceModel.sortDirection === "asc" ? Qt.AscendingOrder : Qt.DescendingOrder
+                }
+
+                view.model.sort(view.sortRole, view.sortOrder);
+                __resetSelection();
+            }
+            function __resetSelection() {
+                // NOTE: Making a forced copy of the list
+                let selectedIndexes = Array(...view.selectionModel.selectedIndexes)
+
+                let currentRow = view.selectionModel.currentIndex.row;
+                let currentColumn = view.selectionModel.currentIndex.column;
+
+                view.selectionModel.clear();
+                for (let i in selectedIndexes) {
+                    view.selectionModel.select(selectedIndexes[i], ItemSelectionModel.Select);
+                }
+
+                view.selectionModel.setCurrentIndex(view.model.index(currentRow, currentColumn), ItemSelectionModel.Select);
+            }
             headerComponents: [
+
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Select")
                     textRole: "checked"
                     role: InvoiceRoles.CheckedRole
-                    width: root.width * 0.05
+                    width: root.width * 0.03
                     headerDelegate: QQC2.CheckBox {
                         onCheckedChanged: invoiceModel.toggleAllInvoicesChecked()
+                    }
+                    itemDelegate: QQC2.CheckBox {
+                        checked: modelData
+                        onCheckedChanged: invoiceModel.setChecked(row, checked)
                     }
                 },
                 Tables.HeaderComponent {
@@ -264,20 +313,12 @@ Kirigami.Page {
                     role: InvoiceRoles.ReferenceNumberRole
                     width: root.width * 0.15
                 },
-                Tables.HeaderComponent {
-                    title: i18nc("@title:column", "Date")
-                    textRole: "issueDate"
-                    role: InvoiceRoles.IssueDateRole
-                    width: root.width * 0.12
-                    itemDelegate: QQC2.Label {
-                        text: Qt.formatDateTime(modelData, "dd/MM/yyyy")
-                    }
-                },
+
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Invoiceable")
                     textRole: "invoiceableType"
                     role: InvoiceRoles.InvoiceableTypeRole
-                    width: root.width * 0.15
+                    width: root.width * 0.16
                     itemDelegate: QQC2.Label {
                         text: modelData + " #" + model.invoiceableId
                     }
@@ -287,15 +328,24 @@ Kirigami.Page {
                     textRole: "status"
                     role: InvoiceRoles.StatusRole
                     width: root.width * 0.10
-                    itemDelegate: QQC2.Label {
-                        text: modelData
-                        color: {
+                    itemDelegate: DStatusBadge {
+                        text: {
+                            switch(modelData) {
+                                case "draft": return "Draft"
+                                case "sent": return "Sent"
+                                case "paid": return "Paid"
+                                case "overdue": return "Overdue"
+                                case "cancelled": return "Cancelled"
+                                default: return Kirigami.Theme.textColor
+                            }
+                        }
+                        textColor: {
                             switch(modelData) {
                                 case "draft": return Kirigami.Theme.neutralTextColor
                                 case "sent": return Kirigami.Theme.positiveTextColor
                                 case "paid": return Kirigami.Theme.positiveTextColor
-                                case "overdue": return Kirigami.Theme.negativeTextColor
-                                case "cancelled": return Kirigami.Theme.disabledTextColor
+                                case "overdue": return Kirigami.Theme.neutralTextColor
+                                case "cancelled": return Kirigami.Theme.negativeTextColor
                                 default: return Kirigami.Theme.textColor
                             }
                         }
@@ -308,35 +358,51 @@ Kirigami.Page {
                     width: root.width * 0.12
                     itemDelegate: QQC2.Label {
                         text: Number(modelData).toLocaleString(Qt.locale(), 'f', 2)
+                        color: Number(modelData) >= 0 ? Kirigami.Theme.positiveTextColor : Kirigami.Theme.negativeTextColor
+                        font.bold : true
                         horizontalAlignment: Text.AlignRight
                     }
                 },
                 Tables.HeaderComponent {
-                    title: i18nc("@title:column", "Actions")
-                    width: root.width * 0.15
-                    itemDelegate: RowLayout {
-                        QQC2.Button {
-                            icon.name: "document-view"
-                            text: i18n("View")
-                            enabled: !invoiceModel.loading
-                            onClicked: {
-                                let row = model.row
-                                let invoiceId = view.model.data(view.model.index(row, 0), InvoiceRoles.IdRole)
-                                invoiceModel.generatePdf(invoiceId)
-                            }
-                        }
-                        QQC2.Button {
-                            icon.name: "mail-sent"
-                            text: i18n("Send")
-                            visible: modelData.status !== "sent"
-                            onClicked: {
-                                let row = model.row
-                                let invoiceId = view.model.data(view.model.index(row, 0), InvoiceRoles.IdRole)
-                                invoiceModel.sendToClient(invoiceId)
-                            }
-                        }
+                    title: i18nc("@title:column", "Date")
+                    textRole: "issueDate"
+                    role: InvoiceRoles.IssueDateRole
+                    width: root.width * 0.40
+                    itemDelegate: QQC2.Label {
+                        text: Qt.formatDateTime(modelData, "dd/MM/yyyy")
+                        horizontalAlignment: Text.AlignRight
+
                     }
                 }
+                // Tables.HeaderComponent {
+                //     title: i18nc("@title:column", "Actions")
+                //     width: root.width * 0.15
+                //     itemDelegate: RowLayout {
+                //         anchors.fill : parent
+                //         QQC2.Button {
+                //             icon.name: "document-view"
+                //             text: i18n("View")
+                //             enabled: !invoiceModel.loading
+                //              Layout.alignment: Qt.AlignTop
+                //             onClicked: {
+                //                 let row = model.row
+                //                 let invoiceId = view.model.data(view.model.index(row, 0), InvoiceRoles.IdRole)
+                //                 invoiceModel.generatePdf(invoiceId)
+                //             }
+                //         }
+                //         QQC2.ToolButton {
+                //             icon.name: "mail-sent"
+                //             text: i18n("Send")
+                //             visible: modelData.status !== "sent"
+                //              Layout.alignment: Qt.AlignTop
+                //             onClicked: {
+                //                 let row = model.row
+                //                 let invoiceId = view.model.data(view.model.index(row, 0), InvoiceRoles.IdRole)
+                //                 invoiceModel.sendToClient(invoiceId)
+                //             }
+                //         }
+                //     }
+                // }
             ]
         }
     }
@@ -364,8 +430,8 @@ Kirigami.Page {
         onAccepted: {
             let checkedIds = invoiceModel.getCheckedInvoiceIds();
             checkedIds.forEach(invoiceId => {
-                invoiceModel.deleteInvoice(invoiceId);
-            });
+                                   invoiceModel.deleteInvoice(invoiceId);
+                               });
         }
     }
 
@@ -392,23 +458,23 @@ Kirigami.Page {
         target: invoiceApi
         function onInvoiceDeleted() {
             applicationWindow().gnotification.showNotification(
-                "",
-                "Invoice deleted successfully",
-                Kirigami.MessageType.Positive,
-                "short",
-                "dialog-close"
-            )
+                        "",
+                        "Invoice deleted successfully",
+                        Kirigami.MessageType.Positive,
+                        "short",
+                        "dialog-close"
+                        )
             invoiceModel.clearAllChecked();
         }
 
         function onErrorInvoicesReceived(message, status, details) {
             applicationWindow().gnotification.showNotification(
-                "",
-                message,
-                Kirigami.MessageType.Error,
-                "short",
-                "dialog-close"
-            )
+                        "",
+                        message,
+                        Kirigami.MessageType.Error,
+                        "short",
+                        "dialog-close"
+                        )
         }
     }
     ViewPdfDialog {
@@ -424,9 +490,9 @@ Kirigami.Page {
 
         function onErrorPdfGenerated(message, status, details) {
             applicationWindow().showPassiveNotification(
-                i18n("Error generating PDF: %1", message),
-                "long"
-            )
+                        i18n("Error generating PDF: %1", message),
+                        "long"
+                        )
         }
     }
     Component.onCompleted: {

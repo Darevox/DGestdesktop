@@ -23,11 +23,11 @@ Kirigami.Page {
         anchors.centerIn: parent
         z: 99
         width: parent.width - (Kirigami.Units.largeSpacing * 4)
-        visible: !cashSourceModel.loading && cashSourceModel.rowCount === 0
+        visible: !cashSourceApi.isLoading && cashSourceModel.rowCount === 0
         text: searchField.text !== ""
               ? i18n("There are no cash sources matching '%1'", searchField.text)
               : i18n("There are no cash sources. Please add a new cash source.")
-        icon.name: "money-management"
+        icon.name: searchField.text !== "" ?  "search-symbolic" : "view-financial-account-cash"
 
         helpfulAction: searchField.text !== ""
                        ? null
@@ -90,7 +90,7 @@ Kirigami.Page {
         Item { Layout.fillWidth: true }
 
         QQC2.BusyIndicator {
-            running: cashSourceModel.loading
+            running: cashSourceApi.isLoading
         }
 
         Kirigami.SearchField {
@@ -111,7 +111,7 @@ Kirigami.Page {
 
     GridLayout {
         anchors.fill: parent
-        visible: cashSourceModel.loading
+        visible: cashSourceApi.isLoading
         columns: 6
         rows: 8
         columnSpacing: parent.width * 0.01
@@ -136,9 +136,9 @@ Kirigami.Page {
     QQC2.ScrollView {
         anchors.fill: parent
         contentWidth: view.width
-        visible: !cashSourceModel.loading && cashSourceModel.rowCount > 0
+        visible: !cashSourceApi.isLoading && cashSourceModel.rowCount > 0
 
-        DKTableViewAbstract {
+                Tables.KTableView {
             id: view
             model: cashSourceModel
             interactive: false
@@ -146,72 +146,191 @@ Kirigami.Page {
             alternatingRows: true
             sortOrder: cashSourceModel.sortDirection === "asc" ? Qt.AscendingOrder : Qt.DescendingOrder
             sortRole: CashSourceRoles.NameRole
-            modelCheck : cashSourceModel
+           // modelCheck : cashSourceModel
+            property var nonSortableColumns: {
+                return {
+                    [CashSourceRoles.InitialBalanceRole]: "initialBalance",
+                    [CashSourceRoles.CheckedRole]: "checked",
+                    // Add more as needed
+                }
+            }
+
+            // Modified onColumnClicked function
+            onColumnClicked: function (index, headerComponent) {
+                // Check if the column is sortable
+                if (Object.keys(nonSortableColumns).includes(String(headerComponent.role)) ||
+                        Object.values(nonSortableColumns).includes(headerComponent.textRole)) {
+                    return; // Exit if column shouldn't be sortable
+                }
+
+                if (view.sortRole !== headerComponent.role) {
+                    cashSourceModel.sortField = headerComponent.textRole
+                    cashSourceModel.sortDirection = "asc"
+                    view.sortRole = headerComponent.role;
+                    view.sortOrder = Qt.AscendingOrder;
+                } else {
+                    cashSourceModel.sortDirection = view.sortOrder === Qt.AscendingOrder ? "desc" : "asc"
+                    view.sortOrder = cashSourceModel.sortDirection === "asc" ? Qt.AscendingOrder : Qt.DescendingOrder
+                }
+
+                view.model.sort(view.sortRole, view.sortOrder);
+                __resetSelection();
+            }
+            function __resetSelection() {
+                // NOTE: Making a forced copy of the list
+                let selectedIndexes = Array(...view.selectionModel.selectedIndexes)
+
+                let currentRow = view.selectionModel.currentIndex.row;
+                let currentColumn = view.selectionModel.currentIndex.column;
+
+                view.selectionModel.clear();
+                for (let i in selectedIndexes) {
+                    view.selectionModel.select(selectedIndexes[i], ItemSelectionModel.Select);
+                }
+
+                view.selectionModel.setCurrentIndex(view.model.index(currentRow, currentColumn), ItemSelectionModel.Select);
+            }
+
             onCellDoubleClicked: function(row) {
                 let sourceId = view.model.data(view.model.index(row, 0), CashSourceRoles.IdRole)
                 cashSourceDetailsDialog.sourceId = sourceId
                 cashSourceDetailsDialog.active = true
             }
-
+            property  int  columnWidth :( root.width -  (root.width * 0.05) )/ 6.2
             headerComponents: [
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Select")
                     textRole: "checked"
                     role: CashSourceRoles.CheckedRole
-                    minimumWidth: root.width * 0.05
-                    width: minimumWidth
+                    width: root.width * 0.05
                     headerDelegate: QQC2.CheckBox {
                         onCheckedChanged: cashSourceModel.toggleAllCashSourcesChecked()
+                    }
+                    itemDelegate: QQC2.CheckBox {
+                        checked: modelData
+                        onCheckedChanged: modelCheck.setChecked(row, checked)
                     }
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Name")
                     textRole: "name"
                     role: CashSourceRoles.NameRole
-                    minimumWidth: root.width * 0.20
-                    width: minimumWidth
+                    width: view.columnWidth
+                    itemDelegate: QQC2.Label {
+                        text: modelData || ""
+                        width: view.columnWidth - 20
+                        elide: Text.ElideRight
+                    }
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Type")
                     textRole: "type"
                     role: CashSourceRoles.TypeRole
-                    minimumWidth: root.width * 0.15
-                    width: minimumWidth
+                    width: view.columnWidth
+                    itemDelegate: QQC2.Label {
+                        text: {
+                            switch(modelData) {
+                                case "bank": return i18n("Bank")
+                                case "cash": return i18n("Cash")
+                                default: return modelData || ""
+                            }
+                        }
+                        width: view.columnWidth - 20
+                        elide: Text.ElideRight
+                        color: Kirigami.Theme.textColor
+                    }
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Balance")
                     textRole: "balance"
                     role: CashSourceRoles.BalanceRole
-                    minimumWidth: root.width * 0.15
-                    width: minimumWidth
+                    width: view.columnWidth
+                    itemDelegate: QQC2.Label {
+                        text: Number(modelData).toLocaleString(Qt.locale(), 'f', 2)
+                        //  horizontalAlignment: Text.AlignRight
+                        font.bold : true
+                        color: Number(modelData) >= 0 ? Kirigami.Theme.positiveTextColor : Kirigami.Theme.negativeTextColor
+                        width: view.columnWidth - 20
+                        elide: Text.ElideRight
+                          horizontalAlignment: Text.AlignRight
+                    }
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Status")
                     textRole: "status"
                     role: CashSourceRoles.StatusRole
-                    minimumWidth: root.width * 0.15
-                    width: minimumWidth
+                    width: view.columnWidth
+                    itemDelegate: DStatusBadge {
+                        width: view.columnWidth
+                        height: parent.height
+                        text: {
+                            switch(modelData) {
+                                case "active":
+                                return i18n("Active")
+                                case "inactive":
+                                return i18n("Inactive")
+                                case "pending":
+                                return i18n("Pending")
+                                default:
+                                return modelData || ""
+                            }
+                        }
+                        textColor: {
+                            switch(modelData) {
+                                case "active":
+                                return Kirigami.Theme.positiveTextColor
+                                case "inactive":
+                                return Kirigami.Theme.negativeTextColor
+                                case "pending":
+                                return Kirigami.Theme.neutralTextColor
+                                default:
+                                return Kirigami.Theme.textColor
+                            }
+                        }
+                    }
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Description")
                     textRole: "description"
                     role: CashSourceRoles.DescriptionRole
-                    minimumWidth: root.width * 0.30
-                    width: minimumWidth
+                    width: view.columnWidth
+                    itemDelegate: QQC2.Label {
+                        width: view.columnWidth - 20
+                        text: modelData || ""
+                        elide: Text.ElideRight
+                        wrapMode: Text.Wrap
+                        maximumLineCount: 1
+                        clip: true
+                    }
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Initial Balance")
                     textRole: "initialBalance"
                     role: CashSourceRoles.InitialBalanceRole
-                    minimumWidth: root.width * 0.15
-                    width: minimumWidth
+                    width: view.columnWidth
+                    itemDelegate: QQC2.Label {
+                        text: Number(modelData).toLocaleString(Qt.locale(), 'f', 2)
+                        //   horizontalAlignment: Text.AlignRight
+                        font.bold : true
+                        width: view.columnWidth - 20
+                        elide: Text.ElideRight
+                        color: Number(modelData) >= 0 ? Kirigami.Theme.positiveTextColor : Kirigami.Theme.negativeTextColor
+                          horizontalAlignment: Text.AlignRight
+                    }
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Current Balance")
                     textRole: "balance"
                     role: CashSourceRoles.BalanceRole
-                    minimumWidth: root.width * 0.15
-                    width: minimumWidth
+                    width: view.columnWidth
+                    itemDelegate: QQC2.Label {
+                        text: Number(modelData).toLocaleString(Qt.locale(), 'f', 2)
+                        //  horizontalAlignment: Text.AlignRight
+                        font.bold : true
+                        width: view.columnWidth - 20
+                        elide: Text.ElideRight
+                        color: Number(modelData) >= 0 ? Kirigami.Theme.positiveTextColor : Kirigami.Theme.negativeTextColor
+                    }
                 }
             ]
         }
@@ -260,7 +379,28 @@ Kirigami.Page {
                                })
         }
     }
+    Connections {
+        target: cashSourceApi
+        // function cashSourceDeleted(){
+        //     applicationWindow().gnotification.showNotification("",
+        //                                                        "Product  Deleted successfully", // message
+        //                                                        Kirigami.MessageType.Positive, // message type
+        //                                                        "short",
+        //                                                        "dialog-close"
+        //                                                        )
+        //     cashSourceModel.clearAllChecked();
 
+        // }
+        function onErrorCashSourcesReceived(message, status, details) {
+            applicationWindow().gnotification.showNotification("",
+                                                               message, // message
+                                                               Kirigami.MessageType.Error, // message type
+                                                               "short",
+                                                               "dialog-close"
+                                                               )
+
+        }
+    }
     TransferDialog {
         id: transferDialog
         onTransferAccepted: function(sourceId, destinationId, amount, notes) {

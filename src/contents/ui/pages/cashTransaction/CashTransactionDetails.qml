@@ -7,35 +7,17 @@ import org.kde.kirigamiaddons.tableview as Tables
 import org.kde.kirigamiaddons.formcard as FormCard
 import "../../components"
 import "."
-Kirigami.OverlaySheet {
+Kirigami.Dialog {
     id: transactionDetailsSheet
+    preferredWidth: Kirigami.Units.gridUnit * 50
     property var transaction: ({})
-
-    header: ColumnLayout {
-        Kirigami.Heading {
-            text: i18n("Transaction Details")
-            level: 2
-        }
-        QQC2.Label {
-            text: {
-                switch(transaction.type) {
-                    case "transfer": return i18n("Transfer Transaction")
-                    case "deposit": return i18n("Deposit Transaction")
-                    case "withdrawal": return i18n("Withdrawal Transaction")
-                    default: return i18n("Transaction")
-                }
-            }
-            opacity: 0.7
-        }
-    }
-
-    ColumnLayout {
+    title : i18n("Transaction Details")
+    RowLayout {
         spacing: Kirigami.Units.largeSpacing
-
         // Basic Transaction Info
         FormCard.FormCard {
             Layout.fillWidth: true
-
+            Layout.alignment: Qt.AlignTop
             FormCard.FormTextDelegate {
                 text: i18n("Reference Number")
                 description: transaction.reference_number || ""
@@ -50,10 +32,10 @@ Kirigami.OverlaySheet {
                 text: i18n("Type")
                 description: {
                     switch(transaction.type) {
-                        case "transfer": return i18n("Transfer")
-                        case "deposit": return i18n("Deposit")
-                        case "withdrawal": return i18n("Withdrawal")
-                        default: return transaction.type || ""
+                    case "transfer": return i18n("Transfer")
+                    case "deposit": return i18n("Deposit")
+                    case "withdrawal": return i18n("Withdrawal")
+                    default: return transaction.type || ""
                     }
                 }
             }
@@ -78,9 +60,11 @@ Kirigami.OverlaySheet {
         // Source Account Details
         FormCard.FormCard {
             Layout.fillWidth: true
-
-
+            Layout.alignment: Qt.AlignTop
+            Layout.fillHeight: true
             Kirigami.Heading {
+                Layout.margins : Kirigami.Units.smallSpacing
+                Layout.alignment: Qt.AlignTop
                 text: transaction.type === "transfer" ? i18n("Source Account") : i18n("Account")
             }
             FormCard.FormTextDelegate {
@@ -92,9 +76,9 @@ Kirigami.OverlaySheet {
                 text: i18n("Type")
                 description: {
                     switch(transaction.cash_source?.type) {
-                        case "cash": return i18n("Cash")
-                        case "bank": return i18n("Bank Account")
-                        default: return transaction.cash_source?.type || ""
+                    case "cash": return i18n("Cash")
+                    case "bank": return i18n("Bank Account")
+                    default: return transaction.cash_source?.type || ""
                     }
                 }
             }
@@ -125,9 +109,15 @@ Kirigami.OverlaySheet {
         // Destination Account Details (for transfers)
         FormCard.FormCard {
             Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            Layout.alignment: Qt.AlignTop
             visible: transaction.type === "transfer" && transaction.transfer_destination
             Kirigami.Heading {
                 text: i18n("Destination Account")
+                Layout.margins : Kirigami.Units.smallSpacing
+                Layout.alignment: Qt.AlignTop
+
             }
 
             FormCard.FormTextDelegate {
@@ -139,9 +129,9 @@ Kirigami.OverlaySheet {
                 text: i18n("Type")
                 description: {
                     switch(transaction.transfer_destination?.type) {
-                        case "cash": return i18n("Cash")
-                        case "bank": return i18n("Bank Account")
-                        default: return transaction.transfer_destination?.type || ""
+                    case "cash": return i18n("Cash")
+                    case "bank": return i18n("Bank Account")
+                    default: return transaction.transfer_destination?.type || ""
                     }
                 }
             }
@@ -172,9 +162,14 @@ Kirigami.OverlaySheet {
         // Metadata
         FormCard.FormCard {
             Layout.fillWidth: true
+            Layout.fillHeight: true
 
-           Kirigami.Heading {
+            Layout.alignment: Qt.AlignTop
+            Kirigami.Heading {
                 text: i18n("Additional Information")
+                Layout.margins : Kirigami.Units.smallSpacing
+                Layout.alignment: Qt.AlignTop
+
             }
 
             FormCard.FormTextDelegate {
@@ -188,27 +183,36 @@ Kirigami.OverlaySheet {
             }
         }
     }
-
-    footer: RowLayout {
-        QQC2.Button {
-            text: i18n("View Source Transactions")
-            icon.name: "view-list-details"
-            visible: transaction.cash_source?.id
-            onClicked: {
-                showSourceTransactions(
-                    transaction.cash_source.id,
-                    transaction.cash_source.name
-                )
-                transactionDetailsSheet.close()
-            }
+    customFooterActions: [
+        Kirigami.Action {
+            text: qsTr("Cancel")
+            icon.name: "dialog-cancel"
+            onTriggered: transactionDetailsSheet.close()
         }
+    ]
+    footerLeadingComponent :  QQC2.Button {
+        text: i18n("View Source Transactions")
+        icon.name: "view-list-details"
+        visible: transaction.cash_source?.id
+        onClicked: {
+            showSourceTransactions(
+                        transaction.cash_source.id,
+                        transaction.cash_source.name
+                        )
+            transactionDetailsSheet.close()
+        }
+    }
 
-        Item { Layout.fillWidth: true }
+    Connections {
+        target: cashTransactionApi
+        function errorTransactionReceived(message, status, details){
+            applicationWindow().gnotification.showNotification("",
+                                                               message, // message
+                                                               Kirigami.MessageType.Error, // message type
+                                                               "short",
+                                                               "dialog-close"
+                                                               )
 
-        QQC2.Button {
-            text: i18n("Close")
-            icon.name: "dialog-close"
-            onClicked: transactionDetailsSheet.close()
         }
     }
 }

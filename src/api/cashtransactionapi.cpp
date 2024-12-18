@@ -53,7 +53,7 @@ QFuture<void> CashTransactionApi::getTransactions(
     if (!queryParts.isEmpty()) {
         path += "?" + queryParts.join("&");
     }
-
+    qDebug()<<"path : "<<path;
     QNetworkRequest request = createRequest(path);
     request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
 
@@ -137,7 +137,6 @@ QFuture<void> CashTransactionApi::getSummary(const QDateTime &startDate, const Q
     if (!queryParts.isEmpty()) {
         path += "?" + queryParts.join("&");
     }
-
     QNetworkRequest request = createRequest(path);
     request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
 
