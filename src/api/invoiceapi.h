@@ -102,7 +102,10 @@ public:
                                           const QString &sortDirection = "desc",
                                           int page = 1,
                                           const QString &status = QString(),
-                                          const QString &paymentStatus = QString());
+                                          const QString &paymentStatus = QString(),
+                                          const QDateTime &startDate = QDateTime(),
+                                          const QDateTime &endDate = QDateTime()
+                                            );
 
     Q_INVOKABLE QFuture<void> getInvoice(int id);
     Q_INVOKABLE QFuture<void> createInvoice(const Invoice &invoice);
@@ -162,7 +165,6 @@ private:
     PaginatedInvoices paginatedInvoicesFromJson(const QJsonObject &json) const;
     QVariantMap invoiceToVariantMap(const Invoice &invoice) const;
     QVariantMap invoiceItemToVariantMap(const InvoiceItem &item) const;
-
     QSettings m_settings;
     bool m_isLoading = false;
     void setLoading(bool loading) {

@@ -24,7 +24,8 @@ class InvoiceModel : public QAbstractTableModel
     Q_PROPERTY(QString paymentStatus READ paymentStatus WRITE setPaymentStatus NOTIFY paymentStatusChanged)
     Q_PROPERTY(bool hasCheckedItems READ hasCheckedItems NOTIFY hasCheckedItemsChanged)
     Q_PROPERTY(int rowCount READ rowCount NOTIFY rowCountChanged)
-
+    Q_PROPERTY(QDateTime startDate READ startDate WRITE setStartDate NOTIFY startDateChanged)
+    Q_PROPERTY(QDateTime endDate READ endDate WRITE setEndDate NOTIFY endDateChanged)
 public:
     enum InvoiceRoles {
         IdRole = Qt::UserRole + 1,
@@ -88,14 +89,16 @@ public:
     Q_INVOKABLE QVariantList getCheckedInvoiceIds() const;
     Q_INVOKABLE void clearAllChecked();
     Q_INVOKABLE void toggleAllInvoicesChecked();
-
+    QDateTime startDate() const { return m_startDate; }
+    QDateTime endDate() const { return m_endDate; }
 public slots:
     void setSortField(const QString &field);
     void setSortDirection(const QString &direction);
     void setSearchQuery(const QString &query);
     void setStatus(const QString &status);
     void setPaymentStatus(const QString &paymentStatus);
-
+    void setStartDate(const QDateTime &date);
+    void setEndDate(const QDateTime &date);
 signals:
     void loadingChanged();
     void errorMessageChanged();
@@ -118,7 +121,8 @@ signals:
     void summaryReceived(const QVariantMap &summary);
     void hasCheckedItemsChanged();
     void rowCountChanged();
-
+    void startDateChanged();
+       void endDateChanged();
 private slots:
     void handleInvoicesReceived(const PaginatedInvoices &invoices);
     void handleInvoiceError(const QString &message, ApiStatus status);
@@ -155,6 +159,8 @@ private:
     QVariantMap invoiceItemToVariantMap(const InvoiceItem &item) const;
     InvoicePayment paymentFromVariantMap(const QVariantMap &map) const;
     void updateHasCheckedItems();
+    QDateTime m_startDate;
+    QDateTime m_endDate;
 };
 
 } // namespace NetworkApi

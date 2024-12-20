@@ -52,6 +52,7 @@ Kirigami.Page {
                     ]
                     textRole: "text"
                     valueRole: "value"
+                    currentIndex : 0
                     onCurrentValueChanged: invoiceModel.setStatus(currentValue)
                 }
 
@@ -59,22 +60,26 @@ Kirigami.Page {
                     id: startDateField
                     dateTimeDisplay: FormCard.FormDateTimeDelegate.DateTimeDisplay.Date
                     text: i18n("Start Date")
-                    value: undefined
+                    onValueChanged: invoiceModel.startDate = value
+
+                    Component.onCompleted: {
+
+                        let today = new Date()
+                        let firstDayLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+                        value = firstDayLastMonth
+
+                    }
                 }
 
                 FormCard.FormDateTimeDelegate {
                     id: endDateField
                     dateTimeDisplay: FormCard.FormDateTimeDelegate.DateTimeDisplay.Date
                     text: i18n("End Date")
-                    value: undefined
+                    value: new Date()
+                    onValueChanged: invoiceModel.endDate = value
+
                 }
-            }
-
-            RowLayout {
-                Layout.fillWidth: true
-                Layout.margins: Kirigami.Units.largeSpacing
-
-                QQC2.Button {
+                FormCard.FormButtonDelegate {
                     text: i18n("Apply Filters")
                     icon.name: "view-filter"
                     onClicked: {
@@ -82,14 +87,15 @@ Kirigami.Page {
                         filterSheet.close()
                     }
                 }
-
-                QQC2.Button {
+                FormCard.FormButtonDelegate {
                     text: i18n("Clear Filters")
                     icon.name: "edit-clear-all"
                     onClicked: {
+                        let today = new Date()
+                        let firstDayLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+                        startDateField.value = firstDayLastMonth
+                        endDateField.value = new Date()
                         statusCombo.currentIndex = 0
-                        startDateField.value = undefined
-                        endDateField.value = undefined
                         invoiceModel.refresh()
                     }
                 }
@@ -137,7 +143,7 @@ Kirigami.Page {
         anchors.centerIn: parent
         z: 99
         width: parent.width - (Kirigami.Units.largeSpacing * 4)
-        visible: !invoiceModel.loading && invoiceModel.rowCount === 0
+        visible: !invoiceApi.isLoading && invoiceModel.rowCount === 0
         text: {
             if (statusCombo.currentValue && searchField.text !== "") {
                 icon.name = "document-edit"
@@ -189,13 +195,22 @@ Kirigami.Page {
             onTriggered: deleteDialog.open()
         },
         Kirigami.Action {
-            icon.name: "filter"
+            icon.name: "view-filter"
             text: i18n("Filter")
-            onTriggered: filterSheet.open()
+            onTriggered:{
+                if(!applicationWindow().globalDrawer.collapsed)
+                applicationWindow().globalDrawer.collapsed=true
+                if(filterSheet.opened)
+                filterSheet.close()
+                else
+                filterSheet.open()
+
+            }
         },
         Kirigami.Action {
             icon.name: "view-statistics"
             text: i18n("Summary")
+            visible : false
             onTriggered: {
                 invoiceModel.getSummary()
                 summarySheet.open()
@@ -210,7 +225,7 @@ Kirigami.Page {
         Item { Layout.fillWidth: true }
 
         QQC2.BusyIndicator {
-            running: invoiceModel.loading
+            running: invoiceApi.isLoading
         }
 
         Kirigami.SearchField {
@@ -233,7 +248,7 @@ Kirigami.Page {
     QQC2.ScrollView {
         anchors.fill: parent
         contentWidth: view.width
-        visible: !invoiceModel.loading && invoiceModel.rowCount > 0
+        visible: !invoiceApi.isLoading && invoiceModel.rowCount > 0
 
         Tables.KTableView {
             id: view
@@ -320,7 +335,13 @@ Kirigami.Page {
                     role: InvoiceRoles.InvoiceableTypeRole
                     width: root.width * 0.16
                     itemDelegate: QQC2.Label {
-                        text: modelData + " #" + model.invoiceableId
+                        text: {
+                            switch(modelData) {
+                                case "App\\Models\\Sale": return "Sale #" + model.invoiceableId
+                                case "App\\Models\\Purchase": return "Purchase #" + model.invoiceableId
+                             //   default: return "Sale #"  + model.invoiceableId
+                            }
+                        }
                     }
                 },
                 Tables.HeaderComponent {
@@ -334,7 +355,6 @@ Kirigami.Page {
                                 case "draft": return "Draft"
                                 case "sent": return "Sent"
                                 case "paid": return "Paid"
-                                case "overdue": return "Overdue"
                                 case "cancelled": return "Cancelled"
                                 default: return Kirigami.Theme.textColor
                             }
@@ -344,7 +364,6 @@ Kirigami.Page {
                                 case "draft": return Kirigami.Theme.neutralTextColor
                                 case "sent": return Kirigami.Theme.positiveTextColor
                                 case "paid": return Kirigami.Theme.positiveTextColor
-                                case "overdue": return Kirigami.Theme.neutralTextColor
                                 case "cancelled": return Kirigami.Theme.negativeTextColor
                                 default: return Kirigami.Theme.textColor
                             }
@@ -374,35 +393,6 @@ Kirigami.Page {
 
                     }
                 }
-                // Tables.HeaderComponent {
-                //     title: i18nc("@title:column", "Actions")
-                //     width: root.width * 0.15
-                //     itemDelegate: RowLayout {
-                //         anchors.fill : parent
-                //         QQC2.Button {
-                //             icon.name: "document-view"
-                //             text: i18n("View")
-                //             enabled: !invoiceModel.loading
-                //              Layout.alignment: Qt.AlignTop
-                //             onClicked: {
-                //                 let row = model.row
-                //                 let invoiceId = view.model.data(view.model.index(row, 0), InvoiceRoles.IdRole)
-                //                 invoiceModel.generatePdf(invoiceId)
-                //             }
-                //         }
-                //         QQC2.ToolButton {
-                //             icon.name: "mail-sent"
-                //             text: i18n("Send")
-                //             visible: modelData.status !== "sent"
-                //              Layout.alignment: Qt.AlignTop
-                //             onClicked: {
-                //                 let row = model.row
-                //                 let invoiceId = view.model.data(view.model.index(row, 0), InvoiceRoles.IdRole)
-                //                 invoiceModel.sendToClient(invoiceId)
-                //             }
-                //         }
-                //     }
-                // }
             ]
         }
     }

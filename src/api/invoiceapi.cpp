@@ -88,7 +88,9 @@ QJsonObject InvoiceApi::invoiceToJson(const Invoice &invoice) const
         }
         json["items"] = itemsArray;
     }
-
+    QJsonDocument doc(json);
+    QString jsonString = doc.toJson(QJsonDocument::Indented);
+    qDebug()<<"DATA in CPP : " <<jsonString;
     return json;
 }
 
@@ -184,7 +186,10 @@ PaginatedInvoices InvoiceApi::paginatedInvoicesFromJson(const QJsonObject &json)
 
 QFuture<void> InvoiceApi::getInvoices(const QString &search, const QString &sortBy,
                                      const QString &sortDirection, int page,
-                                     const QString &status, const QString &paymentStatus)
+                                     const QString &status, const QString &paymentStatus,
+                                      const QDateTime &startDate,
+                                      const QDateTime &endDate
+                                      )
 {
     setLoading(true);
     QString path = "/api/v1/invoices";
@@ -202,7 +207,10 @@ QFuture<void> InvoiceApi::getInvoices(const QString &search, const QString &sort
         queryParts << QString("status=%1").arg(status);
     if (!paymentStatus.isEmpty())
         queryParts << QString("payment_status=%1").arg(paymentStatus);
-
+    if (startDate.isValid())
+        queryParts << QString("start_date=%1").arg(startDate.toString(Qt::ISODate));
+    if (endDate.isValid())
+        queryParts << QString("end_date=%1").arg(endDate.toString(Qt::ISODate));
     if (!queryParts.isEmpty()) {
         path += "?" + queryParts.join("&");
     }

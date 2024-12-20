@@ -49,7 +49,27 @@ int InvoiceModel::columnCount(const QModelIndex &parent) const
         return 0;
     return 6; // Date, Reference, Invoiceable, Status, Total, Paid, Actions
 }
+void InvoiceModel::setStartDate(const QDateTime &date)
+{
+    if (m_startDate != date) {
+        m_startDate = date;
+        emit startDateChanged();
+        m_currentPage = 1; // Reset to first page when changing filter
+        emit currentPageChanged();
+        refresh();
+    }
+}
 
+void InvoiceModel::setEndDate(const QDateTime &date)
+{
+    if (m_endDate != date) {
+        m_endDate = date;
+        emit endDateChanged();
+        m_currentPage = 1; // Reset to first page when changing filter
+        emit currentPageChanged();
+        refresh();
+    }
+}
 QVariant InvoiceModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || index.row() >= m_invoices.count())
@@ -155,7 +175,7 @@ void InvoiceModel::refresh()
         return;
 
     setLoading(true);
-    m_api->getInvoices(m_searchQuery, m_sortField, m_sortDirection, m_currentPage, m_status, m_paymentStatus);
+    m_api->getInvoices(m_searchQuery, m_sortField, m_sortDirection, m_currentPage, m_status, m_paymentStatus, m_startDate, m_endDate);
 }
 
 void InvoiceModel::loadPage(int page)
@@ -492,14 +512,14 @@ Invoice InvoiceModel::invoiceFromVariantMap(const QVariantMap &map) const
     invoice.id = map["id"].toInt();
     invoice.team_id = map["teamId"].toInt();
     invoice.reference_number = map["referenceNumber"].toString();
-    invoice.invoiceable_type = map["invoiceableType"].toString();
+    invoice.invoiceable_type = map["invoiceable_type"].toString();
     invoice.invoiceable_id = map["invoiceableId"].toInt();
     invoice.total_amount = map["totalAmount"].toDouble();
     invoice.tax_amount = map["taxAmount"].toDouble();
     invoice.discount_amount = map["discountAmount"].toDouble();
     invoice.status = map["status"].toString();
-    invoice.issue_date = map["issueDate"].toDateTime();
-    invoice.due_date = map["dueDate"].toDateTime();
+    invoice.issue_date = map["issue_date"].toDateTime();
+    invoice.due_date = map["due_date"].toDateTime();
     invoice.notes = map["notes"].toString();
     invoice.meta_data = map["metaData"].toMap();
 

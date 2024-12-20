@@ -47,7 +47,8 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName(QStringLiteral("Dervox"));
     QCoreApplication::setOrganizationDomain(QStringLiteral("Dervox.com"));
     QCoreApplication::setApplicationName(QStringLiteral("DGest"));
-
+    qputenv("QML_XHR_ALLOW_FILE_READ", QByteArray("1"));
+    qputenv("QML_XHR_ALLOW_FILE_WRITE", QByteArray("1"));
     if (qEnvironmentVariableIsEmpty("QT_QUICK_CONTROLS_STYLE")) {
         QQuickStyle::setStyle(QStringLiteral("org.kde.desktop"));
     }

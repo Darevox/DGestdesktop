@@ -1,4 +1,5 @@
 // ViewPdfDialog.qml
+ import QtCore
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
@@ -15,11 +16,13 @@ Kirigami.Dialog {
     height: Kirigami.Units.gridUnit * 40
 
     property string pdfUrl: ""
+    property string originalFileName: ""  // Add this to store original filename
     customFooterActions: [
         Kirigami.Action {
             text: i18n("Save PDF")
             icon.name: "document-save"
             onTriggered: {
+                saveFileDialog.currentFile = "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation) + "/" + originalFileName
                 saveFileDialog.open()
             }
         },
@@ -39,7 +42,7 @@ Kirigami.Dialog {
             }
         }
     ]
-     ColumnLayout {
+    ColumnLayout {
         spacing: 10
         width: Kirigami.Units.gridUnit * 60
         height: pdfDialog.height
@@ -123,40 +126,53 @@ Kirigami.Dialog {
     }
 
     // File save dialog
+    // File save dialog
     Platform.FileDialog {
         id: saveFileDialog
         title: i18n("Save PDF")
-        folder: Platform.StandardPaths.writableLocation(Platform.StandardPaths.DocumentsLocation)
+        folder: StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
         fileMode: Platform.FileDialog.SaveFile
         nameFilters: [ i18n("PDF files (*.pdf)") ]
         defaultSuffix: "pdf"
 
         onAccepted: {
-            const sourceUrl = pdfDialog.pdfUrl
-            const destinationUrl = saveFileDialog.file
-
-            const xhr = new XMLHttpRequest()
-            xhr.open("GET", sourceUrl)
-            xhr.responseType = "arraybuffer"
+            // Read source file
+            let xhr = new XMLHttpRequest();
+            xhr.open("GET", pdfDialog.pdfUrl, true);
+            xhr.responseType = "arraybuffer";
 
             xhr.onload = function() {
                 if (xhr.status === 200) {
-                    const saveXhr = new XMLHttpRequest()
-                    saveXhr.open("PUT", destinationUrl)
-                    saveXhr.send(xhr.response)
-                    applicationWindow().showPassiveNotification(
+                    // Write to destination file
+                    let saveXhr = new XMLHttpRequest();
+                    saveXhr.open("PUT", saveFileDialog.file, true);
+                    saveXhr.onload = function() {
+                        if (saveXhr.status === 200) {
+                            applicationWindow().showPassiveNotification(
                                 i18n("PDF saved successfully"),
                                 "short"
-                                )
+                            );
+                        } else {
+                            applicationWindow().showPassiveNotification(
+                                i18n("Failed to save PDF"),
+                                "short"
+                            );
+                        }
+                    };
+                    saveXhr.send(xhr.response);
+                } else {
+                    applicationWindow().showPassiveNotification(
+                        i18n("Failed to read PDF"),
+                        "short"
+                    );
                 }
-            }
-
-            xhr.send()
+            };
+            xhr.send();
         }
     }
 
     onClosed: {
-       // pdfDocument.source = ""
+        // pdfDocument.source = ""
         if (pdfUrl) {
             const xhr = new XMLHttpRequest()
             xhr.open("DELETE", pdfUrl)
