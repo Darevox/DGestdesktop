@@ -338,7 +338,8 @@ Product ProductApi::productFromJson(const QJsonObject &json) const
     product.maxStockLevel = json["max_stock_level"].toInt();
     product.reorderPoint = json["reorder_point"].toInt();
     product.location = json["location"].toString();
-
+    product.image_path = json["image_path"].toString();
+    qDebug()<<"IIIIIIIIIIIIIIIIII : "<<json["image_path"].toString();
     if (json.contains("unit")) {
         product.unit = productUnitFromJson(json["unit"].toObject());
     }
@@ -447,7 +448,7 @@ QVariantMap ProductApi::productToVariantMap(const Product &product) const
     map["maxStockLevel"] = product.maxStockLevel;
     map["reorderPoint"] = product.reorderPoint;
     map["location"] = product.location;
-
+    map["image_path"] = product.image_path;
     // Handle the unit
     QVariantMap unitMap;
     unitMap["id"] = product.unit.id;
@@ -467,6 +468,193 @@ QVariantMap ProductApi::productToVariantMap(const Product &product) const
     map["packages"] = packagesList;
     return map;
 }
+
+// QFuture<void> ProductApi::uploadProductImage(int productId, const QString &imagePath)
+// {
+//     setLoading(true);
+//     qDebug() << "Original Path:" << imagePath;
+
+//       // Convert URL to local file path
+//       QString localPath = QUrl(imagePath).toLocalFile();
+//       if (localPath.isEmpty()) {
+//           // If toLocalFile() returns empty, try removing the file:// prefix manually
+//           localPath = imagePath;
+//           if (localPath.startsWith("file://")) {
+//               localPath = localPath.mid(7);  // Remove "file://"
+//           }
+//       }
+
+//       qDebug() << "Local Path:" << localPath;
+//  qDebug()<<"===================================FILE : "<<imagePath;
+//         QString path = QString("/api/v1/products/%1/image").arg(productId);
+//     QNetworkRequest request = createRequest(path);
+//     request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+
+//     // Create multipart request
+//     QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+
+//     // Add method override for PUT request
+//     QHttpPart methodPart;
+//     methodPart.setHeader(QNetworkRequest::ContentDispositionHeader,
+//                          QVariant("form-data; name=\"_method\""));
+//     methodPart.setBody("PUT");
+//     multiPart->append(methodPart);
+//     qDebug()<<"===================================Upload";
+//     // Add image file
+//     QFile *file = new QFile(localPath);
+//     if (!file->open(QIODevice::ReadOnly)) {
+//         delete file;
+//         delete multiPart;
+//         qDebug()<<"===================================Failed to open image file";
+//         emit uploadImageError("Failed to open image file ");
+//         setLoading(false);
+//         return QtFuture::makeReadyVoidFuture();
+//     }
+//     qDebug()<<"===================================Upload2";
+//     QHttpPart imagePart;
+//     imagePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("image/jpeg"));
+//     imagePart.setHeader(QNetworkRequest::ContentDispositionHeader,
+//                         QVariant("form-data; name=\"image\"; filename=\"image.jpg\""));
+//     imagePart.setBodyDevice(file);
+//     file->setParent(multiPart); // File will be deleted with multiPart
+//     multiPart->append(imagePart);
+
+//     auto future = makeRequest<QJsonObject>([=]() {
+//         QNetworkReply* reply = m_netManager->post(request, multiPart);
+//         multiPart->setParent(reply); // Delete multiPart with reply
+//         return reply;
+//     }).then([=](JsonResponse response) {
+//         if (response.success) {
+//             const QJsonObject &productData = response.data->value("product").toObject();
+//             Product updatedProduct = productFromJson(productData);
+//             emit productUpdated(updatedProduct);
+//             qDebug()<<"===================================Works";
+
+//         } else {
+//             qDebug()<<"===================================Error";
+
+//             emit productError(response.error->message, response.error->status,
+//                               QJsonDocument(response.error->details).toJson());
+//         }
+//         setLoading(false);
+//     });
+
+//     return future.then([=]() {});
+// }
+QFuture<void> ProductApi::uploadProductImage(int productId, const QString &imagePath)
+{
+    setLoading(true);
+
+    // Convert URL to local file path
+    QString localPath = QUrl(imagePath).toLocalFile();
+    if (localPath.isEmpty()) {
+        localPath = imagePath;
+        if (localPath.startsWith("file://")) {
+            localPath = localPath.mid(7);
+        }
+    }
+
+    QString path = QString("/api/v1/products/%1/image").arg(productId);
+    QNetworkRequest request = createRequest(path);
+    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+
+    // Create multipart with explicit boundary
+    QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+    QString boundary = "boundary" + QUuid::createUuid().toString(QUuid::WithoutBraces);
+    multiPart->setBoundary(boundary.toLatin1());
+
+    // Add image file
+    QFile *file = new QFile(localPath);
+    if (!file->open(QIODevice::ReadOnly)) {
+        delete file;
+        delete multiPart;
+        emit uploadImageError("Failed to open image file");
+        setLoading(false);
+        return QtFuture::makeReadyVoidFuture();
+    }
+
+    QHttpPart imagePart;
+
+    // Set headers
+    imagePart.setHeader(QNetworkRequest::ContentTypeHeader,
+        QVariant(localPath.endsWith(".png", Qt::CaseInsensitive) ? "image/png" : "image/jpeg"));
+
+    imagePart.setHeader(QNetworkRequest::ContentDispositionHeader,
+        QVariant(QString("form-data; name=\"image\"; filename=\"%1\"")
+            .arg(QFileInfo(localPath).fileName())));
+
+    // Read file content
+    QByteArray fileData = file->readAll();
+    file->close();
+    delete file;
+
+    // Set the body
+    imagePart.setBody(fileData);
+    multiPart->append(imagePart);
+
+    // Set the content type for the request
+    request.setHeader(QNetworkRequest::ContentTypeHeader,
+        QString("multipart/form-data; boundary=%1").arg(boundary));
+
+    qDebug() << "Sending request:";
+    qDebug() << "Boundary:" << boundary;
+    qDebug() << "Content-Type:" << request.header(QNetworkRequest::ContentTypeHeader);
+    qDebug() << "File size:" << fileData.size();
+
+    auto future = makeRequest<QJsonObject>([=]() {
+        QNetworkReply* reply = m_netManager->post(request, multiPart);
+        multiPart->setParent(reply);
+
+        connect(reply, &QNetworkReply::uploadProgress,
+                [](qint64 bytesSent, qint64 bytesTotal) {
+            qDebug() << "Upload progress:" << bytesSent << "/" << bytesTotal;
+        });
+
+        return reply;
+    }).then([=](JsonResponse response) {
+        if (response.success) {
+            const QJsonObject &productData = response.data->value("product").toObject();
+            Product updatedProduct = productFromJson(productData);
+            emit productUpdated(updatedProduct);
+            qDebug() << "Image upload successful";
+        } else {
+            qDebug() << "Image upload failed";
+            qDebug() << "Error details:" << response.error->details;
+            emit productError(response.error->message, response.error->status,
+                            QJsonDocument(response.error->details).toJson());
+        }
+        setLoading(false);
+    });
+
+    return future.then([=]() {});
+}
+
+
+
+QFuture<void> ProductApi::removeProductImage(int productId)
+{
+    setLoading(true);
+
+    QNetworkRequest request = createRequest(QString("/api/v1/products/%1/image").arg(productId));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+
+    auto future = makeRequest<std::monostate>([=]() {
+        return m_netManager->deleteResource(request);
+    }).then([=](VoidResponse response) {
+        if (response.success) {
+            emit imageRemoved(productId);
+        } else {
+            emit productError(response.error->message, response.error->status,
+                              QJsonDocument(response.error->details).toJson());
+        }
+        setLoading(false);
+    });
+
+    return future.then([=]() {});
+}
+
+
 QString ProductApi::getToken() const {
     QString token=m_settings.value("auth/token").toString();
     return token;

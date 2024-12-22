@@ -11,6 +11,7 @@
 #include <KAboutData>
 #include <colorschememanager.h>
 #include <traymanager.h>
+#include <printerhelper.h>
 
 #include <api/userapi.h>
 #include <api/subscriptionapi.h>
@@ -42,7 +43,7 @@
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    QLoggingCategory::setFilterRules("*.debug=true");
+ //   QLoggingCategory::setFilterRules("*.debug=true");
     KLocalizedString::setApplicationDomain("Managements");
     QCoreApplication::setOrganizationName(QStringLiteral("Dervox"));
     QCoreApplication::setOrganizationDomain(QStringLiteral("Dervox.com"));
@@ -83,7 +84,7 @@ int main(int argc, char *argv[])
     NetworkApi::InvoiceModel *invoiceModel = new NetworkApi::InvoiceModel();
     NetworkApi::DashboardModel *dashboardModel = new NetworkApi::DashboardModel();
 
-
+    qmlRegisterType<PrinterHelper>("com.dervox.printing", 1, 0, "PrinterHelper");
     // TrayManager trayManager;
     qmlRegisterSingletonType(
                 "org.kde.about",        // <========== used in the import

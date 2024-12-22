@@ -5,6 +5,9 @@
 #include "abstractapi.h"
 #include <QSettings>
 #include <QJsonArray>
+#include <QHttpMultiPart>
+#include <QFile>
+#include <QFileInfo>
 namespace NetworkApi {
 
 struct ProductUnit {
@@ -38,6 +41,7 @@ struct Product {
     ProductUnit unit;
     QList<ProductPackageProduct> packages;
     bool checked = false;
+    QString image_path;
 };
 
 struct PaginatedProducts {
@@ -77,8 +81,8 @@ public:
     Q_INVOKABLE QFuture<void> removeProductBarcode(int productId, int barcodeId);
     Q_INVOKABLE QFuture<void> getProductBarcodes(int productId);
 
-
-
+    Q_INVOKABLE QFuture<void> uploadProductImage(int productId, const QString &imagePath);
+    Q_INVOKABLE QFuture<void> removeProductImage(int productId);
 
     Q_INVOKABLE QString getToken() const;
     Q_INVOKABLE void saveToken(const QString &token);
@@ -97,13 +101,16 @@ signals:
     // Error signals
     void productError(const QString &message, ApiStatus status,const QString &details);
     void productNotFound();
+    void uploadImageError(const QString &message);
 
     void barcodeAdded(const QJsonObject &barcode);
     void barcodeRemoved(int productId, int barcodeId);
     void productBarcodesReceived(const QList<QJsonObject> &barcodes);
+    void imageRemoved(int productId);
 
     void isLoadingChanged();
 
+    void imageUploaded(const QString &imageUrl);
 private:
     Product productFromJson(const QJsonObject &json) const;
     ProductUnit productUnitFromJson(const QJsonObject &json) const;
@@ -112,7 +119,7 @@ private:
     QVariantMap productToVariantMap(const Product &product) const;
     Product productFromVariant(const QVariantMap &data) const;
     QSettings m_settings;
-
+    QNetworkReply* createMultipartRequest(const QString &path, const QString &imagePath);
     bool m_isLoading = false;
     void setLoading(bool loading) {
         if (m_isLoading != loading) {

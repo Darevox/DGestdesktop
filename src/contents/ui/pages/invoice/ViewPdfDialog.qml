@@ -1,11 +1,12 @@
 // ViewPdfDialog.qml
- import QtCore
+import QtCore
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 import QtQuick.Pdf
 import Qt.labs.platform as Platform
+import com.dervox.printing 1.0
 
 Kirigami.Dialog {
     id: pdfDialog
@@ -17,6 +18,11 @@ Kirigami.Dialog {
 
     property string pdfUrl: ""
     property string originalFileName: ""  // Add this to store original filename
+    property string defaultFileName: "invoice.pdf" // Add this property to set default filename
+    PrinterHelper {
+           id: printerHelper
+       }
+
     customFooterActions: [
         Kirigami.Action {
             text: i18n("Save PDF")
@@ -31,7 +37,17 @@ Kirigami.Dialog {
             icon.name: "document-print"
             enabled: pdfDocument.status === PdfDocument.Ready
             onTriggered: {
-                printDialog.open()
+                if (printerHelper.printPdfWithPreview(pdfUrl)) {
+                    applicationWindow().showPassiveNotification(
+                        i18n("Document printed successfully"),
+                        "short"
+                        )
+                } else {
+                    applicationWindow().showPassiveNotification(
+                        i18n("Printing failed"),
+                        "short"
+                        )
+                }
             }
         },
         Kirigami.Action {
@@ -134,43 +150,41 @@ Kirigami.Dialog {
         fileMode: Platform.FileDialog.SaveFile
         nameFilters: [ i18n("PDF files (*.pdf)") ]
         defaultSuffix: "pdf"
+        currentFile: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation) + "/" + defaultFileName // Set default filename
 
         onAccepted: {
-            // Read source file
             let xhr = new XMLHttpRequest();
             xhr.open("GET", pdfDialog.pdfUrl, true);
             xhr.responseType = "arraybuffer";
 
             xhr.onload = function() {
                 if (xhr.status === 200) {
-                    // Write to destination file
                     let saveXhr = new XMLHttpRequest();
                     saveXhr.open("PUT", saveFileDialog.file, true);
                     saveXhr.onload = function() {
                         if (saveXhr.status === 200) {
                             applicationWindow().showPassiveNotification(
-                                i18n("PDF saved successfully"),
-                                "short"
-                            );
+                                        i18n("PDF saved successfully"),
+                                        "short"
+                                        );
                         } else {
                             applicationWindow().showPassiveNotification(
-                                i18n("Failed to save PDF"),
-                                "short"
-                            );
+                                        i18n("Failed to save PDF"),
+                                        "short"
+                                        );
                         }
                     };
                     saveXhr.send(xhr.response);
                 } else {
                     applicationWindow().showPassiveNotification(
-                        i18n("Failed to read PDF"),
-                        "short"
-                    );
+                                i18n("Failed to read PDF"),
+                                "short"
+                                );
                 }
             };
             xhr.send();
         }
     }
-
     onClosed: {
         // pdfDocument.source = ""
         if (pdfUrl) {

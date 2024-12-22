@@ -6,10 +6,13 @@ import org.kde.kirigamiaddons.formcard as FormCard
 import com.dervox.ProductUnitModel 1.0
 import "../../components"
 import "."
-Kirigami.PromptDialog {
+Kirigami.Dialog {
     id: productDialog
     title: "Product Details"
-    preferredWidth: Kirigami.Units.gridUnit * 50
+    padding: Kirigami.Units.largeSpacing
+    width: Kirigami.Units.gridUnit * 65
+    height : Kirigami.Units.gridUnit * 35
+
     standardButtons: Kirigami.Dialog.NoButton
     property int dialogProductId: 0
     property var productData: ({})
@@ -62,7 +65,7 @@ Kirigami.PromptDialog {
             location: locationField.text,
             packages: packages
         };
-            console.log("Final product data:", JSON.stringify(updatedProduct));
+        console.log("Final product data:", JSON.stringify(updatedProduct));
         return updatedProduct;
     }
     customFooterActions: [
@@ -118,234 +121,293 @@ Kirigami.PromptDialog {
             }
         }
     ]
-    GridLayout{
-        columns:2
-        rows:1
-        // anchors.fill:parent
-        enabled: !productApi.isLoading
-        FormCard.FormCard {
-            FormCard.FormTextFieldDelegate {
-                id: nameField
-                label: qsTr("Name")
-                text:  ""
-                status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
-            }
 
-            FormCard.FormTextAreaDelegate {
-                id: descriptionField
-                label: qsTr("Description")
-                text:  ""
-            }
-            FormCard.FormSpinBoxDelegate {
-                id: quantityField
-                label: qsTr("Quantity")
-                value: 0
-                from: 0
-                to: 999999
-                stepSize: 1
-            }
-            DFormTextFieldDelegate {
-                id: purchase_priceField
-                label: qsTr("Purchase Price")
-                text: "0"
+    contentItem :
+        GridLayout{
+            columns:3
+            rows:1
+           // anchors.fill : parent
+            anchors.margins : 20
+            enabled: !productApi.isLoading
+            FormCard.FormCard {
+                Layout.fillHeight:true
+                             Layout.alignment: Qt.AlignTop
+                ImageBannerCard {
+                    id: productImageCard
+                    idProduct : productDialog.dialogProductId
 
-                // Property to store clean value as integer
-                // Only allow digits
-                validator: RegularExpressionValidator {
-                    regularExpression: /^\d+$/
+                    Layout.alignment: Qt.AlignTop
+
                 }
 
-                // Input validation - only allow numbers
-                inputMethodHints: Qt.ImhDigitsOnly
-            }
-            FormCard.FormTextDelegate {
-                leading: purchase_priceField
-                text: {
-                    var price = Number(priceField.text) || 0           // Selling Price
-                    var purchasePrice = Number(purchase_priceField.text) || 0  // Purchase Price
-                    var profit = price - purchasePrice
-                    return "Selling Price: " + price.toFixed(2)
+                FormCard.FormTextFieldDelegate {
+                    id: nameField
+                    label: qsTr("Name")
+                    text:  ""
+                    status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
                 }
-                description: {
-                    var price = Number(priceField.text) || 0           // Selling Price
-                    var purchasePrice = Number(purchase_priceField.text) || 0  // Purchase Price
-                    var profit = price - purchasePrice
-                    return "Profit: " + profit.toFixed(2)
-                }
-            }
-            DFormTextFieldDelegate {
-                id: priceField
-                label: qsTr("Price")
-                text: "0"
-                // Only allow digits
-                validator: RegularExpressionValidator {
-                    regularExpression: /^\d+$/
-                }
-                inputMethodHints: Qt.ImhDigitsOnly
-            }
 
-            FormCard.FormTextDelegate {
-                leading: priceField
-                text: {
-                    return "Profit Margin: "
+                FormCard.FormTextAreaDelegate {
+                    id: descriptionField
+                    label: qsTr("Description")
+                    text:  ""
                 }
-                description: {
-                    var price = Number(priceField.text) || 0
-                    var purchasePrice = Number(purchase_priceField.text) || 0
-
-                    // Avoid division by zero
-                    if (price === 0) return "0 %"
-
-                    var profitMargin = ((price - purchasePrice) / price) * 100
-                    return  profitMargin.toFixed(2) + " %"
-                }
-            }
-            FormCard.FormComboBoxDelegate {
-                id: unitCombo
-                text: i18nc("@label:listbox", "Product Unit")
-                displayMode: FormCard.FormComboBoxDelegate.ComboBox
-                editable: false
-                currentIndex:-1
-                property int unitId: 0
-                textRole: "name"
-                // Function to find and set index by unit ID
-                function setCurrentIndexById(id) {
-                    if(id === 0 || id === -1) {
-                        unitCombo.currentIndex = -1
-                    }
-                    else
-                        for(let i = 0; i < unitCombo.model.rowCount(); i++) {
-                            let itemId = unitCombo.model.data(unitCombo.model.index(i, 0), Qt.UserRole + 1)
-                            if(itemId === id) {
-                                unitCombo.currentIndex = i
-                                break
-                            }
+                FormCard.FormComboBoxDelegate {
+                    id: unitCombo
+                    text: i18nc("@label:listbox", "Product Unit")
+                    displayMode: FormCard.FormComboBoxDelegate.ComboBox
+                    editable: false
+                    currentIndex:-1
+                    property int unitId: 0
+                    textRole: "name"
+                    // Function to find and set index by unit ID
+                    function setCurrentIndexById(id) {
+                        if(id === 0 || id === -1) {
+                            unitCombo.currentIndex = -1
                         }
+                        else
+                            for(let i = 0; i < unitCombo.model.rowCount(); i++) {
+                                let itemId = unitCombo.model.data(unitCombo.model.index(i, 0), Qt.UserRole + 1)
+                                if(itemId === id) {
+                                    unitCombo.currentIndex = i
+                                    break
+                                }
+                            }
+                    }
+
+                    onCurrentIndexChanged: {
+                        console.log("unitCombo currentIndex", unitCombo.currentIndex)
+                        var selectedIndex = unitCombo.currentIndex
+                        var selectedId = unitCombo.model.data(unitCombo.model.index(selectedIndex, 0),  Qt.UserRole + 1)
+                        var selectedName = unitCombo.model.data(unitCombo.model.index(selectedIndex, 0),  Qt.UserRole + 2)
+                        unitCombo.unitId = selectedId
+                        console.log("unitCombo name", selectedName)
+                        console.log("unitCombo id", selectedId)
+                    }
+                }
+                FormCard.FormTextFieldDelegate {
+                    id: locationField
+                    label: qsTr("Location")
+                    text:  ""
                 }
 
-                onCurrentIndexChanged: {
-                    console.log("unitCombo currentIndex", unitCombo.currentIndex)
-                    var selectedIndex = unitCombo.currentIndex
-                    var selectedId = unitCombo.model.data(unitCombo.model.index(selectedIndex, 0),  Qt.UserRole + 1)
-                    var selectedName = unitCombo.model.data(unitCombo.model.index(selectedIndex, 0),  Qt.UserRole + 2)
-                    unitCombo.unitId = selectedId
-                    console.log("unitCombo name", selectedName)
-                    console.log("unitCombo id", selectedId)
-                }
             }
-            FormCard.FormDateTimeDelegate {
-                id: expiredDateField
-                dateTimeDisplay:FormCard.FormDateTimeDelegate.DateTimeDisplay.Date
-                text: i18nc("@label:listbox", "Expiration Date")
-                value: undefined
-                onValueChanged:{
-                    console.log(value)
+            FormCard.FormCard {
+                 Layout.fillHeight:true
+                Layout.alignment: Qt.AlignTop
+                FormCard.FormSpinBoxDelegate {
+                    id: quantityField
+                    label: qsTr("Quantity")
+                    value: 0
+                    from: 0
+                    to: 999999
+                    stepSize: 1
                 }
-            }
+                DFormTextFieldDelegate {
+                    id: purchase_priceField
+                    label: qsTr("Purchase Price")
+                    text: "0"
 
+                    // Property to store clean value as integer
+                    // Only allow digits
+                    validator: RegularExpressionValidator {
+                        regularExpression: /^\d+$/
+                    }
+
+                    // Input validation - only allow numbers
+                    inputMethodHints: Qt.ImhDigitsOnly
+                }
+                FormCard.FormTextDelegate {
+                    leading: purchase_priceField
+                    text: {
+                        var price = Number(priceField.text) || 0           // Selling Price
+                        var purchasePrice = Number(purchase_priceField.text) || 0  // Purchase Price
+                        var profit = price - purchasePrice
+                        return "Selling Price: " + price.toFixed(2)
+                    }
+                    description: {
+                        var price = Number(priceField.text) || 0           // Selling Price
+                        var purchasePrice = Number(purchase_priceField.text) || 0  // Purchase Price
+                        var profit = price - purchasePrice
+                        return "Profit: " + profit.toFixed(2)
+                    }
+                }
+                DFormTextFieldDelegate {
+                    id: priceField
+                    label: qsTr("Price")
+                    text: "0"
+                    // Only allow digits
+                    validator: RegularExpressionValidator {
+                        regularExpression: /^\d+$/
+                    }
+                    inputMethodHints: Qt.ImhDigitsOnly
+                }
+                FormCard.FormTextDelegate {
+                    leading: priceField
+                    text: {
+                        return "Profit Margin: "
+                    }
+                    description: {
+                        var price = Number(priceField.text) || 0
+                        var purchasePrice = Number(purchase_priceField.text) || 0
+
+                        // Avoid division by zero
+                        if (price === 0) return "0 %"
+
+                        var profitMargin = ((price - purchasePrice) / price) * 100
+                        return  profitMargin.toFixed(2) + " %"
+                    }
+                }
+                FormCard.FormSpinBoxDelegate {
+                    id: minStockField
+                    label: qsTr("Min Stock")
+                    value:  0
+                    from: 0
+                    to: 999999
+                }
+                FormCard.FormSpinBoxDelegate {
+                    id: maxStockField
+                    label: qsTr("Max Stock")
+                    value:  0
+                    from: 0
+                    to: 999999
+                }
+            }
+            FormCard.FormCard {
+                Layout.fillHeight:true
+
+                Layout.alignment: Qt.AlignTop
+                FormCard.FormSpinBoxDelegate {
+                    id: reorderPointField
+                    label: qsTr("Reorder Point")
+                    value:  0
+                    from: 0
+                    to: 999999
+                }
+
+                FormCard.FormTextFieldDelegate {
+                    id: referenceField
+                    label: qsTr("Refernce")
+                    text:  ""
+                }
+                FormCard.FormTextFieldDelegate {
+                    id: skuField
+                    label: qsTr("SKU")
+                    text:  ""
+                }
+                FormCard.FormButtonDelegate{
+                    text:"Setup Barcode"
+                    description:"View & print"
+                    icon.name:"view-barcode"
+                    onClicked :{
+                        // barcodeDialogLoader.priceText = priceField.text
+                        // barcodeDialogLoader.contentEditText = barcodeField.text
+                        barcodeDialogLoader.productId =  productDialog.dialogProductId
+                        barcodeDialogLoader.active=true
+                    }
+                }
+
+
+                FormCard.FormDateTimeDelegate {
+                    id: expiredDateField
+                    dateTimeDisplay:FormCard.FormDateTimeDelegate.DateTimeDisplay.Date
+                    text: i18nc("@label:listbox", "Expiration Date")
+                    value: undefined
+                    onValueChanged:{
+                        console.log(value)
+                    }
+                }
+
+
+                FormCard.FormButtonDelegate {
+                    Layout.margins : 10
+                    text: i18n("Manage Packages")
+                    description: packagesModel.count > 0 ?
+                                     i18np("%1 package defined", "%1 packages defined", packagesModel.count) :
+                                     i18n("No packages defined")
+                    icon.name: "package"
+                    onClicked: packagesListDialog.open()
+                }
+
+            }
         }
-        FormCard.FormCard {
-            FormCard.FormTextFieldDelegate {
-                id: referenceField
-                label: qsTr("Refernce")
-                text:  ""
-            }
-            FormCard.FormTextFieldDelegate {
-                id: skuField
-                label: qsTr("SKU")
-                text:  ""
-            }
-            FormCard.FormButtonDelegate{
-                text:"Setup Barcode"
-                description:"View & print"
-                icon.name:"view-barcode"
-                onClicked :{
-                    // barcodeDialogLoader.priceText = priceField.text
-                    // barcodeDialogLoader.contentEditText = barcodeField.text
-                    barcodeDialogLoader.productId =  productDialog.dialogProductId
-                    barcodeDialogLoader.active=true
-                }
-            }
-            FormCard.FormSpinBoxDelegate {
-                id: minStockField
-                label: qsTr("Min Stock")
-                value:  0
-                from: 0
-                to: 999999
-            }
-            FormCard.FormSpinBoxDelegate {
-                id: maxStockField
-                label: qsTr("Max Stock")
-                value:  0
-                from: 0
-                to: 999999
-            }
-            FormCard.FormSpinBoxDelegate {
-                id: reorderPointField
-                label: qsTr("Reorder Point")
-                value:  0
-                from: 0
-                to: 999999
-            }
-            FormCard.FormTextFieldDelegate {
-                id: locationField
-                label: qsTr("Location")
-                text:  ""
-            }
 
+    Kirigami.Dialog {
+        id: packagesListDialog
+        title: i18n("Product Packages")
+        preferredWidth: Kirigami.Units.gridUnit * 50
 
-        }
-
-        FormCard.FormCard {
-            Layout.fillWidth: true
-
-            Kirigami.Heading {
-                text: i18n("Product Packages")
-            }
-
-            ColumnLayout {
+        ColumnLayout {
+            spacing: Kirigami.Units.largeSpacing
+            Kirigami.InlineMessage {
+                id:inlineMsgPackagesListDialog
                 Layout.fillWidth: true
-                spacing: Kirigami.Units.smallSpacing
+                text: "Hey! Let me tell you something positive!"
+                showCloseButton: true
+                type: Kirigami.MessageType.Positive
+                visible: false
+            }
+            QQC2.Button {
+                text: i18n("Add Package")
+                icon.name: "list-add"
+                onClicked: packageDialog.open()
+                Layout.alignment: Qt.AlignRight
+                Layout.rightMargin: Kirigami.Units.gridUnit * 2
+            }
 
-                QQC2.Button {
-                    text: i18n("Add Package")
-                    icon.name: "list-add"
-                    onClicked: packageDialog.open()
-                }
+            ListView {
+                id: packagesList
+                Layout.fillWidth: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 20
+                model: ListModel { id: packagesModel }
+                clip: true
+                spacing: 1
+                Layout.rightMargin : Kirigami.Units.gridUnit * 2
+                Layout.leftMargin : Kirigami.Units.gridUnit * 2
 
-                ListView {
-                    id: packagesList
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: Math.min(contentHeight + 60, 200)
-                    model: ListModel { id: packagesModel }
-                    clip: true
+                delegate: Rectangle {
+                    width: ListView.view.width
+                    height: Kirigami.Units.gridUnit * 3
+                    color: index % 2 === 0 ? Kirigami.Theme.backgroundColor : Kirigami.Theme.alternateBackgroundColor
 
-                    delegate: Rectangle {
-                        width: parent.width
-                        height: 50
-                        color: index % 2 === 0 ? Kirigami.Theme.backgroundColor : Kirigami.Theme.alternateBackgroundColor
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: Kirigami.Units.smallSpacing
+                        spacing: Kirigami.Units.largeSpacing
+
+                        QQC2.Label {
+                            text: model.name
+                            Layout.preferredWidth: parent.width * 0.2
+                            elide: Text.ElideRight
+                            font.bold: true
+                        }
+                        QQC2.Label {
+                            text: i18n("%1 pieces", model.pieces_per_package)
+                            Layout.preferredWidth: parent.width * 0.15
+                            elide: Text.ElideRight
+                        }
+                        QQC2.Label {
+                            text: i18n("Purchase: %1", model.purchase_price)
+                            Layout.preferredWidth: parent.width * 0.2
+                            elide: Text.ElideRight
+                            horizontalAlignment: Text.AlignRight
+                        }
+                        QQC2.Label {
+                            text: i18n("Selling: %1", model.selling_price)
+                            Layout.preferredWidth: parent.width * 0.2
+                            elide: Text.ElideRight
+                            horizontalAlignment: Text.AlignRight
+                        }
+
+                        Item {
+                            Layout.fillWidth: true
+                            Layout.minimumWidth: Kirigami.Units.gridUnit
+                        }
 
                         RowLayout {
-                            anchors.fill: parent
-                            anchors.margins: Kirigami.Units.smallSpacing
+                            spacing: Kirigami.Units.smallSpacing
+                            Layout.alignment: Qt.AlignRight
 
-                            QQC2.Label {
-                                text: model.name
-                                Layout.preferredWidth: 150
-                            }
-                            QQC2.Label {
-                                text: i18n("%1 pieces", model.pieces_per_package)
-                                Layout.preferredWidth: 100
-                            }
-                            QQC2.Label {
-                                text: i18n("Purchase: %1", model.purchase_price)
-                                Layout.preferredWidth: 100
-                            }
-                            QQC2.Label {
-                                text: i18n("Selling: %1", model.selling_price)
-                                Layout.preferredWidth: 100
-                            }
-                            Item { Layout.fillWidth: true }
                             QQC2.ToolButton {
                                 icon.name: "edit-entry"
                                 onClicked: editPackage(index)
@@ -357,79 +419,123 @@ Kirigami.PromptDialog {
                         }
                     }
                 }
+
+                QQC2.ScrollBar.vertical: QQC2.ScrollBar {
+                    active: true
+                    visible: packagesList.contentHeight > packagesList.height
+                }
             }
         }
+
+        customFooterActions: [
+            Kirigami.Action {
+                text: i18n("Close")
+                icon.name: "dialog-close"
+                onTriggered: packagesListDialog.close()
+            }
+        ]
     }
+
 
 
     Kirigami.Dialog {
         id: packageDialog
         title: editingPackageIndex >= 0 ? i18n("Edit Package") : i18n("Add Package")
-        standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
+        preferredWidth: Kirigami.Units.gridUnit * 30
 
         property int editingPackageIndex: -1
 
-        FormCard.FormCard {
-            FormCard.FormTextFieldDelegate {
-                id: packageNameField
-                label: i18n("Package Name")
-                placeholderText: i18n("e.g., Box, Pack")
-            }
+        ColumnLayout {
+            spacing: Kirigami.Units.largeSpacing
 
-            FormCard.FormSpinBoxDelegate {
-                id: packageQuantityField
-                label: i18n("Pieces per Package")
-                from: 1
-                to: 999999
-                value: 1
-            }
+            FormCard.FormCard {
+                Layout.fillWidth: true
 
-            FormCard.FormSpinBoxDelegate {
-                id: packagePurchasePriceField
-                label: i18n("Purchase Price")
-                from: 0
-                to: 999999
-                value: 0
-            }
+                FormCard.FormTextFieldDelegate {
+                    id: packageNameField
+                    label: i18n("Package Name")
+                    placeholderText: i18n("e.g., Box, Pack")
+                }
 
-            FormCard.FormSpinBoxDelegate {
-                id: packageSellingPriceField
-                label: i18n("Selling Price")
-                from: 0
-                to: 999999
-                value: 0
-            }
+                FormCard.FormSpinBoxDelegate {
+                    id: packageQuantityField
+                    label: i18n("Pieces per Package")
+                    from: 1
+                    to: 999999
+                    value: 1
+                }
 
-            FormCard.FormTextFieldDelegate {
-                id: packageBarcodeField
-                label: i18n("Barcode (Optional)")
+                FormCard.FormSpinBoxDelegate {
+                    id: packagePurchasePriceField
+                    label: i18n("Purchase Price")
+                    from: 0
+                    to: 999999
+                    value: 0
+                }
+
+                FormCard.FormSpinBoxDelegate {
+                    id: packageSellingPriceField
+                    label: i18n("Selling Price")
+                    from: 0
+                    to: 999999
+                    value: 0
+                }
+
+                FormCard.FormTextFieldDelegate {
+                    id: packageBarcodeField
+                    visible:false
+                    label: i18n("Barcode (Optional)")
+                }
             }
         }
 
-        onAccepted: {
-            if (editingPackageIndex >= 0) {
-                packagesModel.set(editingPackageIndex, {
-                                      name: packageNameField.text,
-                                      pieces_per_package: packageQuantityField.value,
-                                      purchase_price: packagePurchasePriceField.value,
-                                      selling_price: packageSellingPriceField.value,
-                                      barcode: packageBarcodeField.text
-                                  });
-            } else {
-                packagesModel.append({
-                                         name: packageNameField.text,
-                                         pieces_per_package: packageQuantityField.value,
-                                         purchase_price: packagePurchasePriceField.value,
-                                         selling_price: packageSellingPriceField.value,
-                                         barcode: packageBarcodeField.text
-                                     });
-            }
-            clearPackageDialog();
-        }
+        customFooterActions: [
+            Kirigami.Action {
+                text: packageDialog.editingPackageIndex >= 0 ? i18n("Update") : i18n("Add")
+                icon.name: packageDialog.editingPackageIndex >= 0 ? "document-save" : "list-add"
+                onTriggered: {
+                    if (packageNameField.text.length === 0) {
+                        return
+                    }
 
-        onRejected: {
-            clearPackageDialog();
-        }
+                    if (packageDialog.editingPackageIndex >= 0) {
+                        packagesModel.set(packageDialog.editingPackageIndex, {
+                                              name: packageNameField.text,
+                                              pieces_per_package: packageQuantityField.value,
+                                              purchase_price: packagePurchasePriceField.value,
+                                              selling_price: packageSellingPriceField.value,
+                                              barcode: packageBarcodeField.text
+                                          })
+
+                        inlineMsgPackagesListDialog.text= "Package updated successfully"
+                        inlineMsgPackagesListDialog.visible=true
+                        inlineMsgPackagesListDialog.type= Kirigami.MessageType.Positive
+                    } else {
+                        packagesModel.append({
+                                                 name: packageNameField.text,
+                                                 pieces_per_package: packageQuantityField.value,
+                                                 purchase_price: packagePurchasePriceField.value,
+                                                 selling_price: packageSellingPriceField.value,
+                                                 barcode: packageBarcodeField.text
+                                             })
+
+                        inlineMsgPackagesListDialog.text= "Package added successfully"
+                        inlineMsgPackagesListDialog.visible=true
+                        inlineMsgPackagesListDialog.type= Kirigami.MessageType.Positive
+                    }
+                    clearPackageDialog()
+                    packageDialog.close()
+                }
+            },
+            Kirigami.Action {
+                text: i18n("Cancel")
+                icon.name: "dialog-cancel"
+                onTriggered: {
+                    clearPackageDialog()
+                    packageDialog.close()
+                }
+            }
+        ]
     }
 
     function clearPackageDialog() {
@@ -470,6 +576,7 @@ Kirigami.PromptDialog {
         maxStockField.value = product.maxStockLevel || 0;
         reorderPointField.value = product.reorderPoint || 0;
         locationField.text = product.location || "";
+        productImageCard.imageUrl = product.image_path ? "http://localhost:8000/" + product.image_path : "";
         packagesModel.clear();
         if (product.packages) {
             product.packages.forEach(pkg => {
@@ -482,6 +589,7 @@ Kirigami.PromptDialog {
                                                               });
                                      });
         }
+
     }
     Connections {
         target: productApi
@@ -541,6 +649,11 @@ Kirigami.PromptDialog {
             }
             isCreateAnother=false
         }
+        // function onImageRemoved(productId) {
+        //       if (product && product.id === productId) {
+        //           product.image_url = ""
+        //       }
+        //   }
 
     }
     // Add function to clear all status messages

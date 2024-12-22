@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(ECM   REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH})
 
-find_package(Qt6 6.4 REQUIRED COMPONENTS Quick QuickControls2 Network Pdf Concurrent)
+find_package(Qt6 6.4 REQUIRED COMPONENTS Quick QuickControls2 Network Pdf Concurrent PrintSupport)
 find_package(KF6  REQUIRED COMPONENTS Kirigami
     I18n
     CoreAddons
@@ -113,6 +113,10 @@ qt_add_qml_module(DGestapp
     QML_FILES contents/ui/pages/dashboard/Dashboard.qml
     QML_FILES contents/ui/pages/dashboard/PieChartCard.qml
     QML_FILES contents/ui/components/DStatusBadge.qml
+    SOURCES printerhelper.h printerhelper.cpp
+    QML_FILES contents/ui/pages/product/ProductImageEditor.qml
+    QML_FILES contents/ui/pages/product/ImageFileDialog.qml
+    QML_FILES contents/ui/pages/product/ImageBannerCard.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -127,7 +131,7 @@ set_target_properties(DGestapp PROPERTIES
 )
 
 target_link_libraries(DGestapp
-    PRIVATE Qt6::Quick Qt6::QuickControls2 Qt6::Network Qt6::Pdf  Qt6::Concurrent
+    PRIVATE Qt6::Quick Qt6::QuickControls2 Qt6::Network Qt6::Pdf  Qt6::Concurrent Qt6::PrintSupport
     KF6::Kirigami
     KF6::I18n
     KF6::CoreAddons
