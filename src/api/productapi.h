@@ -78,6 +78,8 @@ public:
 
 
     Q_INVOKABLE QFuture<void> addProductBarcode(int productId, const QString &barcode);
+    Q_INVOKABLE QFuture<void> updateProductBarcode(int productId, int barcodeId, const QString &newBarcode);
+
     Q_INVOKABLE QFuture<void> removeProductBarcode(int productId, int barcodeId);
     Q_INVOKABLE QFuture<void> getProductBarcodes(int productId);
 
@@ -91,6 +93,8 @@ signals:
     // Success signals
     void productsReceived(const PaginatedProducts &products);
     void productReceived(const QVariantMap &product);
+    void productReceivedForBarcode(const QVariantMap &product); // to get id from  variantmap
+
     void productCreated(const Product &product);
     void productUpdated(const Product &product);
     void productDeleted(int id);
@@ -103,13 +107,26 @@ signals:
     void productNotFound();
     void uploadImageError(const QString &message);
 
+    void errorProductsReceived(const QString &message, ApiStatus status,const QString &details);
+    void errorProductReceived(const QString &message, ApiStatus status,const QString &details);
+    void errorProductCreated(const QString &message, ApiStatus status,const QString &details);
+    void errorProductUpdated(const QString &message, ApiStatus status,const QString &details);
+    void errorPoductDeleted(const QString &message, ApiStatus status,const QString &details);
+    void errorBarcodeAdded(const QString &message, ApiStatus status,const QString &details);
+    void errorBarcodeRemoved(const QString &message, ApiStatus status,const QString &details);
+    void errorBarcodeUpdated(const QString &message, ApiStatus status,const QString &details);
+    void errorProductBarcodesReceived(const QString &message, ApiStatus status,const QString &details);
+
+
     void barcodeAdded(const QJsonObject &barcode);
     void barcodeRemoved(int productId, int barcodeId);
+    void barcodeUpdated(const QJsonObject &barcode);
     void productBarcodesReceived(const QList<QJsonObject> &barcodes);
+
+
     void imageRemoved(int productId);
 
     void isLoadingChanged();
-
     void imageUploaded(const QString &imageUrl);
 private:
     Product productFromJson(const QJsonObject &json) const;

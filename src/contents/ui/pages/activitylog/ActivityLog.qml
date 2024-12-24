@@ -9,7 +9,7 @@ import org.kde.kirigamiaddons.formcard as FormCard
 import "../../components"
 import "."
 import com.dervox.ActivityLogModel 1.0
-
+//TODO Fix sorting in table
 Kirigami.Page {
     id: root
     title: i18nc("@title:group", "Activity Logs")
@@ -28,13 +28,25 @@ Kirigami.Page {
         ListElement { text: "Create"; value: "Create" }
         ListElement { text: "Delete"; value: "Delete" }
         ListElement { text: "Update"; value: "Update" }
+        ListElement { text: "Download"; value: "download" }
+        ListElement { text: "Send"; value: "send" }
+        ListElement { text: "Status Update"; value: "status update" }
+        ListElement { text: "Payment"; value: "payment" }
+        ListElement { text: "Price Update"; value: "price update" }
+        ListElement { text: "Transfer"; value: "transfer" }
+        ListElement { text: "Deposit"; value: "Withdrawal" }
     }
 
     property var modelTypesModel: ListModel {
         id: modelTypesList
         ListElement { text: "All"; value: "" }
         ListElement { text: "Product"; value: "Product" }
-        ListElement { text: "Barcode"; value: "Barcode" }
+        ListElement { text: "Cash Source"; value: "cashsource" }
+        ListElement { text: "Purchase"; value: "purchase" }
+        ListElement { text: "Sale"; value: "sale" }
+        ListElement { text: "Invoice"; value: "invoice" }
+        ListElement { text: "Client"; value: "client" }
+        ListElement { text: "Supplier"; value: "supplier" }
     }
     // Left overlay for filters
     Kirigami.OverlayDrawer {
@@ -232,21 +244,21 @@ Kirigami.Page {
 
     actions: [
         Kirigami.Action {
-            icon.name: "filter"
+            icon.name: "view-filter"
             text: i18n("Filter")
             onTriggered: filterSheet.open()
-        },
-        Kirigami.Action {
-            icon.name: "overflow-menu"
-            Kirigami.Action {
-                text: i18n("Export")
-                onTriggered: showPassiveNotification(i18n("Export feature coming soon"))
-            }
-            Kirigami.Action {
-                text: i18n("Statistics")
-                onTriggered: statisticsSheet.open()
-            }
         }
+        // Kirigami.Action {
+        //     icon.name: "overflow-menu"
+        //     Kirigami.Action {
+        //         text: i18n("Export")
+        //         onTriggered: showPassiveNotification(i18n("Export feature coming soon"))
+        //     }
+        //     Kirigami.Action {
+        //         text: i18n("Statistics")
+        //         onTriggered: statisticsSheet.open()
+        //     }
+        // }
     ]
 
     header: RowLayout {
@@ -298,6 +310,56 @@ Kirigami.Page {
             sortRole: ActivityLogRoles.CreatedAtRole
 
             contentWidth: parent.width
+            property var nonSortableColumns: {
+                   return {
+
+                   }
+               }
+
+            // onColumnClicked: function (index, headerComponent) {
+            //     if (Object.keys(nonSortableColumns).includes(String(headerComponent.role)) ||
+            //             Object.values(nonSortableColumns).includes(headerComponent.textRole)) {
+            //         return; // Exit if column shouldn't be sortable
+            //     }
+            //     if (view.sortRole !== headerComponent.role) {
+
+            //         activityLogModel.sortField=headerComponent.textRole
+            //         activityLogModel.sortDirection="asc"
+
+            //         view.sortRole = headerComponent.role;
+
+            //         view.sortOrder = Qt.AscendingOrder;
+
+            //     } else {
+            //         //view.sortOrder = view.sortOrder === Qt.AscendingOrder ? Qt.DescendingOrder : Qt.AscendingOrder
+            //         // view.sortOrder = view.sortOrder === "asc" ? "desc": "asc"
+            //         activityLogModel.sortDirection=view.sortOrder === Qt.AscendingOrder ? "desc" : "asc"
+            //         view.sortOrder = activityLogModel.sortDirection === "asc" ? Qt.AscendingOrder : Qt.DescendingOrder
+
+
+
+            //     }
+
+            //     view.model.sort(view.sortRole, view.sortOrder);
+
+            //     // After sorting we need update selection
+            //     __resetSelection();
+            // }
+
+            function __resetSelection() {
+                // NOTE: Making a forced copy of the list
+                let selectedIndexes = Array(...view.selectionModel.selectedIndexes)
+
+                let currentRow = view.selectionModel.currentIndex.row;
+                let currentColumn = view.selectionModel.currentIndex.column;
+
+                view.selectionModel.clear();
+                for (let i in selectedIndexes) {
+                    view.selectionModel.select(selectedIndexes[i], ItemSelectionModel.Select);
+                }
+
+                view.selectionModel.setCurrentIndex(view.model.index(currentRow, currentColumn), ItemSelectionModel.Select);
+            }
 
             headerComponents: [
                 Tables.HeaderComponent {
@@ -306,6 +368,11 @@ Kirigami.Page {
                     role: ActivityLogRoles.IdRole
                     minimumWidth: root.width * 0.05
                     width: minimumWidth
+                    itemDelegate: QQC2.Label {
+                        text: modelData
+                        horizontalAlignment: Text.AlignRight
+                        font.weight: Font.Medium
+                    }
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Log Type")
@@ -313,6 +380,18 @@ Kirigami.Page {
                     role: ActivityLogRoles.LogTypeRole
                     minimumWidth: root.width * 0.15
                     width: minimumWidth
+                    itemDelegate: QQC2.Label {
+                        text: modelData
+                        color: {
+                            switch(modelData.toLowerCase()) {
+                                case 'create': return Kirigami.Theme.positiveTextColor;
+                                case 'update': return Kirigami.Theme.neutralTextColor;
+                                case 'delete': return Kirigami.Theme.negativeTextColor;
+                                default: return Kirigami.Theme.textColor;
+                            }
+                        }
+                        font.weight: Font.Medium
+                    }
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Model Type")
@@ -320,6 +399,16 @@ Kirigami.Page {
                     role: ActivityLogRoles.ModelTypeRole
                     minimumWidth: root.width * 0.15
                     width: minimumWidth
+                    itemDelegate: QQC2.Label {
+                        //  text: modelData
+                        color: Kirigami.Theme.neutralTextColor
+                        text: {
+                            if(modelData == "CashSource")
+                            return "Cash Source"
+                            else
+                            return modelData;
+                        }
+                    }
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Model ID")
@@ -327,6 +416,11 @@ Kirigami.Page {
                     role: ActivityLogRoles.ModelIdentifierRole
                     minimumWidth: root.width * 0.15
                     width: minimumWidth
+                    itemDelegate: QQC2.Label {
+                        text: modelData
+                        elide: Text.ElideMiddle
+                        horizontalAlignment: Text.AlignLeft
+                    }
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "User")
@@ -334,13 +428,27 @@ Kirigami.Page {
                     role: ActivityLogRoles.UserIdentifierRole
                     minimumWidth: root.width * 0.15
                     width: minimumWidth
+                    itemDelegate: QQC2.Label {
+                        text: modelData
+                        elide: Text.ElideRight
+                        font.weight: Font.Medium
+                    }
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Created At")
                     textRole: "createdAt"
                     role: ActivityLogRoles.CreatedAtRole
-                    minimumWidth: root.width * 0.15
+                    minimumWidth: root.width * 0.30
                     width: minimumWidth
+                    itemDelegate: QQC2.Label {
+                        text: {
+                            // Assuming createdAt is a valid date string or timestamp
+                            let date = new Date(modelData);
+                            return Qt.formatDateTime(date, "yyyy-MM-dd HH:mm:ss");
+                        }
+                        horizontalAlignment: Text.AlignRight
+                        font.family: "Monospace"
+                    }
                 }
             ]
         }
@@ -357,7 +465,19 @@ Kirigami.Page {
         totalItems: activityLogModel.totalItems
         onPageChanged: activityLogModel.loadPage(page)
     }
+    Connections {
+        target: activityLogApi
 
+        function onLogError(message, status, details) {
+            applicationWindow().gnotification.showNotification("",
+                                                               message, // message
+                                                               Kirigami.MessageType.Error, // message type
+                                                               "short",
+                                                               "dialog-close"
+                                                               )
+
+        }
+    }
 
     Component.onCompleted: {
         activityLogModel.setApi(activityLogApi)

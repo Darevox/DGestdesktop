@@ -76,8 +76,8 @@ Kirigami.Page {
                 delegate: FormCard.FormTextDelegate {
                     text: modelData.name || i18n("Anonymous")
                     description: i18n("%1 sales, Total: %2",
-                        modelData.count,
-                        Number(modelData.total_amount).toLocaleString(Qt.locale(), 'f', 2))
+                                      modelData.count,
+                                      Number(modelData.total_amount).toLocaleString(Qt.locale(), 'f', 2))
                 }
             }
         }
@@ -94,8 +94,8 @@ Kirigami.Page {
                 delegate: FormCard.FormTextDelegate {
                     text: modelData.name
                     description: i18n("Sold: %1, Total: %2",
-                        modelData.total_quantity,
-                        Number(modelData.total_amount).toLocaleString(Qt.locale(), 'f', 2))
+                                      modelData.total_quantity,
+                                      Number(modelData.total_amount).toLocaleString(Qt.locale(), 'f', 2))
                 }
             }
         }
@@ -287,15 +287,7 @@ Kirigami.Page {
                     role: SaleRoles.ReferenceNumberRole
                     width: root.width * 0.15
                 },
-                Tables.HeaderComponent {
-                    title: i18nc("@title:column", "Date")
-                    textRole: "saleDate"
-                    role: SaleRoles.SaleDateRole
-                    width: root.width * 0.15
-                    itemDelegate: QQC2.Label {
-                        text: Qt.formatDateTime(modelData, "dd/MM/yyyy")
-                    }
-                },
+
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Client")
                     textRole: "client"
@@ -310,12 +302,21 @@ Kirigami.Page {
                     textRole: "status"
                     role: SaleRoles.StatusRole
                     width: root.width * 0.10
-                    itemDelegate: QQC2.Label {
-                        text: modelData || ""
-                        color: {
+
+                    itemDelegate: DStatusBadge {
+                        text: {
+                            switch(modelData) {
+                                case "completed": return "Completed"
+                                case "cancelled": return "Cancelled"
+                                case "pending": return "Pending"
+                                default: return modelData || ""
+                            }
+                        }
+                        textColor: {
                             switch(modelData) {
                                 case "completed": return Kirigami.Theme.positiveTextColor
                                 case "cancelled": return Kirigami.Theme.negativeTextColor
+                                case "pending": return Kirigami.Theme.neutralTextColor
                                 default: return Kirigami.Theme.textColor
                             }
                         }
@@ -326,13 +327,21 @@ Kirigami.Page {
                     textRole: "paymentStatus"
                     role: SaleRoles.PaymentStatusRole
                     width: root.width * 0.10
-                    itemDelegate: QQC2.Label {
-                        text: modelData || ""
-                        color: {
+
+                    itemDelegate: DStatusBadge {
+                        text: {
                             switch(modelData) {
+                                case "partial": return "Partial"
+                                case "unpaid": return "Unpaid"
+                                case "paid": return "Paid"
+                                default: return modelData || ""
+                            }
+                        }
+                        textColor: {
+                            switch(modelData) {
+                                case "partial": return Kirigami.Theme.neutralTextColor
                                 case "paid": return Kirigami.Theme.positiveTextColor
                                 case "unpaid": return Kirigami.Theme.negativeTextColor
-                                case "partial": return Kirigami.Theme.neutralTextColor
                                 default: return Kirigami.Theme.textColor
                             }
                         }
@@ -356,8 +365,30 @@ Kirigami.Page {
                     itemDelegate: QQC2.Label {
                         text: Number(modelData || 0).toLocaleString(Qt.locale(), 'f', 2)
                         horizontalAlignment: Text.AlignRight
+                        color: {
+                            if (model.paidAmount === 0) {
+                                return Kirigami.Theme.negativeTextColor;  // Not paid
+                            } else if (model.paidAmount === model.totalAmount) {
+                                return Kirigami.Theme.positiveTextColor;  // Fully paid
+                            } else if (model.paidAmount < model.totalAmount) {
+                                return Kirigami.Theme.neutralTextColor;   // Partially paid
+                            }
+                            return Kirigami.Theme.textColor;  // Default color
+                        }
+                        font.bold: model.paidAmount > 0  // Optional: make non-zero amounts bold
+                    }
+                },
+                Tables.HeaderComponent {
+                    title: i18nc("@title:column", "Date")
+                    textRole: "saleDate"
+                    role: SaleRoles.SaleDateRole
+                    width: root.width * 0.15
+                    itemDelegate: QQC2.Label {
+                        text: Qt.formatDateTime(modelData, "dd/MM/yyyy")
+                         horizontalAlignment: Text.AlignRight
                     }
                 }
+
             ]
 
             onCellDoubleClicked: function(row) {
@@ -404,8 +435,8 @@ Kirigami.Page {
         onAccepted: {
             let checkedIds = saleModel.getCheckedSaleIds()
             checkedIds.forEach(id => {
-                saleModel.deleteSale(id)
-            })
+                                   saleModel.deleteSale(id)
+                               })
         }
     }
 

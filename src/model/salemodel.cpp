@@ -46,7 +46,7 @@ int SaleModel::columnCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
-    return 8; // Adjust based on your needs
+    return 7; // Adjust based on your needs
 }
 
 QVariant SaleModel::data(const QModelIndex &index, int role) const

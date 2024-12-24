@@ -569,10 +569,10 @@ void ProductModel::toggleAllProductsChecked()
     updateHasCheckedItems();
 }
 
-bool ProductModel::hasCheckedItems() const
-{
-    return m_hasCheckedItems;
-}
+// bool ProductModel::hasCheckedItems() const
+// {
+//     return m_hasCheckedItems;
+// }
 
 void ProductModel::updateHasCheckedItems()
 {

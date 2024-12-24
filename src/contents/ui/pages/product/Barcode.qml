@@ -29,9 +29,17 @@ Kirigami.Dialog {
         }
     ]
 
+
     contentItem: ColumnLayout {
         spacing: Kirigami.Units.smallSpacing
-
+        Kirigami.InlineMessage {
+            id:inlineMsgBarcode
+            Layout.fillWidth: true
+            text: "Hey! Let me tell you something positive!"
+            showCloseButton: true
+            type: Kirigami.MessageType.Positive
+            visible: false
+        }
         RowLayout {
             Layout.fillWidth: true
             Item {
@@ -41,7 +49,7 @@ Kirigami.Dialog {
                 icon.name: "list-add-symbolic"
                 text: "Add"
                 onClicked:{
-                addDialog.open()
+                    addDialog.open()
                 }
             }
         }
@@ -118,6 +126,7 @@ Kirigami.Dialog {
                             id: editButton
                             icon.name: "cell_edit"
                             onClicked: {
+                                editDialog.barcodeIDToEdit=model.id
                                 editDialog.barcodeToEdit = model.barcode
                                 editDialog.open()
                             }
@@ -157,6 +166,14 @@ Kirigami.Dialog {
         id: addDialog
         title: "New Barcode"
         standardButtons: Kirigami.Dialog.NoButton
+        Kirigami.InlineMessage {
+            id:inlineMsgAddDialog
+            Layout.fillWidth: true
+            text: "Hey! Let me tell you something positive!"
+            showCloseButton: true
+            type: Kirigami.MessageType.Positive
+            visible: false
+        }
         customFooterActions: [
             Kirigami.Action {
                 text: "Create Barcode"
@@ -180,18 +197,42 @@ Kirigami.Dialog {
                 placeholderText: "Barcode…"
             }
         }
+        Connections {
+            target: productApi
+            function onErrorBarcodeAdded(message, status, details) {
+                inlineMsgAddDialog.text= details
+                inlineMsgAddDialog.visible=true
+                inlineMsgAddDialog.type= Kirigami.MessageType.Error
+            }
+        }
+        onOpened:{
+            barcodeText.text=""
+            inlineMsgAddDialog.text=""
+            inlineMsgAddDialog.visible=false
+
+        }
     }
     Kirigami.PromptDialog {
         id: editDialog
         title: "Edit Barcode"
         standardButtons: Kirigami.Dialog.NoButton
         property string barcodeToEdit: ""
+        property int barcodeIDToEdit: 0
+        Kirigami.InlineMessage {
+            id:inlineMsgEditDialog
+            Layout.fillWidth: true
+            text: "Hey! Let me tell you something positive!"
+            showCloseButton: true
+            type: Kirigami.MessageType.Positive
+            visible: false
+        }
         customFooterActions: [
             Kirigami.Action {
                 text: "Save Barcode"
                 icon.name: "dialog-ok"
                 onTriggered: {
-                    productApi.removeProductBarcode(productId,barcodeTextToEdit.text)
+                    productApi.updateProductBarcode(productId, editDialog.barcodeIDToEdit, barcodeTextToEdit.text)
+
                 }
             },
             Kirigami.Action {
@@ -209,9 +250,25 @@ Kirigami.Dialog {
                 Layout.fillWidth: true
             }
         }
+        Connections {
+            target: productApi
+            function onErrorBarcodeUpdated(message, status, details) {
+                inlineMsgEditDialog.text= details
+                inlineMsgEditDialog.visible=true
+                inlineMsgEditDialog.type= Kirigami.MessageType.Error
+            }
+        }
+        onOpened:{
+
+            inlineMsgEditDialog.text=""
+            inlineMsgEditDialog.visible=false
+
+        }
     }
     Kirigami.PromptDialog {
         id: deleteDialog
+
+
         property int barcodeToDelete: -1
         title: i18n("Delete Barcode")
         subtitle: i18n("Are you sure you'd like to delete this barcode?")
@@ -219,6 +276,7 @@ Kirigami.Dialog {
         onAccepted: {
             productApi.removeProductBarcode(productId,barcodeToDelete)
         }
+
     }
 
     onProductIdChanged: {
@@ -229,6 +287,40 @@ Kirigami.Dialog {
         }
     }
 
+    Connections {
+        target: productApi
+        function onErrorProductBarcodesReceived(message, status, details) {
+            inlineMsgBarcode.text= details
+            inlineMsgBarcode.visible=true
+            inlineMsgBarcode.type= Kirigami.MessageType.Error
+        }
+        function onErrorBarcodeRemoved(message, status, details) {
+            inlineMsgBarcode.text= details
+            inlineMsgBarcode.visible=true
+            inlineMsgBarcode.type= Kirigami.MessageType.Error
+        }
+        function onBarcodeAdded() {
+            addDialog.close()
+            inlineMsgBarcode.text= "Barcode Created successfully"
+            inlineMsgBarcode.visible=true
+            inlineMsgBarcode.type= Kirigami.MessageType.Positive
+            barcodeModel.refresh()
+        }
+        function onBarcodeRemoved() {
+            inlineMsgBarcode.text= "Barcode Deleted successfully"
+            inlineMsgBarcode.visible=true
+            inlineMsgBarcode.type= Kirigami.MessageType.Positive
+            barcodeModel.refresh()
+        }
+        function onBarcodeUpdated() {
+            editDialog.close()
+            inlineMsgBarcode.text= "Barcode Updated successfully"
+            inlineMsgBarcode.visible=true
+            inlineMsgBarcode.type= Kirigami.MessageType.Positive
+            barcodeModel.refresh()
+        }
+
+    }
     BarcodePrint {
         id: barcodePrint
     }

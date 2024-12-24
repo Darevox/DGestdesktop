@@ -17,6 +17,8 @@ Kirigami.Dialog {
     property int dialogProductId: 0
     property var productData: ({})
     property bool isCreateAnother: false
+    property bool isBarcodeRequest: false
+
     QQC2.BusyIndicator {
         id: busyIndicator
         anchors.centerIn: parent
@@ -75,7 +77,7 @@ Kirigami.Dialog {
             enabled: !productApi.isLoading
             onTriggered: {
                 inlineMsg.visible=false
-                isCreateAnother=false
+                productDialog.isCreateAnother=false
                 clearStatusMessages() // Clear previous error messages
                 let updatedProduct = updateProduct()
                 if (dialogProductId>0) {
@@ -124,213 +126,220 @@ Kirigami.Dialog {
 
     contentItem :
         GridLayout{
-            columns:3
-            rows:1
-           // anchors.fill : parent
-            anchors.margins : 20
-            enabled: !productApi.isLoading
-            FormCard.FormCard {
-                Layout.fillHeight:true
-                             Layout.alignment: Qt.AlignTop
-                ImageBannerCard {
-                    id: productImageCard
-                    idProduct : productDialog.dialogProductId
+        columns:3
+        rows:1
+        // anchors.fill : parent
+        anchors.margins : 20
+        enabled: !productApi.isLoading
+        FormCard.FormCard {
+            Layout.fillHeight:true
+            Layout.alignment: Qt.AlignTop
+            ImageBannerCard {
+                id: productImageCard
+                idProduct : productDialog.dialogProductId
 
-                    Layout.alignment: Qt.AlignTop
+                Layout.alignment: Qt.AlignTop
 
-                }
+            }
 
-                FormCard.FormTextFieldDelegate {
-                    id: nameField
-                    label: qsTr("Name")
-                    text:  ""
-                    status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
-                }
+            FormCard.FormTextFieldDelegate {
+                id: nameField
+                label: qsTr("Name")
+                text:  ""
+                status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
+            }
 
-                FormCard.FormTextAreaDelegate {
-                    id: descriptionField
-                    label: qsTr("Description")
-                    text:  ""
-                }
-                FormCard.FormComboBoxDelegate {
-                    id: unitCombo
-                    text: i18nc("@label:listbox", "Product Unit")
-                    displayMode: FormCard.FormComboBoxDelegate.ComboBox
-                    editable: false
-                    currentIndex:-1
-                    property int unitId: 0
-                    textRole: "name"
-                    // Function to find and set index by unit ID
-                    function setCurrentIndexById(id) {
-                        if(id === 0 || id === -1) {
-                            unitCombo.currentIndex = -1
-                        }
-                        else
-                            for(let i = 0; i < unitCombo.model.rowCount(); i++) {
-                                let itemId = unitCombo.model.data(unitCombo.model.index(i, 0), Qt.UserRole + 1)
-                                if(itemId === id) {
-                                    unitCombo.currentIndex = i
-                                    break
-                                }
+            FormCard.FormTextAreaDelegate {
+                id: descriptionField
+                label: qsTr("Description")
+                text:  ""
+            }
+            FormCard.FormComboBoxDelegate {
+                id: unitCombo
+                text: i18nc("@label:listbox", "Product Unit")
+                displayMode: FormCard.FormComboBoxDelegate.ComboBox
+                editable: false
+                currentIndex:-1
+                property int unitId: 0
+                textRole: "name"
+                // Function to find and set index by unit ID
+                function setCurrentIndexById(id) {
+                    if(id === 0 || id === -1) {
+                        unitCombo.currentIndex = -1
+                    }
+                    else
+                        for(let i = 0; i < unitCombo.model.rowCount(); i++) {
+                            let itemId = unitCombo.model.data(unitCombo.model.index(i, 0), Qt.UserRole + 1)
+                            if(itemId === id) {
+                                unitCombo.currentIndex = i
+                                break
                             }
-                    }
-
-                    onCurrentIndexChanged: {
-                        console.log("unitCombo currentIndex", unitCombo.currentIndex)
-                        var selectedIndex = unitCombo.currentIndex
-                        var selectedId = unitCombo.model.data(unitCombo.model.index(selectedIndex, 0),  Qt.UserRole + 1)
-                        var selectedName = unitCombo.model.data(unitCombo.model.index(selectedIndex, 0),  Qt.UserRole + 2)
-                        unitCombo.unitId = selectedId
-                        console.log("unitCombo name", selectedName)
-                        console.log("unitCombo id", selectedId)
-                    }
-                }
-                FormCard.FormTextFieldDelegate {
-                    id: locationField
-                    label: qsTr("Location")
-                    text:  ""
+                        }
                 }
 
-            }
-            FormCard.FormCard {
-                 Layout.fillHeight:true
-                Layout.alignment: Qt.AlignTop
-                FormCard.FormSpinBoxDelegate {
-                    id: quantityField
-                    label: qsTr("Quantity")
-                    value: 0
-                    from: 0
-                    to: 999999
-                    stepSize: 1
-                }
-                DFormTextFieldDelegate {
-                    id: purchase_priceField
-                    label: qsTr("Purchase Price")
-                    text: "0"
-
-                    // Property to store clean value as integer
-                    // Only allow digits
-                    validator: RegularExpressionValidator {
-                        regularExpression: /^\d+$/
-                    }
-
-                    // Input validation - only allow numbers
-                    inputMethodHints: Qt.ImhDigitsOnly
-                }
-                FormCard.FormTextDelegate {
-                    leading: purchase_priceField
-                    text: {
-                        var price = Number(priceField.text) || 0           // Selling Price
-                        var purchasePrice = Number(purchase_priceField.text) || 0  // Purchase Price
-                        var profit = price - purchasePrice
-                        return "Selling Price: " + price.toFixed(2)
-                    }
-                    description: {
-                        var price = Number(priceField.text) || 0           // Selling Price
-                        var purchasePrice = Number(purchase_priceField.text) || 0  // Purchase Price
-                        var profit = price - purchasePrice
-                        return "Profit: " + profit.toFixed(2)
-                    }
-                }
-                DFormTextFieldDelegate {
-                    id: priceField
-                    label: qsTr("Price")
-                    text: "0"
-                    // Only allow digits
-                    validator: RegularExpressionValidator {
-                        regularExpression: /^\d+$/
-                    }
-                    inputMethodHints: Qt.ImhDigitsOnly
-                }
-                FormCard.FormTextDelegate {
-                    leading: priceField
-                    text: {
-                        return "Profit Margin: "
-                    }
-                    description: {
-                        var price = Number(priceField.text) || 0
-                        var purchasePrice = Number(purchase_priceField.text) || 0
-
-                        // Avoid division by zero
-                        if (price === 0) return "0 %"
-
-                        var profitMargin = ((price - purchasePrice) / price) * 100
-                        return  profitMargin.toFixed(2) + " %"
-                    }
-                }
-                FormCard.FormSpinBoxDelegate {
-                    id: minStockField
-                    label: qsTr("Min Stock")
-                    value:  0
-                    from: 0
-                    to: 999999
-                }
-                FormCard.FormSpinBoxDelegate {
-                    id: maxStockField
-                    label: qsTr("Max Stock")
-                    value:  0
-                    from: 0
-                    to: 999999
+                onCurrentIndexChanged: {
+                    console.log("unitCombo currentIndex", unitCombo.currentIndex)
+                    var selectedIndex = unitCombo.currentIndex
+                    var selectedId = unitCombo.model.data(unitCombo.model.index(selectedIndex, 0),  Qt.UserRole + 1)
+                    var selectedName = unitCombo.model.data(unitCombo.model.index(selectedIndex, 0),  Qt.UserRole + 2)
+                    unitCombo.unitId = selectedId
+                    console.log("unitCombo name", selectedName)
+                    console.log("unitCombo id", selectedId)
                 }
             }
-            FormCard.FormCard {
-                Layout.fillHeight:true
+            FormCard.FormTextFieldDelegate {
+                id: locationField
+                label: qsTr("Location")
+                text:  ""
+            }
 
-                Layout.alignment: Qt.AlignTop
-                FormCard.FormSpinBoxDelegate {
-                    id: reorderPointField
-                    label: qsTr("Reorder Point")
-                    value:  0
-                    from: 0
-                    to: 999999
+        }
+        FormCard.FormCard {
+            Layout.fillHeight:true
+            Layout.alignment: Qt.AlignTop
+            FormCard.FormSpinBoxDelegate {
+                id: quantityField
+                label: qsTr("Quantity")
+                value: 0
+                from: 0
+                to: 999999
+                stepSize: 1
+            }
+            DFormTextFieldDelegate {
+                id: purchase_priceField
+                label: qsTr("Purchase Price")
+                text: "0"
+
+                // Property to store clean value as integer
+                // Only allow digits
+                validator: RegularExpressionValidator {
+                    regularExpression: /^\d+$/
                 }
 
-                FormCard.FormTextFieldDelegate {
-                    id: referenceField
-                    label: qsTr("Refernce")
-                    text:  ""
+                // Input validation - only allow numbers
+                inputMethodHints: Qt.ImhDigitsOnly
+            }
+            FormCard.FormTextDelegate {
+                leading: purchase_priceField
+                text: {
+                    var price = Number(priceField.text) || 0           // Selling Price
+                    var purchasePrice = Number(purchase_priceField.text) || 0  // Purchase Price
+                    var profit = price - purchasePrice
+                    return "Selling Price: " + price.toFixed(2)
                 }
-                FormCard.FormTextFieldDelegate {
-                    id: skuField
-                    label: qsTr("SKU")
-                    text:  ""
+                description: {
+                    var price = Number(priceField.text) || 0           // Selling Price
+                    var purchasePrice = Number(purchase_priceField.text) || 0  // Purchase Price
+                    var profit = price - purchasePrice
+                    return "Profit: " + profit.toFixed(2)
                 }
-                FormCard.FormButtonDelegate{
-                    text:"Setup Barcode"
-                    description:"View & print"
-                    icon.name:"view-barcode"
-                    onClicked :{
-                        // barcodeDialogLoader.priceText = priceField.text
-                        // barcodeDialogLoader.contentEditText = barcodeField.text
+            }
+            DFormTextFieldDelegate {
+                id: priceField
+                label: qsTr("Price")
+                text: "0"
+                // Only allow digits
+                validator: RegularExpressionValidator {
+                    regularExpression: /^\d+$/
+                }
+                inputMethodHints: Qt.ImhDigitsOnly
+            }
+            FormCard.FormTextDelegate {
+                leading: priceField
+                text: {
+                    return "Profit Margin: "
+                }
+                description: {
+                    var price = Number(priceField.text) || 0
+                    var purchasePrice = Number(purchase_priceField.text) || 0
+
+                    // Avoid division by zero
+                    if (price === 0) return "0 %"
+
+                    var profitMargin = ((price - purchasePrice) / price) * 100
+                    return  profitMargin.toFixed(2) + " %"
+                }
+            }
+            FormCard.FormSpinBoxDelegate {
+                id: minStockField
+                label: qsTr("Min Stock")
+                value:  0
+                from: 0
+                to: 999999
+            }
+            FormCard.FormSpinBoxDelegate {
+                id: maxStockField
+                label: qsTr("Max Stock")
+                value:  0
+                from: 0
+                to: 999999
+            }
+        }
+        FormCard.FormCard {
+            Layout.fillHeight:true
+
+            Layout.alignment: Qt.AlignTop
+            FormCard.FormSpinBoxDelegate {
+                id: reorderPointField
+                label: qsTr("Reorder Point")
+                value:  0
+                from: 0
+                to: 999999
+            }
+
+            FormCard.FormTextFieldDelegate {
+                id: referenceField
+                label: qsTr("Refernce")
+                text:  ""
+            }
+            FormCard.FormTextFieldDelegate {
+                id: skuField
+                label: qsTr("SKU")
+                text:  ""
+            }
+            FormCard.FormButtonDelegate{
+                text:"Setup Barcode"
+                description:"View & print"
+                icon.name:"view-barcode"
+                onClicked :{
+                    // barcodeDialogLoader.priceText = priceField.text
+                    // barcodeDialogLoader.contentEditText = barcodeField.text
+                    if(productDialog.dialogProductId>0){
                         barcodeDialogLoader.productId =  productDialog.dialogProductId
                         barcodeDialogLoader.active=true
                     }
-                }
+                    else {
+                        productDialog.isBarcodeRequest=true
+                        createBeforSetupDialog.open()
 
-
-                FormCard.FormDateTimeDelegate {
-                    id: expiredDateField
-                    dateTimeDisplay:FormCard.FormDateTimeDelegate.DateTimeDisplay.Date
-                    text: i18nc("@label:listbox", "Expiration Date")
-                    value: undefined
-                    onValueChanged:{
-                        console.log(value)
                     }
                 }
-
-
-                FormCard.FormButtonDelegate {
-                    Layout.margins : 10
-                    text: i18n("Manage Packages")
-                    description: packagesModel.count > 0 ?
-                                     i18np("%1 package defined", "%1 packages defined", packagesModel.count) :
-                                     i18n("No packages defined")
-                    icon.name: "package"
-                    onClicked: packagesListDialog.open()
-                }
-
             }
+
+
+            FormCard.FormDateTimeDelegate {
+                id: expiredDateField
+                dateTimeDisplay:FormCard.FormDateTimeDelegate.DateTimeDisplay.Date
+                text: i18nc("@label:listbox", "Expiration Date")
+                value: undefined
+                onValueChanged:{
+                    console.log(value)
+                }
+            }
+
+
+            FormCard.FormButtonDelegate {
+                Layout.margins : 10
+                text: i18n("Manage Packages")
+                description: packagesModel.count > 0 ?
+                                 i18np("%1 package defined", "%1 packages defined", packagesModel.count) :
+                                 i18n("No packages defined")
+                icon.name: "package"
+                onClicked: packagesListDialog.open()
+            }
+
         }
+    }
 
     Kirigami.Dialog {
         id: packagesListDialog
@@ -537,7 +546,18 @@ Kirigami.Dialog {
             }
         ]
     }
+    Kirigami.PromptDialog {
+        id: createBeforSetupDialog
+        title: i18n("Create Product")
+        subtitle: i18n("You need to create prodcut before setup barcode, Are you sure you'd like to create product?")
+        standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
+        onAccepted: {
+            clearStatusMessages() // Clear previous error messages
+            let updatedProduct = updateProduct()
+            productModel.createProduct(updatedProduct)
 
+        }
+    }
     function clearPackageDialog() {
         packageDialog.editingPackageIndex = -1;
         packageNameField.text = "";
@@ -589,18 +609,24 @@ Kirigami.Dialog {
                                                               });
                                      });
         }
+        if(productDialog.isBarcodeRequest){
+            barcodeDialogLoader.productId =  productDialog.dialogProductId
+            barcodeDialogLoader.active=true
+            productDialog.isBarcodeRequest=false
+        }
+
 
     }
     Connections {
         target: productApi
         function onProductReceived(product) {
+
             loadData(product)
         }
         function onProductUnitsReceived(){
             unitCombo.model=productUnitModel
         }
-
-        function onProductError(message, status, details) {
+        function onErrorProductCreated(message, status, details) {
             if (status === 1) { // Validation error
                 handleValidationErrors(details)
             }
@@ -612,6 +638,43 @@ Kirigami.Dialog {
 
             }
         }
+        function onErrorProductUpdated(message, status, details) {
+            if (status === 1) { // Validation error
+                handleValidationErrors(details)
+            }
+            else{
+
+                inlineMsg.text= message
+                inlineMsg.visible=true
+                inlineMsg.type= Kirigami.MessageType.Error
+
+            }
+        }
+        function onErrorPoductDeleted(message, status, details) {
+            if (status === 1) { // Validation error
+                handleValidationErrors(details)
+            }
+            else{
+
+                inlineMsg.text= message
+                inlineMsg.visible=true
+                inlineMsg.type= Kirigami.MessageType.Error
+
+            }
+        }
+        function onErrorProductReceived(message, status, details) {
+            if (status === 1) { // Validation error
+                handleValidationErrors(details)
+            }
+            else{
+
+                inlineMsg.text= message
+                inlineMsg.visible=true
+                inlineMsg.type= Kirigami.MessageType.Error
+
+            }
+        }
+
         function onProductUpdated(){
             applicationWindow().gnotification.showNotification("",
                                                                "Product "+ nameField.text +" Updated successfully", // message
@@ -620,6 +683,8 @@ Kirigami.Dialog {
                                                                "dialog-close"
                                                                )
             productDialog.close()
+            productModel.refresh()
+
         }
         function onProductDeleted(){
             applicationWindow().gnotification.showNotification("",
@@ -629,25 +694,37 @@ Kirigami.Dialog {
                                                                "dialog-close"
                                                                )
             productDialog.close()
+            productModel.refresh()
+
+        }
+        function  onProductReceivedForBarcode(product){
+            if(productDialog.isBarcodeRequest){
+                productDialog.dialogProductId=product.id
+            }
+
         }
         function onProductCreated(){
-            if(!isCreateAnother){
+            if(!productDialog.isBarcodeRequest){
+                if(!isCreateAnother){
 
-                applicationWindow().gnotification.showNotification("",
-                                                                   "Product Added successfully", // message
-                                                                   Kirigami.MessageType.Positive, // message type
-                                                                   "short",
-                                                                   "dialog-close"
-                                                                   )
-                productDialog.close()
+                    applicationWindow().gnotification.showNotification("",
+                                                                       "Product Added successfully", // message
+                                                                       Kirigami.MessageType.Positive, // message type
+                                                                       "short",
+                                                                       "dialog-close"
+                                                                       )
+                    productDialog.close()
 
+                }
+                else {
+                    inlineMsg.text="Product "+ nameField.text +" Added successfully"
+                    inlineMsg.visible=true
+                    cleanField()
+                }
+                isCreateAnother=false
             }
-            else {
-                inlineMsg.text="Product "+ nameField.text +" Added successfully"
-                inlineMsg.visible=true
-                cleanField()
-            }
-            isCreateAnother=false
+            productModel.refresh()
+
         }
         // function onImageRemoved(productId) {
         //       if (product && product.id === productId) {
@@ -741,13 +818,16 @@ Kirigami.Dialog {
             }
         }
     }
+    onDialogProductIdChanged:{
+
+        productUnitModel.fetchUnits(productApi)
+        if(productDialog.dialogProductId>0)
+            productApi.getProduct(productDialog.dialogProductId)
 
 
+    }
     Component.onCompleted:{
         //  cleanField()
-        productUnitModel.fetchUnits(productApi)
-        if(productDetailsDialog.productId>0)
-            productApi.getProduct(productDetailsDialog.productId)
-
+        console.log("productDialog.productId : ",productDialog.dialogProductId)
     }
 }

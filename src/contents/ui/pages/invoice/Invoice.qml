@@ -339,7 +339,7 @@ Kirigami.Page {
                             switch(modelData) {
                                 case "App\\Models\\Sale": return "Sale #" + model.invoiceableId
                                 case "App\\Models\\Purchase": return "Purchase #" + model.invoiceableId
-                             //   default: return "Sale #"  + model.invoiceableId
+                                //   default: return "Sale #"  + model.invoiceableId
                             }
                         }
                     }
@@ -356,7 +356,7 @@ Kirigami.Page {
                                 case "sent": return "Sent"
                                 case "paid": return "Paid"
                                 case "cancelled": return "Cancelled"
-                                default: return Kirigami.Theme.textColor
+                                default: return modelData || ""
                             }
                         }
                         textColor: {

@@ -117,6 +117,10 @@ qt_add_qml_module(DGestapp
     QML_FILES contents/ui/pages/product/ProductImageEditor.qml
     QML_FILES contents/ui/pages/product/ImageFileDialog.qml
     QML_FILES contents/ui/pages/product/ImageBannerCard.qml
+    QML_FILES contents/ui/components/DSearchableComboBox.qml
+    SOURCES model/productmodelFetch.cpp
+    SOURCES model/productmodelFetch.h
+    QML_FILES contents/ui/components/DSearchableComboBoxClient.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

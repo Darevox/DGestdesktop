@@ -10,9 +10,7 @@ namespace NetworkApi {
 class ProductModel : public QAbstractTableModel
 {
     Q_OBJECT
-
-    //   QML_ELEMENT
-    //QML_SINGLETON
+    // Q_PROPERTIES remain in public section
     Q_PROPERTY(bool loading READ loading NOTIFY loadingChanged)
     Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
     Q_PROPERTY(int totalItems READ totalItems NOTIFY totalItemsChanged)
@@ -23,7 +21,9 @@ class ProductModel : public QAbstractTableModel
     Q_PROPERTY(QString searchQuery READ searchQuery WRITE setSearchQuery NOTIFY searchQueryChanged)
     Q_PROPERTY(bool hasCheckedItems READ hasCheckedItems NOTIFY hasCheckedItemsChanged)
     Q_PROPERTY(int rowCount READ rowCount NOTIFY rowCountChanged)
+
 public:
+    // Enums remain public
     enum ProductRoles {
         IdRole = Qt::UserRole + 1,
         ReferenceRole,
@@ -46,6 +46,8 @@ public:
     Q_ENUM(ProductRoles)
 
     explicit ProductModel(QObject *parent = nullptr);
+
+    // Public interface methods
     Q_INVOKABLE void setApi(ProductApi* api);
 
     // QAbstractTableModel interface
@@ -56,7 +58,7 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
-    // Properties
+    // Public getters
     bool loading() const { return m_loading; }
     QString errorMessage() const { return m_errorMessage; }
     int totalItems() const { return m_totalItems; }
@@ -65,22 +67,22 @@ public:
     QString sortField() const { return m_sortField; }
     QString sortDirection() const { return m_sortDirection; }
     QString searchQuery() const { return m_searchQuery; }
+    bool hasCheckedItems() const { return m_hasCheckedItems; }
 
-    // Q_INVOKABLE methods for QML
-    Q_INVOKABLE void refresh();
-    Q_INVOKABLE void loadPage(int page);
+    // Public QML methods
+    Q_INVOKABLE virtual void refresh();
+    Q_INVOKABLE virtual void loadPage(int page);
     Q_INVOKABLE void createProduct(const QVariantMap &productData);
     Q_INVOKABLE void updateProduct(int id, const QVariantMap &productData);
     Q_INVOKABLE void deleteProduct(int id);
     Q_INVOKABLE void updateStock(int id, int quantity, const QString &operation);
     Q_INVOKABLE QVariantMap getProduct(int row) const;
     Q_INVOKABLE void filterLowStock(bool enabled);
-
     Q_INVOKABLE void setChecked(int row, bool checked);
     Q_INVOKABLE QVariantList getCheckedProductIds() const;
     Q_INVOKABLE void clearAllChecked();
     Q_INVOKABLE void toggleAllProductsChecked();
-    bool hasCheckedItems() const;
+
 public slots:
     void setSortField(const QString &field);
     void setSortDirection(const QString &direction);
@@ -101,15 +103,20 @@ signals:
     void stockUpdated();
     void hasCheckedItemsChanged();
     void rowCountChanged();
-private slots:
-    void handleProductsReceived(const PaginatedProducts &products);
+
+protected:
+    // Protected methods that derived classes might need to access
+    virtual void handleProductsReceived(const PaginatedProducts &products);
     void handleProductError(const QString &message, ApiStatus status);
     void handleProductCreated(const Product &product);
     void handleProductUpdated(const Product &product);
     void handleProductDeleted(int id);
     void handleStockUpdated(const Product &product);
+    void setLoading(bool loading);
+    void setErrorMessage(const QString &message);
+    void updateHasCheckedItems();
 
-private:
+    // Protected data members that derived classes might need to access
     ProductApi* m_api;
     QList<Product> m_products;
     bool m_loading;
@@ -121,17 +128,14 @@ private:
     QString m_sortDirection;
     QString m_searchQuery;
     bool m_lowStockFilter;
+    bool m_hasCheckedItems = false;
 
-    void setLoading(bool loading);
-    void setErrorMessage(const QString &message);
+private:
+    // Truly private methods that derived classes don't need
     Product productFromVariantMap(const QVariantMap &map) const;
     QVariantMap productToVariantMap(const Product &product) const;
-
-    bool m_hasCheckedItems = false;
-    void updateHasCheckedItems();
 };
 
 }
-
 
 #endif // PRODUCTMODEL_H

@@ -51,7 +51,7 @@ QFuture<void> ProductApi::getProducts(const QString &search, const QString &sort
             PaginatedProducts paginatedProducts = paginatedProductsFromJson(*response.data);
             emit productsReceived(paginatedProducts);
         } else {
-            emit productError(response.error->message, response.error->status,
+            emit errorProductsReceived(response.error->message, response.error->status,
                               QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -76,7 +76,7 @@ QFuture<void> ProductApi::getProduct(int id)
             QVariantMap productMap= productToVariantMap(product);
             emit productReceived(productMap);
         } else {
-            emit productError(response.error->message, response.error->status,
+            emit errorProductReceived(response.error->message, response.error->status,
                               QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -101,9 +101,11 @@ QFuture<void> ProductApi::createProduct(const Product &product)
         if (response.success) {
             const QJsonObject &productData = response.data->value("product").toObject();
             Product createdProduct = productFromJson(productData);
+            QVariantMap productMap= productToVariantMap(createdProduct);
+            emit productReceivedForBarcode(productMap);
             emit productCreated(createdProduct);
         } else {
-            emit productError(response.error->message, response.error->status,
+            emit errorProductCreated(response.error->message, response.error->status,
                               QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -130,7 +132,7 @@ QFuture<void> ProductApi::updateProduct(int id, const Product &product)
             Product updatedProduct = productFromJson(productData);
             emit productUpdated(updatedProduct);
         } else {
-            emit productError(response.error->message, response.error->status,
+            emit errorProductUpdated(response.error->message, response.error->status,
                               QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -153,7 +155,7 @@ QFuture<void> ProductApi::deleteProduct(int id)
         if (response.success) {
             emit productDeleted(id);
         } else {
-            emit productError(response.error->message, response.error->status,
+            emit errorPoductDeleted(response.error->message, response.error->status,
                               QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -256,8 +258,37 @@ QFuture<void> ProductApi::addProductBarcode(int productId, const QString &barcod
             // You might want to define a Barcode struct/class similar to Product
             emit barcodeAdded(barcodeData);
         } else {
-            emit productError(response.error->message, response.error->status,
+            emit errorBarcodeAdded(response.error->message, response.error->status,
                               QJsonDocument(response.error->details).toJson());
+        }
+        setLoading(false);
+    });
+
+    return future.then([=]() {});
+}
+
+QFuture<void> ProductApi::updateProductBarcode(int productId, int barcodeId, const QString &newBarcode)
+{
+    setLoading(true);
+
+    QNetworkRequest request = createRequest(
+        QString("/api/v1/products/%1/barcodes/%2").arg(productId).arg(barcodeId)
+    );
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+
+    QJsonObject jsonData;
+    jsonData["barcode"] = newBarcode;
+
+    auto future = makeRequest<QJsonObject>([=]() {
+        return m_netManager->put(request, QJsonDocument(jsonData).toJson());
+    }).then([=](JsonResponse response) {
+        if (response.success) {
+            const QJsonObject &barcodeData = response.data->value("barcode").toObject();
+            emit barcodeUpdated(barcodeData);
+        } else {
+            emit errorBarcodeUpdated(response.error->message, response.error->status,
+                                   QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -280,7 +311,7 @@ QFuture<void> ProductApi::removeProductBarcode(int productId, int barcodeId)
         if (response.success) {
             emit barcodeRemoved(productId, barcodeId);
         } else {
-            emit productError(response.error->message, response.error->status,
+            emit errorBarcodeRemoved(response.error->message, response.error->status,
                               QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -309,7 +340,7 @@ QFuture<void> ProductApi::getProductBarcodes(int productId)
             }
             emit productBarcodesReceived(barcodes);
         } else {
-            emit productError(response.error->message, response.error->status,
+            emit errorProductBarcodesReceived(response.error->message, response.error->status,
                               QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);

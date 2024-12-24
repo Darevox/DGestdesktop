@@ -157,6 +157,7 @@ Kirigami.Page {
             let token = api.getToken();
             subscriptionApi.getStatus(token);
             productApi.saveToken(token);
+                        productApiFetch.saveToken(token);
             activityLogApi.saveToken(token);
             supplierApi.saveToken(token);
             cashSourceApi.saveToken(token);

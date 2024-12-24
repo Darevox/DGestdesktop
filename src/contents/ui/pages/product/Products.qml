@@ -28,7 +28,7 @@ Kirigami.Page {
         anchors.centerIn: parent
         z:99
         width: parent.width - (Kirigami.Units.largeSpacing * 4)
-        visible: !productModel.loading && productModel.rowCount === 0
+        visible: !productApi.isLoading && productModel.rowCount === 0
         text: {
             if (lowStockCheckBox.checked && searchField.text !== "") {
                 icon.name="package"
@@ -54,8 +54,8 @@ Kirigami.Page {
                                             icon.name: "list-add"
                                             text: "Add product"
                                             onTriggered: {
-                                            productDetailsDialog.productId = 0
-                                            productDetailsDialog.active = true
+                                            productDialogLoader.productId = 0
+                                            productDialogLoader.active = true
                                             }
                                             }
                                             `, emptyStateMessage)
@@ -65,8 +65,8 @@ Kirigami.Page {
             icon.name: "list-add-symbolic"
             text:"Add"
             onTriggered: {
-                productDetailsDialog.productId=0
-                productDetailsDialog.active=true
+                productDialogLoader.productId=0
+                productDialogLoader.active=true
             }
         },
         Kirigami.Action {
@@ -100,7 +100,7 @@ Kirigami.Page {
 
         }
         QQC2.BusyIndicator {
-            running: productModel.loading
+            running: productApi.isLoading
         }
         Kirigami.SearchField {
             id: searchField
@@ -130,7 +130,7 @@ Kirigami.Page {
     }
     GridLayout {
         anchors.fill: parent
-        visible: productModel.loading
+        visible: productApi.isLoading
         columns: 8
         rows: 8
         columnSpacing: parent.width * 0.01
@@ -165,11 +165,11 @@ Kirigami.Page {
     QQC2.ScrollView {
         anchors.fill:parent
         contentWidth : view.width
-        visible:!productModel.loading&& productModel.rowCount > 0
+        visible:!productApi.isLoading&& productModel.rowCount > 0
         contentItem:Tables.KTableView {
 
             id: view
-            enabled: !productModel.loading
+            enabled: !productApi.isLoading
             model: productModel
             interactive: false
             clip: true
@@ -182,14 +182,24 @@ Kirigami.Page {
             onCellDoubleClicked:function (row){
                 let idProduct = view.model.data(view.model.index(row, 0), ProductRoles.IdRole);
                 console.log("Row Clicked:", row, "Name:", idProduct);
-                productDetailsDialog.productId=idProduct
-                productDetailsDialog.active=true
+                productDialogLoader.productId=idProduct
+                productDialogLoader.active=true
 
             }
 
+            property var nonSortableColumns: {
+                   return {
+                       [ ProductRoles.ProductUnitRole]: "productUnit",
+                     [ ProductRoles.MinStockLevelRole]: "minStock",
+
+                   }
+               }
 
             onColumnClicked: function (index, headerComponent) {
-
+                if (Object.keys(nonSortableColumns).includes(String(headerComponent.role)) ||
+                        Object.values(nonSortableColumns).includes(headerComponent.textRole)) {
+                    return; // Exit if column shouldn't be sortable
+                }
                 if (view.sortRole !== headerComponent.role) {
 
                     productModel.sortField=headerComponent.textRole
@@ -261,11 +271,11 @@ Kirigami.Page {
                     title: i18nc("@title:column", "Name")
                     textRole: "name"
                     role: ProductRoles.NameRole
-                    leading: Kirigami.Icon {
-                        source: "system-software-install"
-                        implicitWidth: view.compact ? Kirigami.Units.iconSizes.small : Kirigami.Units.iconSizes.medium
-                        implicitHeight: implicitWidth
-                    }
+                    // leading: Kirigami.Icon {
+                    //     source: "system-software-install"
+                    //     implicitWidth: view.compact ? Kirigami.Units.iconSizes.small : Kirigami.Units.iconSizes.medium
+                    //     implicitHeight: implicitWidth
+                    // }
                     minimumWidth: view.width * 0.20
                     width: minimumWidth
                     itemDelegate: QQC2.Label {
@@ -366,35 +376,35 @@ Kirigami.Page {
     // }
 
     Loader {
-        id: productDetailsDialog
+        id: productDialogLoader
         active: false
         asynchronous: true
         sourceComponent: ProductDetails{}
         property int productId: 0
         onLoaded: {
-            item.dialogProductId=productDetailsDialog.productId
+            item.dialogProductId=productDialogLoader.productId
             item.open()
         }
 
         Connections {
-            target: productDetailsDialog.item
+            target: productDialogLoader.item
             function onClosed() {
-                productDetailsDialog.active = false
+                productDialogLoader.active = false
             }
         }
     }
     Connections {
         target: productApi
-        function onProductDeleted(){
-            applicationWindow().gnotification.showNotification("",
-                                                               "Product  Deleted successfully", // message
-                                                               Kirigami.MessageType.Positive, // message type
-                                                               "short",
-                                                               "dialog-close"
-                                                               )
-            productModel.clearAllChecked();
+        // function onProductDeleted(){
+        //     applicationWindow().gnotification.showNotification("",
+        //                                                        "Product  Deleted successfully", // message
+        //                                                        Kirigami.MessageType.Positive, // message type
+        //                                                        "short",
+        //                                                        "dialog-close"
+        //                                                        )
+        //     productModel.clearAllChecked();
 
-        }
+        // }
         function onProductError(message, status, details) {
             applicationWindow().gnotification.showNotification("",
                                                                message, // message
@@ -402,7 +412,6 @@ Kirigami.Page {
                                                                "short",
                                                                "dialog-close"
                                                                )
-
 
         }
     }

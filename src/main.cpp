@@ -40,10 +40,12 @@
 #include <model/invoicemodel.h>
 #include <model/dashboardmodel.h>
 
+#include <model/productmodelFetch.h>
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
- //   QLoggingCategory::setFilterRules("*.debug=true");
+    //   QLoggingCategory::setFilterRules("*.debug=true");
     KLocalizedString::setApplicationDomain("Managements");
     QCoreApplication::setOrganizationName(QStringLiteral("Dervox"));
     QCoreApplication::setOrganizationDomain(QStringLiteral("Dervox.com"));
@@ -60,6 +62,8 @@ int main(int argc, char *argv[])
     NetworkApi::UserApi *userapi = new NetworkApi::UserApi(networkManager);
     NetworkApi::SubscriptionApi *subscriptionApi = new NetworkApi::SubscriptionApi(networkManager);
     NetworkApi::ProductApi *productApi = new NetworkApi::ProductApi(networkManager);
+    NetworkApi::ProductApi *productApiFetch = new NetworkApi::ProductApi(networkManager);
+
     NetworkApi::ActivityLogApi *activityLogApi = new NetworkApi::ActivityLogApi(networkManager);
     NetworkApi::SupplierApi *supplierApi = new NetworkApi::SupplierApi(networkManager);
     NetworkApi::CashSourceApi *cashSourceApi = new NetworkApi::CashSourceApi(networkManager);
@@ -84,6 +88,8 @@ int main(int argc, char *argv[])
     NetworkApi::InvoiceModel *invoiceModel = new NetworkApi::InvoiceModel();
     NetworkApi::DashboardModel *dashboardModel = new NetworkApi::DashboardModel();
 
+    NetworkApi::ProductModelFetch *productModelFetch = new NetworkApi::ProductModelFetch();
+
     qmlRegisterType<PrinterHelper>("com.dervox.printing", 1, 0, "PrinterHelper");
     // TrayManager trayManager;
     qmlRegisterSingletonType(
@@ -97,6 +103,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("api", userapi);
     engine.rootContext()->setContextProperty("subscriptionApi", subscriptionApi);
     engine.rootContext()->setContextProperty("productApi", productApi);
+    engine.rootContext()->setContextProperty("productApiFetch", productApiFetch);
     engine.rootContext()->setContextProperty("activityLogApi", activityLogApi);
     engine.rootContext()->setContextProperty("supplierApi", supplierApi);
     engine.rootContext()->setContextProperty("cashSourceApi", cashSourceApi);
@@ -121,6 +128,11 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("invoiceModel", invoiceModel);
     engine.rootContext()->setContextProperty("dashboardModel", dashboardModel);
     //   engine.rootContext()->setContextProperty("trayManager", &trayManager);
+
+
+    engine.rootContext()->setContextProperty("productModelFetch", productModelFetch);
+
+
 
     qmlRegisterType<ColorSchemeManager>("com.dervox.ColorSchemeManager", 1, 0, "ColorSchemeModel");
     //  qmlRegisterType<NetworkApi::ProductModel>("com.dervox.ProductModel", 1, 0, "ProductModel");
