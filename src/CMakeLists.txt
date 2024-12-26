@@ -18,7 +18,13 @@ find_package(KF6  REQUIRED COMPONENTS Kirigami
     Prison
     QuickCharts
     QQC2DesktopStyle
+
 )
+find_package(Poppler COMPONENTS Qt6)
+set_package_properties("Poppler" PROPERTIES
+        TYPE RECOMMENDED
+        PURPOSE "Support for PDF file operations.")
+
 qt_standard_project_setup()
 qt_policy(SET QTP0001 OLD)
 qt_add_executable(DGestapp
@@ -123,6 +129,8 @@ qt_add_qml_module(DGestapp
     SOURCES model/productmodelFetch.h
     QML_FILES contents/ui/components/DSearchableComboBoxClient.qml
     SOURCES printer.cpp printer.h
+SOURCES utils/pageImageProvider.cpp utils/pageImageProvider.h utils/pdfModel.cpp utils/pdfModel.h
+QML_FILES utils/PDFView.qml
 )
 if(Qt6PrintSupport_FOUND)
     target_link_libraries(DGestapp PRIVATE Qt6::PrintSupport)
@@ -141,7 +149,7 @@ set_target_properties(DGestapp PROPERTIES
 )
 
 target_link_libraries(DGestapp
-    PRIVATE Qt6::Quick Qt6::QuickControls2 Qt6::Network Qt6::Pdf  Qt6::Concurrent Qt6::PrintSupport
+    PRIVATE Qt6::Quick Qt6::QuickControls2 Qt6::Network Qt6::Pdf  Qt6::Concurrent Qt6::PrintSupport Poppler::Qt6
     KF6::Kirigami
     KF6::I18n
     KF6::CoreAddons

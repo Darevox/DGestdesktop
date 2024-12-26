@@ -1,27 +1,26 @@
-// ViewPdfDialog.qml
 import QtCore
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
+import QtQuick.Window
 import org.kde.kirigami as Kirigami
-import QtQuick.Pdf
 import Qt.labs.platform as Platform
+import com.dervox.PDFView 1.0
 import com.dervox.printing 1.0
 
 Kirigami.Dialog {
     id: pdfDialog
     title: i18nc("@title:window", "Invoice PDF")
-    // preferredWidth: Kirigami.Units.gridUnit * 60
-    // preferredHeight: Kirigami.Units.gridUnit * 40
     width: Kirigami.Units.gridUnit * 60
     height: Kirigami.Units.gridUnit * 40
 
     property string pdfUrl: ""
-    property string originalFileName: ""  // Add this to store original filename
-    property string defaultFileName: "invoice.pdf" // Add this property to set default filename
+    property string originalFileName: ""
+    property string defaultFileName: "invoice.pdf"
+
     PrinterHelper {
-           id: printerHelper
-       }
+        id: printerHelper
+    }
 
     customFooterActions: [
         Kirigami.Action {
@@ -35,18 +34,18 @@ Kirigami.Dialog {
         Kirigami.Action {
             text: i18n("Print")
             icon.name: "document-print"
-            enabled: pdfDocument.status === PdfDocument.Ready
+            enabled: pdfView.count > 0
             onTriggered: {
                 if (printerHelper.printPdfWithPreview(pdfUrl)) {
                     applicationWindow().showPassiveNotification(
                         i18n("Document printed successfully"),
                         "short"
-                        )
+                    )
                 } else {
                     applicationWindow().showPassiveNotification(
                         i18n("Printing failed"),
                         "short"
-                        )
+                    )
                 }
             }
         },
@@ -58,6 +57,7 @@ Kirigami.Dialog {
             }
         }
     ]
+
     ColumnLayout {
         spacing: 10
         width: Kirigami.Units.gridUnit * 60
@@ -70,78 +70,69 @@ Kirigami.Dialog {
 
             RowLayout {
                 anchors.fill: parent
-                anchors.margins :  Kirigami.Units.smallSpacing
+                anchors.margins: Kirigami.Units.smallSpacing
                 spacing: Kirigami.Units.smallSpacing
+
                 Item { Layout.fillWidth: true }
 
                 QQC2.Label {
                     text: i18n("Page %1 of %2",
-                               (pdfView.currentPage + 1),
-                               Math.max(1, pdfDocument.pageCount))
-                    visible: pdfDocument.status === PdfDocument.Ready
+                        (pdfView.currentPage + 1),
+                        Math.max(1, pdfView.count))
+                    visible: pdfView.count > 0
                 }
 
                 QQC2.ToolButton {
                     icon.name: "zoom-fit-width"
-                    onClicked: pdfView.scaleToWidth(pdfView.width, pdfView.height)
+                    onClicked: pdfView.zoom = 1.0
                     QQC2.ToolTip.text: i18n("Fit to width")
                     QQC2.ToolTip.visible: hovered
                 }
 
                 QQC2.ToolButton {
                     icon.name: "zoom-in"
-                    onClicked: pdfView.renderScale *= 1.2
+                    onClicked: pdfView.zoom *= 1.2
                     QQC2.ToolTip.text: i18n("Zoom in")
                     QQC2.ToolTip.visible: hovered
                 }
 
                 QQC2.ToolButton {
                     icon.name: "zoom-out"
-                    onClicked: pdfView.renderScale *= 0.8
+                    onClicked: pdfView.zoom *= 0.8
                     QQC2.ToolTip.text: i18n("Zoom out")
                     QQC2.ToolTip.visible: hovered
                 }
 
                 Item { Layout.fillWidth: true }
-
-
             }
         }
 
         // PDF View
-        Item{
+        Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            clip:true
-            PdfDocument {
-                id: pdfDocument
-                source: pdfDialog.pdfUrl
-                onStatusChanged: function() {
-                    console.log("PDF status:", status, source)
-                    if (status === PdfDocument.Ready) {
-                        console.log("PDF loaded, page count:", pageCount)
-                        Qt.callLater(function() {
-                            pdfView.scaleToWidth(pdfView.width, pdfView.height)
-                        })
-                    }
-                }
-            }
-            PdfMultiPageView {
+            clip: true
+
+            PDFView {
                 id: pdfView
-                anchors.fill:parent
-                anchors.margins : Kirigami.Units.smallSpacing * 5
-                clip:true
-                document: pdfDocument
+                anchors.fill: parent
+                anchors.margins: Kirigami.Units.smallSpacing * 5
+                path: pdfUrl.toString().substring(7) // Remove "file://" prefix
+                focus: true
+
+                QQC2.ScrollBar.vertical: QQC2.ScrollBar {
+                    minimumSize: 0.04
+                }
+
                 QQC2.BusyIndicator {
                     anchors.centerIn: parent
-                    running: pdfDocument.status === PdfDocument.Loading
+                    running: pdfView.count === 0 && pdfUrl !== ""
                     visible: running
                 }
             }
         }
     }
 
-    // File save dialog
     // File save dialog
     Platform.FileDialog {
         id: saveFileDialog
@@ -150,7 +141,7 @@ Kirigami.Dialog {
         fileMode: Platform.FileDialog.SaveFile
         nameFilters: [ i18n("PDF files (*.pdf)") ]
         defaultSuffix: "pdf"
-        currentFile: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation) + "/" + defaultFileName // Set default filename
+        currentFile: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation) + "/" + defaultFileName
 
         onAccepted: {
             let xhr = new XMLHttpRequest();
@@ -164,29 +155,29 @@ Kirigami.Dialog {
                     saveXhr.onload = function() {
                         if (saveXhr.status === 200) {
                             applicationWindow().showPassiveNotification(
-                                        i18n("PDF saved successfully"),
-                                        "short"
-                                        );
+                                i18n("PDF saved successfully"),
+                                "short"
+                            );
                         } else {
                             applicationWindow().showPassiveNotification(
-                                        i18n("Failed to save PDF"),
-                                        "short"
-                                        );
+                                i18n("Failed to save PDF"),
+                                "short"
+                            );
                         }
                     };
                     saveXhr.send(xhr.response);
                 } else {
                     applicationWindow().showPassiveNotification(
-                                i18n("Failed to read PDF"),
-                                "short"
-                                );
+                        i18n("Failed to read PDF"),
+                        "short"
+                    );
                 }
             };
             xhr.send();
         }
     }
+
     onClosed: {
-        // pdfDocument.source = ""
         if (pdfUrl) {
             const xhr = new XMLHttpRequest()
             xhr.open("DELETE", pdfUrl)

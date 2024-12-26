@@ -44,7 +44,7 @@
 #include <model/dashboardmodel.h>
 
 #include <model/productmodelFetch.h>
-
+#include <utils/pdfModel.h>
 
 int main(int argc, char *argv[])
 {
@@ -97,6 +97,8 @@ int main(int argc, char *argv[])
     NetworkApi::ProductModelFetch *productModelFetch = new NetworkApi::ProductModelFetch();
 
     qmlRegisterType<PrinterHelper>("com.dervox.printing", 1, 0, "PrinterHelper");
+    qmlRegisterType<PdfModel>("com.dervox.Poppler", 1, 0, "Poppler");
+
     // TrayManager trayManager;
     qmlRegisterSingletonType(
                 "org.kde.about",        // <========== used in the import
@@ -142,6 +144,11 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<ColorSchemeManager>("com.dervox.ColorSchemeManager", 1, 0, "ColorSchemeModel");
     qmlRegisterType<Printer>("com.dervox.Printer", 1, 0, "Printer");
+    qmlRegisterType( QUrl(QStringLiteral("qrc:/DGest/utils/PDFView.qml")), "com.dervox.PDFView", 1, 0, "PDFView" );
+
+
+
+
     //  qmlRegisterType<NetworkApi::ProductModel>("com.dervox.ProductModel", 1, 0, "ProductModel");
     qmlRegisterUncreatableType<NetworkApi::ProductModel>("com.dervox.ProductModel",
                                                          1,
