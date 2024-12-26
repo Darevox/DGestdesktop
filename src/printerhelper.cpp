@@ -1,10 +1,9 @@
-// printer_helper.cpp
+// printerhelper.cpp
 #include "printerhelper.h"
 #include <QPrinter>
 #include <QPrintDialog>
 #include <QPrintPreviewDialog>
 #include <QFileInfo>
-#include <QPdfDocument>
 #include <QPainter>
 #include <QDebug>
 
@@ -17,16 +16,22 @@ PrinterHelper::PrinterHelper(QObject *parent)
     printer.setDuplex(QPrinter::DuplexNone);
 }
 
+QString PrinterHelper::normalizeFilePath(const QString &path)
+{
+    QString filePath = path;
+    if (filePath.startsWith("file:///")) {
+        filePath = filePath.mid(8);
+    }
+    if (!filePath.startsWith("/")) {
+        filePath = "/" + filePath;
+    }
+    return filePath;
+}
+
 bool PrinterHelper::setupPrinter(const QString &pdfPath)
 {
-    // Remove file:/// if present
-    QString filePath = pdfPath;
-       if (filePath.startsWith("file:///")) {
-           filePath = filePath.mid(8);
-       }
-       if (!filePath.startsWith("/")) {
-           filePath = "/" + filePath;
-       }
+    QString filePath = normalizeFilePath(pdfPath);
+
     // Check if file exists
     QFileInfo fileInfo(filePath);
     if (!fileInfo.exists()) {
@@ -37,6 +42,59 @@ bool PrinterHelper::setupPrinter(const QString &pdfPath)
     // Set document name from file name
     printer.setDocName(fileInfo.fileName());
 
+    return true;
+}
+
+bool PrinterHelper::renderDocument(const std::unique_ptr<Poppler::Document>& document, QPrinter* printer)
+{
+    if (!document) return false;
+
+    QPainter painter;
+    if (!painter.begin(printer)) {
+        qWarning() << "Failed to initialize painter";
+        return false;
+    }
+
+    // Print each page
+    for (int i = 0; i < document->numPages(); ++i) {
+        if (i > 0) {
+            printer->newPage();
+        }
+
+        // Get the page
+        std::unique_ptr<Poppler::Page> page(document->page(i));
+        if (!page) {
+            qWarning() << "Failed to get page" << i;
+            continue;
+        }
+
+        // Calculate proper resolution
+        QSizeF pageSize = page->pageSizeF();
+        qreal scale = printer->resolution() / 72.0; // Convert from points to device pixels
+
+        // Calculate scaled size
+        QSize targetSize(
+            qRound(pageSize.width() * scale),
+            qRound(pageSize.height() * scale)
+        );
+
+        // Render page
+        QImage image = page->renderToImage(printer->resolution(), printer->resolution());
+        if (image.isNull()) {
+            qWarning() << "Failed to render page" << i;
+            continue;
+        }
+
+        // Calculate positioning to center the page
+        QRect printerRect = printer->pageRect(QPrinter::DevicePixel).toRect();
+        QRect imageRect(QPoint(0, 0), image.size());
+        imageRect.moveCenter(printerRect.center());
+
+        // Draw the page
+        painter.drawImage(imageRect, image);
+    }
+
+    painter.end();
     return true;
 }
 
@@ -53,58 +111,19 @@ bool PrinterHelper::printPdf(const QString &pdfPath)
     }
 
     // Load PDF document
-    QPdfDocument document;
-    QString filePath = pdfPath;
-    if (filePath.startsWith("file:///")) {
-        filePath = filePath.mid(8);
-    }
+    QString filePath = normalizeFilePath(pdfPath);
+    std::unique_ptr<Poppler::Document> document(Poppler::Document::load(filePath));
 
-    if (document.load(filePath) != QPdfDocument::Error::None) {
+    if (!document || document->isLocked()) {
         qWarning() << "Failed to load PDF document";
         return false;
     }
 
-    // Print document
-    QPainter painter;
-    if (!painter.begin(&printer)) {
-        qWarning() << "Failed to initialize painter";
-        return false;
-    }
+    // Set up document for rendering
+    document->setRenderHint(Poppler::Document::Antialiasing);
+    document->setRenderHint(Poppler::Document::TextAntialiasing);
 
-    // Print each page
-    for (int i = 0; i < document.pageCount(); ++i) {
-        if (i > 0) {
-            printer.newPage();
-        }
-
-        // Get page size and render at proper resolution
-        QSizeF pageSize = document.pagePointSize(i);
-        qreal scale = printer.resolution() / 72.0; // Convert from points to device pixels
-
-        // Calculate scaled size
-        QSize targetSize(
-                    qRound(pageSize.width() * scale),
-                    qRound(pageSize.height() * scale)
-                    );
-
-        // Render page
-        QImage image = document.render(i, targetSize);
-        if (image.isNull()) {
-            qWarning() << "Failed to render page" << i;
-            continue;
-        }
-
-        // Calculate positioning to center the page
-        QRect printerRect = printer.pageRect(QPrinter::DevicePixel).toRect();
-        QRect imageRect(QPoint(0, 0), image.size());
-        imageRect.moveCenter(printerRect.center());
-
-        // Draw the page
-        painter.drawImage(imageRect, image);
-    }
-
-    painter.end();
-    return true;
+    return renderDocument(document, &printer);
 }
 
 bool PrinterHelper::printPdfWithPreview(const QString &pdfPath)
@@ -118,42 +137,19 @@ bool PrinterHelper::printPdfWithPreview(const QString &pdfPath)
     // Connect preview paint request to lambda that renders the PDF
     connect(&preview, &QPrintPreviewDialog::paintRequested,
             [this, pdfPath](QPrinter *previewPrinter) {
-        QString filePath = pdfPath;
-        if (filePath.startsWith("file:///")) {
-            filePath = filePath.mid(8);
-        }
-        if (!filePath.startsWith("/")) {
-            filePath = "/" + filePath;
-        }
+        QString filePath = normalizeFilePath(pdfPath);
 
-        QPdfDocument document;
-        if (document.load(filePath) != QPdfDocument::Error::None) {
+        std::unique_ptr<Poppler::Document> document(Poppler::Document::load(filePath));
+        if (!document || document->isLocked()) {
             qWarning() << "Failed to load PDF for preview";
             return;
         }
 
-        QPainter painter(previewPrinter);
-        for (int i = 0; i < document.pageCount(); ++i) {
-            if (i > 0) {
-                previewPrinter->newPage();
-            }
+        // Set up document for rendering
+        document->setRenderHint(Poppler::Document::Antialiasing);
+        document->setRenderHint(Poppler::Document::TextAntialiasing);
 
-            QSizeF pageSize = document.pagePointSize(i);
-            qreal scale = previewPrinter->resolution() / 72.0;
-
-            QSize targetSize(
-                        qRound(pageSize.width() * scale),
-                        qRound(pageSize.height() * scale)
-                        );
-
-            QImage image = document.render(i, targetSize);
-            if (!image.isNull()) {
-                QRect printerRect = previewPrinter->pageRect(QPrinter::DevicePixel).toRect();
-                QRect imageRect(QPoint(0, 0), image.size());
-                imageRect.moveCenter(printerRect.center());
-                painter.drawImage(imageRect, image);
-            }
-        }
+        renderDocument(document, previewPrinter);
     });
 
     return preview.exec() == QDialog::Accepted;

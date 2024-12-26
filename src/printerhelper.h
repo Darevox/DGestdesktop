@@ -1,4 +1,4 @@
-// printer_helper.h
+// printerhelper.h
 #ifndef PRINTERHELPER_H
 #define PRINTERHELPER_H
 
@@ -6,6 +6,8 @@
 #include <QPrinter>
 #include <QPrintDialog>
 #include <QString>
+#include <memory>
+#include <poppler-qt6.h>
 
 class PrinterHelper : public QObject
 {
@@ -26,6 +28,8 @@ public:
 private:
     QPrinter printer;
     bool setupPrinter(const QString &pdfPath);
+    QString normalizeFilePath(const QString &path);
+    bool renderDocument(const std::unique_ptr<Poppler::Document>& document, QPrinter* printer);
 };
 
 #endif // PRINTERHELPER_H
