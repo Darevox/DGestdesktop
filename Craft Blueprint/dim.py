@@ -24,7 +24,6 @@ class subinfo(info.infoclass):
         self.runtimeDependencies["kde/frameworks/tier2/kstatusnotifieritem"] = None
         self.runtimeDependencies["kde/frameworks/tier2/kcolorscheme"] = None
         self.runtimeDependencies["kde/unreleased/kirigami-addons"] = None
-        self.runtimeDependencies["kde/unreleased/componentprinter"] = None
         self.runtimeDependencies["kde/frameworks/tier3/kiconthemes"] = None
         self.runtimeDependencies["qt-libs/poppler"] = None
         if not CraftCore.compiler.isAndroid:
