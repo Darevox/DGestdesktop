@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(ECM   REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH})
 
-find_package(Qt6 6.4 REQUIRED COMPONENTS Quick QuickControls2 Network Pdf Concurrent PrintSupport Svg)
+find_package(Qt6 6.4 REQUIRED COMPONENTS Quick QuickControls2 Network Pdf Concurrent PrintSupport)
 find_package(KF6  REQUIRED COMPONENTS Kirigami
     I18n
     CoreAddons
