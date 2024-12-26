@@ -12,6 +12,9 @@
 #include <colorschememanager.h>
 #include <traymanager.h>
 #include <printerhelper.h>
+#include <printer.h>
+#include <KIconThemes/kicontheme.h>
+
 
 #include <api/userapi.h>
 #include <api/subscriptionapi.h>
@@ -42,9 +45,12 @@
 
 #include <model/productmodelFetch.h>
 
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+    KIconTheme::current();
+    QApplication::setStyle("breeze");
     //   QLoggingCategory::setFilterRules("*.debug=true");
     KLocalizedString::setApplicationDomain("Managements");
     QCoreApplication::setOrganizationName(QStringLiteral("Dervox"));
@@ -135,6 +141,7 @@ int main(int argc, char *argv[])
 
 
     qmlRegisterType<ColorSchemeManager>("com.dervox.ColorSchemeManager", 1, 0, "ColorSchemeModel");
+    qmlRegisterType<Printer>("com.dervox.Printer", 1, 0, "Printer");
     //  qmlRegisterType<NetworkApi::ProductModel>("com.dervox.ProductModel", 1, 0, "ProductModel");
     qmlRegisterUncreatableType<NetworkApi::ProductModel>("com.dervox.ProductModel",
                                                          1,

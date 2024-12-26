@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(ECM   REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH})
 
-find_package(Qt6 6.4 REQUIRED COMPONENTS Quick QuickControls2 Network Pdf Concurrent PrintSupport)
+find_package(Qt6 6.4 REQUIRED COMPONENTS Quick QuickControls2 Network Pdf Concurrent PrintSupport Svg)
 find_package(KF6  REQUIRED COMPONENTS Kirigami
     I18n
     CoreAddons
@@ -17,6 +17,7 @@ find_package(KF6  REQUIRED COMPONENTS Kirigami
     StatusNotifierItem
     Prison
     QuickCharts
+    QQC2DesktopStyle
 )
 qt_standard_project_setup()
 qt_policy(SET QTP0001 OLD)
@@ -121,8 +122,13 @@ qt_add_qml_module(DGestapp
     SOURCES model/productmodelFetch.cpp
     SOURCES model/productmodelFetch.h
     QML_FILES contents/ui/components/DSearchableComboBoxClient.qml
+    SOURCES printer.cpp printer.h
 )
-
+if(Qt6PrintSupport_FOUND)
+    target_link_libraries(DGestapp PRIVATE Qt6::PrintSupport)
+else()
+    target_compile_definitions(DGestapp PRIVATE QT_NO_PRINTER)
+endif()
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.

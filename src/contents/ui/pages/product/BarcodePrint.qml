@@ -5,7 +5,7 @@ import org.kde.kirigami as Kirigami
 import org.kde.kirigamiaddons.formcard as FormCard
 import "../../components"
 import org.kde.prison as Prison
-import com.foxmoxie.Printer
+import com.dervox.Printer
 
 Kirigami.Dialog {
     id: barcodeDialog

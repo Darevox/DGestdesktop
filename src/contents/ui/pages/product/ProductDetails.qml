@@ -596,7 +596,7 @@ Kirigami.Dialog {
         maxStockField.value = product.maxStockLevel || 0;
         reorderPointField.value = product.reorderPoint || 0;
         locationField.text = product.location || "";
-        productImageCard.imageUrl = product.image_path ? "http://localhost:8000/" + product.image_path : "";
+        productImageCard.imageUrl = product.image_path ? "http://localhost:8000" + product.image_path : "";
         packagesModel.clear();
         if (product.packages) {
             product.packages.forEach(pkg => {
