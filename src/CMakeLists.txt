@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(ECM   REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH})
 
-find_package(Qt6 6.4 REQUIRED COMPONENTS Quick QuickControls2 Network Pdf Concurrent PrintSupport)
+find_package(Qt6 6.4 REQUIRED COMPONENTS Quick QuickControls2 Network  Concurrent PrintSupport)
 find_package(KF6  REQUIRED COMPONENTS Kirigami
     I18n
     CoreAddons
@@ -149,7 +149,7 @@ set_target_properties(DGestapp PROPERTIES
 )
 
 target_link_libraries(DGestapp
-    PRIVATE Qt6::Quick Qt6::QuickControls2 Qt6::Network Qt6::Pdf  Qt6::Concurrent Qt6::PrintSupport Poppler::Qt6
+    PRIVATE Qt6::Quick Qt6::QuickControls2 Qt6::Network  Qt6::Concurrent Qt6::PrintSupport Poppler::Qt6
     KF6::Kirigami
     KF6::I18n
     KF6::CoreAddons
