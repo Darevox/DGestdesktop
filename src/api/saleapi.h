@@ -36,6 +36,8 @@ struct Sale {
     double paid_amount = 0.0;
     double tax_amount = 0.0;
     double discount_amount = 0.0;
+    double payment_amount = 0.0;
+
     QString payment_status = "unpaid";
     QString status = "pending";
     QDateTime sale_date;
@@ -43,6 +45,7 @@ struct Sale {
     QString notes;
     QVariantMap client;
     QList<SaleItem> items;
+    bool auto_payment = false;
     bool checked = false;
 };
 

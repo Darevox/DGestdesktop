@@ -157,10 +157,11 @@ void SaleModel::loadPage(int page)
 }
 
 void SaleModel::createSale(const QVariantMap &saleData)
-{
+{qDebug()<<"NNNNNNN";
+
     if (!m_api)
         return;
-
+qDebug()<<"WWWWWWW";
     setLoading(true);
     Sale sale = saleFromVariantMap(saleData);
     m_api->createSale(sale);
@@ -452,6 +453,15 @@ Sale SaleModel::saleFromVariantMap(const QVariantMap &map) const
 
     if (map.contains("due_date") && !map["due_date"].isNull()) {
         sale.due_date = map["due_date"].toDateTime();
+    }
+
+    // Payment related fields
+    if (map.contains("auto_payment")) {
+        sale.auto_payment = map["auto_payment"].toBool();
+    }
+
+    if (map.contains("payment_amount")) {
+        sale.payment_amount = map["payment_amount"].toDouble();
     }
 
     // Items

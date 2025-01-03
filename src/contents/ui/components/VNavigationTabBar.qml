@@ -16,6 +16,11 @@ ListView {
             pathPage: "qrc:/DGest/contents/ui/pages/dashboard/Dashboard.qml"
         }
         ListElement {
+            name: "Quick Sale"
+            icon: "view-financial-category-income"
+            pathPage: "qrc:/DGest/contents/ui/pages/quickSalePage/QuickSalePage.qml"
+        }
+        ListElement {
             name: "Cashier"
             icon: "view-financial-account-cash"
             pathPage: "qrc:/DGest/contents/ui/pages/cashsource/CashSource.qml"

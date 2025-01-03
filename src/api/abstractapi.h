@@ -53,7 +53,9 @@ protected:
     QNetworkAccessManager *m_netManager;
     QString m_apiHost;
     QString m_token;
-
+    void setNetworkManager(QNetworkAccessManager *manager) {
+        m_netManager = manager;
+    }
 
     // Helper methods that need implementation
     QNetworkRequest createRequest(const QString &path) const;

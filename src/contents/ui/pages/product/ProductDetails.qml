@@ -4,6 +4,8 @@ import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 import org.kde.kirigamiaddons.formcard as FormCard
 import com.dervox.ProductUnitModel 1.0
+//import com.dervox.FavoriteManager
+
 import "../../components"
 import "."
 Kirigami.Dialog {
@@ -125,221 +127,445 @@ Kirigami.Dialog {
     ]
 
     contentItem :
-        GridLayout{
-        columns:3
-        rows:1
+        ColumnLayout{
+
         // anchors.fill : parent
         anchors.margins : 20
         enabled: !productApi.isLoading
-        FormCard.FormCard {
-            Layout.fillHeight:true
-            Layout.alignment: Qt.AlignTop
-            ImageBannerCard {
-                id: productImageCard
-                idProduct : productDialog.dialogProductId
+        QQC2.TabBar {
+            id: tabBar
+            Layout.fillWidth: true
+
+            QQC2.TabButton {
+                text: i18n("Basic Info")
+                 Layout.fillWidth: true
+            }
+            QQC2.TabButton {
+                text: i18n("Pricing & Stock")
+                 Layout.fillWidth: true
+            }
+            QQC2.TabButton {
+                text: i18n("Other Info")
+                 Layout.fillWidth: true
+            }
+            QQC2.TabButton {
+                text: i18n("Categories / Packages")
+                 Layout.fillWidth: true
+            }
+        }
+        StackLayout {
+            currentIndex: tabBar.currentIndex
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            FormCard.FormCard {
+                Layout.fillHeight:true
+                Layout.alignment: Qt.AlignTop
+                ImageBannerCard {
+                    id: productImageCard
+                    idProduct : productDialog.dialogProductId
+
+                    Layout.alignment: Qt.AlignTop
+
+                }
+
+                FormCard.FormTextFieldDelegate {
+                    id: nameField
+                    label: qsTr("Name")
+                    text:  ""
+                    status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
+                }
+
+                FormCard.FormTextAreaDelegate {
+                    id: descriptionField
+                    label: qsTr("Description")
+                    text:  ""
+                }
+                FormCard.FormComboBoxDelegate {
+                    id: unitCombo
+                    text: i18nc("@label:listbox", "Product Unit")
+                    displayMode: FormCard.FormComboBoxDelegate.ComboBox
+                    editable: false
+                    currentIndex:-1
+                    property int unitId: 0
+                    textRole: "name"
+                    // Function to find and set index by unit ID
+                    function setCurrentIndexById(id) {
+                        if(id === 0 || id === -1) {
+                            unitCombo.currentIndex = -1
+                        }
+                        else
+                            for(let i = 0; i < unitCombo.model.rowCount(); i++) {
+                                let itemId = unitCombo.model.data(unitCombo.model.index(i, 0), Qt.UserRole + 1)
+                                if(itemId === id) {
+                                    unitCombo.currentIndex = i
+                                    break
+                                }
+                            }
+                    }
+
+                    onCurrentIndexChanged: {
+                        console.log("unitCombo currentIndex", unitCombo.currentIndex)
+                        var selectedIndex = unitCombo.currentIndex
+                        var selectedId = unitCombo.model.data(unitCombo.model.index(selectedIndex, 0),  Qt.UserRole + 1)
+                        var selectedName = unitCombo.model.data(unitCombo.model.index(selectedIndex, 0),  Qt.UserRole + 2)
+                        unitCombo.unitId = selectedId
+                        console.log("unitCombo name", selectedName)
+                        console.log("unitCombo id", selectedId)
+                    }
+                }
+                FormCard.FormTextFieldDelegate {
+                    id: locationField
+                    label: qsTr("Location")
+                    text:  ""
+                }
+
+            }
+            FormCard.FormCard {
+                Layout.fillHeight:true
+                Layout.alignment: Qt.AlignTop
+                FormCard.FormSpinBoxDelegate {
+                    id: quantityField
+                    label: qsTr("Quantity")
+                    value: 0
+                    from: 0
+                    to: 999999
+                    stepSize: 1
+                }
+                DFormTextFieldDelegate {
+                    id: purchase_priceField
+                    label: qsTr("Purchase Price")
+                    text: "0"
+
+                    // Property to store clean value as integer
+                    // Only allow digits
+                    validator: RegularExpressionValidator {
+                        regularExpression: /^\d+$/
+                    }
+
+                    // Input validation - only allow numbers
+                    inputMethodHints: Qt.ImhDigitsOnly
+                }
+                FormCard.FormTextDelegate {
+                    leading: purchase_priceField
+                    text: {
+                        var price = Number(priceField.text) || 0           // Selling Price
+                        var purchasePrice = Number(purchase_priceField.text) || 0  // Purchase Price
+                        var profit = price - purchasePrice
+                        return "Selling Price: " + price.toFixed(2)
+                    }
+                    description: {
+                        var price = Number(priceField.text) || 0           // Selling Price
+                        var purchasePrice = Number(purchase_priceField.text) || 0  // Purchase Price
+                        var profit = price - purchasePrice
+                        return "Profit: " + profit.toFixed(2)
+                    }
+                }
+                DFormTextFieldDelegate {
+                    id: priceField
+                    label: qsTr("Price")
+                    text: "0"
+                    // Only allow digits
+                    validator: RegularExpressionValidator {
+                        regularExpression: /^\d+$/
+                    }
+                    inputMethodHints: Qt.ImhDigitsOnly
+                }
+                FormCard.FormTextDelegate {
+                    leading: priceField
+                    text: {
+                        return "Profit Margin: "
+                    }
+                    description: {
+                        var price = Number(priceField.text) || 0
+                        var purchasePrice = Number(purchase_priceField.text) || 0
+
+                        // Avoid division by zero
+                        if (price === 0) return "0 %"
+
+                        var profitMargin = ((price - purchasePrice) / price) * 100
+                        return  profitMargin.toFixed(2) + " %"
+                    }
+                }
+                FormCard.FormSpinBoxDelegate {
+                    id: minStockField
+                    label: qsTr("Min Stock")
+                    value:  0
+                    from: 0
+                    to: 999999
+                }
+                FormCard.FormSpinBoxDelegate {
+                    id: maxStockField
+                    label: qsTr("Max Stock")
+                    value:  0
+                    from: 0
+                    to: 999999
+                }
+            }
+            FormCard.FormCard {
+                Layout.fillHeight:true
 
                 Layout.alignment: Qt.AlignTop
+                FormCard.FormSpinBoxDelegate {
+                    id: reorderPointField
+                    label: qsTr("Reorder Point")
+                    value:  0
+                    from: 0
+                    to: 999999
+                }
 
-            }
+                FormCard.FormTextFieldDelegate {
+                    id: referenceField
+                    label: qsTr("Refernce")
+                    text:  ""
+                }
+                FormCard.FormTextFieldDelegate {
+                    id: skuField
+                    label: qsTr("SKU")
+                    text:  ""
+                }
+                FormCard.FormButtonDelegate{
+                    text:"Setup Barcode"
+                    description:"View & print"
+                    icon.name:"view-barcode"
+                    onClicked :{
+                        // barcodeDialogLoader.priceText = priceField.text
+                        // barcodeDialogLoader.contentEditText = barcodeField.text
+                        if(productDialog.dialogProductId>0){
+                            barcodeDialogLoader.productId =  productDialog.dialogProductId
+                            barcodeDialogLoader.active=true
+                        }
+                        else {
+                            productDialog.isBarcodeRequest=true
+                            createBeforSetupDialog.open()
 
-            FormCard.FormTextFieldDelegate {
-                id: nameField
-                label: qsTr("Name")
-                text:  ""
-                status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
-            }
-
-            FormCard.FormTextAreaDelegate {
-                id: descriptionField
-                label: qsTr("Description")
-                text:  ""
-            }
-            FormCard.FormComboBoxDelegate {
-                id: unitCombo
-                text: i18nc("@label:listbox", "Product Unit")
-                displayMode: FormCard.FormComboBoxDelegate.ComboBox
-                editable: false
-                currentIndex:-1
-                property int unitId: 0
-                textRole: "name"
-                // Function to find and set index by unit ID
-                function setCurrentIndexById(id) {
-                    if(id === 0 || id === -1) {
-                        unitCombo.currentIndex = -1
+                        }
                     }
-                    else
-                        for(let i = 0; i < unitCombo.model.rowCount(); i++) {
-                            let itemId = unitCombo.model.data(unitCombo.model.index(i, 0), Qt.UserRole + 1)
-                            if(itemId === id) {
-                                unitCombo.currentIndex = i
-                                break
+                }
+
+
+                FormCard.FormDateTimeDelegate {
+                    id: expiredDateField
+                    dateTimeDisplay:FormCard.FormDateTimeDelegate.DateTimeDisplay.Date
+                    text: i18nc("@label:listbox", "Expiration Date")
+                    value: undefined
+                    onValueChanged:{
+                        console.log(value)
+                    }
+                }
+
+
+
+
+            }
+
+            FormCard.FormCard {
+                // Categories Section
+                FormCard.FormHeader {
+                    title: i18n("Categories")
+                }
+
+                // Current Categories as Chips
+                Flow {
+                    Layout.fillWidth: true
+                    spacing: Kirigami.Units.smallSpacing
+
+                    Repeater {
+                        id: categoryChipsRepeater
+                        model: {
+                            // Only show chips for categories that contain this product
+                            if (productDialog.dialogProductId <= 0) return [];
+                            return favoriteManager.getCategories().filter(category => {
+                                                                              let productIds = favoriteManager.getCategoryProductIds(category.id)
+                                                                              return productIds.includes(productDialog.dialogProductId)
+                                                                          });
+                        }
+                        delegate: Kirigami.Chip {
+                            text: modelData.name
+                            closable: true
+                            onRemoved: { // Use onCloseClicked instead of onClicked
+                                favoriteManager.removeProductFromCategory(modelData.id, productDialog.dialogProductId)
                             }
                         }
-                }
-
-                onCurrentIndexChanged: {
-                    console.log("unitCombo currentIndex", unitCombo.currentIndex)
-                    var selectedIndex = unitCombo.currentIndex
-                    var selectedId = unitCombo.model.data(unitCombo.model.index(selectedIndex, 0),  Qt.UserRole + 1)
-                    var selectedName = unitCombo.model.data(unitCombo.model.index(selectedIndex, 0),  Qt.UserRole + 2)
-                    unitCombo.unitId = selectedId
-                    console.log("unitCombo name", selectedName)
-                    console.log("unitCombo id", selectedId)
-                }
-            }
-            FormCard.FormTextFieldDelegate {
-                id: locationField
-                label: qsTr("Location")
-                text:  ""
-            }
-
-        }
-        FormCard.FormCard {
-            Layout.fillHeight:true
-            Layout.alignment: Qt.AlignTop
-            FormCard.FormSpinBoxDelegate {
-                id: quantityField
-                label: qsTr("Quantity")
-                value: 0
-                from: 0
-                to: 999999
-                stepSize: 1
-            }
-            DFormTextFieldDelegate {
-                id: purchase_priceField
-                label: qsTr("Purchase Price")
-                text: "0"
-
-                // Property to store clean value as integer
-                // Only allow digits
-                validator: RegularExpressionValidator {
-                    regularExpression: /^\d+$/
-                }
-
-                // Input validation - only allow numbers
-                inputMethodHints: Qt.ImhDigitsOnly
-            }
-            FormCard.FormTextDelegate {
-                leading: purchase_priceField
-                text: {
-                    var price = Number(priceField.text) || 0           // Selling Price
-                    var purchasePrice = Number(purchase_priceField.text) || 0  // Purchase Price
-                    var profit = price - purchasePrice
-                    return "Selling Price: " + price.toFixed(2)
-                }
-                description: {
-                    var price = Number(priceField.text) || 0           // Selling Price
-                    var purchasePrice = Number(purchase_priceField.text) || 0  // Purchase Price
-                    var profit = price - purchasePrice
-                    return "Profit: " + profit.toFixed(2)
-                }
-            }
-            DFormTextFieldDelegate {
-                id: priceField
-                label: qsTr("Price")
-                text: "0"
-                // Only allow digits
-                validator: RegularExpressionValidator {
-                    regularExpression: /^\d+$/
-                }
-                inputMethodHints: Qt.ImhDigitsOnly
-            }
-            FormCard.FormTextDelegate {
-                leading: priceField
-                text: {
-                    return "Profit Margin: "
-                }
-                description: {
-                    var price = Number(priceField.text) || 0
-                    var purchasePrice = Number(purchase_priceField.text) || 0
-
-                    // Avoid division by zero
-                    if (price === 0) return "0 %"
-
-                    var profitMargin = ((price - purchasePrice) / price) * 100
-                    return  profitMargin.toFixed(2) + " %"
-                }
-            }
-            FormCard.FormSpinBoxDelegate {
-                id: minStockField
-                label: qsTr("Min Stock")
-                value:  0
-                from: 0
-                to: 999999
-            }
-            FormCard.FormSpinBoxDelegate {
-                id: maxStockField
-                label: qsTr("Max Stock")
-                value:  0
-                from: 0
-                to: 999999
-            }
-        }
-        FormCard.FormCard {
-            Layout.fillHeight:true
-
-            Layout.alignment: Qt.AlignTop
-            FormCard.FormSpinBoxDelegate {
-                id: reorderPointField
-                label: qsTr("Reorder Point")
-                value:  0
-                from: 0
-                to: 999999
-            }
-
-            FormCard.FormTextFieldDelegate {
-                id: referenceField
-                label: qsTr("Refernce")
-                text:  ""
-            }
-            FormCard.FormTextFieldDelegate {
-                id: skuField
-                label: qsTr("SKU")
-                text:  ""
-            }
-            FormCard.FormButtonDelegate{
-                text:"Setup Barcode"
-                description:"View & print"
-                icon.name:"view-barcode"
-                onClicked :{
-                    // barcodeDialogLoader.priceText = priceField.text
-                    // barcodeDialogLoader.contentEditText = barcodeField.text
-                    if(productDialog.dialogProductId>0){
-                        barcodeDialogLoader.productId =  productDialog.dialogProductId
-                        barcodeDialogLoader.active=true
-                    }
-                    else {
-                        productDialog.isBarcodeRequest=true
-                        createBeforSetupDialog.open()
-
                     }
                 }
-            }
 
+                // Category Selection and Actions
+                RowLayout {
+                    Layout.fillWidth: true
+                    Layout.margins: Kirigami.Units.smallSpacing
+                    spacing: Kirigami.Units.smallSpacing
 
-            FormCard.FormDateTimeDelegate {
-                id: expiredDateField
-                dateTimeDisplay:FormCard.FormDateTimeDelegate.DateTimeDisplay.Date
-                text: i18nc("@label:listbox", "Expiration Date")
-                value: undefined
-                onValueChanged:{
-                    console.log(value)
+                    QQC2.ComboBox {
+                        id: categoryCombo
+                        Layout.fillWidth: true
+                        textRole: "name"
+                        valueRole: "id"
+                        model: {
+                            // Filter out categories that already contain the product
+                            if (productDialog.dialogProductId <= 0) return [];
+                            return favoriteManager.getCategories().filter(category => {
+                                                                              let productIds = favoriteManager.getCategoryProductIds(category.id)
+                                                                              return !productIds.includes(productDialog.dialogProductId)
+                                                                          });
+                        }
+
+                        Connections {
+                            target: favoriteManager
+                            function onCategoriesChanged() {
+                                // Update combo box model when categories change
+                                let categories = favoriteManager.getCategories()
+                                if (productDialog.dialogProductId > 0) {
+                                    categories = categories.filter(category => {
+                                                                       let productIds = favoriteManager.getCategoryProductIds(category.id)
+                                                                       return !productIds.includes(productDialog.dialogProductId)
+                                                                   });
+                                }
+                                categoryCombo.model = categories
+                            }
+                            function onProductsChanged() {
+                                // Update both chips and combo box when products change
+                                categoryChipsRepeater.model = Qt.binding(() => {
+                                                                             if (productDialog.dialogProductId <= 0) return [];
+                                                                             return favoriteManager.getCategories().filter(category => {
+                                                                                                                               let productIds = favoriteManager.getCategoryProductIds(category.id)
+                                                                                                                               return productIds.includes(productDialog.dialogProductId)
+                                                                                                                           });
+                                                                         });
+
+                                categoryCombo.model = Qt.binding(() => {
+                                                                     if (productDialog.dialogProductId <= 0) return [];
+                                                                     return favoriteManager.getCategories().filter(category => {
+                                                                                                                       let productIds = favoriteManager.getCategoryProductIds(category.id)
+                                                                                                                       return !productIds.includes(productDialog.dialogProductId)
+                                                                                                                   });
+                                                                 });
+                            }
+                        }
+                    }
+
+                    QQC2.Button {
+                        icon.name: "list-add"
+                        text: i18n("Add to Category")
+                        enabled: categoryCombo.currentValue !== undefined && productDialog.dialogProductId > 0
+                        onClicked: {
+                            if (categoryCombo.currentValue !== undefined) {
+                                favoriteManager.addProductToCategory(categoryCombo.currentValue, productDialog.dialogProductId)
+                            }
+                        }
+                    }
+
+                    QQC2.Button {
+                        icon.name: "folder-new"
+                        text: i18n("New Category")
+                        onClicked: newCategoryDialog.open()
+                    }
                 }
-            }
 
 
-            FormCard.FormButtonDelegate {
-                Layout.margins : 10
-                text: i18n("Manage Packages")
-                description: packagesModel.count > 0 ?
-                                 i18np("%1 package defined", "%1 packages defined", packagesModel.count) :
-                                 i18n("No packages defined")
-                icon.name: "package"
-                onClicked: packagesListDialog.open()
+
+                FormCard.FormButtonDelegate {
+                    Layout.margins: 10
+                    text: i18n("Manage Packages")
+                    description: packagesModel.count > 0 ?
+                                     i18np("%1 package defined", "%1 packages defined", packagesModel.count) :
+                                     i18n("No packages defined")
+                    icon.name: "package"
+                    onClicked: packagesListDialog.open()
+                }
             }
 
         }
     }
+    Kirigami.Dialog {
+        id: newCategoryDialog
+        title: i18n("New Category")
+        standardButtons: QQC2.Dialog.Ok | QQC2.Dialog.Cancel
+
+        FormCard.FormCard {
+            FormCard.FormTextFieldDelegate {
+                id: newCategoryField
+                label: i18n("Category Name")
+                placeholderText: i18n("Enter category name")
+            }
+        }
+
+        onAccepted: {
+            if (newCategoryField.text.length > 0) {
+                favoriteManager.createCategory(newCategoryField.text)
+                newCategoryField.text = ""
+            }
+        }
+    }
+    Kirigami.Dialog {
+        id: categoryManagementDialog
+        title: i18n("Manage Categories")
+        preferredWidth: Kirigami.Units.gridUnit * 40
+
+        ColumnLayout {
+            spacing: Kirigami.Units.largeSpacing
+
+            RowLayout {
+                Layout.fillWidth: true
+                QQC2.TextField {
+                    id: newCategoryField1
+                    Layout.fillWidth: true
+                    placeholderText: i18n("New category name")
+                }
+                QQC2.Button {
+                    text: i18n("Add")
+                    icon.name: "list-add"
+                    onClicked: {
+                        if (newCategoryField1.text.length > 0) {
+                            favoriteManager.createCategory(newCategoryField1.text)
+                            newCategoryField1.text = ""
+                        }
+                    }
+                }
+            }
+
+            ListView {
+                Layout.fillWidth: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 15
+                model: favoriteManager.getCategories()
+                delegate: Kirigami.SwipeListItem {
+                    contentItem: RowLayout {
+                        QQC2.Label {
+                            text: modelData.name
+                            Layout.fillWidth: true
+                        }
+                        QQC2.CheckBox {
+                            checked: {
+                                let productIds = favoriteManager.getCategoryProductIds(modelData.id)
+                                return productIds.includes(productDialog.dialogProductId)
+                            }
+                            onToggled: {
+                                if (checked) {
+                                    favoriteManager.addProductToCategory(modelData.id, productDialog.dialogProductId)
+                                } else {
+                                    favoriteManager.removeProductFromCategory(modelData.id, productDialog.dialogProductId)
+                                }
+                            }
+                        }
+                    }
+                    actions: [
+                        Kirigami.Action {
+                            icon.name: "edit-entry"
+                            onTriggered: {
+                                editCategoryDialog.categoryId = modelData.id
+                                editCategoryDialog.categoryName = modelData.name
+                                editCategoryDialog.open()
+                            }
+                        },
+                        Kirigami.Action {
+                            icon.name: "edit-delete"
+                            onTriggered: favoriteManager.deleteCategory(modelData.id)
+                        }
+                    ]
+                }
+            }
+        }
+    }
+
 
     Kirigami.Dialog {
         id: packagesListDialog
@@ -693,6 +919,8 @@ Kirigami.Dialog {
                                                                "short",
                                                                "dialog-close"
                                                                )
+            favoriteManager.removeProductFromAllCategories(dialogProductId);
+
             productDialog.close()
             productModel.refresh()
 
@@ -794,7 +1022,19 @@ Kirigami.Dialog {
 
     }
 
+    Connections {
+        target: favoriteManager
+        function onCategoriesChanged() {
+            categoryChipsRepeater.model = favoriteManager.getCategories()
+        }
+        function onProductsChanged(categoryId) {
+            categoryChipsRepeater.model = favoriteManager.getCategories()
+        }
+    }
 
+    // FavoriteManager {
+    //     id: favoriteManager
+    // }
     Loader {
         id: barcodeDialogLoader
         active: false

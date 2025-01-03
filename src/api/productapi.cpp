@@ -6,10 +6,39 @@
 
 namespace NetworkApi {
 
+QNetworkAccessManager* ProductApi::netManager = nullptr;
+
+void ProductApi::setSharedNetworkManager(QNetworkAccessManager* manager)
+{
+    if (netManager && netManager->parent() == nullptr) {
+        delete netManager;
+    }
+    netManager = manager;
+}
+
+void ProductApi::ensureSharedNetworkManager()
+{
+    if (!netManager) {
+        netManager = new QNetworkAccessManager();
+    }
+}
+
+// Modified constructors
+ProductApi::ProductApi(QObject *parent)
+    : AbstractApi(nullptr, parent)
+    , m_settings("Dervox", "DGest")
+
+{
+    ensureSharedNetworkManager();
+    setNetworkManager(netManager);
+    m_favoriteManager = new FavoriteManager(this);
+}
+
 ProductApi::ProductApi(QNetworkAccessManager *netManager, QObject *parent)
     : AbstractApi(netManager, parent)
     , m_settings("Dervox", "DGest")
 {
+    m_favoriteManager = new FavoriteManager(this);
 }
 
 QFuture<void> ProductApi::getProducts(const QString &search, const QString &sortBy,
@@ -52,7 +81,7 @@ QFuture<void> ProductApi::getProducts(const QString &search, const QString &sort
             emit productsReceived(paginatedProducts);
         } else {
             emit errorProductsReceived(response.error->message, response.error->status,
-                              QJsonDocument(response.error->details).toJson());
+                                       QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -77,7 +106,7 @@ QFuture<void> ProductApi::getProduct(int id)
             emit productReceived(productMap);
         } else {
             emit errorProductReceived(response.error->message, response.error->status,
-                              QJsonDocument(response.error->details).toJson());
+                                      QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -106,7 +135,7 @@ QFuture<void> ProductApi::createProduct(const Product &product)
             emit productCreated(createdProduct);
         } else {
             emit errorProductCreated(response.error->message, response.error->status,
-                              QJsonDocument(response.error->details).toJson());
+                                     QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -133,7 +162,7 @@ QFuture<void> ProductApi::updateProduct(int id, const Product &product)
             emit productUpdated(updatedProduct);
         } else {
             emit errorProductUpdated(response.error->message, response.error->status,
-                              QJsonDocument(response.error->details).toJson());
+                                     QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -154,9 +183,10 @@ QFuture<void> ProductApi::deleteProduct(int id)
     }).then([=](VoidResponse response) {
         if (response.success) {
             emit productDeleted(id);
+          //  m_favoriteManager->removeProductFromAllCategories(id);
         } else {
             emit errorPoductDeleted(response.error->message, response.error->status,
-                              QJsonDocument(response.error->details).toJson());
+                                    QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -259,7 +289,7 @@ QFuture<void> ProductApi::addProductBarcode(int productId, const QString &barcod
             emit barcodeAdded(barcodeData);
         } else {
             emit errorBarcodeAdded(response.error->message, response.error->status,
-                              QJsonDocument(response.error->details).toJson());
+                                   QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -272,8 +302,8 @@ QFuture<void> ProductApi::updateProductBarcode(int productId, int barcodeId, con
     setLoading(true);
 
     QNetworkRequest request = createRequest(
-        QString("/api/v1/products/%1/barcodes/%2").arg(productId).arg(barcodeId)
-    );
+                QString("/api/v1/products/%1/barcodes/%2").arg(productId).arg(barcodeId)
+                );
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
 
@@ -288,7 +318,7 @@ QFuture<void> ProductApi::updateProductBarcode(int productId, int barcodeId, con
             emit barcodeUpdated(barcodeData);
         } else {
             emit errorBarcodeUpdated(response.error->message, response.error->status,
-                                   QJsonDocument(response.error->details).toJson());
+                                     QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -312,7 +342,7 @@ QFuture<void> ProductApi::removeProductBarcode(int productId, int barcodeId)
             emit barcodeRemoved(productId, barcodeId);
         } else {
             emit errorBarcodeRemoved(response.error->message, response.error->status,
-                              QJsonDocument(response.error->details).toJson());
+                                     QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -341,7 +371,7 @@ QFuture<void> ProductApi::getProductBarcodes(int productId)
             emit productBarcodesReceived(barcodes);
         } else {
             emit errorProductBarcodesReceived(response.error->message, response.error->status,
-                              QJsonDocument(response.error->details).toJson());
+                                              QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -370,7 +400,6 @@ Product ProductApi::productFromJson(const QJsonObject &json) const
     product.reorderPoint = json["reorder_point"].toInt();
     product.location = json["location"].toString();
     product.image_path = json["image_path"].toString();
-    qDebug()<<"IIIIIIIIIIIIIIIIII : "<<json["image_path"].toString();
     if (json.contains("unit")) {
         product.unit = productUnitFromJson(json["unit"].toObject());
     }
@@ -608,11 +637,11 @@ QFuture<void> ProductApi::uploadProductImage(int productId, const QString &image
 
     // Set headers
     imagePart.setHeader(QNetworkRequest::ContentTypeHeader,
-        QVariant(localPath.endsWith(".png", Qt::CaseInsensitive) ? "image/png" : "image/jpeg"));
+                        QVariant(localPath.endsWith(".png", Qt::CaseInsensitive) ? "image/png" : "image/jpeg"));
 
     imagePart.setHeader(QNetworkRequest::ContentDispositionHeader,
-        QVariant(QString("form-data; name=\"image\"; filename=\"%1\"")
-            .arg(QFileInfo(localPath).fileName())));
+                        QVariant(QString("form-data; name=\"image\"; filename=\"%1\"")
+                                 .arg(QFileInfo(localPath).fileName())));
 
     // Read file content
     QByteArray fileData = file->readAll();
@@ -625,7 +654,7 @@ QFuture<void> ProductApi::uploadProductImage(int productId, const QString &image
 
     // Set the content type for the request
     request.setHeader(QNetworkRequest::ContentTypeHeader,
-        QString("multipart/form-data; boundary=%1").arg(boundary));
+                      QString("multipart/form-data; boundary=%1").arg(boundary));
 
     qDebug() << "Sending request:";
     qDebug() << "Boundary:" << boundary;
@@ -652,7 +681,7 @@ QFuture<void> ProductApi::uploadProductImage(int productId, const QString &image
             qDebug() << "Image upload failed";
             qDebug() << "Error details:" << response.error->details;
             emit productError(response.error->message, response.error->status,
-                            QJsonDocument(response.error->details).toJson());
+                              QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });

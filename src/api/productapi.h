@@ -8,6 +8,8 @@
 #include <QHttpMultiPart>
 #include <QFile>
 #include <QFileInfo>
+#include "../utils/favoritemanager.h"
+
 namespace NetworkApi {
 
 struct ProductUnit {
@@ -55,8 +57,9 @@ class ProductApi : public AbstractApi {
     Q_OBJECT
     Q_PROPERTY(bool isLoading READ isLoading NOTIFY isLoadingChanged)
 public:
+   // explicit ProductApi(QNetworkAccessManager *netManager, QObject *parent = nullptr);
+    explicit ProductApi(QObject *parent = nullptr);
     explicit ProductApi(QNetworkAccessManager *netManager, QObject *parent = nullptr);
-
     // Main CRUD operations
     Q_INVOKABLE QFuture<void> getProducts(const QString &search = QString(),
                                           const QString &sortBy = "created_at",
@@ -89,6 +92,8 @@ public:
     Q_INVOKABLE QString getToken() const;
     Q_INVOKABLE void saveToken(const QString &token);
     bool isLoading() const { return m_isLoading; }
+
+    static void setSharedNetworkManager(QNetworkAccessManager* manager);
 signals:
     // Success signals
     void productsReceived(const PaginatedProducts &products);
@@ -144,6 +149,11 @@ private:
             emit isLoadingChanged();
         }
     }
+
+    static QNetworkAccessManager* netManager;
+    static void ensureSharedNetworkManager();
+
+        FavoriteManager* m_favoriteManager;
 };
 
 } // namespace NetworkApi

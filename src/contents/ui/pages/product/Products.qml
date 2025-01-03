@@ -23,6 +23,7 @@ Kirigami.Page {
     rightPadding: 10
     Kirigami.Theme.colorSet: Kirigami.Theme.View
     Kirigami.Theme.inherit: false
+    property var checkedProductIds: []
     Kirigami.PlaceholderMessage {
         id: emptyStateMessage
         anchors.centerIn: parent
@@ -188,12 +189,12 @@ Kirigami.Page {
             }
 
             property var nonSortableColumns: {
-                   return {
-                       [ ProductRoles.ProductUnitRole]: "productUnit",
-                     [ ProductRoles.MinStockLevelRole]: "minStock",
+                return {
+                    [ ProductRoles.ProductUnitRole]: "productUnit",
+                    [ ProductRoles.MinStockLevelRole]: "minStock",
 
-                   }
-               }
+                }
+            }
 
             onColumnClicked: function (index, headerComponent) {
                 if (Object.keys(nonSortableColumns).includes(String(headerComponent.role)) ||
@@ -414,6 +415,34 @@ Kirigami.Page {
                                                                )
 
         }
+        function onProductDeleted() {
+               // Get the first ID from our stored array
+               if (checkedProductIds.length > 0) {
+                   const productId = checkedProductIds[0];
+                   console.log("Processing deletion for productId:", productId); // Debug log
+
+                   // Remove from favorites
+                   favoriteManager.removeProductFromAllCategories(productId);
+
+                   // Show notification
+                   applicationWindow().gnotification.showNotification("",
+                       "Product Deleted successfully",
+                       Kirigami.MessageType.Positive,
+                       "short",
+                       "dialog-close"
+                   );
+
+                   // Remove this ID from our array
+                   checkedProductIds.shift(); // removes and returns the first element
+                   console.log("Remaining products to process:", checkedProductIds); // Debug log
+
+                   // If all deletions are complete
+                   if (checkedProductIds.length === 0) {
+                       productModel.clearAllChecked();
+                   }
+               }
+           }
+
     }
     Kirigami.PromptDialog {
         id: deleteDialog
@@ -422,11 +451,11 @@ Kirigami.Page {
 
         standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
         onAccepted: {
-            let checkedIds = productModel.getCheckedProductIds();
-            checkedIds.forEach(productId => {
-                                   productModel.deleteProduct(productId);
-                               });
-
+            checkedProductIds = productModel.getCheckedProductIds();
+              console.log("Initial checkedProductIds:", checkedProductIds); // Debug log
+              checkedProductIds.forEach(productId => {
+                  productModel.deleteProduct(productId);
+              });
         }
     }
 

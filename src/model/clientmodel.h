@@ -62,8 +62,8 @@ public:
     bool hasCheckedItems() const { return m_hasCheckedItems; }
 
     // Q_INVOKABLE methods for QML
-    Q_INVOKABLE void refresh();
-    Q_INVOKABLE void loadPage(int page);
+    Q_INVOKABLE virtual void refresh();
+    Q_INVOKABLE virtual void loadPage(int page);
     Q_INVOKABLE void createClient(const QVariantMap &clientData);
     Q_INVOKABLE void updateClient(int id, const QVariantMap &clientData);
     Q_INVOKABLE void deleteClient(int id);
@@ -98,13 +98,12 @@ signals:
     void rowCountChanged();
 
 private slots:
-    void handleClientsReceived(const PaginatedClients &clients);
+    virtual void handleClientsReceived(const PaginatedClients &clients);
     void handleClientError(const QString &message, ApiStatus status);
     void handleClientCreated(const Client &client);
     void handleClientUpdated(const Client &client);
     void handleClientDeleted(int id);
-
-private:
+protected:
     ClientApi* m_api;
     QList<Client> m_clients;
     bool m_loading;
@@ -120,9 +119,12 @@ private:
 
     void setLoading(bool loading);
     void setErrorMessage(const QString &message);
+    void updateHasCheckedItems();
+private:
+
     Client clientFromVariantMap(const QVariantMap &map) const;
     QVariantMap clientToVariantMap(const Client &client) const;
-    void updateHasCheckedItems();
+
 };
 
 } // namespace NetworkApi

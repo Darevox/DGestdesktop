@@ -62,8 +62,8 @@ public:
     Q_INVOKABLE bool hasCheckedItems() const { return m_hasCheckedItems; }
 
     // Q_INVOKABLE methods for QML
-    Q_INVOKABLE void refresh();
-    Q_INVOKABLE void loadPage(int page);
+    Q_INVOKABLE virtual void refresh();
+    Q_INVOKABLE virtual void loadPage(int page);
     Q_INVOKABLE void createCashSource(const QVariantMap &sourceData);
     Q_INVOKABLE void updateCashSource(int id, const QVariantMap &sourceData);
     Q_INVOKABLE void deleteCashSource(int id);
@@ -129,7 +129,7 @@ signals:
     void rowCountChanged();
 
 private slots:
-    void handleCashSourcesReceived(const PaginatedCashSources &sources);
+    virtual void handleCashSourcesReceived(const PaginatedCashSources &sources);
     void handleCashSourceError(const QString &message, ApiStatus status);
     void handleCashSourceCreated(const CashSource &source);
     void handleCashSourceUpdated(const CashSource &source);
@@ -137,8 +137,7 @@ private slots:
     void handleDepositCompleted(const QVariantMap &transaction);
     void handleWithdrawalCompleted(const QVariantMap &transaction);
     void handleTransferCompleted(const QVariantMap &transaction);
-
-private:
+protected:
     CashSourceApi* m_api;
     QList<CashSource> m_sources;
     bool m_loading;
@@ -153,10 +152,13 @@ private:
 
     void setLoading(bool loading);
     void setErrorMessage(const QString &message);
+    void updateHasCheckedItems();
+
+private:
+
     CashSource cashSourceFromVariantMap(const QVariantMap &map) const;
     QVariantMap cashSourceToVariantMap(const CashSource &source) const;
     TransferData transferDataFromVariantMap(const QVariantMap &map) const;
-    void updateHasCheckedItems();
 };
 
 } // namespace NetworkApi

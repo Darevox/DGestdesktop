@@ -1,3 +1,4 @@
+// CashSourceComboBox.qml
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
@@ -13,33 +14,30 @@ QQC2.ComboBox {
     property int selectedId: -1  // -1 indicates no selection
     signal itemSelected(var item)
     signal enterPressed(string text)
+    property int defaultSourceId: -1
 
     editable: true
-
-    // Direct access to the TextField
     property alias inputField: inputField
 
-    // Custom contentItem to have better control over the TextField
     contentItem: QQC2.TextField {
         id: inputField
         text: root.editText
         width: root.width - root.indicator.width - root.spacing
         font: root.font
         verticalAlignment: Text.AlignVCenter
-        placeholderText:"Enter Name , Email ..."
+        placeholderText: "Enter Cash Source Name..."
 
-        // Keep focus when model updates
         background: Rectangle {
             color: "transparent"
-            border.width: 0  // No border
+            border.width: 0
         }
+
         onTextChanged: {
             if (activeFocus) {
                 forceActiveFocus()
             }
         }
 
-        // Update ComboBox editText
         onTextEdited: {
             root.editText = text
             if (searchOnType && !preventAutoOpen) {
@@ -57,11 +55,10 @@ QQC2.ComboBox {
         interval: root.debounceInterval
         onTriggered: {
             currentSearchText = root.editText
-            clientModelFetch.setSearchQuery(currentSearchText)
+            cashSourceModelFetch.setSearchQuery(currentSearchText)
         }
     }
 
-    // Load initial data when dropdown is opened
     onPressedChanged: {
         if (pressed) {
             loadInitialData()
@@ -69,18 +66,17 @@ QQC2.ComboBox {
     }
 
     function loadInitialData() {
-        if (clientModelFetch.rowCount === 0) {
-            clientModelFetch.setSearchQuery("")
-            clientModelFetch.refresh()
+        if (cashSourceModelFetch.rowCount === 0) {
+            cashSourceModelFetch.setSearchQuery("")
+            cashSourceModelFetch.refresh()
         }
     }
 
-    // Connection to handle loading state changes
     Connections {
-        target: clientModelFetch
+        target: cashSourceModelFetch
 
         function onLoadingChanged() {
-            if (!clientModelFetch.loading) {
+            if (!cashSourceModelFetch.loading) {
                 inputField.forceActiveFocus()
             }
         }
@@ -116,17 +112,17 @@ QQC2.ComboBox {
                 Layout.fillHeight: true
 
                 supportsRefreshing: true
-                refreshing: clientModelFetch.loading
+                refreshing: cashSourceModelFetch.loading
 
                 onRefreshingChanged: {
                     if (refreshing) {
-                        clientModelFetch.refresh()
+                        cashSourceModelFetch.refresh()
                     }
                 }
 
                 ListView {
                     id: listView
-                    model: clientModelFetch
+                    model: cashSourceModelFetch
 
                     delegate: QQC2.ItemDelegate {
                         width: listView.width
@@ -136,7 +132,7 @@ QQC2.ComboBox {
                             spacing: Kirigami.Units.smallSpacing
 
                             Kirigami.Icon {
-                                source: "package"
+                                source: "wallet-open"
                                 implicitWidth: Kirigami.Units.iconSizes.small
                                 implicitHeight: Kirigami.Units.iconSizes.small
                             }
@@ -154,19 +150,25 @@ QQC2.ComboBox {
 
                                 QQC2.Label {
                                     Layout.fillWidth: true
-                                    text: i18n("Email: %1", model.email || "")
+                                    text: i18n("Balance: %1", Number(model.balance || 0).toLocaleString(Qt.locale(), 'f', 2))
                                     elide: Text.ElideRight
                                     font.pointSize: Kirigami.Theme.smallFont.pointSize
                                     opacity: 0.7
                                 }
                             }
 
+                            QQC2.Label {
+                                text: model.type || ""
+                                font.italic: true
+                                opacity: 0.7
+                            }
                         }
 
                         QQC2.ToolTip.visible: hovered
-                        QQC2.ToolTip.text: i18n("Name: %1 \n Email: %2",
+                        QQC2.ToolTip.text: i18n("Name: %1\nType: %2\nBalance: %3",
                                                 model.name || "",
-                                                model.email || ""
+                                                model.type || "",
+                                                Number(model.balance || 0).toLocaleString(Qt.locale(), 'f', 2)
                                                 )
 
                         onClicked: {
@@ -174,26 +176,23 @@ QQC2.ComboBox {
                             root.activated(index)
                             root.popup.close()
 
-                            // Get the ID from the model and call API
-                            const clientId = model.id
-                            clientApiFetch.getClient(clientId)
+                            const sourceId = model.id
+                            cashSourceApiFetch.getCashSource(sourceId)
                         }
                     }
 
-                    // Empty state message
                     Kirigami.PlaceholderMessage {
                         anchors.centerIn: parent
                         width: parent.width - (Kirigami.Units.largeSpacing * 4)
-                        visible: listView.count === 0 && !clientModelFetch.loading
+                        visible: listView.count === 0 && !cashSourceModelFetch.loading
                         text: currentSearchText ?
-                                  i18n("No client found matching '%1'", currentSearchText) :
-                                  i18n("No client available")
-                        // icon.name: "package"
+                                  i18n("No cash source found matching '%1'", currentSearchText) :
+                                  i18n("No cash sources available")
                     }
 
-                    // Load more button
                     footer: QQC2.ItemDelegate {
-                        visible: clientModelFetch.currentPage < clientModelFetch.totalPages && !clientModelFetch.loading
+                        visible: cashSourceModelFetch.currentPage < cashSourceModelFetch.totalPages &&
+                                 !cashSourceModelFetch.loading
                         width: parent.width
                         height: visible ? implicitHeight : 0
 
@@ -203,53 +202,59 @@ QQC2.ComboBox {
                             QQC2.Label {
                                 Layout.fillWidth: true
                                 horizontalAlignment: Text.AlignHCenter
-                                text: i18n("Load More")
+                                text: i18n("Load More... (Page %1 of %2)",
+                                           cashSourceModelFetch.currentPage,
+                                           cashSourceModelFetch.totalPages)
                             }
                         }
 
                         onClicked: {
-                            console.log(" clientModelFetch.currentPage :" , clientModelFetch.currentPage)
-
-                            clientModelFetch.loadPage(clientModelFetch.currentPage + 1)
+                            cashSourceModelFetch.loadPage(cashSourceModelFetch.currentPage + 1)
                         }
                     }
                 }
             }
 
-            // Loading indicator
             QQC2.BusyIndicator {
                 Layout.alignment: Qt.AlignCenter
-                running: clientModelFetch.loading
+                running: cashSourceModelFetch.loading
                 visible: running
             }
         }
     }
 
-    // Handle Enter key
     Keys.onReturnPressed: {
         root.enterPressed(editText)
     }
 
     Component.onCompleted: {
-        clientModelFetch.setApi(clientApiFetch)
-        clientModelFetch.setSearchQuery("")
+        cashSourceModelFetch.setApi(cashSourceApiFetch)
+        cashSourceModelFetch.setSearchQuery("")
         inputField.forceActiveFocus()
+        if (defaultSourceId > 0) {
+            cashSourceApiFetch.getCashSource(defaultSourceId)
+
+                  // for (let i = 0; i < cashSourceModelFetch.count; i++) {
+                  //     if (cashSourceModelFetch.get(i).id === defaultSourceId) {
+                  //         currentIndex = i
+                  //         break
+                  //     }
+                  // }
+              }
     }
+
     Connections {
-        target: clientApiFetch
-        function onClientReceived(client) {
-            if (client) {
-                root.editText = client.name || ""
-                //  root.editText = ""
-                root.selectedId = client.id  // Store the ID
-                root.itemSelected(client)
+        target: cashSourceApiFetch
+        function onCashSourceReceived(source) {
+            if (source) {
+                root.editText = source.name || ""
+                root.selectedId = source.id  // Store the ID
+                root.itemSelected(source)
                 inputField.forceActiveFocus()
-                //  inputField.selectAll()
             }
         }
     }
 
-    // Override default focus handling
     onActiveFocusChanged: {
         if (activeFocus) {
             inputField.forceActiveFocus()

@@ -81,7 +81,7 @@ Kirigami.Dialog {
                         //     visible: hasClientCheckbox.checked
                         // }
                         DSearchableComboBoxClient {
-                            id: clientComboBox
+                            id: clientField
                             Layout.fillWidth: true
                             Layout.margins : Kirigami.Units.smallSpacing
                             enabled: !isEditing && hasClientCheckbox.checked
@@ -94,24 +94,41 @@ Kirigami.Dialog {
                             onEnterPressed: function(text) {
                             }
                         }
-
-                        FormCard.FormComboBoxDelegate {
+                        DSearchableComboBoxCashSource {
                             id: cashSourceField
-                            text: i18n("Cash Source")
-                            model: cashSourceModel
-                            textRole: "name"
-                            valueRole: "id"
+                            Layout.fillWidth: true
+                            Layout.margins : Kirigami.Units.smallSpacing
                             enabled: !isEditing
+                            onItemSelected: function(item) {
+                                console.log("Selected CashSoruce:", JSON.stringify(item))
+                                // Handle selection with full product data
+                            }
+
+                            onEnterPressed: function(text) {
+                            }
                         }
+
+                        // FormCard.FormComboBoxDelegate {
+                        //     id: cashSourceField
+                        //     text: i18n("Cash Source")
+                        //     model: cashSourceModel
+                        //     textRole: "name"
+                        //     valueRole: "id"
+                        //     enabled: !isEditing
+                        // }
 
                         FormCard.FormDateTimeDelegate {
                             id: saleDateField
+                            dateTimeDisplay:FormCard.FormDateTimeDelegate.DateTimeDisplay.Date
+
                             text: i18n("Sale Date")
                             value: new Date()
                         }
 
                         FormCard.FormDateTimeDelegate {
                             id: dueDateField
+                            dateTimeDisplay:FormCard.FormDateTimeDelegate.DateTimeDisplay.Date
+
                             text: i18n("Due Date")
                             value: new Date()
                             enabled: hasClientCheckbox.checked
@@ -711,8 +728,8 @@ Kirigami.Dialog {
 
 
     function validateForm() {
-        return (!hasClientCheckbox.checked || clientComboBox.currentIndex >= 0) &&
-                cashSourceField.currentIndex >= 0 &&
+        return (!hasClientCheckbox.checked || clientField.selectedId >= 0) &&
+                cashSourceField.selectedId >= 0 &&
                 selectedProductsModel.count > 0;
        // return true;
     }
@@ -720,10 +737,12 @@ Kirigami.Dialog {
     function findModelIndex(model, id) {
         for (let i = 0; i < model.rowCount; i++) {
             if (model.data(model.index(i, 0), model.IdRole) === id) {
-                return i;
+              //  return i;
+                            return model.data(model.index(i, 0),  Qt.UserRole + 2)
             }
         }
-        return -1;
+      //return -1;
+         return ""
     }
     function saveSale() {
         let items = [];
@@ -748,8 +767,8 @@ Kirigami.Dialog {
         }
 
         let saleData = {
-            client_id: hasClientCheckbox.checked ? clientField.currentValue : null,
-            cash_source_id: cashSourceField.currentValue,
+            client_id: hasClientCheckbox.checked ? clientField.selectedId : null,
+            cash_source_id: cashSourceField.selectedId,
             sale_date: saleDateField.value.toISOString(),
             due_date: hasClientCheckbox.checked ? dueDateField.value.toISOString() : null,
             notes: notesField.text || "",
@@ -768,8 +787,10 @@ Kirigami.Dialog {
     function clearForm() {
         currentSale = null;
         hasClientCheckbox.checked = false;
-        clientField.currentIndex = -1;
-        cashSourceField.currentIndex = -1;
+        clientField.selectedId = -1;
+        clientField.editText=""
+        cashSourceField.selectedId = -1;
+        cashSourceField.editText=""
         saleDateField.value = new Date();
         dueDateField.value = new Date();
         notesField.text = "";
@@ -799,11 +820,11 @@ Kirigami.Dialog {
         // Update client field using findModelIndex
         hasClientCheckbox.checked = sale.client_id ? true : false;
         if (sale.client_id) {
-            clientField.currentIndex = findModelIndex(clientModel, sale.client_id);
+            clientField.editText = findModelIndex(clientModel, sale.client_id);
         }
 
         // Update cash source field using findModelIndex
-        cashSourceField.currentIndex = findModelIndex(cashSourceModel, sale.cash_source_id);
+        cashSourceField.editText = findModelIndex(cashSourceModel, sale.cash_source_id);
 
         // Update other fields
         saleDateField.value = new Date(sale.sale_date);

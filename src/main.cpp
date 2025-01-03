@@ -37,14 +37,18 @@
 #include <model/salemodel.h>
 #include <model/purchasemodel.h>
 #include <model/clientmodel.h>
+#include <model/clientmodelfetch.h>
 #include <model/suppliermodel.h>
 #include <model/cashsourcemodel.h>
+#include <model/cashsourcemodelfetch.h>
+
 #include <model/cashtransactionmodel.h>
 #include <model/invoicemodel.h>
 #include <model/dashboardmodel.h>
 
 #include <model/productmodelFetch.h>
 #include <utils/pdfModel.h>
+#include <utils/favoritemanager.h>
 
 int main(int argc, char *argv[])
 {
@@ -67,15 +71,30 @@ int main(int argc, char *argv[])
     QNetworkAccessManager *networkManager = new QNetworkAccessManager();
     NetworkApi::UserApi *userapi = new NetworkApi::UserApi(networkManager);
     NetworkApi::SubscriptionApi *subscriptionApi = new NetworkApi::SubscriptionApi(networkManager);
+    //  NetworkApi::ProductApi *productApi = new NetworkApi::ProductApi(networkManager);
+    // NetworkApi::ProductApi *productApiFetch = new NetworkApi::ProductApi(networkManager);
+    // Set shared network manager for createable instances
+    NetworkApi::ProductApi::setSharedNetworkManager(networkManager);
+
+    // Register for createable instances
+    qmlRegisterType<NetworkApi::ProductApi>("com.dervox.ProductFetchApi", 1, 0, "ProductFetchApi");
+
+    // Create singleton instance
     NetworkApi::ProductApi *productApi = new NetworkApi::ProductApi(networkManager);
-    NetworkApi::ProductApi *productApiFetch = new NetworkApi::ProductApi(networkManager);
+     NetworkApi::ProductApi *productApiFetch = new NetworkApi::ProductApi(networkManager);
+
+    engine.rootContext()->setContextProperty("productApi", productApi);
 
     NetworkApi::ActivityLogApi *activityLogApi = new NetworkApi::ActivityLogApi(networkManager);
     NetworkApi::SupplierApi *supplierApi = new NetworkApi::SupplierApi(networkManager);
     NetworkApi::CashSourceApi *cashSourceApi = new NetworkApi::CashSourceApi(networkManager);
+    NetworkApi::CashSourceApi *cashSourceApiFetch = new NetworkApi::CashSourceApi(networkManager);
+
     NetworkApi::SaleApi *saleApi = new NetworkApi::SaleApi(networkManager);
     NetworkApi::PurchaseApi *purchaseApi = new NetworkApi::PurchaseApi(networkManager);
     NetworkApi::ClientApi *clientApi = new NetworkApi::ClientApi(networkManager);
+    NetworkApi::ClientApi *clientApiFetch = new NetworkApi::ClientApi(networkManager);
+
     NetworkApi::InvoiceApi *invoiceApi = new NetworkApi::InvoiceApi(networkManager);
     NetworkApi::CashTransactionApi *cashTransactionApi = new NetworkApi::CashTransactionApi(networkManager);
     NetworkApi::DashboardAnalyticsApi *dashboardAnalyticsApi = new NetworkApi::DashboardAnalyticsApi(networkManager);
@@ -89,8 +108,11 @@ int main(int argc, char *argv[])
     NetworkApi::PurchaseModel *purchaseModel = new NetworkApi::PurchaseModel();
     NetworkApi::SupplierModel *supplierModel = new NetworkApi::SupplierModel();
     NetworkApi::CashSourceModel *cashSourceModel = new NetworkApi::CashSourceModel();
+    NetworkApi::CashSourceModelFetch *cashSourceModelFetch = new NetworkApi::CashSourceModelFetch();
+
     NetworkApi::CashTransactionModel *cashTransactionModel = new NetworkApi::CashTransactionModel();
     NetworkApi::ClientModel *clientModel = new NetworkApi::ClientModel();
+    NetworkApi::ClientModelFetch *clientModelFetch = new NetworkApi::ClientModelFetch();
     NetworkApi::InvoiceModel *invoiceModel = new NetworkApi::InvoiceModel();
     NetworkApi::DashboardModel *dashboardModel = new NetworkApi::DashboardModel();
 
@@ -115,9 +137,12 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("activityLogApi", activityLogApi);
     engine.rootContext()->setContextProperty("supplierApi", supplierApi);
     engine.rootContext()->setContextProperty("cashSourceApi", cashSourceApi);
+    engine.rootContext()->setContextProperty("cashSourceApiFetch", cashSourceApiFetch);
     engine.rootContext()->setContextProperty("saleApi", saleApi);
     engine.rootContext()->setContextProperty("purchaseApi", purchaseApi);
     engine.rootContext()->setContextProperty("clientApi", clientApi);
+    engine.rootContext()->setContextProperty("clientApiFetch", clientApiFetch);
+
     engine.rootContext()->setContextProperty("invoiceApi", invoiceApi);
     engine.rootContext()->setContextProperty("cashTransactionApi", cashTransactionApi);
     engine.rootContext()->setContextProperty("dashboardAnalyticsApi", dashboardAnalyticsApi);
@@ -131,8 +156,12 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("purchaseModel", purchaseModel);
     engine.rootContext()->setContextProperty("supplierModel", supplierModel);
     engine.rootContext()->setContextProperty("cashSourceModel", cashSourceModel);
+    engine.rootContext()->setContextProperty("cashSourceModelFetch", cashSourceModelFetch);
+
     engine.rootContext()->setContextProperty("cashTransactionModel", cashTransactionModel);
     engine.rootContext()->setContextProperty("clientModel", clientModel);
+    engine.rootContext()->setContextProperty("clientModelFetch", clientModelFetch);
+
     engine.rootContext()->setContextProperty("invoiceModel", invoiceModel);
     engine.rootContext()->setContextProperty("dashboardModel", dashboardModel);
     //   engine.rootContext()->setContextProperty("trayManager", &trayManager);
@@ -145,8 +174,12 @@ int main(int argc, char *argv[])
     qmlRegisterType<ColorSchemeManager>("com.dervox.ColorSchemeManager", 1, 0, "ColorSchemeModel");
     qmlRegisterType<Printer>("com.dervox.Printer", 1, 0, "Printer");
     qmlRegisterType( QUrl(QStringLiteral("qrc:/DGest/utils/PDFView.qml")), "com.dervox.PDFView", 1, 0, "PDFView" );
+    FavoriteManager *favoriteManager = new FavoriteManager();
+    engine.rootContext()->setContextProperty("favoriteManager", favoriteManager);
 
+    //qmlRegisterType<FavoriteManager>("com.dervox.FavoriteManager", 1, 0, "FavoriteManager");
 
+    qmlRegisterType<NetworkApi::ProductModelFetch>("com.dervox.ProductFetchModel", 1, 0, "ProductFetchModel");
 
 
     //  qmlRegisterType<NetworkApi::ProductModel>("com.dervox.ProductModel", 1, 0, "ProductModel");

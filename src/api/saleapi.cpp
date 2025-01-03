@@ -92,7 +92,11 @@ QJsonObject SaleApi::saleToJson(const Sale &sale) const
     json["total_amount"] = sale.total_amount;
     json["tax_amount"] = sale.tax_amount;
     json["discount_amount"] = sale.discount_amount;
-
+    // Auto-payment flag and amount
+     if (sale.auto_payment) {
+         json["auto_payment"] = true;
+         json["payment_amount"] = sale.payment_amount;
+     }
     // Optional fields
     if (sale.client_id > 0) {
         json["client_id"] = sale.client_id;
@@ -284,6 +288,8 @@ QFuture<void> SaleApi::getSale(int id)
 QFuture<void> SaleApi::createSale(const Sale &sale)
 {
     setLoading(true);
+    qDebug() << "================== Sale:";
+
     QNetworkRequest request = createRequest("/api/v1/sales");
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
@@ -295,8 +301,11 @@ QFuture<void> SaleApi::createSale(const Sale &sale)
     }).then([=](JsonResponse response) {
         if (response.success) {
             Sale createdSale = saleFromJson(response.data->value("sale").toObject());
+             qDebug() << "================== Done:";
             emit saleCreated(createdSale);
         } else {
+            qDebug() << "Error Sale details:" << response.error->details;
+
             emit errorSaleCreated(response.error->message, response.error->status,
                                 QJsonDocument(response.error->details).toJson());
         }

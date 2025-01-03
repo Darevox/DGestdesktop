@@ -22,8 +22,8 @@ find_package(KF6  REQUIRED COMPONENTS Kirigami
 )
 find_package(Poppler COMPONENTS Qt6)
 set_package_properties("Poppler" PROPERTIES
-        TYPE RECOMMENDED
-        PURPOSE "Support for PDF file operations.")
+    TYPE RECOMMENDED
+    PURPOSE "Support for PDF file operations.")
 
 qt_standard_project_setup()
 qt_policy(SET QTP0001 OLD)
@@ -129,8 +129,18 @@ qt_add_qml_module(DGestapp
     SOURCES model/productmodelFetch.h
     QML_FILES contents/ui/components/DSearchableComboBoxClient.qml
     SOURCES printer.cpp printer.h
-SOURCES utils/pageImageProvider.cpp utils/pageImageProvider.h utils/pdfModel.cpp utils/pdfModel.h
-QML_FILES utils/PDFView.qml
+    SOURCES utils/pageImageProvider.cpp utils/pageImageProvider.h utils/pdfModel.cpp utils/pdfModel.h
+    QML_FILES utils/PDFView.qml
+    SOURCES model/clientmodelfetch.h model/clientmodelfetch.cpp
+    SOURCES model/cashsourcemodelfetch.h model/cashsourcemodelfetch.cpp
+    QML_FILES contents/ui/components/DSearchableComboBoxCashSource.qml
+    SOURCES utils/favoritemanager.h utils/favoritemanager.cpp
+    QML_FILES contents/ui/pages/quickSalePage/QuickSalePage.qml
+    QML_FILES contents/ui/pages/quickSalePage/QuickSaleTabContent.qml
+    QML_FILES contents/ui/components/NumPad.qml
+    QML_FILES contents/ui/pages/quickSalePage/FavoriteProductsSettings.qml
+    QML_FILES contents/ui/pages/quickSalePage/SharedFavoritesGrid.qml
+    QML_FILES contents/ui/pages/quickSalePage/CashSourceSettings.qml
 )
 if(Qt6PrintSupport_FOUND)
     target_link_libraries(DGestapp PRIVATE Qt6::PrintSupport)

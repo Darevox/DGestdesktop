@@ -3,7 +3,8 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
-
+import com.dervox.ProductFetchApi
+import com.dervox.ProductFetchModel
 QQC2.ComboBox {
     id: root
 
@@ -16,6 +17,12 @@ QQC2.ComboBox {
     signal enterPressed(string text)
 
     editable: true
+    ProductFetchApi{
+        id:productFetchApi
+    }
+    ProductFetchModel{
+        id:productFetchModel
+    }
 
     // Direct access to the TextField
     property alias inputField: inputField
@@ -57,7 +64,7 @@ QQC2.ComboBox {
         interval: root.debounceInterval
         onTriggered: {
             currentSearchText = root.editText
-            productModelFetch.setSearchQuery(currentSearchText)
+            productFetchModel.setSearchQuery(currentSearchText)
         }
     }
 
@@ -69,18 +76,18 @@ QQC2.ComboBox {
     }
 
     function loadInitialData() {
-        if (productModelFetch.rowCount === 0) {
-            productModelFetch.setSearchQuery("")
-            productModelFetch.refresh()
+        if (productFetchModel.rowCount === 0) {
+            productFetchModel.setSearchQuery("")
+            productFetchModel.refresh()
         }
     }
 
     // Connection to handle loading state changes
     Connections {
-        target: productModelFetch
+        target: productFetchModel
 
         function onLoadingChanged() {
-            if (!productModelFetch.loading) {
+            if (!productFetchModel.loading) {
                 inputField.forceActiveFocus()
             }
         }
@@ -96,9 +103,9 @@ QQC2.ComboBox {
         height: Math.min(contentHeight + Kirigami.Units.gridUnit, 300)
         padding: 1
         onOpened: {
-            productModelFetch.setSortField("")
-            productModelFetch.setSearchQuery("")
-            productModelFetch.loadPage(1)
+            productFetchModel.setSortField("")
+            productFetchModel.setSearchQuery("")
+            productFetchModel.loadPage(1)
             inputField.forceActiveFocus()
         }
 
@@ -116,20 +123,20 @@ QQC2.ComboBox {
             Kirigami.ScrollablePage {
 
                 supportsRefreshing: true
-                refreshing: productModelFetch.loading
+                refreshing: productFetchModel.loading
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
 
                 onRefreshingChanged: {
                     if (refreshing) {
-                        productModelFetch.refresh()
+                        productFetchModel.refresh()
                     }
                 }
 
                 ListView {
                     id: listView
-                    model: productModelFetch
+                    model: productFetchModel
                     interactive : true
                     delegate: QQC2.ItemDelegate {
                         width: listView.width
@@ -186,7 +193,7 @@ QQC2.ComboBox {
 
                             // Get the ID from the model and call API
                             const productId = model.id
-                            productApiFetch.getProduct(productId)
+                            productFetchApi.getProduct(productId)
                         }
                     }
 
@@ -194,7 +201,7 @@ QQC2.ComboBox {
                     Kirigami.PlaceholderMessage {
                         anchors.centerIn: parent
                         width: parent.width - (Kirigami.Units.largeSpacing * 4)
-                        visible: listView.count === 0 && !productModelFetch.loading
+                        visible: listView.count === 0 && !productFetchModel.loading
                         text: currentSearchText ?
                                   i18n("No products found matching '%1'", currentSearchText) :
                                   i18n("No products available")
@@ -203,7 +210,7 @@ QQC2.ComboBox {
 
                     // Load more button
                     footer: QQC2.ItemDelegate {
-                        visible: productModelFetch.currentPage < productModelFetch.totalPages && !productModelFetch.loading
+                        visible: productFetchModel.currentPage < productFetchModel.totalPages && !productFetchModel.loading
                         width: parent.width
                         height: visible ? implicitHeight : 0
 
@@ -218,8 +225,8 @@ QQC2.ComboBox {
                         }
 
                         onClicked: {
-                            console.log(" productModelFetch.currentPage :" , productModelFetch.currentPage)
-                            productModelFetch.loadPage(productModelFetch.currentPage + 1)
+                            console.log(" productFetchModel.currentPage :" , productFetchModel.currentPage)
+                            productFetchModel.loadPage(productFetchModel.currentPage + 1)
                         }
                     }
                 }
@@ -228,7 +235,7 @@ QQC2.ComboBox {
             // Loading indicator
             QQC2.BusyIndicator {
                 Layout.alignment: Qt.AlignCenter
-                running: productModelFetch.loading
+                running: productFetchModel.loading
                 visible: running
             }
         }
@@ -240,12 +247,15 @@ QQC2.ComboBox {
     }
 
     Component.onCompleted: {
-        productModelFetch.setApi(productApiFetch)
-        productModelFetch.setSearchQuery("")
+        let token = api.getToken();
+
+        productFetchApi.saveToken(token);
+        productFetchModel.setApi(productFetchApi)
+        productFetchModel.setSearchQuery("")
         inputField.forceActiveFocus()
     }
     Connections {
-        target: productApiFetch
+        target: productFetchApi
         function onProductReceived(product) {
             if (product) {
                 //  root.editText = product.name || ""
@@ -253,9 +263,9 @@ QQC2.ComboBox {
                 root.itemSelected(product)
                 inputField.forceActiveFocus()
                 inputField.selectAll()
-                productModelFetch.setSortField("")
-                productModelFetch.setSearchQuery("")
-                productModelFetch.loadPage(1)
+                productFetchModel.setSortField("")
+                productFetchModel.setSearchQuery("")
+                productFetchModel.loadPage(1)
             }
         }
     }
