@@ -25,7 +25,6 @@ Item {
             width: favoritesGrid.cellWidth - 10
             height: favoritesGrid.cellHeight - 10
             opacity: root.loadedProducts[modelData] ? 1 : 0.5
-
             states: [
                 State {
                     name: "hovered"

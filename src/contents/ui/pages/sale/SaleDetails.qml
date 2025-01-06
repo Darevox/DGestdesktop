@@ -4,6 +4,8 @@ import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 import org.kde.kirigamiaddons.formcard as FormCard
+import com.dervox.printing 1.0
+
 import "../../components"
 import "."
 
@@ -530,6 +532,13 @@ Kirigami.Dialog {
             onTriggered: paymentDialog.open()
         },
         Kirigami.Action {
+            text: i18n("Print Receipt")
+            icon.name: "document-print"
+            visible: isEditing
+            enabled: !saleModel.loading
+            onTriggered: saleApi.generateReceipt(dialogSaleId)
+        },
+        Kirigami.Action {
             text: i18n("Generate Invoice")
             icon.name: "document-print"
             visible: isEditing
@@ -731,18 +740,18 @@ Kirigami.Dialog {
         return (!hasClientCheckbox.checked || clientField.selectedId >= 0) &&
                 cashSourceField.selectedId >= 0 &&
                 selectedProductsModel.count > 0;
-       // return true;
+        // return true;
     }
 
     function findModelIndex(model, id) {
         for (let i = 0; i < model.rowCount; i++) {
             if (model.data(model.index(i, 0), model.IdRole) === id) {
-              //  return i;
-                            return model.data(model.index(i, 0),  Qt.UserRole + 2)
+                //  return i;
+                return model.data(model.index(i, 0),  Qt.UserRole + 2)
             }
         }
-      //return -1;
-         return ""
+        //return -1;
+        return ""
     }
     function saveSale() {
         let items = [];
@@ -889,6 +898,15 @@ Kirigami.Dialog {
             updateRemainingAmount()
             loadData(sale)
         }
+        function onReceiptGenerated(pdfUrl) {
+            printerHelper.printPdfWithPreview(pdfUrl)
+        }
+        function onErrorReceiptGenerated(title, message) {
+            applicationWindow().showPassiveNotification(
+                        i18n("Receipt generation failed: %1", message),
+                        "long"
+                        )
+        }
     }
 
     onDialogSaleIdChanged: {
@@ -896,7 +914,10 @@ Kirigami.Dialog {
             saleApi.getSale(dialogSaleId)
         }
     }
+    PrinterHelper{
+        id:printerHelper
 
+    }
     Component.onCompleted: {
         clientModel.setApi(clientApi)
         cashSourceModel.setApi(cashSourceApi)

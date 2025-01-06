@@ -141,6 +141,7 @@ qt_add_qml_module(DGestapp
     QML_FILES contents/ui/pages/quickSalePage/FavoriteProductsSettings.qml
     QML_FILES contents/ui/pages/quickSalePage/SharedFavoritesGrid.qml
     QML_FILES contents/ui/pages/quickSalePage/CashSourceSettings.qml
+    QML_FILES contents/ui/pages/product/CategoriesSettings.qml
 )
 if(Qt6PrintSupport_FOUND)
     target_link_libraries(DGestapp PRIVATE Qt6::PrintSupport)

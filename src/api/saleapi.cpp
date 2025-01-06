@@ -93,10 +93,10 @@ QJsonObject SaleApi::saleToJson(const Sale &sale) const
     json["tax_amount"] = sale.tax_amount;
     json["discount_amount"] = sale.discount_amount;
     // Auto-payment flag and amount
-     if (sale.auto_payment) {
-         json["auto_payment"] = true;
-         json["payment_amount"] = sale.payment_amount;
-     }
+    if (sale.auto_payment) {
+        json["auto_payment"] = true;
+        json["payment_amount"] = sale.payment_amount;
+    }
     // Optional fields
     if (sale.client_id > 0) {
         json["client_id"] = sale.client_id;
@@ -220,8 +220,8 @@ QVariantMap SaleApi::saleItemToVariantMap(const SaleItem &item) const
 
 // API Methods
 QFuture<void> SaleApi::getSales(const QString &search, const QString &sortBy,
-                               const QString &sortDirection, int page,
-                               const QString &status, const QString &paymentStatus)
+                                const QString &sortDirection, int page,
+                                const QString &status, const QString &paymentStatus)
 {
     setLoading(true);
     QString path = "/api/v1/sales";
@@ -255,7 +255,7 @@ QFuture<void> SaleApi::getSales(const QString &search, const QString &sortBy,
             emit salesReceived(paginatedSales);
         } else {
             emit errorSalesReceived(response.error->message, response.error->status,
-                                  QJsonDocument(response.error->details).toJson());
+                                    QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -277,7 +277,7 @@ QFuture<void> SaleApi::getSale(int id)
             emit saleReceived(saleToVariantMap(sale));
         } else {
             emit errorSaleReceived(response.error->message, response.error->status,
-                                 QJsonDocument(response.error->details).toJson());
+                                   QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -301,13 +301,14 @@ QFuture<void> SaleApi::createSale(const Sale &sale)
     }).then([=](JsonResponse response) {
         if (response.success) {
             Sale createdSale = saleFromJson(response.data->value("sale").toObject());
-             qDebug() << "================== Done:";
+            qDebug() << "================== Done:";
             emit saleCreated(createdSale);
+            emit saleMapCreated(saleToVariantMap(createdSale));
         } else {
             qDebug() << "Error Sale details:" << response.error->details;
 
             emit errorSaleCreated(response.error->message, response.error->status,
-                                QJsonDocument(response.error->details).toJson());
+                                  QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -332,7 +333,7 @@ QFuture<void> SaleApi::updateSale(int id, const Sale &sale)
             emit saleUpdated(updatedSale);
         } else {
             emit errorSaleUpdated(response.error->message, response.error->status,
-                                QJsonDocument(response.error->details).toJson());
+                                  QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -353,7 +354,7 @@ QFuture<void> SaleApi::deleteSale(int id)
             emit saleDeleted(id);
         } else {
             emit errorSaleDeleted(response.error->message, response.error->status,
-                                QJsonDocument(response.error->details).toJson());
+                                  QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -384,7 +385,7 @@ QFuture<void> SaleApi::addPayment(int id, const Payment &payment)
             emit paymentAdded(response.data->value("sale").toObject().toVariantMap());
         } else {
             emit errorPaymentAdded(response.error->message, response.error->status,
-                                 QJsonDocument(response.error->details).toJson());
+                                   QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -405,12 +406,73 @@ QFuture<void> SaleApi::generateInvoice(int id)
             emit invoiceGenerated(response.data->value("invoice").toObject().toVariantMap());
         } else {
             emit errorInvoiceGenerated(response.error->message, response.error->status,
-                                     QJsonDocument(response.error->details).toJson());
+                                       QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
 
     return future.then([=]() {});
+}
+
+QFuture<QByteArray> SaleApi::generateReceipt(int id)
+{
+    setLoading(true);
+    QNetworkRequest request = createRequest(QString("/api/v1/sales/%1/receipt").arg(id));
+    request.setRawHeader("Authorization", QString("Bearer %1").arg(getToken()).toUtf8());
+
+    auto promise = std::make_shared<QPromise<QByteArray>>();
+
+    m_currentReply = m_netManager->get(request);
+
+    connect(m_currentReply, &QNetworkReply::finished, this, [this, promise]() {
+        setLoading(false);
+
+        if (m_currentReply->error() == QNetworkReply::NoError) {
+            QString contentType = m_currentReply->header(QNetworkRequest::ContentTypeHeader).toString();
+
+            if (contentType.contains("application/pdf")) {
+                QByteArray pdfData = m_currentReply->readAll();
+
+                // Save to app's data location
+                QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+                QDir().mkpath(appDataPath + "/pdfs");
+
+                QString fileName = QString("receipt-%1.pdf").arg(QDateTime::currentMSecsSinceEpoch());
+                QString filePath = appDataPath + "/pdfs/" + fileName;
+
+                QFile file(filePath);
+                if (file.open(QIODevice::WriteOnly)) {
+                    file.write(pdfData);
+                    file.close();
+
+                    QString fileUrl = QUrl::fromLocalFile(filePath).toString();
+                    qDebug() << "Receipt PDF saved to:" << fileUrl;
+                    emit receiptGenerated(fileUrl);
+                    promise->addResult(pdfData);
+                    setLoading(false);
+                } else {
+                    emit errorReceiptGenerated("Failed to save PDF", file.errorString());
+                    promise->addResult(QByteArray());
+                }
+            } else if (contentType.contains("application/json")) {
+                // Handle error response
+                QJsonDocument jsonResponse = QJsonDocument::fromJson(m_currentReply->readAll());
+                QJsonObject jsonObject = jsonResponse.object();
+                QString errorMessage = jsonObject["message"].toString();
+                emit errorReceiptGenerated("Error", errorMessage);
+                promise->addResult(QByteArray());
+            }
+        } else {
+            emit errorReceiptGenerated("Network Error", m_currentReply->errorString());
+            promise->addResult(QByteArray());
+        }
+
+        promise->finish();
+        m_currentReply->deleteLater();
+        m_currentReply = nullptr;
+    });
+
+    return promise->future();
 }
 
 QFuture<void> SaleApi::getSummary(const QString &period)
@@ -431,7 +493,7 @@ QFuture<void> SaleApi::getSummary(const QString &period)
             emit summaryReceived(response.data->value("summary").toObject().toVariantMap());
         } else {
             emit errorSummaryReceived(response.error->message, response.error->status,
-                                    QJsonDocument(response.error->details).toJson());
+                                      QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });

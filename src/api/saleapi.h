@@ -5,7 +5,11 @@
 #include "abstractapi.h"
 #include <QSettings>
 #include <QJsonArray>
-
+#include <QStandardPaths>
+#include <QDir>
+#include <QFile>
+#include <QDateTime>
+#include <QUrl>
 namespace NetworkApi {
 
 struct SaleItem {
@@ -21,9 +25,9 @@ struct SaleItem {
     QString notes;
     QVariantMap product;
     bool is_package = false;
-       int package_id = 0;
-       int total_pieces = 0;
-       QVariantMap package;
+    int package_id = 0;
+    int total_pieces = 0;
+    QVariantMap package;
 };
 
 struct Sale {
@@ -74,11 +78,11 @@ public:
 
     // CRUD operations
     Q_INVOKABLE QFuture<void> getSales(const QString &search = QString(),
-                                      const QString &sortBy = "sale_date",
-                                      const QString &sortDirection = "desc",
-                                      int page = 1,
-                                      const QString &status = QString(),
-                                      const QString &paymentStatus = QString());
+                                       const QString &sortBy = "sale_date",
+                                       const QString &sortDirection = "desc",
+                                       int page = 1,
+                                       const QString &status = QString(),
+                                       const QString &paymentStatus = QString());
 
     Q_INVOKABLE QFuture<void> getSale(int id);
     Q_INVOKABLE QFuture<void> createSale(const Sale &sale);
@@ -88,6 +92,7 @@ public:
     // Additional operations
     Q_INVOKABLE QFuture<void> addPayment(int id, const Payment &payment);
     Q_INVOKABLE QFuture<void> generateInvoice(int id);
+    Q_INVOKABLE QFuture<QByteArray> generateReceipt(int id);
     Q_INVOKABLE QFuture<void> getSummary(const QString &period = "month");
 
     // Token management
@@ -101,6 +106,7 @@ signals:
     void salesReceived(const PaginatedSales &sales);
     void saleReceived(const QVariantMap &sale);
     void saleCreated(const Sale &sale);
+    void saleMapCreated(const QVariantMap &sale);
     void saleUpdated(const Sale &sale);
     void saleDeleted(int id);
     void paymentAdded(const QVariantMap &payment);
@@ -119,8 +125,12 @@ signals:
 
     void isLoadingChanged();
 
+    void receiptGenerated(const QString &fileUrl);
+    void errorReceiptGenerated(const QString &title, const QString &message);
 private:
     // Helper methods for JSON conversion
+    QNetworkReply* m_currentReply = nullptr;
+
     Sale saleFromJson(const QJsonObject &json) const;
     SaleItem saleItemFromJson(const QJsonObject &json) const;
     QJsonObject saleToJson(const Sale &sale) const;

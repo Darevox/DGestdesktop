@@ -136,7 +136,7 @@ QQC2.ComboBox {
                             spacing: Kirigami.Units.smallSpacing
 
                             Kirigami.Icon {
-                                source: "package"
+                                source: "group"
                                 implicitWidth: Kirigami.Units.iconSizes.small
                                 implicitHeight: Kirigami.Units.iconSizes.small
                             }

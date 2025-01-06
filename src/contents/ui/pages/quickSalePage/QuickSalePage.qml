@@ -34,6 +34,7 @@ Kirigami.Page {
         Kirigami.Action {
             text: i18n("New Sale")
             icon.name: "list-add"
+            enabled: saleStates.length<=5
             onTriggered: addNewSaleTab()
         }
     ]

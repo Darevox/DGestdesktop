@@ -12,7 +12,7 @@ Kirigami.Dialog {
     id: productDialog
     title: "Product Details"
     padding: Kirigami.Units.largeSpacing
-    width: Kirigami.Units.gridUnit * 65
+    width: Kirigami.Units.gridUnit * 30
     height : Kirigami.Units.gridUnit * 35
 
     standardButtons: Kirigami.Dialog.NoButton
@@ -138,19 +138,19 @@ Kirigami.Dialog {
 
             QQC2.TabButton {
                 text: i18n("Basic Info")
-                 Layout.fillWidth: true
+                Layout.fillWidth: true
             }
             QQC2.TabButton {
                 text: i18n("Pricing & Stock")
-                 Layout.fillWidth: true
+                Layout.fillWidth: true
             }
             QQC2.TabButton {
                 text: i18n("Other Info")
-                 Layout.fillWidth: true
+                Layout.fillWidth: true
             }
             QQC2.TabButton {
                 text: i18n("Categories / Packages")
-                 Layout.fillWidth: true
+                Layout.fillWidth: true
             }
         }
         StackLayout {
@@ -360,87 +360,32 @@ Kirigami.Dialog {
 
             FormCard.FormCard {
                 // Categories Section
+                id :categoriesSection
+                Layout.margins:Kirigami.Units.smallSpacing
                 FormCard.FormHeader {
                     title: i18n("Categories")
+                    actions: [
+                        Kirigami.Action {
+                            icon.name: "settings-configure"
+                            text: i18n("Manage Categories")
+                            onTriggered: categorySettingsDialog.open()
+                        }
+                    ]
                 }
 
                 // Current Categories as Chips
-                Flow {
-                    Layout.fillWidth: true
-                    spacing: Kirigami.Units.smallSpacing
-
-                    Repeater {
-                        id: categoryChipsRepeater
-                        model: {
-                            // Only show chips for categories that contain this product
-                            if (productDialog.dialogProductId <= 0) return [];
-                            return favoriteManager.getCategories().filter(category => {
-                                                                              let productIds = favoriteManager.getCategoryProductIds(category.id)
-                                                                              return productIds.includes(productDialog.dialogProductId)
-                                                                          });
-                        }
-                        delegate: Kirigami.Chip {
-                            text: modelData.name
-                            closable: true
-                            onRemoved: { // Use onCloseClicked instead of onClicked
-                                favoriteManager.removeProductFromCategory(modelData.id, productDialog.dialogProductId)
-                            }
-                        }
-                    }
-                }
-
-                // Category Selection and Actions
+                // Add to Category section
                 RowLayout {
                     Layout.fillWidth: true
-                    Layout.margins: Kirigami.Units.smallSpacing
                     spacing: Kirigami.Units.smallSpacing
 
+                    Layout.margins:Kirigami.Units.smallSpacing
                     QQC2.ComboBox {
                         id: categoryCombo
                         Layout.fillWidth: true
                         textRole: "name"
                         valueRole: "id"
-                        model: {
-                            // Filter out categories that already contain the product
-                            if (productDialog.dialogProductId <= 0) return [];
-                            return favoriteManager.getCategories().filter(category => {
-                                                                              let productIds = favoriteManager.getCategoryProductIds(category.id)
-                                                                              return !productIds.includes(productDialog.dialogProductId)
-                                                                          });
-                        }
-
-                        Connections {
-                            target: favoriteManager
-                            function onCategoriesChanged() {
-                                // Update combo box model when categories change
-                                let categories = favoriteManager.getCategories()
-                                if (productDialog.dialogProductId > 0) {
-                                    categories = categories.filter(category => {
-                                                                       let productIds = favoriteManager.getCategoryProductIds(category.id)
-                                                                       return !productIds.includes(productDialog.dialogProductId)
-                                                                   });
-                                }
-                                categoryCombo.model = categories
-                            }
-                            function onProductsChanged() {
-                                // Update both chips and combo box when products change
-                                categoryChipsRepeater.model = Qt.binding(() => {
-                                                                             if (productDialog.dialogProductId <= 0) return [];
-                                                                             return favoriteManager.getCategories().filter(category => {
-                                                                                                                               let productIds = favoriteManager.getCategoryProductIds(category.id)
-                                                                                                                               return productIds.includes(productDialog.dialogProductId)
-                                                                                                                           });
-                                                                         });
-
-                                categoryCombo.model = Qt.binding(() => {
-                                                                     if (productDialog.dialogProductId <= 0) return [];
-                                                                     return favoriteManager.getCategories().filter(category => {
-                                                                                                                       let productIds = favoriteManager.getCategoryProductIds(category.id)
-                                                                                                                       return !productIds.includes(productDialog.dialogProductId)
-                                                                                                                   });
-                                                                 });
-                            }
-                        }
+                        model: categoriesSection.getAvailableCategories()
                     }
 
                     QQC2.Button {
@@ -450,21 +395,42 @@ Kirigami.Dialog {
                         onClicked: {
                             if (categoryCombo.currentValue !== undefined) {
                                 favoriteManager.addProductToCategory(categoryCombo.currentValue, productDialog.dialogProductId)
+                                // Force update both models
+                                categoryChipsRepeater.model = categoriesSection.getProductCategories()
+                                categoryCombo.model = categoriesSection.getAvailableCategories()
+                            }
+                        }
+                    }
+                }
+                FormCard.FormCard {
+                    Layout.fillHeight: true
+                    Layout.margins:Kirigami.Units.smallSpacing
+                    Flow {
+                        Layout.alignment:Qt.AlignTop
+                        Layout.fillWidth: true
+                        spacing: Kirigami.Units.smallSpacing
+                        Layout.margins:Kirigami.Units.smallSpacing
+                        Repeater {
+                            id: categoryChipsRepeater
+                            model: categoriesSection.getProductCategories()
+
+                            delegate: Kirigami.Chip {
+                                text: modelData.name
+                                closable: true
+                                onRemoved: {
+                                    favoriteManager.removeProductFromCategory(modelData.id, productDialog.dialogProductId)
+                                    // Force update both models
+                                    categoryChipsRepeater.model = categoriesSection.getProductCategories()
+                                    categoryCombo.model = categoriesSection.getAvailableCategories()
+                                }
                             }
                         }
                     }
 
-                    QQC2.Button {
-                        icon.name: "folder-new"
-                        text: i18n("New Category")
-                        onClicked: newCategoryDialog.open()
-                    }
                 }
 
-
-
                 FormCard.FormButtonDelegate {
-                    Layout.margins: 10
+                    Layout.margins:Kirigami.Units.smallSpacing
                     text: i18n("Manage Packages")
                     description: packagesModel.count > 0 ?
                                      i18np("%1 package defined", "%1 packages defined", packagesModel.count) :
@@ -472,96 +438,164 @@ Kirigami.Dialog {
                     icon.name: "package"
                     onClicked: packagesListDialog.open()
                 }
-            }
 
-        }
-    }
-    Kirigami.Dialog {
-        id: newCategoryDialog
-        title: i18n("New Category")
-        standardButtons: QQC2.Dialog.Ok | QQC2.Dialog.Cancel
-
-        FormCard.FormCard {
-            FormCard.FormTextFieldDelegate {
-                id: newCategoryField
-                label: i18n("Category Name")
-                placeholderText: i18n("Enter category name")
-            }
-        }
-
-        onAccepted: {
-            if (newCategoryField.text.length > 0) {
-                favoriteManager.createCategory(newCategoryField.text)
-                newCategoryField.text = ""
-            }
-        }
-    }
-    Kirigami.Dialog {
-        id: categoryManagementDialog
-        title: i18n("Manage Categories")
-        preferredWidth: Kirigami.Units.gridUnit * 40
-
-        ColumnLayout {
-            spacing: Kirigami.Units.largeSpacing
-
-            RowLayout {
-                Layout.fillWidth: true
-                QQC2.TextField {
-                    id: newCategoryField1
-                    Layout.fillWidth: true
-                    placeholderText: i18n("New category name")
+                // Helper functions to get categories
+                function getProductCategories() {
+                    if (productDialog.dialogProductId <= 0) return []
+                    return favoriteManager.getCategories().filter(category => {
+                                                                      let productIds = favoriteManager.getCategoryProductIds(category.id)
+                                                                      return productIds.includes(productDialog.dialogProductId)
+                                                                  })
                 }
-                QQC2.Button {
-                    text: i18n("Add")
-                    icon.name: "list-add"
-                    onClicked: {
-                        if (newCategoryField1.text.length > 0) {
-                            favoriteManager.createCategory(newCategoryField1.text)
-                            newCategoryField1.text = ""
-                        }
+
+                function getAvailableCategories() {
+                    if (productDialog.dialogProductId <= 0) return []
+                    return favoriteManager.getCategories().filter(category => {
+                                                                      let productIds = favoriteManager.getCategoryProductIds(category.id)
+                                                                      return !productIds.includes(productDialog.dialogProductId)
+                                                                  })
+                }
+
+                // Add connections to handle category changes
+                Connections {
+                    target: favoriteManager
+                    function onCategoriesChanged() {
+                        categoryChipsRepeater.model = categoriesSection.getProductCategories()
+                        categoryCombo.model = categoriesSection.getAvailableCategories()
+                    }
+                    function onProductsChanged(categoryId) {
+                        categoryChipsRepeater.model = categoriesSection.getProductCategories()
+                        categoryCombo.model = categoriesSection.getAvailableCategories()
                     }
                 }
             }
 
-            ListView {
-                Layout.fillWidth: true
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 15
-                model: favoriteManager.getCategories()
-                delegate: Kirigami.SwipeListItem {
-                    contentItem: RowLayout {
-                        QQC2.Label {
-                            text: modelData.name
-                            Layout.fillWidth: true
-                        }
-                        QQC2.CheckBox {
-                            checked: {
-                                let productIds = favoriteManager.getCategoryProductIds(modelData.id)
-                                return productIds.includes(productDialog.dialogProductId)
-                            }
-                            onToggled: {
-                                if (checked) {
-                                    favoriteManager.addProductToCategory(modelData.id, productDialog.dialogProductId)
-                                } else {
-                                    favoriteManager.removeProductFromCategory(modelData.id, productDialog.dialogProductId)
-                                }
-                            }
-                        }
-                    }
-                    actions: [
-                        Kirigami.Action {
-                            icon.name: "edit-entry"
-                            onTriggered: {
-                                editCategoryDialog.categoryId = modelData.id
-                                editCategoryDialog.categoryName = modelData.name
-                                editCategoryDialog.open()
-                            }
-                        },
-                        Kirigami.Action {
-                            icon.name: "edit-delete"
-                            onTriggered: favoriteManager.deleteCategory(modelData.id)
-                        }
-                    ]
-                }
+
+            // Add this dialog to use CategoriesSettings
+
+        }
+
+    }
+    //    Kirigami.Dialog {
+    //        id: newCategoryDialog
+    //        title: i18n("New Category")
+    //        standardButtons: QQC2.Dialog.Ok | QQC2.Dialog.Cancel
+
+    //        FormCard.FormCard {
+    //            FormCard.FormTextFieldDelegate {
+    //                id: newCategoryField
+    //                label: i18n("Category Name")
+    //                placeholderText: i18n("Enter category name")
+    //            }
+    //        }
+
+    //        onAccepted: {
+    //            if (newCategoryField.text.length > 0) {
+    //                favoriteManager.createCategory(newCategoryField.text)
+    //                newCategoryField.text = ""
+    //            }
+    //        }
+    //    }
+    //    Kirigami.Dialog {
+    //        id: categoryManagementDialog
+    //        title: i18n("Manage Categories")
+    //        preferredWidth: Kirigami.Units.gridUnit * 40
+
+    //        ColumnLayout {
+    //            spacing: Kirigami.Units.largeSpacing
+
+    //            RowLayout {
+    //                Layout.fillWidth: true
+    //                QQC2.TextField {
+    //                    id: newCategoryField1
+    //                    Layout.fillWidth: true
+    //                    placeholderText: i18n("New category name")
+    //                }
+    //                QQC2.Button {
+    //                    text: i18n("Add")
+    //                    icon.name: "list-add"
+    //                    onClicked: {
+    //                        if (newCategoryField1.text.length > 0) {
+    //                            favoriteManager.createCategory(newCategoryField1.text)
+    //                            newCategoryField1.text = ""
+    //                        }
+    //                    }
+    //                }
+    //            }
+
+    //            ListView {
+    //                Layout.fillWidth: true
+    //                Layout.preferredHeight: Kirigami.Units.gridUnit * 15
+    //                model: favoriteManager.getCategories()
+    //                delegate: Kirigami.SwipeListItem {
+    //                    contentItem: RowLayout {
+    //                        QQC2.Label {
+    //                            text: modelData.name
+    //                            Layout.fillWidth: true
+    //                        }
+    //                        QQC2.CheckBox {
+    //                            checked: {
+    //                                let productIds = favoriteManager.getCategoryProductIds(modelData.id)
+    //                                return productIds.includes(productDialog.dialogProductId)
+    //                            }
+    //                            onToggled: {
+    //                                if (checked) {
+    //                                    favoriteManager.addProductToCategory(modelData.id, productDialog.dialogProductId)
+    //                                } else {
+    //                                    favoriteManager.removeProductFromCategory(modelData.id, productDialog.dialogProductId)
+    //                                }
+    //                            }
+    //                        }
+    //                    }
+    //                    actions: [
+    //                        Kirigami.Action {
+    //                            icon.name: "edit-entry"
+    //                            onTriggered: {
+    //                                editCategoryDialog.categoryId = modelData.id
+    //                                editCategoryDialog.categoryName = modelData.name
+    //                                editCategoryDialog.open()
+    //                            }
+    //                        },
+    //                        Kirigami.Action {
+    //                            icon.name: "edit-delete"
+    //                            onTriggered: favoriteManager.deleteCategory(modelData.id)
+    //                        }
+    //                    ]
+    //                }
+    //            }
+    //        }
+    //    }
+
+
+
+    Kirigami.Dialog {
+        id: categorySettingsDialog
+        title: i18n("Categories Settings")
+        preferredWidth: Kirigami.Units.gridUnit * 30
+        preferredHeight: Kirigami.Units.gridUnit * 30
+
+        CategoriesSettings {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.margins:Kirigami.Units.smallSpacing
+            Layout.preferredHeight :  Kirigami.Units.gridUnit * 28
+            onCategoriesChanged: {
+                // Update the category chips and combo box
+                categoryChipsRepeater.model = Qt.binding(() => {
+                                                             if (productDialog.dialogProductId <= 0) return [];
+                                                             return favoriteManager.getCategories().filter(category => {
+                                                                                                               let productIds = favoriteManager.getCategoryProductIds(category.id)
+                                                                                                               return productIds.includes(productDialog.dialogProductId)
+                                                                                                           });
+                                                         });
+
+                categoryCombo.model = Qt.binding(() => {
+                                                     if (productDialog.dialogProductId <= 0) return [];
+                                                     return favoriteManager.getCategories().filter(category => {
+                                                                                                       let productIds = favoriteManager.getCategoryProductIds(category.id)
+                                                                                                       return !productIds.includes(productDialog.dialogProductId)
+                                                                                                   });
+                                                 });
             }
         }
     }

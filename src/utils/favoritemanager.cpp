@@ -63,9 +63,8 @@ void FavoriteManager::removeProductFromCategory(int categoryId, int productId)
         QJsonArray newProducts;
 
         for (const QJsonValue &value : products) {
-            QJsonObject product = value.toObject();
-            if (product["id"].toInt() != productId) {
-                newProducts.append(product);
+            if (value.toInt() != productId) {
+                newProducts.append(value);
             }
         }
 
@@ -80,13 +79,13 @@ void FavoriteManager::addProductToCategory(int categoryId, int productId)
 {
     QString id = QString::number(categoryId);
     QJsonArray productIds;
-    qDebug()<<"Add product ID "<<productId;
+
     if (m_categoryProducts.contains(id)) {
         productIds = m_categoryProducts[id].toArray();
-        // Check if product already exists in category
+        // Check if product already exists
         for (const QJsonValue &value : productIds) {
             if (value.toInt() == productId) {
-                return;
+                return;  // Product already exists in category
             }
         }
     }
