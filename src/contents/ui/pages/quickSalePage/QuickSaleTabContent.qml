@@ -62,7 +62,8 @@ Item {
         ColumnLayout {
             Layout.preferredHeight: Kirigami.Units.gridUnit * 6
             Layout.fillHeight: true
-
+                Layout.fillWidth: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 60
             // Favorite categories
             QQC2.TabBar {
                 id: categoryBar
@@ -640,7 +641,7 @@ Item {
                         QQC2.Label {
                             text: i18n("Tax: %1", calculateTotalTax().toFixed(2))
                             font.pointSize: 14
-                               color: Kirigami.Theme.neutralTextColor
+                            color: Kirigami.Theme.neutralTextColor
                         }
 
                     }
