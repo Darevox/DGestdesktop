@@ -28,6 +28,7 @@
 #include <api/invoiceapi.h>
 #include <api/cashtransactionapi.h>
 #include <api/dashboardanalyticsapi.h>
+#include <api/teamapi.h>
 
 
 #include <model/productmodel.h>
@@ -49,12 +50,17 @@
 #include <model/productmodelFetch.h>
 #include <utils/pdfModel.h>
 #include <utils/favoritemanager.h>
+#include <utils/appsettings.h>
 
 int main(int argc, char *argv[])
 {
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling); // DPI support
+    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps); //HiDPI pixmaps
+    AppSettings::initializeScale();
     QApplication app(argc, argv);
     KIconTheme::current();
     QApplication::setStyle("breeze");
+    AppSettings *appSettings = new AppSettings(&app);
     //   QLoggingCategory::setFilterRules("*.debug=true");
     KLocalizedString::setApplicationDomain("Managements");
     QCoreApplication::setOrganizationName(QStringLiteral("Dervox"));
@@ -62,6 +68,8 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName(QStringLiteral("DGest"));
     qputenv("QML_XHR_ALLOW_FILE_READ", QByteArray("1"));
     qputenv("QML_XHR_ALLOW_FILE_WRITE", QByteArray("1"));
+
+
     if (qEnvironmentVariableIsEmpty("QT_QUICK_CONTROLS_STYLE")) {
         QQuickStyle::setStyle(QStringLiteral("org.kde.desktop"));
     }
@@ -70,6 +78,8 @@ int main(int argc, char *argv[])
     //engine.addImportPath("qml");
     QNetworkAccessManager *networkManager = new QNetworkAccessManager();
     NetworkApi::UserApi *userapi = new NetworkApi::UserApi(networkManager);
+    NetworkApi::TeamApi *teamApi = new NetworkApi::TeamApi(networkManager);
+
     NetworkApi::SubscriptionApi *subscriptionApi = new NetworkApi::SubscriptionApi(networkManager);
     //  NetworkApi::ProductApi *productApi = new NetworkApi::ProductApi(networkManager);
     // NetworkApi::ProductApi *productApiFetch = new NetworkApi::ProductApi(networkManager);
@@ -81,9 +91,10 @@ int main(int argc, char *argv[])
 
     // Create singleton instance
     NetworkApi::ProductApi *productApi = new NetworkApi::ProductApi(networkManager);
-     NetworkApi::ProductApi *productApiFetch = new NetworkApi::ProductApi(networkManager);
+    NetworkApi::ProductApi *productApiFetch = new NetworkApi::ProductApi(networkManager);
 
     engine.rootContext()->setContextProperty("productApi", productApi);
+    engine.rootContext()->setContextProperty("teamApi", teamApi);
 
     NetworkApi::ActivityLogApi *activityLogApi = new NetworkApi::ActivityLogApi(networkManager);
     NetworkApi::SupplierApi *supplierApi = new NetworkApi::SupplierApi(networkManager);
@@ -130,6 +141,7 @@ int main(int argc, char *argv[])
     }
     );
     // Register the DGestApi instance as a context property
+     engine.rootContext()->setContextProperty("appSettings", appSettings);
     engine.rootContext()->setContextProperty("api", userapi);
     engine.rootContext()->setContextProperty("subscriptionApi", subscriptionApi);
     engine.rootContext()->setContextProperty("productApi", productApi);

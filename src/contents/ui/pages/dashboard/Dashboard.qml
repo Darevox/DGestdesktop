@@ -212,7 +212,7 @@ Kirigami.Page {
 
                 TopItemsCard {
                     Layout.preferredWidth: parent.width / 2
-                    title: i18n("Top Customers")
+                    title: icon("Top Customers")
                     model: dashboardModel.topCustomers
                     iconCard: "user"
                 }

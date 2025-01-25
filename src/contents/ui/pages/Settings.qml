@@ -1,16 +1,26 @@
 import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls as QQC2
 import org.kde.kirigami as Kirigami
 import org.kde.kirigamiaddons.formcard as FormCard
 import org.kde.kirigamiaddons.components as Kcomponents
 import "../components"
-
+import "team/"
 FormCard.FormCardPage {
     id: root
     property bool isLoading: false
     property string userFullName: ""
-
+    property int teamId: 0
     title: i18nc("@title", "Settings")
-
+    actions: [
+        Kirigami.Action {
+            icon.name: "gnumeric-group"
+            text: "Team Settings"
+            onTriggered: {
+                teamDetailsDialog.active = true
+            }
+        }
+    ]
     FormCard.FormHeader {
         title: i18nc("@title:group", "General")
     }
@@ -59,6 +69,42 @@ FormCard.FormCardPage {
                 }
             }
         }
+        FormCard.FormSectionText{
+            text: i18nc("@info:whatsthis", "Scale UI")
+        }
+        FormCard.FormSectionText {
+            RowLayout {
+                anchors.fill: parent
+                QQC2.Slider {
+                    id: scaleSlider
+                    Layout.fillWidth: true
+                    from: 50
+                    to: 200
+                    stepSize: 5
+                    snapMode: QQC2.Slider.SnapOnRelease
+                    value: appSettings.scaleValue
+
+                    property bool wasPressed: false
+
+                    onPressedChanged: {
+                        if (pressed) {
+                            wasPressed = true;
+                        } else if (wasPressed) {
+                            wasPressed = false;
+                            if (value !== appSettings.scaleValue) {
+                                restartPromptDialog.open();
+                            }
+                        }
+                    }
+                }
+                QQC2.Label {
+                    text: scaleSlider.value + "%"
+                }
+            }
+        }
+        FormCard.FormSectionText{
+        }
+
     }
 
     FormCard.FormHeader {
@@ -140,8 +186,40 @@ FormCard.FormCardPage {
         target: api
         function onUserInfoReceived() {
             root.userFullName= api.getUserName()
+            root.teamId =  api.getTeamId()
             root.isLoading=false
 
+        }
+    }
+    Kirigami.PromptDialog {
+        id: restartPromptDialog
+        title: i18n("Scale Change")
+        subtitle: i18n("The application needs to restart to apply the new scale. Do you want to restart now?")
+        standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
+
+        onAccepted: {
+            appSettings.applyScale(scaleSlider.value)
+            appSettings.makeRestart()
+        }
+        onRejected: {
+            scaleSlider.value = appSettings.scaleValue
+        }
+    }
+    Loader {
+        id: teamDetailsDialog
+        active: false
+        asynchronous: true
+        sourceComponent: TeamDialog{}
+        onLoaded: {
+            item.dialogTeamId = root.teamId
+            item.open()
+        }
+
+        Connections {
+            target: teamDetailsDialog.item
+            function onClosed() {
+                teamDetailsDialog.active = false
+            }
         }
     }
     Component.onCompleted:{

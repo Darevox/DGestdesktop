@@ -98,6 +98,7 @@ QFuture<void> UserApi::getUserInfo() {
             const QJsonObject &userData = *response.data; // Dereference the optional
             m_user.name = userData["name"].toString(); // Save the user's name
             m_user.email = userData["email"].toString(); // Save the user's email
+            m_user.team_id = userData["team_id"].toInt();
             emit userInfoReceived(response.data.value());
         } else {
             emit userInfoError(response.error->message,response.error->status);

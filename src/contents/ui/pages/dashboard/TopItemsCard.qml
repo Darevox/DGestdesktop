@@ -7,7 +7,7 @@ Kirigami.AbstractCard {
     id: root
 
     Layout.fillWidth: true
-    Layout.preferredHeight: Kirigami.Units.gridUnit * 12
+    Layout.preferredHeight: Kirigami.Units.gridUnit * 15
 
     property string title: ""
     property var model: []

@@ -142,6 +142,10 @@ qt_add_qml_module(DGestapp
     QML_FILES contents/ui/pages/quickSalePage/SharedFavoritesGrid.qml
     QML_FILES contents/ui/pages/quickSalePage/CashSourceSettings.qml
     QML_FILES contents/ui/pages/product/CategoriesSettings.qml
+    SOURCES utils/appsettings.h utils/appsettings.cpp
+    SOURCES api/teamapi.h api/teamapi.cpp
+    QML_FILES contents/ui/pages/team/TeamDialog.qml
+    QML_FILES contents/ui/pages/team/TeamImageEditor.qml contents/ui/pages/team/TeamImageBannerCard.qml contents/ui/pages/team/ImageFileDialog.qml
 )
 if(Qt6PrintSupport_FOUND)
     target_link_libraries(DGestapp PRIVATE Qt6::PrintSupport)

@@ -156,6 +156,7 @@ Kirigami.Page {
         function onUserInfoReceived() {
             let token = api.getToken();
             subscriptionApi.getStatus(token);
+            teamApi.saveToken(token);
             productApi.saveToken(token);
             productApiFetch.saveToken(token);
             activityLogApi.saveToken(token);
