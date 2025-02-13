@@ -7,7 +7,8 @@
 #endif
 #include <QQuickItem>
 #include <QJSValue>
-
+#include <QtCore>
+#include <QtQml>
 class Printer : public QQuickItem
 {
     Q_OBJECT
@@ -82,7 +83,7 @@ public:
     Q_ENUMS(Status)
 #endif
 
-public slots:
+public Q_SLOTS:
     bool printingSupported() const;
 
 #ifndef QT_NO_PRINTER
@@ -130,11 +131,11 @@ public slots:
     Status getStatus() const;
 #endif
 
-private slots:
+private Q_SLOTS:
     bool grab();
     void grabbed();
 
-signals:
+Q_SIGNALS:
     void itemChanged();
     void frameGrabbed(const QByteArray &imageData);
     void sizeChanged();

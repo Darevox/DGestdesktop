@@ -3,7 +3,7 @@
 #include "pdfModel.h"
 #include <QElapsedTimer>
 #include <QDebug>
-
+using namespace Qt::StringLiterals;
 PageImageProvider::PageImageProvider(Poppler::Document* pdfDocument)
     : QQuickImageProvider(QQuickImageProvider::Image,
                          QQmlImageProviderBase::ForceAsynchronousImageLoading)
@@ -16,13 +16,13 @@ QImage PageImageProvider::requestImage(const QString& id, QSize* size,
     QElapsedTimer timer;
     timer.start();
 
-    QString type = id.section("/", 0, 0);
+    QString type = id.section("/"_L1, 0, 0);
     QImage result;
 
-    if (document && type == "page")
+    if (document && type == "page"_L1)
     {
         bool ok;
-        int numPage = id.section("/", 1, 1).toInt(&ok);
+        int numPage = id.section("/"_L1, 1, 1).toInt(&ok);
 
         if (!ok)
         {

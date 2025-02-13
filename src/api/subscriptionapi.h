@@ -30,12 +30,12 @@ public:
     Q_INVOKABLE QString getExpirationDate() const {
         QDateTime expirationDate = QDateTime::fromString(m_subscription.expirationDate, Qt::ISODate);
         // Return the date formatted as "YYYY-MM-DD"
-        return expirationDate.toString("yyyy-MM-dd"); }
+        return expirationDate.toString(QStringLiteral("yyyy-MM-dd")); }
     Q_INVOKABLE int getDaysUntilExpiration() const { return m_subscription.daysUntilExpiration; }
     Q_INVOKABLE QJsonObject getPlanDetails() const { return m_subscription.planDetails; }
     Q_INVOKABLE QString getToken() const;
 
-signals:
+Q_SIGNALS:
     void statusReceived(const Subscription &subscription);
     void statusError(const QString &message);
 

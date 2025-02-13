@@ -25,7 +25,7 @@ public:
 
     Q_INVOKABLE void fetchUnits(ProductApi* api);
 
-private slots:
+private Q_SLOTS:
     void handleUnitsReceived(const QList<ProductUnit>& units);
     void handleError(const ApiError& error);
 

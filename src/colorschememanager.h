@@ -18,7 +18,7 @@ public:
     // Property accessor for activeSchemeIndex
     int activeSchemeIndex() const;
 
-signals:
+Q_SIGNALS:
     void activeSchemeIndexChanged();
 
 private:

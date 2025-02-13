@@ -19,7 +19,7 @@ Rectangle {
         anchors.margins: 8
 
         QQC2.Label {
-            text: qsTr("Page %1 of %2").arg(currentPage).arg(totalPages)
+            text: i18n("Page %1 of %2", currentPage, totalPages)
             font.pixelSize: 14
             color: "#666666"
             Layout.alignment: Qt.AlignVCenter

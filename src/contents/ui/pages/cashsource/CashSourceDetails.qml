@@ -54,7 +54,7 @@ Kirigami.PromptDialog {
         spacing: Kirigami.Units.largeSpacing
 
         Kirigami.Heading {
-            text: qsTr("Transactions")
+            text: i18n("Transactions")
             level: 3
         }
 
@@ -62,20 +62,20 @@ Kirigami.PromptDialog {
             spacing: Kirigami.Units.largeSpacing
 
             QQC2.Button {
-                text: qsTr("Deposit")
+                text: i18n("Deposit")
                 icon.name: "list-add-money"
                 highlighted: true
                 onClicked: depositDialog.open()
             }
 
             QQC2.Button {
-                text: qsTr("Withdraw")
+                text: i18n("Withdraw")
                 icon.name: "list-remove-money"
                 onClicked: withdrawDialog.open()
             }
 
             QQC2.Button {
-                text: qsTr("Transfer")
+                text: i18n("Transfer")
                 icon.name: "transfer"
                 visible: false // TODO: Implement transfer functionality
                 onClicked: transferDialog.open()
@@ -89,8 +89,8 @@ Kirigami.PromptDialog {
 
             FormCard.FormTextFieldDelegate {
                 id: nameField
-                label: qsTr("Name")
-                placeholderText: qsTr("Enter cash source name")
+                label: i18n("Name")
+                placeholderText: i18n("Enter cash source name")
                 text: ""
                 status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
                 //    required: true
@@ -99,11 +99,11 @@ Kirigami.PromptDialog {
             FormCard.FormComboBoxDelegate {
                 id: typeField
                 //  label: qsTr("Type")
-                description: qsTr("Select the type of cash source")
+                description: i18n("Select the type of cash source")
                 model: [
-                    { text: qsTr("Cash"), value: "cash" },
-                    { text: qsTr("Bank Account"), value: "bank" },
-                    { text: qsTr("Other"), value: "other" }
+                    { text: i18n("Cash"), value: "cash" },
+                    { text: i18n("Bank Account"), value: "bank" },
+                    { text: i18n("Other"), value: "other" }
                 ]
                 textRole: "text"
                 valueRole: "value"
@@ -114,8 +114,8 @@ Kirigami.PromptDialog {
             // Initial Balance (only shown when creating)
             FormCard.FormTextFieldDelegate {
                 id: initialBalanceField
-                label: qsTr("Initial Balance")
-                placeholderText: qsTr("Enter initial balance")
+                label: i18n("Initial Balance")
+                placeholderText: i18n("Enter initial balance")
                 text: "0.00"
                 validator: DoubleValidator {
                     bottom: 0
@@ -140,7 +140,7 @@ Kirigami.PromptDialog {
             // Current Balance (shown when editing)
             FormCard.FormTextFieldDelegate {
                 id: balanceField
-                label: qsTr("Current Balance")
+                label: i18n("Current Balance")
                 text: "0.00"
                 readOnly: true
                 visible: isEditing
@@ -167,33 +167,33 @@ Kirigami.PromptDialog {
 
                 FormCard.FormTextFieldDelegate {
                     id: accountNumberField
-                    label: qsTr("Account Number")
-                    placeholderText: qsTr("Enter account number")
+                    label: i18n("Account Number")
+                    placeholderText: i18n("Enter account number")
                     text: ""
                 }
 
                 FormCard.FormTextFieldDelegate {
                     id: bankNameField
-                    label: qsTr("Bank Name")
-                    placeholderText: qsTr("Enter bank name")
+                    label: i18n("Bank Name")
+                    placeholderText: i18n("Enter bank name")
                     text: ""
                 }
             }
 
             FormCard.FormTextAreaDelegate {
                 id: descriptionField
-                label: qsTr("Description")
-                placeholderText: qsTr("Enter description (optional)")
+                label: i18n("Description")
+                placeholderText: i18n("Enter description (optional)")
                 text: ""
             }
 
             FormCard.FormComboBoxDelegate {
                 id: statusField
                 //   label: qsTr("Status")
-                text: qsTr("Set the operational status")
+                text: i18n("Set the operational status")
                 model: [
-                    { text: qsTr("Active"), value: "active" },
-                    { text: qsTr("Inactive"), value: "inactive" }
+                    { text: i18n("Active"), value: "active" },
+                    { text: i18n("Inactive"), value: "inactive" }
                 ]
                 textRole: "text"
                 valueRole: "value"
@@ -202,8 +202,8 @@ Kirigami.PromptDialog {
 
             FormCard.FormSwitchDelegate {
                 id: isDefaultField
-                text: qsTr("Set as Default")
-                description: qsTr("Make this the default cash source")
+                text: i18n("Set as Default")
+                description: i18n("Make this the default cash source")
                 checked: false
                 visible:false
             }
@@ -214,7 +214,7 @@ Kirigami.PromptDialog {
 
     TransactionDialog {
         id: depositDialog
-        title: qsTr("Deposit")
+        title: i18n("Deposit")
         onTransactionAccepted: function(amount, notes) {
             cashSourceModel.deposit(dialogSourceId, amount, notes)
         }
@@ -222,7 +222,7 @@ Kirigami.PromptDialog {
 
     TransactionDialog {
         id: withdrawDialog
-        title: qsTr("Withdraw")
+        title: i18n("Withdraw")
         onTransactionAccepted: function(amount, notes) {
             cashSourceModel.withdraw(dialogSourceId, amount, notes)
         }
@@ -230,7 +230,7 @@ Kirigami.PromptDialog {
 
     customFooterActions: [
         Kirigami.Action {
-            text: isEditing ? qsTr("Save Changes") : qsTr("Create Cash Source")
+            text: isEditing ? i18n("Save Changes") : i18n("Create Cash Source")
             icon.name: isEditing ? "document-save" : "list-add-symbolic"
             enabled: !cashSourceApi.isLoading && nameField.text.trim() !== "" // Basic validation
             onTriggered: {
@@ -247,7 +247,7 @@ Kirigami.PromptDialog {
             }
         },
         Kirigami.Action {
-            text: qsTr("Create & Add Another")
+            text: i18n("Create & Add Another")
             icon.name: "list-add-symbolic"
             visible: !isEditing
             enabled: !cashSourceApi.isLoading
@@ -258,7 +258,7 @@ Kirigami.PromptDialog {
             }
         },
         Kirigami.Action {
-            text: qsTr("Delete")
+            text: i18n("Delete")
             icon.name: "edit-delete"
             visible: isEditing
             enabled: !cashSourceApi.isLoading
@@ -268,7 +268,7 @@ Kirigami.PromptDialog {
             }
         },
         Kirigami.Action {
-            text: qsTr("Cancel")
+            text: i18n("Cancel")
             icon.name: "dialog-cancel"
             onTriggered: sourceDialog.close()
         }
@@ -284,7 +284,7 @@ Kirigami.PromptDialog {
         function onCashSourceCreated() {
             if (!isCreateAnother) {
                 applicationWindow().gnotification.showNotification("",
-                                                                   "Cash source created successfully",
+                                                                   i18n("Cash source created successfully"),
                                                                    Kirigami.MessageType.Positive,
                                                                    "short",
                                                                    "dialog-close"
@@ -302,7 +302,7 @@ Kirigami.PromptDialog {
         function onCashSourceUpdated() {
             if(!isTransaction){
                 applicationWindow().gnotification.showNotification("",
-                                                                   "Cash source updated successfully",
+                                                                   i18n("Cash source updated successfully"),
                                                                    Kirigami.MessageType.Positive,
                                                                    "short",
                                                                    "dialog-close"
@@ -314,7 +314,7 @@ Kirigami.PromptDialog {
 
         function onCashSourceDeleted() {
             applicationWindow().gnotification.showNotification("",
-                                                               "Cash source deleted successfully",
+                                                               i18n("Cash source deleted successfully"),
                                                                Kirigami.MessageType.Positive,
                                                                "short",
                                                                "dialog-close"
@@ -325,7 +325,7 @@ Kirigami.PromptDialog {
 
         function onDepositCompleted() {
             isTransaction=true
-            inlineMsg.text= "Deposit completed successfully"
+            inlineMsg.text= i18n("Deposit completed successfully")
             inlineMsg.visible=true
             inlineMsg.type= Kirigami.MessageType.Positive
             depositDialog.close()
@@ -340,7 +340,7 @@ Kirigami.PromptDialog {
         function onWithdrawalCompleted() {
             isTransaction=true
             withdrawDialog.close()
-            inlineMsg.text= "Withdrawal completed successfully"
+            inlineMsg.text= i18n("Withdrawal completed successfully")
             inlineMsg.visible=true
             inlineMsg.type= Kirigami.MessageType.Positive
             cashSourceApi.getCashSource(dialogSourceId)

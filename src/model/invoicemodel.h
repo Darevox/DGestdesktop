@@ -82,7 +82,7 @@ public:
     Q_INVOKABLE void sendToClient(int id);
     Q_INVOKABLE void markAsSent(int id);
     Q_INVOKABLE void markAsPaid(int id);
-    Q_INVOKABLE void getSummary(const QString &period = "month");
+    Q_INVOKABLE void getSummary(const QString &period = QStringLiteral("month"));
 
     // Selection methods
     Q_INVOKABLE void setChecked(int row, bool checked);
@@ -91,7 +91,7 @@ public:
     Q_INVOKABLE void toggleAllInvoicesChecked();
     QDateTime startDate() const { return m_startDate; }
     QDateTime endDate() const { return m_endDate; }
-public slots:
+public Q_SLOTS:
     void setSortField(const QString &field);
     void setSortDirection(const QString &direction);
     void setSearchQuery(const QString &query);
@@ -99,7 +99,7 @@ public slots:
     void setPaymentStatus(const QString &paymentStatus);
     void setStartDate(const QDateTime &date);
     void setEndDate(const QDateTime &date);
-signals:
+Q_SIGNALS:
     void loadingChanged();
     void errorMessageChanged();
     void totalItemsChanged();
@@ -123,7 +123,7 @@ signals:
     void rowCountChanged();
     void startDateChanged();
        void endDateChanged();
-private slots:
+private Q_SLOTS:
     void handleInvoicesReceived(const PaginatedInvoices &invoices);
     void handleInvoiceError(const QString &message, ApiStatus status);
     void handleInvoiceCreated(const Invoice &invoice);

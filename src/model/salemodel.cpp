@@ -3,7 +3,7 @@
 #include <QJsonDocument>
 
 namespace NetworkApi {
-
+using namespace Qt::StringLiterals;
 SaleModel::SaleModel(QObject *parent)
     : QAbstractTableModel(parent)
     , m_api(nullptr)
@@ -11,8 +11,8 @@ SaleModel::SaleModel(QObject *parent)
     , m_totalItems(0)
     , m_currentPage(1)
     , m_totalPages(1)
-    , m_sortField("sale_date")
-    , m_sortDirection("desc")
+    , m_sortField(QStringLiteral("sale_date"))
+    , m_sortDirection(QStringLiteral("desc"))
     , m_hasCheckedItems(false)
 {
 }
@@ -61,7 +61,7 @@ QVariant SaleModel::data(const QModelIndex &index, int role) const
         case 0: return sale.id;
         case 1: return sale.reference_number;
         case 2: return sale.sale_date;
-        case 3: return sale.client.value("name").toString();
+        case 3: return sale.client.value("name"_L1).toString();
         case 4: return sale.status;
         case 5: return sale.payment_status;
         case 6: return sale.total_amount;
@@ -130,7 +130,7 @@ bool SaleModel::setData(const QModelIndex &index, const QVariant &value, int rol
     if (role == CheckedRole) {
         if (index.isValid() && index.row() < m_sales.count()) {
             m_sales[index.row()].checked = value.toBool();
-            emit dataChanged(index, index, {role});
+            Q_EMIT dataChanged(index, index, {role});
             updateHasCheckedItems();
             return true;
         }
@@ -151,7 +151,7 @@ void SaleModel::loadPage(int page)
 {
     if (page != m_currentPage && page > 0 && page <= m_totalPages) {
         m_currentPage = page;
-        emit currentPageChanged();
+        Q_EMIT currentPageChanged();
         refresh();
     }
 }
@@ -202,11 +202,11 @@ void SaleModel::addPayment(int id, const QVariantMap &paymentData)
     setLoading(true);
 
     Payment payment;
-    payment.cash_source_id = paymentData["cash_source_id"].toInt();
-    payment.amount = paymentData["amount"].toDouble();
-    payment.payment_method = paymentData["payment_method"].toString();
-    payment.reference_number = paymentData["reference_number"].toString();
-    payment.notes = paymentData["notes"].toString();
+    payment.cash_source_id = paymentData["cash_source_id"_L1].toInt();
+    payment.amount = paymentData["amount"_L1].toDouble();
+    payment.payment_method = paymentData["payment_method"_L1].toString();
+    payment.reference_number = paymentData["reference_number"_L1].toString();
+    payment.notes = paymentData["notes"_L1].toString();
 
     m_api->addPayment(id, payment);
 }
@@ -235,7 +235,7 @@ void SaleModel::setChecked(int row, bool checked)
     if (row >= 0 && row < m_sales.count()) {
         m_sales[row].checked = checked;
         QModelIndex index = createIndex(row, 0);
-        emit dataChanged(index, index, {CheckedRole});
+        Q_EMIT dataChanged(index, index, {CheckedRole});
         updateHasCheckedItems();
     }
 }
@@ -257,7 +257,7 @@ void SaleModel::clearAllChecked()
         if (m_sales[i].checked) {
             m_sales[i].checked = false;
             QModelIndex index = createIndex(i, 0);
-            emit dataChanged(index, index, {CheckedRole});
+            Q_EMIT dataChanged(index, index, {CheckedRole});
         }
     }
     updateHasCheckedItems();
@@ -276,7 +276,7 @@ void SaleModel::toggleAllSalesChecked()
     for (int i = 0; i < m_sales.count(); ++i) {
         m_sales[i].checked = !allChecked;
         QModelIndex index = createIndex(i, 0);
-        emit dataChanged(index, index, {CheckedRole});
+        Q_EMIT dataChanged(index, index, {CheckedRole});
     }
     updateHasCheckedItems();
 }
@@ -286,7 +286,7 @@ void SaleModel::setSortField(const QString &field)
 {
     if (m_sortField != field) {
         m_sortField = field;
-        emit sortFieldChanged();
+        Q_EMIT sortFieldChanged();
         refresh();
     }
 }
@@ -295,7 +295,7 @@ void SaleModel::setSortDirection(const QString &direction)
 {
     if (m_sortDirection != direction) {
         m_sortDirection = direction;
-        emit sortDirectionChanged();
+        Q_EMIT sortDirectionChanged();
         refresh();
     }
 }
@@ -304,7 +304,7 @@ void SaleModel::setSearchQuery(const QString &query)
 {
     if (m_searchQuery != query) {
         m_searchQuery = query;
-        emit searchQueryChanged();
+        Q_EMIT searchQueryChanged();
         refresh();
     }
 }
@@ -313,7 +313,7 @@ void SaleModel::setStatus(const QString &status)
 {
     if (m_status != status) {
         m_status = status;
-        emit statusChanged();
+        Q_EMIT statusChanged();
         refresh();
     }
 }
@@ -322,7 +322,7 @@ void SaleModel::setPaymentStatus(const QString &paymentStatus)
 {
     if (m_paymentStatus != paymentStatus) {
         m_paymentStatus = paymentStatus;
-        emit paymentStatusChanged();
+        Q_EMIT paymentStatusChanged();
         refresh();
     }
 }
@@ -335,19 +335,19 @@ void SaleModel::handleSalesReceived(const PaginatedSales &sales)
     endResetModel();
 
     m_totalItems = sales.total;
-    emit totalItemsChanged();
+    Q_EMIT totalItemsChanged();
 
     m_currentPage = sales.currentPage;
-    emit currentPageChanged();
+    Q_EMIT currentPageChanged();
 
     m_totalPages = sales.lastPage;
-    emit totalPagesChanged();
+    Q_EMIT totalPagesChanged();
 
     setLoading(false);
     setErrorMessage(QString());
 
     updateHasCheckedItems();
-    emit dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
+    Q_EMIT dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
 }
 
 void SaleModel::handleSaleError(const QString &message, ApiStatus status)
@@ -364,7 +364,7 @@ void SaleModel::handleSaleCreated(const Sale &sale)
 
     setLoading(false);
     setErrorMessage(QString());
-    emit saleCreated();
+    Q_EMIT saleCreated();
 }
 
 void SaleModel::handleSaleUpdated(const Sale &sale)
@@ -373,14 +373,14 @@ void SaleModel::handleSaleUpdated(const Sale &sale)
         if (m_sales[i].id == sale.id) {
             m_sales[i] = sale;
             QModelIndex index = createIndex(i, 0);
-            emit dataChanged(index, index);
+            Q_EMIT dataChanged(index, index);
             break;
         }
     }
 
     setLoading(false);
     setErrorMessage(QString());
-    emit saleUpdated();
+    Q_EMIT saleUpdated();
 }
 
 void SaleModel::handleSaleDeleted(int id)
@@ -396,14 +396,14 @@ void SaleModel::handleSaleDeleted(int id)
 
     setLoading(false);
     setErrorMessage(QString());
-    emit saleDeleted();
+    Q_EMIT saleDeleted();
 }
 
 void SaleModel::handlePaymentAdded(const QVariantMap &payment)
 {
     setLoading(false);
     setErrorMessage(QString());
-    emit paymentAdded();
+    Q_EMIT paymentAdded();
     refresh(); // Refresh to update the sale's payment status and amounts
 }
 
@@ -411,14 +411,14 @@ void SaleModel::handleInvoiceGenerated(const QVariantMap &invoice)
 {
     setLoading(false);
     setErrorMessage(QString());
-    emit invoiceGenerated(invoice["url"].toString());
+    Q_EMIT invoiceGenerated(invoice["url"_L1].toString());
 }
 
 void SaleModel::handleSummaryReceived(const QVariantMap &summary)
 {
     setLoading(false);
     setErrorMessage(QString());
-    emit summaryReceived(summary);
+    Q_EMIT summaryReceived(summary);
 }
 
 // Private methods
@@ -426,7 +426,7 @@ void SaleModel::setLoading(bool loading)
 {
     if (m_loading != loading) {
         m_loading = loading;
-        emit loadingChanged();
+        Q_EMIT loadingChanged();
     }
 }
 
@@ -434,7 +434,7 @@ void SaleModel::setErrorMessage(const QString &message)
 {
     if (m_errorMessage != message) {
         m_errorMessage = message;
-        emit errorMessageChanged();
+        Q_EMIT errorMessageChanged();
     }
 }
 
@@ -443,41 +443,41 @@ Sale SaleModel::saleFromVariantMap(const QVariantMap &map) const
     Sale sale;
 
     // Required fields
-    sale.cash_source_id = map["cash_source_id"].toInt();
-    sale.sale_date = map["sale_date"].toDateTime();
+    sale.cash_source_id = map["cash_source_id"_L1].toInt();
+    sale.sale_date = map["sale_date"_L1].toDateTime();
 
     // Optional fields
-    if (map.contains("client_id") && !map["client_id"].isNull()) {
-        sale.client_id = map["client_id"].toInt();
+    if (map.contains("client_id"_L1) && !map["client_id"_L1].isNull()) {
+        sale.client_id = map["client_id"_L1].toInt();
     }
 
-    if (map.contains("due_date") && !map["due_date"].isNull()) {
-        sale.due_date = map["due_date"].toDateTime();
+    if (map.contains("due_date"_L1) && !map["due_date"_L1].isNull()) {
+        sale.due_date = map["due_date"_L1].toDateTime();
     }
 
     // Payment related fields
-    if (map.contains("auto_payment")) {
-        sale.auto_payment = map["auto_payment"].toBool();
+    if (map.contains("auto_payment"_L1)) {
+        sale.auto_payment = map["auto_payment"_L1].toBool();
     }
 
-    if (map.contains("payment_amount")) {
-        sale.payment_amount = map["payment_amount"].toDouble();
+    if (map.contains("payment_amount"_L1)) {
+        sale.payment_amount = map["payment_amount"_L1].toDouble();
     }
 
     // Items
-    QVariantList itemsList = map["items"].toList();
+    QVariantList itemsList = map["items"_L1].toList();
       for (const QVariant &itemVar : itemsList) {
           QVariantMap itemMap = itemVar.toMap();
           SaleItem item;
-          item.product_id = itemMap["product_id"].toInt();
-          item.quantity = itemMap["quantity"].toInt();
-          item.unit_price = itemMap["unit_price"].toString().toDouble();
-          item.tax_rate = itemMap["tax_rate"].toString().toDouble();
-          item.is_package = itemMap["is_package"].toBool();
-          item.total_pieces = itemMap["total_pieces"].toInt();
+          item.product_id = itemMap["product_id"_L1].toInt();
+          item.quantity = itemMap["quantity"_L1].toInt();
+          item.unit_price = itemMap["unit_price"_L1].toString().toDouble();
+          item.tax_rate = itemMap["tax_rate"_L1].toString().toDouble();
+          item.is_package = itemMap["is_package"_L1].toBool();
+          item.total_pieces = itemMap["total_pieces"_L1].toInt();
 
           if (item.is_package) {
-              item.package_id = itemMap["package_id"].toInt();
+              item.package_id = itemMap["package_id"_L1].toInt();
           }
 
           // Calculate amounts
@@ -485,18 +485,18 @@ Sale SaleModel::saleFromVariantMap(const QVariantMap &map) const
           item.tax_amount = (subtotal * item.tax_rate) / 100.0;
           item.total_price = subtotal + item.tax_amount;
 
-          if (itemMap.contains("discount_amount")) {
-              item.discount_amount = itemMap["discount_amount"].toString().toDouble();
+          if (itemMap.contains("discount_amount"_L1)) {
+              item.discount_amount = itemMap["discount_amount"_L1].toString().toDouble();
               item.total_price -= item.discount_amount;
           }
 
-          item.notes = itemMap["notes"].toString();
+          item.notes = itemMap["notes"_L1].toString();
           sale.items.append(item);
       }
 
     // Additional fields
-    sale.notes = map["notes"].toString();
-    sale.status = map["status"].toString();
+    sale.notes = map["notes"_L1].toString();
+    sale.status = map["status"_L1].toString();
 
     // Calculate totals
     double subtotal = 0.0;
@@ -521,55 +521,55 @@ QVariantMap SaleModel::saleToVariantMap(const Sale &sale) const
     QVariantMap map;
 
     // Basic information
-    map["id"] = sale.id;
-    map["team_id"] = sale.team_id;
-    map["cash_source_id"] = sale.cash_source_id;
-    map["reference_number"] = sale.reference_number;
+    map["id"_L1] = sale.id;
+    map["team_id"_L1] = sale.team_id;
+    map["cash_source_id"_L1] = sale.cash_source_id;
+    map["reference_number"_L1] = sale.reference_number;
 
     // Client information (if exists)
     if (sale.client_id > 0) {
-        map["client_id"] = sale.client_id;
-        map["client"] = sale.client;
+        map["client_id"_L1] = sale.client_id;
+        map["client"_L1] = sale.client;
     }
 
     // Dates
-    map["sale_date"] = sale.sale_date;
+    map["sale_date"_L1] = sale.sale_date;
     if (sale.due_date.isValid()) {
-        map["due_date"] = sale.due_date;
+        map["due_date"_L1] = sale.due_date;
     }
 
     // Amounts
-    map["total_amount"] = sale.total_amount;
-    map["paid_amount"] = sale.paid_amount;
-    map["tax_amount"] = sale.tax_amount;
-    map["discount_amount"] = sale.discount_amount;
-    map["remaining_amount"] = sale.total_amount - sale.paid_amount;
+    map["total_amount"_L1] = sale.total_amount;
+    map["paid_amount"_L1] = sale.paid_amount;
+    map["tax_amount"_L1] = sale.tax_amount;
+    map["discount_amount"_L1] = sale.discount_amount;
+    map["remaining_amount"_L1] = sale.total_amount - sale.paid_amount;
 
     // Status
-    map["status"] = sale.status;
-    map["payment_status"] = sale.payment_status;
+    map["status"_L1] = sale.status;
+    map["payment_status"_L1] = sale.payment_status;
 
     // Notes
-    map["notes"] = sale.notes;
+    map["notes"_L1] = sale.notes;
 
     // Items
     QVariantList itemsList;
     for (const SaleItem &item : sale.items) {
         QVariantMap itemMap;
-        itemMap["id"] = item.id;
-        itemMap["product_id"] = item.product_id;
-        itemMap["product_name"] = item.product_name;
-        itemMap["quantity"] = item.quantity;
-        itemMap["unit_price"] = item.unit_price;
-        itemMap["tax_rate"] = item.tax_rate;
-        itemMap["tax_amount"] = item.tax_amount;
-        itemMap["discount_amount"] = item.discount_amount;
-        itemMap["total_price"] = item.total_price;
-        itemMap["notes"] = item.notes;
-        itemMap["product"] = item.product;
+        itemMap["id"_L1] = item.id;
+        itemMap["product_id"_L1] = item.product_id;
+        itemMap["product_name"_L1] = item.product_name;
+        itemMap["quantity"_L1] = item.quantity;
+        itemMap["unit_price"_L1] = item.unit_price;
+        itemMap["tax_rate"_L1] = item.tax_rate;
+        itemMap["tax_amount"_L1] = item.tax_amount;
+        itemMap["discount_amount"_L1] = item.discount_amount;
+        itemMap["total_price"_L1] = item.total_price;
+        itemMap["notes"_L1] = item.notes;
+        itemMap["product"_L1] = item.product;
         itemsList.append(itemMap);
     }
-    map["items"] = itemsList;
+    map["items"_L1] = itemsList;
 
     return map;
 }
@@ -586,7 +586,7 @@ void SaleModel::updateHasCheckedItems()
 
     if (hasChecked != m_hasCheckedItems) {
         m_hasCheckedItems = hasChecked;
-        emit hasCheckedItemsChanged();
+        Q_EMIT hasCheckedItemsChanged();
     }
 }
 

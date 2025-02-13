@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Dim
+GenericName=Dim Application
+Comment=inventory management and point of sale software
+Exec=dim
+Icon=com.dervox.dim
+Type=Application
+Categories=Qt;KDE;

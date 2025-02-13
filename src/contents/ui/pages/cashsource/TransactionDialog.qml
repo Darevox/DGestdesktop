@@ -7,7 +7,7 @@ import org.kde.kirigamiaddons.formcard as FormCard
 Kirigami.Dialog {
     id: dialog
 
-    title: "Transaction"
+    title: i18n("Transaction")
     preferredWidth: Kirigami.Units.gridUnit * 30
 
     property alias amount: amountField.text
@@ -28,7 +28,7 @@ Kirigami.Dialog {
 
             FormCard.FormTextFieldDelegate {
                 id: amountField
-                label: qsTr("Amount")
+                label: i18n("Amount")
                 text: ""
                 validator: DoubleValidator {
                     bottom: 0
@@ -38,7 +38,7 @@ Kirigami.Dialog {
 
             FormCard.FormTextAreaDelegate {
                 id: notesField
-                label: qsTr("Notes")
+                label: i18n("Notes")
                 text: ""
                 Layout.preferredHeight: 80
             }
@@ -47,7 +47,7 @@ Kirigami.Dialog {
 
     customFooterActions: [
         Kirigami.Action {
-            text: qsTr("Submit")
+            text: i18n("Submit")
             icon.name: "dialog-ok"
             onTriggered: {
                 if (validateInput()) {
@@ -67,7 +67,7 @@ Kirigami.Dialog {
         if (!amountField.text || parseFloat(amountField.text) <= 0) {
             // Show error message
             applicationWindow().showPassiveNotification(
-                qsTr("Please enter a valid amount greater than 0"),
+                i18n("Please enter a valid amount greater than 0"),
                 "short"
             )
             return false

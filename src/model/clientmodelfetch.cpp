@@ -1,5 +1,6 @@
 #include "clientmodelfetch.h"
 namespace NetworkApi {
+using namespace Qt::StringLiterals;
 ClientModelFetch::ClientModelFetch(QObject *parent)
     : ClientModel{parent}
 {
@@ -45,9 +46,9 @@ void ClientModelFetch::handleClientsReceived(const PaginatedClients &clients)
     m_currentPage = clients.currentPage; // Update current page to received page
     m_totalPages = clients.lastPage;
 
-    emit totalItemsChanged();
-    emit currentPageChanged();
-    emit totalPagesChanged();
+    Q_EMIT totalItemsChanged();
+    Q_EMIT currentPageChanged();
+    Q_EMIT totalPagesChanged();
 
     setLoading(false);
     setErrorMessage(QString());

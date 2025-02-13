@@ -42,7 +42,7 @@ private:
 
     User m_user;
 
-signals:
+Q_SIGNALS:
     // New signals to emit for QML interaction
     void loginSuccess(const QString &token);
     void loginError(const QString &message ,ApiStatus status , QString errorMessageDetails);

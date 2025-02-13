@@ -3,7 +3,7 @@
 #include <QJsonArray>
 
 namespace NetworkApi {
-
+using namespace Qt::StringLiterals;
 DashboardModel::DashboardModel(QObject *parent)
     : QObject(parent)
 {
@@ -47,7 +47,7 @@ void DashboardModel::setTimeframe(const QString &timeframe)
     if (m_timeframe == timeframe)
         return;
     m_timeframe = timeframe;
-    emit timeframeChanged();
+    Q_EMIT timeframeChanged();
 }
 
 
@@ -57,14 +57,14 @@ void DashboardModel::setDateRange(const QDate &start, const QDate &end)
         return;
     m_startDate = start;
     m_endDate = end;
-    emit dateRangeChanged();
+    Q_EMIT dateRangeChanged();
     refresh();
 }
 
 
 void DashboardModel::updateData()
-{   QString startDateStr = m_startDate.toString("yyyy-MM-dd");
-    QString endDateStr = m_endDate.toString("yyyy-MM-dd");
+{   QString startDateStr = m_startDate.toString(QStringLiteral("yyyy-MM-dd"));
+    QString endDateStr = m_endDate.toString(QStringLiteral("yyyy-MM-dd"));
     qDebug() << "Updating dashboard data for timeframe:" << m_timeframe;
 
     m_api->getOverallDashboard(m_timeframe);
@@ -96,18 +96,18 @@ void DashboardModel::handleOverallDashboard(const DashboardOverview &data)
     // Period info
     m_periodInfo = data.periodInfo;
 
-    // Emit signals
-    emit totalSalesChanged();
-    emit totalPurchasesChanged();
-    emit totalRevenueChanged();
-    emit totalOrdersChanged();
-    emit lowStockCountChanged();
-    emit cashBalanceChanged();
-    emit statsChanged();
-    emit allTimeSalesChanged();
-    emit allTimePurchasesChanged();
-    emit allTimeOrdersChanged();
-    emit periodInfoChanged();
+    // Q_EMIT signals
+    Q_EMIT totalSalesChanged();
+    Q_EMIT totalPurchasesChanged();
+    Q_EMIT totalRevenueChanged();
+    Q_EMIT totalOrdersChanged();
+    Q_EMIT lowStockCountChanged();
+    Q_EMIT cashBalanceChanged();
+    Q_EMIT statsChanged();
+    Q_EMIT allTimeSalesChanged();
+    Q_EMIT allTimePurchasesChanged();
+    Q_EMIT allTimeOrdersChanged();
+    Q_EMIT periodInfoChanged();
 
     setLoading(false);
 }
@@ -132,12 +132,12 @@ void DashboardModel::handleSalesAnalytics(const SaleAnalytics &data)
     // Period info
     m_periodInfo = data.periodInfo;
 
-    emit salesHistoryChanged();
-    emit topItemsChanged();
-    emit statsChanged();
-    emit allTimeSalesChanged();
-    emit allTimeOrdersChanged();
-    emit periodInfoChanged();
+    Q_EMIT salesHistoryChanged();
+    Q_EMIT topItemsChanged();
+    Q_EMIT statsChanged();
+    Q_EMIT allTimeSalesChanged();
+    Q_EMIT allTimeOrdersChanged();
+    Q_EMIT periodInfoChanged();
     setLoading(false);
 }
 
@@ -153,36 +153,36 @@ void DashboardModel::handlePurchaseAnalytics(const PurchaseAnalytics &data)
     // Update period info
     m_periodInfo = data.periodInfo;
 
-    emit purchaseHistoryChanged();
-    emit statsChanged();
-    emit allTimePurchasesChanged();
-    emit periodInfoChanged();
+    Q_EMIT purchaseHistoryChanged();
+    Q_EMIT statsChanged();
+    Q_EMIT allTimePurchasesChanged();
+    Q_EMIT periodInfoChanged();
     setLoading(false);
 }
 
 void DashboardModel::handleCustomerAnalytics(const QVariantMap &data)
 {
     qDebug() << "Handling Customer Analytics:";
-    const QVariantMap dataMap = data["data"].toMap();
+    const QVariantMap dataMap = data["data"_L1].toMap();
 
-    if (dataMap.contains("top_customers")) {
-        m_topCustomers = dataMap["top_customers"].toList();
+    if (dataMap.contains("top_customers"_L1)) {
+        m_topCustomers = dataMap["top_customers"_L1].toList();
         qDebug() << "Top Customers:" << m_topCustomers.count();
 
         // Update period info if available
-        if (dataMap.contains("period_info")) {
-            m_periodInfo = dataMap["period_info"].toMap();
-            emit periodInfoChanged();
+        if (dataMap.contains("period_info"_L1)) {
+            m_periodInfo = dataMap["period_info"_L1].toMap();
+            Q_EMIT periodInfoChanged();
         }
 
-        emit topCustomersChanged();
+        Q_EMIT topCustomersChanged();
     }
     setLoading(false);
 }
-void DashboardModel::handleError(const QString &message, ApiStatus status, const QString &details)
+void DashboardModel::handleError(const QString &message, ApiStatus status, const QByteArray &details)
 {
     setLoading(false);
-    emit error(message);
+    Q_EMIT error(message);
 }
 
 void DashboardModel::setLoading(bool loading)
@@ -191,14 +191,14 @@ void DashboardModel::setLoading(bool loading)
         return;
 
     m_loading = loading;
-    emit loadingChanged();
+    Q_EMIT loadingChanged();
 }
 void DashboardModel::setStartDate(const QDate &date)
 {
     if (m_startDate == date)
         return;
     m_startDate = date;
-    emit dateRangeChanged();
+    Q_EMIT dateRangeChanged();
 }
 
 void DashboardModel::setEndDate(const QDate &date)
@@ -206,7 +206,7 @@ void DashboardModel::setEndDate(const QDate &date)
     if (m_endDate == date)
         return;
     m_endDate = date;
-    emit dateRangeChanged();
+    Q_EMIT dateRangeChanged();
 }
 QVariantMap DashboardModel::formatTopItem(const QVariantMap &item)
 {

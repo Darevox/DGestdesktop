@@ -2,7 +2,7 @@
 #include "productmodel.h"
 
 namespace NetworkApi {
-
+using namespace Qt::StringLiterals;
 ProductModel::ProductModel(QObject *parent)
     : QAbstractTableModel(parent)
     , m_api(nullptr)
@@ -10,8 +10,8 @@ ProductModel::ProductModel(QObject *parent)
     , m_totalItems(0)
     , m_currentPage(1)
     , m_totalPages(1)
-    , m_sortField("created_at")
-    , m_sortDirection("desc")
+    , m_sortField(QStringLiteral("created_at"))
+    , m_sortDirection(QStringLiteral("desc"))
     , m_lowStockFilter(false)
 {
 }
@@ -112,12 +112,12 @@ QVariant ProductModel::data(const QModelIndex &index, int role) const
             QVariantList packages;
             for (const auto &package : product.packages) {
                 QVariantMap packageMap;
-                packageMap["id"] = package.id;
-                packageMap["name"] = package.name;
-                packageMap["pieces_per_package"] = package.pieces_per_package;
-                packageMap["purchase_price"] = package.purchase_price;
-                packageMap["selling_price"] = package.selling_price;
-                packageMap["barcode"] = package.barcode;
+                packageMap["id"_L1] = package.id;
+                packageMap["name"_L1] = package.name;
+                packageMap["pieces_per_package"_L1] = package.pieces_per_package;
+                packageMap["purchase_price"_L1] = package.purchase_price;
+                packageMap["selling_price"_L1] = package.selling_price;
+                packageMap["barcode"_L1] = package.barcode;
                 packages.append(packageMap);
             }
             return packages;
@@ -219,7 +219,7 @@ void ProductModel::loadPage(int page)
 {
     if (page != m_currentPage && page > 0 && page <= m_totalPages) {
         m_currentPage = page;
-        emit currentPageChanged();
+        Q_EMIT currentPageChanged();
         refresh();
     }
 }
@@ -280,7 +280,7 @@ void ProductModel::setSortField(const QString &field)
 {
     if (m_sortField != field) {
         m_sortField = field;
-        emit sortFieldChanged();
+        Q_EMIT sortFieldChanged();
         refresh();  // Refresh data if needed after sort field changes
     }
 }
@@ -288,7 +288,7 @@ void ProductModel::setSortDirection(const QString &direction)
 {
     if (m_sortDirection != direction) {
         m_sortDirection = direction;
-        emit sortDirectionChanged();
+        Q_EMIT sortDirectionChanged();
         refresh();  // Refresh data if needed after sort direction changes
     }
 }
@@ -297,7 +297,7 @@ void ProductModel::setSearchQuery(const QString &query)
 {
     if (m_searchQuery != query) {
         m_searchQuery = query;
-        emit searchQueryChanged();
+        Q_EMIT searchQueryChanged();
         refresh();  // Refresh data based on search query
     }
 }
@@ -308,13 +308,13 @@ void ProductModel::setSearchQuery(const QString &query)
 //     endResetModel();
 
 //     m_totalItems = products.total;
-//     emit totalItemsChanged();
+//     Q_EMIT totalItemsChanged();
 
 //     m_currentPage = products.currentPage;
-//     emit currentPageChanged();
+//     Q_EMIT currentPageChanged();
 
 //     m_totalPages = products.lastPage;
-//     emit totalPagesChanged();
+//     Q_EMIT totalPagesChanged();
 
 //     setLoading(false);
 //     setErrorMessage(QString());
@@ -327,19 +327,19 @@ void ProductModel::handleProductsReceived(const PaginatedProducts& products)
     endResetModel();
 
     m_totalItems = products.total;
-    emit totalItemsChanged();
+    Q_EMIT totalItemsChanged();
 
     m_currentPage = products.currentPage;
-    emit currentPageChanged();
+    Q_EMIT currentPageChanged();
 
     m_totalPages = products.lastPage;
-    emit totalPagesChanged();
+    Q_EMIT totalPagesChanged();
 
     setLoading(false);
     setErrorMessage(QString());
 
-    // Emit a signal to notify the view that the data has changed
-    emit dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
+    // Q_EMIT a signal to notify the view that the data has changed
+    Q_EMIT dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
 }
 void ProductModel::handleProductError(const QString &message, ApiStatus status)
 {
@@ -355,7 +355,7 @@ void ProductModel::handleProductCreated(const Product &product)
 
     setLoading(false);
     setErrorMessage(QString());
-    emit productCreated();
+    Q_EMIT productCreated();
 }
 
 void ProductModel::handleProductUpdated(const Product &product)
@@ -364,14 +364,14 @@ void ProductModel::handleProductUpdated(const Product &product)
         if (m_products[i].id == product.id) {
             m_products[i] = product;
             QModelIndex index = createIndex(i, 0);
-            emit dataChanged(index, index);
+            Q_EMIT dataChanged(index, index);
             break;
         }
     }
 
     setLoading(false);
     setErrorMessage(QString());
-    emit productUpdated();
+    Q_EMIT productUpdated();
 }
 
 void ProductModel::handleProductDeleted(int id)
@@ -387,7 +387,7 @@ void ProductModel::handleProductDeleted(int id)
 
     setLoading(false);
     setErrorMessage(QString());
-    emit productDeleted();
+    Q_EMIT productDeleted();
 }
 
 void ProductModel::handleStockUpdated(const Product &product)
@@ -396,14 +396,14 @@ void ProductModel::handleStockUpdated(const Product &product)
         if (m_products[i].id == product.id) {
             m_products[i] = product;
             QModelIndex index = createIndex(i, 0);
-            emit dataChanged(index, index);
+            Q_EMIT dataChanged(index, index);
             break;
         }
     }
 
     setLoading(false);
     setErrorMessage(QString());
-    emit stockUpdated();
+    Q_EMIT stockUpdated();
 }
 
 // Private methods implementation
@@ -411,7 +411,7 @@ void ProductModel::setLoading(bool loading)
 {
     if (m_loading != loading) {
         m_loading = loading;
-        emit loadingChanged();
+        Q_EMIT loadingChanged();
     }
 }
 
@@ -419,46 +419,46 @@ void ProductModel::setErrorMessage(const QString &message)
 {
     if (m_errorMessage != message) {
         m_errorMessage = message;
-        emit errorMessageChanged();
+        Q_EMIT errorMessageChanged();
     }
 }
 
 Product ProductModel::productFromVariantMap(const QVariantMap &map) const
 {
     Product product;
-    product.id = map.value("id", 0).toInt();
-    product.reference = map.value("reference").toString();
-    product.name = map.value("name").toString();
-    product.description = map.value("description").toString();
-    product.price = map.value("price", 0).toInt();
-    product.purchase_price = map.value("purchase_price", 0).toInt();
+    product.id = map.value("id"_L1, 0).toInt();
+    product.reference = map.value("reference"_L1).toString();
+    product.name = map.value("name"_L1).toString();
+    product.description = map.value("description"_L1).toString();
+    product.price = map.value("price"_L1, 0).toInt();
+    product.purchase_price = map.value("purchase_price"_L1, 0).toInt();
 
-    product.expiredDate = map.value("expiredDate").toDateTime();
-    product.quantity = map.value("quantity", 0).toInt();
-    product.productUnitId = map.value("productUnitId", 0).toInt();
-    product.sku = map.value("sku").toString();
-    product.barcode = map.value("barcode").toString();
-    product.minStockLevel = map.value("minStockLevel", 0.0).toDouble();
-    product.maxStockLevel = map.value("maxStockLevel", 0.0).toDouble();
-    product.reorderPoint = map.value("reorderPoint", 0.0).toDouble();
-    product.location = map.value("location").toString();
+    product.expiredDate = map.value("expiredDate"_L1).toDateTime();
+    product.quantity = map.value("quantity"_L1, 0).toInt();
+    product.productUnitId = map.value("productUnitId"_L1, 0).toInt();
+    product.sku = map.value("sku"_L1).toString();
+    product.barcode = map.value("barcode"_L1).toString();
+    product.minStockLevel = map.value("minStockLevel"_L1, 0.0).toDouble();
+    product.maxStockLevel = map.value("maxStockLevel"_L1, 0.0).toDouble();
+    product.reorderPoint = map.value("reorderPoint"_L1, 0.0).toDouble();
+    product.location = map.value("location"_L1).toString();
 
     // Handle the unit if present in the map
-    QVariantMap unitMap = map.value("unit").toMap();
+    QVariantMap unitMap = map.value("unit"_L1).toMap();
     if (!unitMap.isEmpty()) {
-        product.unit.id = unitMap.value("id", 0).toInt();
-        product.unit.name = unitMap.value("name").toString();
+        product.unit.id = unitMap.value("id"_L1, 0).toInt();
+        product.unit.name = unitMap.value("name"_L1).toString();
     }
-    if (map.contains("packages")) {
-        QVariantList packagesList = map["packages"].toList();
+    if (map.contains("packages"_L1)) {
+        QVariantList packagesList = map["packages"_L1].toList();
         for (const QVariant &packageVar : packagesList) {
             QVariantMap packageMap = packageVar.toMap();
             ProductPackageProduct package;
-            package.name = packageMap["name"].toString();
-            package.pieces_per_package = packageMap["pieces_per_package"].toInt();
-            package.purchase_price = packageMap["purchase_price"].toDouble();
-            package.selling_price = packageMap["selling_price"].toDouble();
-            package.barcode = packageMap["barcode"].toString();
+            package.name = packageMap["name"_L1].toString();
+            package.pieces_per_package = packageMap["pieces_per_package"_L1].toInt();
+            package.purchase_price = packageMap["purchase_price"_L1].toDouble();
+            package.selling_price = packageMap["selling_price"_L1].toDouble();
+            package.barcode = packageMap["barcode"_L1].toString();
             product.packages.append(package);
         }
     }
@@ -469,38 +469,38 @@ Product ProductModel::productFromVariantMap(const QVariantMap &map) const
 QVariantMap ProductModel::productToVariantMap(const Product &product) const
 {
     QVariantMap map;
-    map["id"] = product.id;
-    map["reference"] = product.reference;
-    map["name"] = product.name;
-    map["description"] = product.description;
-    map["price"] = product.price;
-    map["purchase_price"] = product.purchase_price;
-    map["expiredDate"] = product.expiredDate;
-    map["quantity"] = product.quantity;
-    map["productUnitId"] = product.productUnitId;
-    map["sku"] = product.sku;
-    map["barcode"] = product.barcode;
-    map["minStockLevel"] = product.minStockLevel;
-    map["maxStockLevel"] = product.maxStockLevel;
-    map["reorderPoint"] = product.reorderPoint;
-    map["location"] = product.location;
+    map["id"_L1] = product.id;
+    map["reference"_L1] = product.reference;
+    map["name"_L1] = product.name;
+    map["description"_L1] = product.description;
+    map["price"_L1] = product.price;
+    map["purchase_price"_L1] = product.purchase_price;
+    map["expiredDate"_L1] = product.expiredDate;
+    map["quantity"_L1] = product.quantity;
+    map["productUnitId"_L1] = product.productUnitId;
+    map["sku"_L1] = product.sku;
+    map["barcode"_L1] = product.barcode;
+    map["minStockLevel"_L1] = product.minStockLevel;
+    map["maxStockLevel"_L1] = product.maxStockLevel;
+    map["reorderPoint"_L1] = product.reorderPoint;
+    map["location"_L1] = product.location;
 
     // Handle the unit
     QVariantMap unitMap;
-    unitMap["id"] = product.unit.id;
-    unitMap["name"] = product.unit.name;
-    map["unit"] = unitMap;
+    unitMap["id"_L1] = product.unit.id;
+    unitMap["name"_L1] = product.unit.name;
+    map["unit"_L1] = unitMap;
     QVariantList packagesList;
     for (const ProductPackageProduct &package : product.packages) {
         QVariantMap packageMap;
-        packageMap["name"] = package.name;
-        packageMap["pieces_per_package"] = package.pieces_per_package;
-        packageMap["purchase_price"] = package.purchase_price;
-        packageMap["selling_price"] = package.selling_price;
-        packageMap["barcode"] = package.barcode;
+        packageMap["name"_L1] = package.name;
+        packageMap["pieces_per_package"_L1] = package.pieces_per_package;
+        packageMap["purchase_price"_L1] = package.purchase_price;
+        packageMap["selling_price"_L1] = package.selling_price;
+        packageMap["barcode"_L1] = package.barcode;
         packagesList.append(packageMap);
     }
-    map["packages"] = packagesList;
+    map["packages"_L1] = packagesList;
     return map;
 }
 // Add setData method to support checking
@@ -509,7 +509,7 @@ bool ProductModel::setData(const QModelIndex &index, const QVariant &value, int 
     if (role == CheckedRole) {
         if (index.isValid() && index.row() < m_products.count()) {
             m_products[index.row()].checked = value.toBool();
-            emit dataChanged(index, index, {role});
+            Q_EMIT dataChanged(index, index, {role});
             return true;
         }
     }
@@ -522,7 +522,7 @@ void ProductModel::setChecked(int row, bool checked)
     if (row >= 0 && row < m_products.count()) {
         m_products[row].checked = checked;
         QModelIndex index = createIndex(row, 0);
-        emit dataChanged(index, index, {CheckedRole});
+        Q_EMIT dataChanged(index, index, {CheckedRole});
         updateHasCheckedItems();
     }
 }
@@ -544,7 +544,7 @@ void ProductModel::clearAllChecked()
         if (m_products[i].checked) {
             m_products[i].checked = false;
             QModelIndex index = createIndex(i, 0);
-            emit dataChanged(index, index, {CheckedRole});
+            Q_EMIT dataChanged(index, index, {CheckedRole});
         }
     }
     updateHasCheckedItems();
@@ -564,7 +564,7 @@ void ProductModel::toggleAllProductsChecked()
     for (int i = 0; i < m_products.count(); ++i) {
         m_products[i].checked = !allCurrentlyChecked;
         QModelIndex index = createIndex(i, 0);
-        emit dataChanged(index, index, {CheckedRole});
+        Q_EMIT dataChanged(index, index, {CheckedRole});
     }
     updateHasCheckedItems();
 }
@@ -586,7 +586,7 @@ void ProductModel::updateHasCheckedItems()
 
     if (hasChecked != m_hasCheckedItems) {
         m_hasCheckedItems = hasChecked;
-        emit hasCheckedItemsChanged();
+        Q_EMIT hasCheckedItemsChanged();
     }
 }
 

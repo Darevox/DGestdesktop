@@ -16,7 +16,7 @@ public:
     void loadPage(int page) override;
     void refresh() override;
 
-private slots:
+private Q_SLOTS:
     void handleCashSourcesReceived(const PaginatedCashSources &sources) override;
 };
 

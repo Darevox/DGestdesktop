@@ -75,12 +75,12 @@ public:
     Q_INVOKABLE void clearAllChecked();
     Q_INVOKABLE void toggleAllSuppliersChecked();
 
-public slots:
+public Q_SLOTS:
     void setSortField(const QString &field);
     void setSortDirection(const QString &direction);
     void setSearchQuery(const QString &query);
 
-signals:
+Q_SIGNALS:
     void loadingChanged();
     void errorMessageChanged();
     void totalItemsChanged();
@@ -95,7 +95,7 @@ signals:
     void hasCheckedItemsChanged();
     void rowCountChanged();
 
-private slots:
+private Q_SLOTS:
     void handleSuppliersReceived(const PaginatedSuppliers &suppliers);
     void handleSupplierError(const QString &message, ApiStatus status);
     void handleSupplierCreated(const Supplier &supplier);

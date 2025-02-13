@@ -33,8 +33,9 @@ Kirigami.Page {
 
     header: ColumnLayout {
         width: parent.width
-        spacing: Kirigami.Units.largeSpacing
+        spacing: Kirigami.Units.largeSpacing * 2
         Label {
+              Layout.margins : Kirigami.Units.largeSpacing * 2
             text: {
                 if (dashboardModel.periodInfo && dashboardModel.periodInfo.timeframe) {
                     const start = new Date(dashboardModel.periodInfo.start_date)
@@ -66,7 +67,7 @@ Kirigami.Page {
             StatsCard {
                 Layout.preferredWidth: parent.width / 4
                 title: i18n("Total Sales")
-                value: "€" + dashboardModel.totalSales.toFixed(2)
+                value: dashboardModel.totalSales.toFixed(2)  + " DH"
                 subtitle: i18n("All-time: €%1", dashboardModel.allTimeSales.toFixed(2))
                 iconCard: "view-financial-category-income"
                 valueColor: Kirigami.Theme.positiveTextColor
@@ -92,8 +93,8 @@ Kirigami.Page {
             StatsCard {
                 Layout.preferredWidth: parent.width / 4
                 title: i18n("Revenue")
-                value: "€" + dashboardModel.totalRevenue.toFixed(2)
-                subtitle: i18n("All-time: €%1",
+                value:  dashboardModel.totalRevenue.toFixed(2)  + " DH"
+                subtitle: i18n("All-time:  %1 DH",
                                (dashboardModel.allTimeSales - dashboardModel.allTimePurchases).toFixed(2))
                 iconCard: "view-financial-account-investment-security"
                 valueColor: dashboardModel.totalRevenue >= 0 ?
@@ -120,7 +121,7 @@ Kirigami.Page {
                 LineChartCard {
                     Layout.preferredWidth: parent.width / 2
                     title: i18n("Sales Trend")
-                    value: "€" + dashboardModel.totalSales.toFixed(2)
+                    value:   dashboardModel.totalSales.toFixed(2)  + " DH"
                     subtitle: {
                         if (dashboardModel.periodInfo && dashboardModel.periodInfo.timeframe) {
                             switch(dashboardModel.periodInfo.timeframe) {
@@ -143,7 +144,7 @@ Kirigami.Page {
                 LineChartCard {
                     Layout.preferredWidth: parent.width / 2
                     title: i18n("Purchase Trend")
-                    value: "€" + dashboardModel.totalPurchases.toFixed(2)
+                    value:  dashboardModel.totalPurchases.toFixed(2)  + " DH"
                     subtitle: {
                         if (dashboardModel.periodInfo && dashboardModel.periodInfo.timeframe) {
                             switch(dashboardModel.periodInfo.timeframe) {
@@ -212,14 +213,13 @@ Kirigami.Page {
 
                 TopItemsCard {
                     Layout.preferredWidth: parent.width / 2
-                    title: icon("Top Customers")
+                    title: i18n("Top Customers")
                     model: dashboardModel.topCustomers
                     iconCard: "user"
                 }
             }
         }
     }
-
     BusyIndicator {
         anchors.centerIn: parent
         running: dashboardModel.loading

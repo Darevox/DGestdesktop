@@ -91,7 +91,7 @@ public:
     QDateTime startDate() const { return m_startDate; }
     QDateTime endDate() const { return m_endDate; }
 
-public slots:
+public Q_SLOTS:
     void setSortField(const QString &field);
     void setSortDirection(const QString &direction);
     void setSearchQuery(const QString &query);
@@ -102,7 +102,7 @@ public slots:
     void setMaxAmount(double amount);
     void setStartDate(const QDateTime &date);
     void setEndDate(const QDateTime &date);
-signals:
+Q_SIGNALS:
     void loadingChanged();
     void errorMessageChanged();
     void totalItemsChanged();
@@ -122,7 +122,7 @@ signals:
     void startDateChanged();
     void endDateChanged();
 
-private slots:
+private Q_SLOTS:
     void handleTransactionsReceived(const PaginatedCashTransactions &transactions);
     void handleTransactionsBySourceReceived(const PaginatedCashTransactions &transactions);
     void handleSummaryReceived(const QVariantMap &summary);

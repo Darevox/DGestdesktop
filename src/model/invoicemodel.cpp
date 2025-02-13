@@ -1,7 +1,7 @@
 #include "invoicemodel.h"
 
 namespace NetworkApi {
-
+using namespace Qt::StringLiterals;
 InvoiceModel::InvoiceModel(QObject *parent)
     : QAbstractTableModel(parent)
     , m_api(nullptr)
@@ -9,8 +9,8 @@ InvoiceModel::InvoiceModel(QObject *parent)
     , m_totalItems(0)
     , m_currentPage(1)
     , m_totalPages(1)
-    , m_sortField("issue_date")
-    , m_sortDirection("desc")
+    , m_sortField(QStringLiteral("issue_date"))
+    , m_sortDirection(QStringLiteral("desc"))
     , m_hasCheckedItems(false)
 {
 }
@@ -53,9 +53,9 @@ void InvoiceModel::setStartDate(const QDateTime &date)
 {
     if (m_startDate != date) {
         m_startDate = date;
-        emit startDateChanged();
+        Q_EMIT startDateChanged();
         m_currentPage = 1; // Reset to first page when changing filter
-        emit currentPageChanged();
+        Q_EMIT currentPageChanged();
         refresh();
     }
 }
@@ -64,9 +64,9 @@ void InvoiceModel::setEndDate(const QDateTime &date)
 {
     if (m_endDate != date) {
         m_endDate = date;
-        emit endDateChanged();
+        Q_EMIT endDateChanged();
         m_currentPage = 1; // Reset to first page when changing filter
-        emit currentPageChanged();
+        Q_EMIT currentPageChanged();
         refresh();
     }
 }
@@ -81,11 +81,12 @@ QVariant InvoiceModel::data(const QModelIndex &index, int role) const
         switch (index.column()) {
         case 0: return invoice.issue_date;
         case 1: return invoice.reference_number;
-        case 2: return invoice.invoiceable_type + " #" + QString::number(invoice.invoiceable_id);
+        case 2: return QStringLiteral("%1 #%2").arg(invoice.invoiceable_type)
+                                          .arg(invoice.invoiceable_id);
         case 3: return invoice.status;
         case 4: return invoice.total_amount;
         case 5: return invoice.getPaidAmount();
-        case 6: return ""; // Actions column
+        case 6: return QString(); // Actions column
         }
     } else {
         switch (role) {
@@ -161,7 +162,7 @@ bool InvoiceModel::setData(const QModelIndex &index, const QVariant &value, int 
     if (role == CheckedRole) {
         if (index.isValid() && index.row() < m_invoices.count()) {
             m_invoices[index.row()].checked = value.toBool();
-            emit dataChanged(index, index, {role});
+            Q_EMIT dataChanged(index, index, {role});
             updateHasCheckedItems();
             return true;
         }
@@ -182,7 +183,7 @@ void InvoiceModel::loadPage(int page)
 {
     if (page != m_currentPage && page > 0 && page <= m_totalPages) {
         m_currentPage = page;
-        emit currentPageChanged();
+        Q_EMIT currentPageChanged();
         refresh();
     }
 }
@@ -281,7 +282,7 @@ void InvoiceModel::setChecked(int row, bool checked)
     if (row >= 0 && row < m_invoices.count()) {
         m_invoices[row].checked = checked;
         QModelIndex index = createIndex(row, 0);
-        emit dataChanged(index, index, {CheckedRole});
+        Q_EMIT dataChanged(index, index, {CheckedRole});
         updateHasCheckedItems();
     }
 }
@@ -303,7 +304,7 @@ void InvoiceModel::clearAllChecked()
         if (m_invoices[i].checked) {
             m_invoices[i].checked = false;
             QModelIndex index = createIndex(i, 0);
-            emit dataChanged(index, index, {CheckedRole});
+            Q_EMIT dataChanged(index, index, {CheckedRole});
         }
     }
     updateHasCheckedItems();
@@ -322,7 +323,7 @@ void InvoiceModel::toggleAllInvoicesChecked()
     for (int i = 0; i < m_invoices.count(); ++i) {
         m_invoices[i].checked = !allChecked;
         QModelIndex index = createIndex(i, 0);
-        emit dataChanged(index, index, {CheckedRole});
+        Q_EMIT dataChanged(index, index, {CheckedRole});
     }
     updateHasCheckedItems();
 }
@@ -331,7 +332,7 @@ void InvoiceModel::setSortField(const QString &field)
 {
     if (m_sortField != field) {
         m_sortField = field;
-        emit sortFieldChanged();
+        Q_EMIT sortFieldChanged();
         refresh();
     }
 }
@@ -340,7 +341,7 @@ void InvoiceModel::setSortDirection(const QString &direction)
 {
     if (m_sortDirection != direction) {
         m_sortDirection = direction;
-        emit sortDirectionChanged();
+        Q_EMIT sortDirectionChanged();
         refresh();
     }
 }
@@ -349,7 +350,7 @@ void InvoiceModel::setSearchQuery(const QString &query)
 {
     if (m_searchQuery != query) {
         m_searchQuery = query;
-        emit searchQueryChanged();
+        Q_EMIT searchQueryChanged();
         refresh();
     }
 }
@@ -358,7 +359,7 @@ void InvoiceModel::setStatus(const QString &status)
 {
     if (m_status != status) {
         m_status = status;
-        emit statusChanged();
+        Q_EMIT statusChanged();
         refresh();
     }
 }
@@ -367,7 +368,7 @@ void InvoiceModel::setPaymentStatus(const QString &paymentStatus)
 {
     if (m_paymentStatus != paymentStatus) {
         m_paymentStatus = paymentStatus;
-        emit paymentStatusChanged();
+        Q_EMIT paymentStatusChanged();
         refresh();
     }
 }
@@ -380,19 +381,19 @@ void InvoiceModel::handleInvoicesReceived(const PaginatedInvoices &invoices)
     endResetModel();
 
     m_totalItems = invoices.total;
-    emit totalItemsChanged();
+    Q_EMIT totalItemsChanged();
 
     m_currentPage = invoices.currentPage;
-    emit currentPageChanged();
+    Q_EMIT currentPageChanged();
 
     m_totalPages = invoices.lastPage;
-    emit totalPagesChanged();
+    Q_EMIT totalPagesChanged();
 
     setLoading(false);
     setErrorMessage(QString());
 
     updateHasCheckedItems();
-    emit rowCountChanged();
+    Q_EMIT rowCountChanged();
 }
 
 void InvoiceModel::handleInvoiceError(const QString &message, ApiStatus status)
@@ -409,7 +410,7 @@ void InvoiceModel::handleInvoiceCreated(const Invoice &invoice)
 
     setLoading(false);
     setErrorMessage(QString());
-    emit invoiceCreated();
+    Q_EMIT invoiceCreated();
 }
 
 void InvoiceModel::handleInvoiceUpdated(const Invoice &invoice)
@@ -418,14 +419,14 @@ void InvoiceModel::handleInvoiceUpdated(const Invoice &invoice)
         if (m_invoices[i].id == invoice.id) {
             m_invoices[i] = invoice;
             QModelIndex index = createIndex(i, 0);
-            emit dataChanged(index, createIndex(i, columnCount() - 1));
+            Q_EMIT dataChanged(index, createIndex(i, columnCount() - 1));
             break;
         }
     }
 
     setLoading(false);
     setErrorMessage(QString());
-    emit invoiceUpdated();
+    Q_EMIT invoiceUpdated();
 }
 
 void InvoiceModel::handleInvoiceDeleted(int id)
@@ -441,14 +442,14 @@ void InvoiceModel::handleInvoiceDeleted(int id)
 
     setLoading(false);
     setErrorMessage(QString());
-    emit invoiceDeleted();
+    Q_EMIT invoiceDeleted();
 }
 
 void InvoiceModel::handlePaymentAdded(const QVariantMap &payment)
 {
     setLoading(false);
     setErrorMessage(QString());
-    emit paymentAdded();
+    Q_EMIT paymentAdded();
     refresh(); // Refresh to update payment status and amounts
 }
 
@@ -456,21 +457,21 @@ void InvoiceModel::handlePdfGenerated(const QString &pdfUrl)
 {
     setLoading(false);
     setErrorMessage(QString());
-    emit pdfGenerated(pdfUrl);
+    Q_EMIT pdfGenerated(pdfUrl);
 }
 
 void InvoiceModel::handleInvoiceSent(const QVariantMap &result)
 {
     setLoading(false);
     setErrorMessage(QString());
-    emit invoiceSent();
+    Q_EMIT invoiceSent();
 }
 
 void InvoiceModel::handleInvoiceMarkedAsSent(const QVariantMap &invoice)
 {
     setLoading(false);
     setErrorMessage(QString());
-    emit invoiceMarkedAsSent();
+    Q_EMIT invoiceMarkedAsSent();
     refresh();
 }
 
@@ -478,7 +479,7 @@ void InvoiceModel::handleInvoiceMarkedAsPaid(const QVariantMap &invoice)
 {
     setLoading(false);
     setErrorMessage(QString());
-    emit invoiceMarkedAsPaid();
+    Q_EMIT invoiceMarkedAsPaid();
     refresh();
 }
 
@@ -486,7 +487,7 @@ void InvoiceModel::handleSummaryReceived(const QVariantMap &summary)
 {
     setLoading(false);
     setErrorMessage(QString());
-    emit summaryReceived(summary);
+    Q_EMIT summaryReceived(summary);
 }
 
 // Private methods
@@ -494,7 +495,7 @@ void InvoiceModel::setLoading(bool loading)
 {
     if (m_loading != loading) {
         m_loading = loading;
-        emit loadingChanged();
+        Q_EMIT loadingChanged();
     }
 }
 
@@ -502,28 +503,28 @@ void InvoiceModel::setErrorMessage(const QString &message)
 {
     if (m_errorMessage != message) {
         m_errorMessage = message;
-        emit errorMessageChanged();
+        Q_EMIT errorMessageChanged();
     }
 }
 
 Invoice InvoiceModel::invoiceFromVariantMap(const QVariantMap &map) const
 {
     Invoice invoice;
-    invoice.id = map["id"].toInt();
-    invoice.team_id = map["teamId"].toInt();
-    invoice.reference_number = map["referenceNumber"].toString();
-    invoice.invoiceable_type = map["invoiceable_type"].toString();
-    invoice.invoiceable_id = map["invoiceableId"].toInt();
-    invoice.total_amount = map["totalAmount"].toDouble();
-    invoice.tax_amount = map["taxAmount"].toDouble();
-    invoice.discount_amount = map["discountAmount"].toDouble();
-    invoice.status = map["status"].toString();
-    invoice.issue_date = map["issue_date"].toDateTime();
-    invoice.due_date = map["due_date"].toDateTime();
-    invoice.notes = map["notes"].toString();
-    invoice.meta_data = map["metaData"].toMap();
+    invoice.id = map["id"_L1].toInt();
+    invoice.team_id = map["teamId"_L1].toInt();
+    invoice.reference_number = map["referenceNumber"_L1].toString();
+    invoice.invoiceable_type = map["invoiceable_type"_L1].toString();
+    invoice.invoiceable_id = map["invoiceableId"_L1].toInt();
+    invoice.total_amount = map["totalAmount"_L1].toDouble();
+    invoice.tax_amount = map["taxAmount"_L1].toDouble();
+    invoice.discount_amount = map["discountAmount"_L1].toDouble();
+    invoice.status = map["status"_L1].toString();
+    invoice.issue_date = map["issue_date"_L1].toDateTime();
+    invoice.due_date = map["due_date"_L1].toDateTime();
+    invoice.notes = map["notes"_L1].toString();
+    invoice.meta_data = map["metaData"_L1].toMap();
 
-    QVariantList itemsList = map["items"].toList();
+    QVariantList itemsList = map["items"_L1].toList();
     for (const QVariant &itemVar : itemsList) {
         invoice.items.append(invoiceItemFromVariantMap(itemVar.toMap()));
     }
@@ -534,25 +535,25 @@ Invoice InvoiceModel::invoiceFromVariantMap(const QVariantMap &map) const
 QVariantMap InvoiceModel::invoiceToVariantMap(const Invoice &invoice) const
 {
     QVariantMap map;
-    map["id"] = invoice.id;
-    map["teamId"] = invoice.team_id;
-    map["referenceNumber"] = invoice.reference_number;
-    map["invoiceableType"] = invoice.invoiceable_type;
-    map["invoiceableId"] = invoice.invoiceable_id;
-    map["totalAmount"] = invoice.total_amount;
-    map["taxAmount"] = invoice.tax_amount;
-    map["discountAmount"] = invoice.discount_amount;
-    map["status"] = invoice.status;
-    map["issueDate"] = invoice.issue_date;
-    map["dueDate"] = invoice.due_date;
-    map["notes"] = invoice.notes;
-    map["metaData"] = invoice.meta_data;
+    map["id"_L1] = invoice.id;
+    map["teamId"_L1] = invoice.team_id;
+    map["referenceNumber"_L1] = invoice.reference_number;
+    map["invoiceableType"_L1] = invoice.invoiceable_type;
+    map["invoiceableId"_L1] = invoice.invoiceable_id;
+    map["totalAmount"_L1] = invoice.total_amount;
+    map["taxAmount"_L1] = invoice.tax_amount;
+    map["discountAmount"_L1] = invoice.discount_amount;
+    map["status"_L1] = invoice.status;
+    map["issueDate"_L1] = invoice.issue_date;
+    map["dueDate"_L1] = invoice.due_date;
+    map["notes"_L1] = invoice.notes;
+    map["metaData"_L1] = invoice.meta_data;
 
     QVariantList itemsList;
     for (const auto &item : invoice.items) {
         itemsList.append(invoiceItemToVariantMap(item));
     }
-    map["items"] = itemsList;
+    map["items"_L1] = itemsList;
 
     return map;
 }
@@ -560,35 +561,35 @@ QVariantMap InvoiceModel::invoiceToVariantMap(const Invoice &invoice) const
 InvoiceItem InvoiceModel::invoiceItemFromVariantMap(const QVariantMap &map) const
 {
     InvoiceItem item;
-    item.id = map["id"].toInt();
-    item.description = map["description"].toString();
-    item.quantity = map["quantity"].toInt();
-    item.unit_price = map["unitPrice"].toDouble();
-    item.total_price = map["totalPrice"].toDouble();
-    item.notes = map["notes"].toString();
+    item.id = map["id"_L1].toInt();
+    item.description = map["description"_L1].toString();
+    item.quantity = map["quantity"_L1].toInt();
+    item.unit_price = map["unitPrice"_L1].toDouble();
+    item.total_price = map["totalPrice"_L1].toDouble();
+    item.notes = map["notes"_L1].toString();
     return item;
 }
 
 QVariantMap InvoiceModel::invoiceItemToVariantMap(const InvoiceItem &item) const
 {
     QVariantMap map;
-    map["id"] = item.id;
-    map["description"] = item.description;
-    map["quantity"] = item.quantity;
-    map["unitPrice"] = item.unit_price;
-    map["totalPrice"] = item.total_price;
-    map["notes"] = item.notes;
+    map["id"_L1] = item.id;
+    map["description"_L1] = item.description;
+    map["quantity"_L1] = item.quantity;
+    map["unitPrice"_L1] = item.unit_price;
+    map["totalPrice"_L1] = item.total_price;
+    map["notes"_L1] = item.notes;
     return map;
 }
 
 InvoicePayment InvoiceModel::paymentFromVariantMap(const QVariantMap &map) const
 {
     InvoicePayment payment;
-    payment.cash_source_id = map["cashSourceId"].toInt();
-    payment.amount = map["amount"].toDouble();
-    payment.payment_method = map["paymentMethod"].toString();
-    payment.reference_number = map["referenceNumber"].toString();
-    payment.notes = map["notes"].toString();
+    payment.cash_source_id = map["cashSourceId"_L1].toInt();
+    payment.amount = map["amount"_L1].toDouble();
+    payment.payment_method = map["paymentMethod"_L1].toString();
+    payment.reference_number = map["referenceNumber"_L1].toString();
+    payment.notes = map["notes"_L1].toString();
     return payment;
 }
 
@@ -604,7 +605,7 @@ void InvoiceModel::updateHasCheckedItems()
 
     if (hasChecked != m_hasCheckedItems) {
         m_hasCheckedItems = hasChecked;
-        emit hasCheckedItemsChanged();
+        Q_EMIT hasCheckedItemsChanged();
     }
 }
 

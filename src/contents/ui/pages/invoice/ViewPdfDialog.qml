@@ -5,9 +5,9 @@ import QtQuick.Layouts
 import QtQuick.Window
 import org.kde.kirigami as Kirigami
 import Qt.labs.platform as Platform
-import com.dervox.PDFView 1.0
+// import com.dervox.PDFView 1.0
 import com.dervox.printing 1.0
-
+import com.dervox.dim
 Kirigami.Dialog {
     id: pdfDialog
     title: i18nc("@title:window", "Invoice PDF")

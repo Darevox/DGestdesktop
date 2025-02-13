@@ -14,8 +14,8 @@ Kirigami.PromptDialog {
     property string sourceName: ""
     property double sourceBalance: 0.0
 
-    title: qsTr("Transfer Funds")
-    subtitle: qsTr("Transfer money between cash sources")
+    title: i18n("Transfer Funds")
+    subtitle: i18n("Transfer money between cash sources")
     preferredWidth: Kirigami.Units.gridUnit * 40
 
     standardButtons: Kirigami.Dialog.NoButton
@@ -50,7 +50,7 @@ Kirigami.PromptDialog {
                     spacing: Kirigami.Units.smallSpacing
 
                     QQC2.Label {
-                        text: qsTr("From Account")
+                        text: i18n("From Account")
                         font.bold: true
                     }
 
@@ -60,7 +60,7 @@ Kirigami.PromptDialog {
                     }
 
                     QQC2.Label {
-                        text: qsTr("Available Balance: %1").arg(sourceBalance.toFixed(2))
+                        text: i18n("Available Balance: %1").arg(sourceBalance.toFixed(2))
                         opacity: 0.7
                     }
                 }
@@ -74,7 +74,7 @@ Kirigami.PromptDialog {
             // Destination Account
             FormCard.FormComboBoxDelegate {
                 id: destinationField
-                description: qsTr("To Account")
+                description: i18n("To Account")
 
                 property var destinationsModel: ListModel {
                     id: destinationsList
@@ -110,8 +110,8 @@ Kirigami.PromptDialog {
             // Amount
             FormCard.FormTextFieldDelegate {
                 id: amountField
-                label: qsTr("Amount")
-                placeholderText: qsTr("Enter transfer amount")
+                label: i18n("Amount")
+                placeholderText: i18n("Enter transfer amount")
                 text: ""
                 statusMessage: ""
                 validator: DoubleValidator {
@@ -135,8 +135,8 @@ Kirigami.PromptDialog {
             // Notes
             FormCard.FormTextAreaDelegate {
                 id: notesField
-                label: qsTr("Notes")
-                placeholderText: qsTr("Enter transfer notes (optional)")
+                label: i18n("Notes")
+                placeholderText: i18n("Enter transfer notes (optional)")
                 text: ""
             }
         }
@@ -144,7 +144,7 @@ Kirigami.PromptDialog {
 
     customFooterActions: [
         Kirigami.Action {
-            text: qsTr("Transfer")
+            text: i18n("Transfer")
             icon.name: "transfer"
             enabled: !cashSourceApi.isLoading &&
                      destinationField.currentIndex !== -1 &&
@@ -167,7 +167,7 @@ Kirigami.PromptDialog {
             }
         },
         Kirigami.Action {
-            text: qsTr("Cancel")
+            text: i18n("Cancel")
             icon.name: "dialog-cancel"
             onTriggered: transferDialog.close()
         }
@@ -183,24 +183,24 @@ Kirigami.PromptDialog {
 
         // Validate destination
         if (destinationField.currentValue === -1) {
-            errors.push(qsTr("Please select a destination account"))
+            errors.push(i18n("Please select a destination account"))
             isValid = false
         }
 
         // Validate amount
         if (!amountField.text) {
-            amountField.statusMessage = qsTr("Amount is required")
-            errors.push(qsTr("Amount is required"))
+            amountField.statusMessage = i18n("Amount is required")
+            errors.push(i18n("Amount is required"))
             isValid = false
         } else {
             let amount = parseFloat(amountField.text)
             if (isNaN(amount) || amount <= 0) {
-                amountField.statusMessage = qsTr("Please enter a valid amount")
-                errors.push(qsTr("Please enter a valid amount"))
+                amountField.statusMessage = i18n("Please enter a valid amount")
+                errors.push(i18n("Please enter a valid amount"))
                 isValid = false
             } else if (amount > sourceBalance) {
-                amountField.statusMessage = qsTr("Insufficient funds")
-                errors.push(qsTr("Insufficient funds"))
+                amountField.statusMessage = i18n("Insufficient funds")
+                errors.push(i18n("Insufficient funds"))
                 isValid = false
             }
         }
@@ -231,7 +231,7 @@ Kirigami.PromptDialog {
         function onTransferCompleted() {
             transferDialog.close()
             applicationWindow().gnotification.showNotification("",
-                                                               "Transfer completed successfully", // message
+                                                               i18n("Transfer completed successfully"), // message
                                                                Kirigami.MessageType.Positive, // message type
                                                                "short",
                                                                "dialog-close"

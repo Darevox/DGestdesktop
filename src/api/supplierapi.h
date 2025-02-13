@@ -39,8 +39,8 @@ public:
 
     // CRUD operations
     Q_INVOKABLE QFuture<void> getSuppliers(const QString &search = QString(),
-                                           const QString &sortBy = "created_at",
-                                           const QString &sortDirection = "desc",
+                                           const QString &sortBy = QStringLiteral("created_at"),
+                                           const QString &sortDirection = QStringLiteral("desc"),
                                            int page = 1);
     Q_INVOKABLE QFuture<void> getSupplier(int id);
     Q_INVOKABLE QFuture<void> createSupplier(const Supplier &supplier);
@@ -50,7 +50,7 @@ public:
     bool isLoading() const { return m_isLoading; }
     Q_INVOKABLE QString getToken() const;
     Q_INVOKABLE void saveToken(const QString &token);
-signals:
+Q_SIGNALS:
     // Success signals
     void suppliersReceived(const PaginatedSuppliers &suppliers);
     void supplierReceived(const QVariantMap &supplier);
@@ -59,11 +59,11 @@ signals:
     void supplierDeleted(int id);
 
     // Error signals for each operation
-    void errorSuppliersReceived(const QString &message, ApiStatus status, const QString &details);
-    void errorSupplierReceived(const QString &message, ApiStatus status, const QString &details);
-    void errorSupplierCreated(const QString &message, ApiStatus status, const QString &details);
-    void errorSupplierUpdated(const QString &message, ApiStatus status, const QString &details);
-    void errorSupplierDeleted(const QString &message, ApiStatus status, const QString &details);
+    void errorSuppliersReceived(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorSupplierReceived(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorSupplierCreated(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorSupplierUpdated(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorSupplierDeleted(const QString &message, ApiStatus status, const QByteArray &details);
     void supplierNotFound();
 
     void isLoadingChanged();
@@ -78,7 +78,7 @@ private:
     void setLoading(bool loading) {
         if (m_isLoading != loading) {
             m_isLoading = loading;
-            emit isLoadingChanged();
+            Q_EMIT isLoadingChanged();
         }
     }
 };

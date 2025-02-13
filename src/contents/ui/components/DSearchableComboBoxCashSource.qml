@@ -25,7 +25,7 @@ QQC2.ComboBox {
         width: root.width - root.indicator.width - root.spacing
         font: root.font
         verticalAlignment: Text.AlignVCenter
-        placeholderText: "Enter Cash Source Name..."
+        placeholderText:i18n( "Enter Cash Source Name...")
 
         background: Rectangle {
             color: "transparent"

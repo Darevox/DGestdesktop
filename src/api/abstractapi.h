@@ -76,16 +76,16 @@ protected:
         }
 
         // Join all messages with a semicolon for better readability
-        return messagesList.join(" ");
+        return messagesList.join(QStringLiteral(" "));
     }
 
     // 1. ERROR STATUS DETERMINATION
     ApiStatus determineErrorStatus(const QNetworkReply *reply, const QJsonObject &jsonResponse = QJsonObject()) const {
         // First priority: Check API-level errors in JSON response
         if (!jsonResponse.isEmpty()) {
-            if (jsonResponse.value("error").toBool() || jsonResponse.contains("errors")) {
+            if (jsonResponse.value(QStringLiteral("error")).toBool() || jsonResponse.contains(QStringLiteral("errors"))) {
                 // If there are field-specific errors, it's a validation error
-                if (jsonResponse.contains("errors")) {
+                if (jsonResponse.contains(QStringLiteral("errors"))) {
                     return ApiStatus::ValidationError;
                 }
                 return ApiStatus::ServerError;
@@ -123,8 +123,8 @@ protected:
     // 2. ERROR MESSAGE GENERATION
     QString getErrorMessage(ApiStatus status, const QString& originalMessage, const QJsonObject &jsonResponse = QJsonObject()) const {
         // First priority: Use API-provided messages for certain errors
-        if (!jsonResponse.isEmpty() && jsonResponse.contains("message")) {
-            QString apiMessage = jsonResponse["message"].toString();
+        if (!jsonResponse.isEmpty() && jsonResponse.contains(QStringLiteral("message"))) {
+            QString apiMessage = jsonResponse[QStringLiteral("message")].toString();
             if (status == ApiStatus::ValidationError ||
                 status == ApiStatus::ServerError ||
                 status == ApiStatus::AuthenticationError) {
@@ -141,8 +141,8 @@ protected:
         case ApiStatus::AuthenticationError:
             return tr("Authentication error. Please login again.");
         case ApiStatus::ValidationError:
-            if (!jsonResponse.isEmpty() && jsonResponse.contains("errors")) {
-                return getErrorMessages(jsonResponse["errors"].toObject());
+            if (!jsonResponse.isEmpty() && jsonResponse.contains(QStringLiteral("errors"))) {
+                return getErrorMessages(jsonResponse[QStringLiteral("errors")].toObject());
             }
             return originalMessage;
         default:
@@ -168,7 +168,7 @@ protected:
             if constexpr (std::is_same_v<T, QJsonObject>) {
                 return {true, jsonObject, std::nullopt};
             } else if constexpr (std::is_same_v<T, QString>) {
-                return {true, jsonObject["accessToken"].toString(), std::nullopt};
+                return {true, jsonObject[QStringLiteral("accessToken")].toString(), std::nullopt};
             } else if constexpr (std::is_same_v<T, std::monostate>) {
                 return {true, std::monostate{}, std::nullopt};
             }
@@ -178,8 +178,8 @@ protected:
         ApiError error;
         error.status = status;
         error.message = getErrorMessage(status, reply->errorString(), jsonObject);
-        if (jsonObject.contains("errors")) {
-            error.details = jsonObject["errors"].toObject();
+        if (jsonObject.contains(QStringLiteral("errors"))) {
+            error.details = jsonObject[QStringLiteral("errors")].toObject();
         }
 
         // Step 5: Debug output
@@ -205,7 +205,7 @@ protected:
 
         return interface->future();
     }
-signals:
+Q_SIGNALS:
     void apiHostChanged();
     void errorOccurred(const ApiError &error);
 };

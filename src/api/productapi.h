@@ -62,8 +62,8 @@ public:
     explicit ProductApi(QNetworkAccessManager *netManager, QObject *parent = nullptr);
     // Main CRUD operations
     Q_INVOKABLE QFuture<void> getProducts(const QString &search = QString(),
-                                          const QString &sortBy = "created_at",
-                                          const QString &sortDirection = "desc",
+                                          const QString &sortBy = QStringLiteral("created_at"),
+                                          const QString &sortDirection = QStringLiteral("desc"),
                                           int page = 1,
                                           bool lowStock = false,
                                           bool expiringSoon = false,
@@ -94,7 +94,7 @@ public:
     bool isLoading() const { return m_isLoading; }
 
     static void setSharedNetworkManager(QNetworkAccessManager* manager);
-signals:
+Q_SIGNALS:
     // Success signals
     void productsReceived(const PaginatedProducts &products);
     void productReceived(const QVariantMap &product);
@@ -108,19 +108,19 @@ signals:
     void productUnitsReceived(const QList<ProductUnit> &units);
 
     // Error signals
-    void productError(const QString &message, ApiStatus status,const QString &details);
+    void productError(const QString &message, ApiStatus status,const QByteArray &details);
     void productNotFound();
     void uploadImageError(const QString &message);
 
-    void errorProductsReceived(const QString &message, ApiStatus status,const QString &details);
-    void errorProductReceived(const QString &message, ApiStatus status,const QString &details);
-    void errorProductCreated(const QString &message, ApiStatus status,const QString &details);
-    void errorProductUpdated(const QString &message, ApiStatus status,const QString &details);
-    void errorPoductDeleted(const QString &message, ApiStatus status,const QString &details);
-    void errorBarcodeAdded(const QString &message, ApiStatus status,const QString &details);
-    void errorBarcodeRemoved(const QString &message, ApiStatus status,const QString &details);
-    void errorBarcodeUpdated(const QString &message, ApiStatus status,const QString &details);
-    void errorProductBarcodesReceived(const QString &message, ApiStatus status,const QString &details);
+    void errorProductsReceived(const QString &message, ApiStatus status,const QByteArray &details);
+    void errorProductReceived(const QString &message, ApiStatus status,const QByteArray &details);
+    void errorProductCreated(const QString &message, ApiStatus status,const QByteArray &details);
+    void errorProductUpdated(const QString &message, ApiStatus status,const QByteArray &details);
+    void errorPoductDeleted(const QString &message, ApiStatus status,const QByteArray &details);
+    void errorBarcodeAdded(const QString &message, ApiStatus status,const QByteArray &details);
+    void errorBarcodeRemoved(const QString &message, ApiStatus status,const QByteArray &details);
+    void errorBarcodeUpdated(const QString &message, ApiStatus status,const QByteArray &details);
+    void errorProductBarcodesReceived(const QString &message, ApiStatus status,const QByteArray &details);
 
 
     void barcodeAdded(const QJsonObject &barcode);
@@ -146,7 +146,7 @@ private:
     void setLoading(bool loading) {
         if (m_isLoading != loading) {
             m_isLoading = loading;
-            emit isLoadingChanged();
+            Q_EMIT isLoadingChanged();
         }
     }
 

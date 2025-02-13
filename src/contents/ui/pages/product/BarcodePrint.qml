@@ -187,6 +187,7 @@ Kirigami.Dialog {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 anchors.top: barcode.bottom
+                visible: false
             }
         }
 

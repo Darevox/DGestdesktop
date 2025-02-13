@@ -105,12 +105,12 @@ public:
         return ids;
     }
 
-public slots:
+public Q_SLOTS:
     void setSortField(const QString &field);
     void setSortDirection(const QString &direction);
     void setSearchQuery(const QString &query);
 
-signals:
+Q_SIGNALS:
     void loadingChanged();
     void errorMessageChanged();
     void totalItemsChanged();
@@ -128,7 +128,7 @@ signals:
     void hasCheckedItemsChanged();
     void rowCountChanged();
 
-private slots:
+private Q_SLOTS:
     virtual void handleCashSourcesReceived(const PaginatedCashSources &sources);
     void handleCashSourceError(const QString &message, ApiStatus status);
     void handleCashSourceCreated(const CashSource &source);

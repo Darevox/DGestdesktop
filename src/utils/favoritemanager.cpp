@@ -1,9 +1,9 @@
 // favoritemanager.cpp
 #include "favoritemanager.h"
-
+using namespace Qt::StringLiterals;
 FavoriteManager::FavoriteManager(QObject *parent)
     : QObject(parent)
-    , m_settings("Dervox", "DGest")
+    , m_settings(QStringLiteral("Dervox"),QStringLiteral( "DGest"))
 {
     loadSettings();
 }
@@ -14,12 +14,12 @@ void FavoriteManager::createCategory(const QString &name)
 {
     int newId = m_categories.size() + 1;
     QJsonObject category;
-    category["id"] = newId;
-    category["name"] = name;
+    category["id"_L1] = newId;
+    category["name"_L1] = name;
 
     m_categories[QString::number(newId)] = category;
     saveSettings();
-    emit categoriesChanged();
+    Q_EMIT categoriesChanged();
 }
 
 void FavoriteManager::updateCategory(int categoryId, const QString &name)
@@ -27,10 +27,10 @@ void FavoriteManager::updateCategory(int categoryId, const QString &name)
     QString id = QString::number(categoryId);
     if (m_categories.contains(id)) {
         QJsonObject category = m_categories[id].toObject();
-        category["name"] = name;
+        category["name"_L1] = name;
         m_categories[id] = category;
         saveSettings();
-        emit categoriesChanged();
+        Q_EMIT categoriesChanged();
     }
 }
 
@@ -41,7 +41,7 @@ void FavoriteManager::deleteCategory(int categoryId)
         m_categories.remove(id);
         m_categoryProducts.remove(id);
         saveSettings();
-        emit categoriesChanged();
+        Q_EMIT categoriesChanged();
     }
 }
 
@@ -70,7 +70,7 @@ void FavoriteManager::removeProductFromCategory(int categoryId, int productId)
 
         m_categoryProducts[id] = newProducts;
         saveSettings();
-        emit productsChanged(categoryId);
+        Q_EMIT productsChanged(categoryId);
     }
 }
 
@@ -93,7 +93,7 @@ void FavoriteManager::addProductToCategory(int categoryId, int productId)
     productIds.append(productId);
     m_categoryProducts[id] = productIds;
     saveSettings();
-    emit productsChanged(categoryId);
+    Q_EMIT productsChanged(categoryId);
 }
 
 QJsonArray FavoriteManager::getCategoryProductIds(int categoryId)
@@ -111,8 +111,8 @@ void FavoriteManager::saveSettings()
     for (auto it = m_categories.constBegin(); it != m_categories.constEnd(); ++it) {
         QJsonObject category = it.value().toObject();
         QVariantMap categoryMap;
-        categoryMap["id"] = category["id"].toInt();
-        categoryMap["name"] = category["name"].toString();
+        categoryMap["id"_L1] = category["id"_L1].toInt();
+        categoryMap["name"_L1] = category["name"_L1].toString();
         categoriesMap[it.key()] = categoryMap;
     }
     m_settings.setValue("categories", categoriesMap);
@@ -163,10 +163,10 @@ void FavoriteManager::loadSettings()
     for (auto it = categoriesMap.constBegin(); it != categoriesMap.constEnd(); ++it) {
         QVariantMap categoryMap = it.value().toMap();
         QJsonObject category;
-        category["id"] = categoryMap["id"].toInt();
-        category["name"] = categoryMap["name"].toString();
+        category["id"_L1] = categoryMap["id"_L1].toInt();
+        category["name"_L1] = categoryMap["name"_L1].toString();
         m_categories[it.key()] = category;
-        qDebug() << "Category:" << it.key() << "ID:" << categoryMap["id"].toInt() << "Name:" << categoryMap["name"].toString();
+        qDebug() << "Category:" << it.key() << "ID:" << categoryMap["id"_L1].toInt() << "Name:" << categoryMap["name"_L1].toString();
     }
 
     // Load category products
@@ -200,7 +200,7 @@ void FavoriteManager::setDefaultCashSource(int id)
 {
     m_settings.setValue("defaultCashSource", id);
     m_settings.sync();
-    emit defaultCashSourceChanged(id);
+    Q_EMIT defaultCashSourceChanged(id);
 }
 
 int FavoriteManager::getDefaultCashSource() const
@@ -243,7 +243,7 @@ void FavoriteManager::removeProductFromAllCategories(int productId)
         if (categoryChanged) {
             m_categoryProducts[categoryId] = newProducts;
             changed = true;
-            emit productsChanged(categoryId.toInt());
+            Q_EMIT productsChanged(categoryId.toInt());
             qDebug() << "Updated category" << categoryId << "with new products:" << newProducts;
         }
     }

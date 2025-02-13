@@ -69,9 +69,9 @@ public:
     QVariantMap periodInfo() const { return m_periodInfo; }
 
 
-public slots:
+public Q_SLOTS:
 
-signals:
+Q_SIGNALS:
     void loadingChanged();
     void timeframeChanged();
     void salesHistoryChanged();
@@ -96,17 +96,17 @@ signals:
 
 
 
-private slots:
+private Q_SLOTS:
     void handleOverallDashboard(const DashboardOverview &data);
     void handleSalesAnalytics(const SaleAnalytics &data);
     void handlePurchaseAnalytics(const PurchaseAnalytics &data);
-    void handleError(const QString &message, ApiStatus status, const QString &details);
+    void handleError(const QString &message, ApiStatus status, const QByteArray &details);
     void handleCustomerAnalytics(const QVariantMap &data);
 
 private:
     DashboardAnalyticsApi* m_api = nullptr;
     bool m_loading = false;
-    QString m_timeframe = "daily";
+    QString m_timeframe = QStringLiteral("daily");
     QDate m_startDate;
     QDate m_endDate;
 

@@ -83,12 +83,12 @@ public:
     Q_INVOKABLE void clearAllChecked();
     Q_INVOKABLE void toggleAllProductsChecked();
 
-public slots:
+public Q_SLOTS:
     void setSortField(const QString &field);
     void setSortDirection(const QString &direction);
     void setSearchQuery(const QString &query);
 
-signals:
+Q_SIGNALS:
     void loadingChanged();
     void errorMessageChanged();
     void totalItemsChanged();

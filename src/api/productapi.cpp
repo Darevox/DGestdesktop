@@ -5,7 +5,7 @@
 #include <QUrlQuery>
 
 namespace NetworkApi {
-
+using namespace Qt::StringLiterals;
 QNetworkAccessManager* ProductApi::netManager = nullptr;
 
 void ProductApi::setSharedNetworkManager(QNetworkAccessManager* manager)
@@ -26,7 +26,7 @@ void ProductApi::ensureSharedNetworkManager()
 // Modified constructors
 ProductApi::ProductApi(QObject *parent)
     : AbstractApi(nullptr, parent)
-    , m_settings("Dervox", "DGest")
+    , m_settings(QStringLiteral("Dervox"), QStringLiteral("DGest"))
 
 {
     ensureSharedNetworkManager();
@@ -36,7 +36,7 @@ ProductApi::ProductApi(QObject *parent)
 
 ProductApi::ProductApi(QNetworkAccessManager *netManager, QObject *parent)
     : AbstractApi(netManager, parent)
-    , m_settings("Dervox", "DGest")
+    ,  m_settings(QStringLiteral("Dervox"), QStringLiteral("DGest"))
 {
     m_favoriteManager = new FavoriteManager(this);
 }
@@ -46,41 +46,41 @@ QFuture<void> ProductApi::getProducts(const QString &search, const QString &sort
                                       bool expiringSoon, const QString &status)
 {
     setLoading(true);
-    QString path = "/api/v1/products";
+    QString path = QStringLiteral("/api/v1/products");
 
     // Build query string manually
     QStringList queryParts;
     if (!search.isEmpty())
-        queryParts << QString("search=%1").arg(search);
+        queryParts << QStringLiteral("search=%1").arg(search);
     if (!sortBy.isEmpty())
-        queryParts << QString("sort_by=%1").arg(sortBy);
+        queryParts << QStringLiteral("sort_by=%1").arg(sortBy);
     if (!sortDirection.isEmpty())
-        queryParts << QString("sort_direction=%1").arg(sortDirection);
+        queryParts << QStringLiteral("sort_direction=%1").arg(sortDirection);
     if (lowStock)
-        queryParts << "low_stock=1";
+        queryParts <<QStringLiteral( "low_stock=1");
     if (expiringSoon)
-        queryParts << "expiring_soon=1";
+        queryParts <<QStringLiteral( "expiring_soon=1");
     if (page > 0)
-        queryParts << QString("page=%1").arg(page);
+        queryParts << QStringLiteral("page=%1").arg(page);
     if (!status.isEmpty())
-        queryParts << QString("status=%1").arg(status);
+        queryParts << QStringLiteral("status=%1").arg(status);
 
     // Add query parameters to path if there are any
     if (!queryParts.isEmpty()) {
-        path += "?" + queryParts.join("&");
+      path += QStringLiteral("?") + queryParts.join(QLatin1String("&"));
     }
 
     QNetworkRequest request = createRequest(path);
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->get(request);
     }).then([=](JsonResponse response) {
         if (response.success) {
             PaginatedProducts paginatedProducts = paginatedProductsFromJson(*response.data);
-            emit productsReceived(paginatedProducts);
+            Q_EMIT productsReceived(paginatedProducts);
         } else {
-            emit errorProductsReceived(response.error->message, response.error->status,
+            Q_EMIT errorProductsReceived(response.error->message, response.error->status,
                                        QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -93,19 +93,19 @@ QFuture<void> ProductApi::getProduct(int id)
 {
     setLoading(true);
 
-    QNetworkRequest request = createRequest(QString("/api/v1/products/%1").arg(id));
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/products/%1").arg(id));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->get(request);
     }).then([=](JsonResponse response) {
         if (response.success) {
-            const QJsonObject &productData = response.data->value("product").toObject();
+            const QJsonObject &productData = response.data->value("product"_L1).toObject();
             Product product = productFromJson(productData);
             QVariantMap productMap= productToVariantMap(product);
-            emit productReceived(productMap);
+            Q_EMIT productReceived(productMap);
         } else {
-            emit errorProductReceived(response.error->message, response.error->status,
+            Q_EMIT errorProductReceived(response.error->message, response.error->status,
                                       QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -118,9 +118,9 @@ QFuture<void> ProductApi::createProduct(const Product &product)
 {
     setLoading(true);
 
-    QNetworkRequest request = createRequest("/api/v1/products");
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/products"));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     QJsonObject jsonData = productToJson(product);
 
@@ -128,13 +128,13 @@ QFuture<void> ProductApi::createProduct(const Product &product)
         return m_netManager->post(request, QJsonDocument(jsonData).toJson());
     }).then([=](JsonResponse response) {
         if (response.success) {
-            const QJsonObject &productData = response.data->value("product").toObject();
+            const QJsonObject &productData = response.data->value("product"_L1).toObject();
             Product createdProduct = productFromJson(productData);
             QVariantMap productMap= productToVariantMap(createdProduct);
-            emit productReceivedForBarcode(productMap);
-            emit productCreated(createdProduct);
+            Q_EMIT productReceivedForBarcode(productMap);
+            Q_EMIT productCreated(createdProduct);
         } else {
-            emit errorProductCreated(response.error->message, response.error->status,
+            Q_EMIT errorProductCreated(response.error->message, response.error->status,
                                      QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -147,9 +147,9 @@ QFuture<void> ProductApi::updateProduct(int id, const Product &product)
 {
     setLoading(true);
 
-    QNetworkRequest request = createRequest(QString("/api/v1/products/%1").arg(id));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/products/%1").arg(id));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     QJsonObject jsonData = productToJson(product);
 
@@ -157,11 +157,11 @@ QFuture<void> ProductApi::updateProduct(int id, const Product &product)
         return m_netManager->put(request, QJsonDocument(jsonData).toJson());
     }).then([=](JsonResponse response) {
         if (response.success) {
-            const QJsonObject &productData = response.data->value("product").toObject();
+            const QJsonObject &productData = response.data->value("product"_L1).toObject();
             Product updatedProduct = productFromJson(productData);
-            emit productUpdated(updatedProduct);
+            Q_EMIT productUpdated(updatedProduct);
         } else {
-            emit errorProductUpdated(response.error->message, response.error->status,
+            Q_EMIT errorProductUpdated(response.error->message, response.error->status,
                                      QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -174,18 +174,18 @@ QFuture<void> ProductApi::deleteProduct(int id)
 {
     setLoading(true);
 
-    QNetworkRequest request = createRequest(QString("/api/v1/products/%1").arg(id));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/products/%1").arg(id));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<std::monostate>([=]() {
         return m_netManager->deleteResource(request);
     }).then([=](VoidResponse response) {
         if (response.success) {
-            emit productDeleted(id);
+            Q_EMIT productDeleted(id);
           //  m_favoriteManager->removeProductFromAllCategories(id);
         } else {
-            emit errorPoductDeleted(response.error->message, response.error->status,
+            Q_EMIT errorPoductDeleted(response.error->message, response.error->status,
                                     QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -197,23 +197,23 @@ QFuture<void> ProductApi::deleteProduct(int id)
 QFuture<void> ProductApi::updateStock(int id, int quantity, const QString &operation)
 {
 
-    QNetworkRequest request = createRequest(QString("/api/v1/products/%1/stock").arg(id));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/products/%1/stock").arg(id));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     QJsonObject jsonData;
-    jsonData["quantity"] = quantity;
-    jsonData["operation"] = operation;
+    jsonData["quantity"_L1] = quantity;
+    jsonData["operation"_L1] = operation;
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->post(request, QJsonDocument(jsonData).toJson());
     }).then([=](JsonResponse response) {
         if (response.success) {
-            const QJsonObject &productData = response.data->value("product").toObject();
+            const QJsonObject &productData = response.data->value("product"_L1).toObject();
             Product updatedProduct = productFromJson(productData);
-            emit stockUpdated(updatedProduct);
+            Q_EMIT stockUpdated(updatedProduct);
         } else {
-            emit productError(response.error->message, response.error->status,
+            Q_EMIT productError(response.error->message, response.error->status,
                               QJsonDocument(response.error->details).toJson());
         }
     });
@@ -223,21 +223,21 @@ QFuture<void> ProductApi::updateStock(int id, int quantity, const QString &opera
 
 QFuture<void> ProductApi::getLowStockProducts()
 {
-    QNetworkRequest request = createRequest("/api/v1/products/low-stock");
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/products/low-stock"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->get(request);
     }).then([=](JsonResponse response) {
         if (response.success) {
             QList<Product> products;
-            const QJsonArray &productsArray = response.data->value("products").toArray();
+            const QJsonArray &productsArray = response.data->value("products"_L1).toArray();
             for (const QJsonValue &value : productsArray) {
                 products.append(productFromJson(value.toObject()));
             }
-            emit lowStockProductsReceived(products);
+            Q_EMIT lowStockProductsReceived(products);
         } else {
-            emit productError(response.error->message, response.error->status,
+            Q_EMIT productError(response.error->message, response.error->status,
                               QJsonDocument(response.error->details).toJson());
         }
     });
@@ -247,21 +247,21 @@ QFuture<void> ProductApi::getLowStockProducts()
 
 QFuture<void> ProductApi::getProductUnits()
 {
-    QNetworkRequest request = createRequest("/api/v1/product-units");
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/product-units"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->get(request);
     }).then([=](JsonResponse response) {
         if (response.success) {
             QList<ProductUnit> units;
-            const QJsonArray &unitsArray = response.data->value("units").toArray();
+            const QJsonArray &unitsArray = response.data->value("units"_L1).toArray();
             for (const QJsonValue &value : unitsArray) {
                 units.append(productUnitFromJson(value.toObject()));
             }
-            emit productUnitsReceived(units);
+            Q_EMIT productUnitsReceived(units);
         } else {
-            emit productError(response.error->message, response.error->status,
+            Q_EMIT productError(response.error->message, response.error->status,
                               QJsonDocument(response.error->details).toJson());
         }
     });
@@ -273,22 +273,22 @@ QFuture<void> ProductApi::addProductBarcode(int productId, const QString &barcod
 {
     setLoading(true);
 
-    QNetworkRequest request = createRequest(QString("/api/v1/products/%1/barcodes").arg(productId));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/products/%1/barcodes").arg(productId));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     QJsonObject jsonData;
-    jsonData["barcode"] = barcode;
+    jsonData["barcode"_L1] = barcode;
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->post(request, QJsonDocument(jsonData).toJson());
     }).then([=](JsonResponse response) {
         if (response.success) {
-            const QJsonObject &barcodeData = response.data->value("barcode").toObject();
+            const QJsonObject &barcodeData = response.data->value("barcode"_L1).toObject();
             // You might want to define a Barcode struct/class similar to Product
-            emit barcodeAdded(barcodeData);
+            Q_EMIT barcodeAdded(barcodeData);
         } else {
-            emit errorBarcodeAdded(response.error->message, response.error->status,
+            Q_EMIT errorBarcodeAdded(response.error->message, response.error->status,
                                    QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -302,22 +302,22 @@ QFuture<void> ProductApi::updateProductBarcode(int productId, int barcodeId, con
     setLoading(true);
 
     QNetworkRequest request = createRequest(
-                QString("/api/v1/products/%1/barcodes/%2").arg(productId).arg(barcodeId)
+                QStringLiteral("/api/v1/products/%1/barcodes/%2").arg(productId).arg(barcodeId)
                 );
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     QJsonObject jsonData;
-    jsonData["barcode"] = newBarcode;
+    jsonData["barcode"_L1] = newBarcode;
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->put(request, QJsonDocument(jsonData).toJson());
     }).then([=](JsonResponse response) {
         if (response.success) {
-            const QJsonObject &barcodeData = response.data->value("barcode").toObject();
-            emit barcodeUpdated(barcodeData);
+            const QJsonObject &barcodeData = response.data->value("barcode"_L1).toObject();
+            Q_EMIT barcodeUpdated(barcodeData);
         } else {
-            emit errorBarcodeUpdated(response.error->message, response.error->status,
+            Q_EMIT errorBarcodeUpdated(response.error->message, response.error->status,
                                      QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -331,17 +331,17 @@ QFuture<void> ProductApi::removeProductBarcode(int productId, int barcodeId)
     setLoading(true);
 
     QNetworkRequest request = createRequest(
-                QString("/api/v1/products/%1/barcodes/%2").arg(productId).arg(barcodeId)
+                QStringLiteral("/api/v1/products/%1/barcodes/%2").arg(productId).arg(barcodeId)
                 );
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<std::monostate>([=]() {
         return m_netManager->deleteResource(request);
     }).then([=](VoidResponse response) {
         if (response.success) {
-            emit barcodeRemoved(productId, barcodeId);
+            Q_EMIT barcodeRemoved(productId, barcodeId);
         } else {
-            emit errorBarcodeRemoved(response.error->message, response.error->status,
+            Q_EMIT errorBarcodeRemoved(response.error->message, response.error->status,
                                      QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -355,22 +355,22 @@ QFuture<void> ProductApi::getProductBarcodes(int productId)
     setLoading(true);
 
     QNetworkRequest request = createRequest(
-                QString("/api/v1/products/%1/barcodes").arg(productId)
+                QStringLiteral("/api/v1/products/%1/barcodes").arg(productId)
                 );
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->get(request);
     }).then([=](JsonResponse response) {
         if (response.success) {
             QList<QJsonObject> barcodes;
-            const QJsonArray &barcodesArray = response.data->value("barcodes").toArray();
+            const QJsonArray &barcodesArray = response.data->value("barcodes"_L1).toArray();
             for (const QJsonValue &value : barcodesArray) {
                 barcodes.append(value.toObject());
             }
-            emit productBarcodesReceived(barcodes);
+            Q_EMIT productBarcodesReceived(barcodes);
         } else {
-            emit errorProductBarcodesReceived(response.error->message, response.error->status,
+            Q_EMIT errorProductBarcodesReceived(response.error->message, response.error->status,
                                               QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -384,36 +384,36 @@ QFuture<void> ProductApi::getProductBarcodes(int productId)
 Product ProductApi::productFromJson(const QJsonObject &json) const
 {
     Product product;
-    product.id = json["id"].toInt();
-    product.reference = json["reference"].toString();
-    product.name = json["name"].toString();
-    product.description = json["description"].toString();
-    product.price = json["price"].toInt();
-    product.purchase_price = json["purchase_price"].toInt();
-    product.expiredDate = QDateTime::fromString(json["expired_date"].toString(), Qt::ISODate);
-    product.quantity = json["quantity"].toInt();
-    product.productUnitId = json["product_unit_id"].toInt();
-    product.sku = json["sku"].toString();
-    //product.barcode = json["barcode"].toString();
-    product.minStockLevel = json["min_stock_level"].toInt();
-    product.maxStockLevel = json["max_stock_level"].toInt();
-    product.reorderPoint = json["reorder_point"].toInt();
-    product.location = json["location"].toString();
-    product.image_path = json["image_path"].toString();
-    if (json.contains("unit")) {
-        product.unit = productUnitFromJson(json["unit"].toObject());
+    product.id = json["id"_L1].toInt();
+    product.reference = json["reference"_L1].toString();
+    product.name = json["name"_L1].toString();
+    product.description = json["description"_L1].toString();
+    product.price = json["price"_L1].toInt();
+    product.purchase_price = json["purchase_price"_L1].toInt();
+    product.expiredDate = QDateTime::fromString(json["expired_date"_L1].toString(), Qt::ISODate);
+    product.quantity = json["quantity"_L1].toInt();
+    product.productUnitId = json["product_unit_id"_L1].toInt();
+    product.sku = json["sku"_L1].toString();
+    //product.barcode = json["barcode"_L1].toString();
+    product.minStockLevel = json["min_stock_level"_L1].toInt();
+    product.maxStockLevel = json["max_stock_level"_L1].toInt();
+    product.reorderPoint = json["reorder_point"_L1].toInt();
+    product.location = json["location"_L1].toString();
+    product.image_path = json["image_path"_L1].toString();
+    if (json.contains("unit"_L1)) {
+        product.unit = productUnitFromJson(json["unit"_L1].toObject());
     }
-    if (json.contains("packages") && json["packages"].isArray()) {
-        QJsonArray packagesArray = json["packages"].toArray();
+    if (json.contains("packages"_L1) && json["packages"_L1].isArray()) {
+        QJsonArray packagesArray = json["packages"_L1].toArray();
         for (const QJsonValue &value : packagesArray) {
             QJsonObject packageObj = value.toObject();
             ProductPackageProduct package;
-            package.id = packageObj["id"].toInt();
-            package.name = packageObj["name"].toString();
-            package.pieces_per_package = packageObj["pieces_per_package"].toInt();
-            package.purchase_price = packageObj["purchase_price"].toDouble();
-            package.selling_price = packageObj["selling_price"].toDouble();
-            package.barcode = packageObj["barcode"].toString();
+            package.id = packageObj["id"_L1].toInt();
+            package.name = packageObj["name"_L1].toString();
+            package.pieces_per_package = packageObj["pieces_per_package"_L1].toInt();
+            package.purchase_price = packageObj["purchase_price"_L1].toDouble();
+            package.selling_price = packageObj["selling_price"_L1].toDouble();
+            package.barcode = packageObj["barcode"_L1].toString();
             product.packages.append(package);
         }
     }
@@ -423,34 +423,34 @@ Product ProductApi::productFromJson(const QJsonObject &json) const
 ProductUnit ProductApi::productUnitFromJson(const QJsonObject &json) const
 {
     ProductUnit unit;
-    unit.id = json["id"].toInt();
-    unit.name = json["name"].toString();
+    unit.id = json["id"_L1].toInt();
+    unit.name = json["name"_L1].toString();
     return unit;
 }
 
 QJsonObject ProductApi::productToJson(const Product &product) const
 {
     QJsonObject json;
-    json["reference"] = product.reference;
-    json["name"] = product.name;
-    json["description"] = product.description;
-    json["price"] = product.price;
-    json["purchase_price"] = product.purchase_price;
-    json["expired_date"] = product.expiredDate.toString(Qt::ISODate);
-    json["quantity"] = product.quantity;
-    //json["product_unit_id"] = product.productUnitId;
+    json["reference"_L1] = product.reference;
+    json["name"_L1] = product.name;
+    json["description"_L1] = product.description;
+    json["price"_L1] = product.price;
+    json["purchase_price"_L1] = product.purchase_price;
+    json["expired_date"_L1] = product.expiredDate.toString(Qt::ISODate);
+    json["quantity"_L1] = product.quantity;
+    //json["product_unit_id"_L1] = product.productUnitId;
     if (product.productUnitId == 0 || product.productUnitId == -1) {  // Assuming 0 represents null/unset
-        json["product_unit_id"] = QJsonValue::Null;
+        json["product_unit_id"_L1] = QJsonValue::Null;
     } else {
-        json["product_unit_id"] = product.productUnitId;
+        json["product_unit_id"_L1] = product.productUnitId;
     }
 
-    json["sku"] = product.sku;
-    //json["barcode"] = product.barcode;
-    json["min_stock_level"] = product.minStockLevel;
-    json["max_stock_level"] = product.maxStockLevel;
-    json["reorder_point"] = product.reorderPoint;
-    json["location"] = product.location;
+    json["sku"_L1] = product.sku;
+    //json["barcode"_L1] = product.barcode;
+    json["min_stock_level"_L1] = product.minStockLevel;
+    json["max_stock_level"_L1] = product.maxStockLevel;
+    json["reorder_point"_L1] = product.reorderPoint;
+    json["location"_L1] = product.location;
     qDebug() << "Converting product to JSON";
     qDebug() << "Packages count:" << product.packages.size();
 
@@ -459,15 +459,15 @@ QJsonObject ProductApi::productToJson(const Product &product) const
         QJsonArray packagesArray;
         for (const ProductPackageProduct &package : product.packages) {
             QJsonObject packageObj;
-            packageObj["name"] = package.name;
-            packageObj["pieces_per_package"] = package.pieces_per_package;
-            packageObj["purchase_price"] = package.purchase_price;
-            packageObj["selling_price"] = package.selling_price;
-            packageObj["barcode"] = package.barcode;
+            packageObj["name"_L1] = package.name;
+            packageObj["pieces_per_package"_L1] = package.pieces_per_package;
+            packageObj["purchase_price"_L1] = package.purchase_price;
+            packageObj["selling_price"_L1] = package.selling_price;
+            packageObj["barcode"_L1] = package.barcode;
             packagesArray.append(packageObj);
             qDebug() << "Added package:" << packageObj;
         }
-        json["packages"] = packagesArray;
+        json["packages"_L1] = packagesArray;
     }
 
     qDebug() << "Final JSON:" << json;
@@ -477,13 +477,13 @@ QJsonObject ProductApi::productToJson(const Product &product) const
 PaginatedProducts ProductApi::paginatedProductsFromJson(const QJsonObject &json) const
 {
     PaginatedProducts result;
-    const QJsonObject &meta = json["products"].toObject();
-    result.currentPage = meta["current_page"].toInt();
-    result.lastPage = meta["last_page"].toInt();
-    result.perPage = meta["per_page"].toInt();
-    result.total = meta["total"].toInt();
+    const QJsonObject &meta = json["products"_L1].toObject();
+    result.currentPage = meta["current_page"_L1].toInt();
+    result.lastPage = meta["last_page"_L1].toInt();
+    result.perPage = meta["per_page"_L1].toInt();
+    result.total = meta["total"_L1].toInt();
 
-    const QJsonArray &dataArray = meta["data"].toArray();
+    const QJsonArray &dataArray = meta["data"_L1].toArray();
     for (const QJsonValue &value : dataArray) {
         result.data.append(productFromJson(value.toObject()));
     }
@@ -493,39 +493,39 @@ PaginatedProducts ProductApi::paginatedProductsFromJson(const QJsonObject &json)
 QVariantMap ProductApi::productToVariantMap(const Product &product) const
 {
     QVariantMap map;
-    map["id"] = product.id;
-    map["reference"] = product.reference;
-    map["name"] = product.name;
-    map["description"] = product.description;
-    map["price"] = product.price;
-    map["purchase_price"] = product.purchase_price;
-    map["expiredDate"] = product.expiredDate;
-    map["quantity"] = product.quantity;
-    map["productUnitId"] = product.productUnitId;
-    map["sku"] = product.sku;
-    // map["barcode"] = product.barcode;
-    map["minStockLevel"] = product.minStockLevel;
-    map["maxStockLevel"] = product.maxStockLevel;
-    map["reorderPoint"] = product.reorderPoint;
-    map["location"] = product.location;
-    map["image_path"] = product.image_path;
+    map["id"_L1] = product.id;
+    map["reference"_L1] = product.reference;
+    map["name"_L1] = product.name;
+    map["description"_L1] = product.description;
+    map["price"_L1] = product.price;
+    map["purchase_price"_L1] = product.purchase_price;
+    map["expiredDate"_L1] = product.expiredDate;
+    map["quantity"_L1] = product.quantity;
+    map["productUnitId"_L1] = product.productUnitId;
+    map["sku"_L1] = product.sku;
+    // map["barcode"_L1] = product.barcode;
+    map["minStockLevel"_L1] = product.minStockLevel;
+    map["maxStockLevel"_L1] = product.maxStockLevel;
+    map["reorderPoint"_L1] = product.reorderPoint;
+    map["location"_L1] = product.location;
+    map["image_path"_L1] = product.image_path;
     // Handle the unit
     QVariantMap unitMap;
-    unitMap["id"] = product.unit.id;
-    unitMap["name"] = product.unit.name;
-    map["unit"] = unitMap;
+    unitMap["id"_L1] = product.unit.id;
+    unitMap["name"_L1] = product.unit.name;
+    map["unit"_L1] = unitMap;
     QVariantList packagesList;
     for (const ProductPackageProduct &package : product.packages) {
         QVariantMap packageMap;
-        packageMap["id"] = package.id;           // Make sure to include the ID
-        packageMap["name"] = package.name;
-        packageMap["pieces_per_package"] = package.pieces_per_package;
-        packageMap["purchase_price"] = package.purchase_price;
-        packageMap["selling_price"] = package.selling_price;
-        packageMap["barcode"] = package.barcode;
+        packageMap["id"_L1] = package.id;           // Make sure to include the ID
+        packageMap["name"_L1] = package.name;
+        packageMap["pieces_per_package"_L1] = package.pieces_per_package;
+        packageMap["purchase_price"_L1] = package.purchase_price;
+        packageMap["selling_price"_L1] = package.selling_price;
+        packageMap["barcode"_L1] = package.barcode;
         packagesList.append(packageMap);
     }
-    map["packages"] = packagesList;
+    map["packages"_L1] = packagesList;
     return map;
 }
 
@@ -546,9 +546,9 @@ QVariantMap ProductApi::productToVariantMap(const Product &product) const
 
 //       qDebug() << "Local Path:" << localPath;
 //  qDebug()<<"===================================FILE : "<<imagePath;
-//         QString path = QString("/api/v1/products/%1/image").arg(productId);
+//         QString path = QStringLiteral("/api/v1/products/%1/image").arg(productId);
 //     QNetworkRequest request = createRequest(path);
-//     request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+//     request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
 //     // Create multipart request
 //     QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
@@ -566,7 +566,7 @@ QVariantMap ProductApi::productToVariantMap(const Product &product) const
 //         delete file;
 //         delete multiPart;
 //         qDebug()<<"===================================Failed to open image file";
-//         emit uploadImageError("Failed to open image file ");
+//         Q_EMIT uploadImageError("Failed to open image file ");
 //         setLoading(false);
 //         return QtFuture::makeReadyVoidFuture();
 //     }
@@ -587,13 +587,13 @@ QVariantMap ProductApi::productToVariantMap(const Product &product) const
 //         if (response.success) {
 //             const QJsonObject &productData = response.data->value("product").toObject();
 //             Product updatedProduct = productFromJson(productData);
-//             emit productUpdated(updatedProduct);
+//             Q_EMIT productUpdated(updatedProduct);
 //             qDebug()<<"===================================Works";
 
 //         } else {
 //             qDebug()<<"===================================Error";
 
-//             emit productError(response.error->message, response.error->status,
+//             Q_EMIT productError(response.error->message, response.error->status,
 //                               QJsonDocument(response.error->details).toJson());
 //         }
 //         setLoading(false);
@@ -609,18 +609,18 @@ QFuture<void> ProductApi::uploadProductImage(int productId, const QString &image
     QString localPath = QUrl(imagePath).toLocalFile();
     if (localPath.isEmpty()) {
         localPath = imagePath;
-        if (localPath.startsWith("file://")) {
+        if (localPath.startsWith(QStringLiteral("file://"))) {
             localPath = localPath.mid(7);
         }
     }
 
-    QString path = QString("/api/v1/products/%1/image").arg(productId);
+    QString path = QStringLiteral("/api/v1/products/%1/image").arg(productId);
     QNetworkRequest request = createRequest(path);
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     // Create multipart with explicit boundary
     QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
-    QString boundary = "boundary" + QUuid::createUuid().toString(QUuid::WithoutBraces);
+    QString boundary = QStringLiteral("boundary%1").arg(QUuid::createUuid().toString(QUuid::WithoutBraces));
     multiPart->setBoundary(boundary.toLatin1());
 
     // Add image file
@@ -628,7 +628,7 @@ QFuture<void> ProductApi::uploadProductImage(int productId, const QString &image
     if (!file->open(QIODevice::ReadOnly)) {
         delete file;
         delete multiPart;
-        emit uploadImageError("Failed to open image file");
+        Q_EMIT uploadImageError(QStringLiteral("Failed to open image file"));
         setLoading(false);
         return QtFuture::makeReadyVoidFuture();
     }
@@ -637,10 +637,10 @@ QFuture<void> ProductApi::uploadProductImage(int productId, const QString &image
 
     // Set headers
     imagePart.setHeader(QNetworkRequest::ContentTypeHeader,
-                        QVariant(localPath.endsWith(".png", Qt::CaseInsensitive) ? "image/png" : "image/jpeg"));
+                        QVariant(localPath.endsWith(QStringLiteral(".png"), Qt::CaseInsensitive) ? QStringLiteral("image/png") : QStringLiteral("image/jpeg")));
 
     imagePart.setHeader(QNetworkRequest::ContentDispositionHeader,
-                        QVariant(QString("form-data; name=\"image\"; filename=\"%1\"")
+                        QVariant(QStringLiteral("form-data; name=\"image\"; filename=\"%1\"")
                                  .arg(QFileInfo(localPath).fileName())));
 
     // Read file content
@@ -654,7 +654,7 @@ QFuture<void> ProductApi::uploadProductImage(int productId, const QString &image
 
     // Set the content type for the request
     request.setHeader(QNetworkRequest::ContentTypeHeader,
-                      QString("multipart/form-data; boundary=%1").arg(boundary));
+                      QStringLiteral("multipart/form-data; boundary=%1").arg(boundary));
 
     qDebug() << "Sending request:";
     qDebug() << "Boundary:" << boundary;
@@ -673,14 +673,14 @@ QFuture<void> ProductApi::uploadProductImage(int productId, const QString &image
         return reply;
     }).then([=](JsonResponse response) {
         if (response.success) {
-            const QJsonObject &productData = response.data->value("product").toObject();
+            const QJsonObject &productData = response.data->value("product"_L1).toObject();
             Product updatedProduct = productFromJson(productData);
-            emit productUpdated(updatedProduct);
+            Q_EMIT productUpdated(updatedProduct);
             qDebug() << "Image upload successful";
         } else {
             qDebug() << "Image upload failed";
             qDebug() << "Error details:" << response.error->details;
-            emit productError(response.error->message, response.error->status,
+            Q_EMIT productError(response.error->message, response.error->status,
                               QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -695,17 +695,17 @@ QFuture<void> ProductApi::removeProductImage(int productId)
 {
     setLoading(true);
 
-    QNetworkRequest request = createRequest(QString("/api/v1/products/%1/image").arg(productId));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/products/%1/image").arg(productId));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<std::monostate>([=]() {
         return m_netManager->deleteResource(request);
     }).then([=](VoidResponse response) {
         if (response.success) {
-            emit imageRemoved(productId);
+            Q_EMIT imageRemoved(productId);
         } else {
-            emit productError(response.error->message, response.error->status,
+            Q_EMIT productError(response.error->message, response.error->status,
                               QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);

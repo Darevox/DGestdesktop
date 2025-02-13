@@ -42,14 +42,14 @@ struct Invoice {
 
     // Helper methods for UI compatibility
     QString getPaymentStatus() const {
-        if (status == "paid") return "paid";
-        double paidAmount = meta_data.value("paid_amount", 0.0).toDouble();
-        if (paidAmount > 0) return "partial";
-        return "unpaid";
+        if (status == QStringLiteral("paid")) return QStringLiteral("paid");
+        double paidAmount = meta_data.value(QStringLiteral("paid_amount"), 0.0).toDouble();
+        if (paidAmount > 0) return QStringLiteral("partial");
+        return QStringLiteral("unpaid");
     }
 
     double getPaidAmount() const {
-        return meta_data.value("paid_amount", 0.0).toDouble();
+        return meta_data.value(QStringLiteral("paid_amount"), 0.0).toDouble();
     }
 
     double getRemainingAmount() const {
@@ -61,15 +61,15 @@ struct Invoice {
     }
 
     QVariantMap getClient() const {
-        return meta_data.value("client", QVariantMap()).toMap();
+        return meta_data.value(QStringLiteral("client"), QVariantMap()).toMap();
     }
 
     int getClientId() const {
-        return meta_data.value("client_id", 0).toInt();
+        return meta_data.value(QStringLiteral("client_id"), 0).toInt();
     }
 
     QString getTermsConditions() const {
-        return meta_data.value("terms_conditions", QString()).toString();
+        return meta_data.value(QStringLiteral("terms_conditions"), QString()).toString();
     }
 };
 
@@ -98,8 +98,8 @@ public:
 
     // CRUD operations
     Q_INVOKABLE QFuture<void> getInvoices(const QString &search = QString(),
-                                          const QString &sortBy = "issue_date",
-                                          const QString &sortDirection = "desc",
+                                          const QString &sortBy = QStringLiteral("issue_date"),
+                                          const QString &sortDirection = QStringLiteral("desc"),
                                           int page = 1,
                                           const QString &status = QString(),
                                           const QString &paymentStatus = QString(),
@@ -118,7 +118,7 @@ public:
     Q_INVOKABLE QFuture<void> sendToClient(int id);
     Q_INVOKABLE QFuture<void> markAsSent(int id);
     Q_INVOKABLE QFuture<void> markAsPaid(int id);
-    Q_INVOKABLE QFuture<void> getSummary(const QString &period = "month");
+    Q_INVOKABLE QFuture<void> getSummary(const QString &period = QStringLiteral("month"));
 
     // Token management
     Q_INVOKABLE QString getToken() const;
@@ -126,7 +126,7 @@ public:
 
     bool isLoading() const { return m_isLoading; }
 
-signals:
+Q_SIGNALS:
     // Success signals
     void invoicesReceived(const PaginatedInvoices &invoices);
     void invoiceReceived(const QVariantMap &invoice);
@@ -141,17 +141,17 @@ signals:
     void summaryReceived(const QVariantMap &summary);
 
     // Error signals
-    void errorInvoicesReceived(const QString &message, ApiStatus status, const QString &details);
-    void errorInvoiceReceived(const QString &message, ApiStatus status, const QString &details);
-    void errorInvoiceCreated(const QString &message, ApiStatus status, const QString &details);
-    void errorInvoiceUpdated(const QString &message, ApiStatus status, const QString &details);
-    void errorInvoiceDeleted(const QString &message, ApiStatus status, const QString &details);
-    void errorPaymentAdded(const QString &message, ApiStatus status,const QString &details);
+    void errorInvoicesReceived(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorInvoiceReceived(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorInvoiceCreated(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorInvoiceUpdated(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorInvoiceDeleted(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorPaymentAdded(const QString &message, ApiStatus status,const QByteArray &details);
     void errorPdfGenerated(const QString &message, const QString &details);
-    void errorInvoiceSent(const QString &message, ApiStatus status, const QString &details);
-    void errorInvoiceMarkedAsSent(const QString &message, ApiStatus status, const QString &details);
-    void errorInvoiceMarkedAsPaid(const QString &message, ApiStatus status, const QString &details);
-    void errorSummaryReceived(const QString &message, ApiStatus status, const QString &details);
+    void errorInvoiceSent(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorInvoiceMarkedAsSent(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorInvoiceMarkedAsPaid(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorSummaryReceived(const QString &message, ApiStatus status, const QByteArray &details);
 
     void isLoadingChanged();
 
@@ -170,7 +170,7 @@ private:
     void setLoading(bool loading) {
         if (m_isLoading != loading) {
             m_isLoading = loading;
-            emit isLoadingChanged();
+            Q_EMIT isLoadingChanged();
         }
     }
 };

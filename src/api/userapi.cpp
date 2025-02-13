@@ -3,10 +3,11 @@
 #include <QJsonObject>
 
 namespace NetworkApi {
+using namespace Qt::StringLiterals;
 
 UserApi::UserApi(QNetworkAccessManager *netManager, QObject *parent)
     : AbstractApi(netManager, parent)
-    , m_settings("Dervox", "DGest")
+    ,m_settings(QStringLiteral("Dervox"), QStringLiteral("DGest"))
     , m_rememberMe(false)
 {
     m_token = m_settings.value("auth/token").toString();
@@ -14,12 +15,12 @@ UserApi::UserApi(QNetworkAccessManager *netManager, QObject *parent)
 }
 
 QFuture<void> UserApi::login(const QString &email, const QString &password, bool rememberMe) {
-    QNetworkRequest request = createRequest("/api/v1/login");
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    QNetworkRequest request = createRequest(QStringLiteral( "/api/v1/login"));
+    request.setHeader(QNetworkRequest::ContentTypeHeader,QStringLiteral( "application/json"));
 
     QJsonObject jsonData;
-    jsonData["email"] = email;
-    jsonData["password"] = password;
+    jsonData["email"_L1] = email;
+    jsonData["password"_L1] = password;
 
     auto future = makeRequest<QString>([=]() {
         return m_netManager->post(request, QJsonDocument(jsonData).toJson());
@@ -28,10 +29,10 @@ QFuture<void> UserApi::login(const QString &email, const QString &password, bool
             saveToken(response.data.value_or(QString()));
             saveRememberMe(rememberMe);
             getUserInfo();
-            emit loginSuccess(response.data.value());
+            Q_EMIT loginSuccess(response.data.value());
         } else {
             QString errorMessageDetails = getErrorMessages(response.error->details);
-            emit loginError(response.error->message, response.error->status,errorMessageDetails);
+            Q_EMIT loginError(response.error->message, response.error->status,errorMessageDetails);
         }
     });
 
@@ -43,22 +44,22 @@ QFuture<void> UserApi::login(const QString &email, const QString &password, bool
 
 QFuture<void> UserApi::registerUser(const QString &name, const QString &email,
                                     const QString &password, const QString &confirmPassword) {
-    QNetworkRequest request = createRequest("/api/v1/register");
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    QNetworkRequest request = createRequest(QStringLiteral( "/api/v1/register"));
+    request.setHeader(QNetworkRequest::ContentTypeHeader,QStringLiteral( "application/json"));
 
     QJsonObject jsonData;
-    jsonData["name"] = name;
-    jsonData["email"] = email;
-    jsonData["password"] = password;
-    jsonData["c_password"] = confirmPassword;
+    jsonData["name"_L1] = name;
+    jsonData["email"_L1] = email;
+    jsonData["password"_L1] = password;
+    jsonData["c_password"_L1] = confirmPassword;
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->post(request, QJsonDocument(jsonData).toJson());
     }).then([=](JsonResponse response) {
         if (response.success) {
-            emit registerSuccess();
+            Q_EMIT registerSuccess();
         } else {
-            emit registerError(response.error->message);
+            Q_EMIT registerError(response.error->message);
         }
     });
 
@@ -68,17 +69,17 @@ QFuture<void> UserApi::registerUser(const QString &name, const QString &email,
 }
 
 QFuture<void> UserApi::logout() {
-    QNetworkRequest request = createRequest("/api/v1/logout");
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral( "/api/v1/logout"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<std::monostate>([=]() {
         return m_netManager->get(request);
     }).then([=](VoidResponse response) {
         if (response.success) {
-            saveToken("");
-            emit logoutSuccess();
+            saveToken(QString{});
+            Q_EMIT logoutSuccess();
         } else {
-            emit logoutError(response.error->message);
+            Q_EMIT logoutError(response.error->message);
         }
     });
 
@@ -88,20 +89,20 @@ QFuture<void> UserApi::logout() {
 }
 
 QFuture<void> UserApi::getUserInfo() {
-    QNetworkRequest request = createRequest("/api/v1/user");
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral( "/api/v1/user"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->get(request);
     }).then([=](JsonResponse response) {
         if (response.success) {
             const QJsonObject &userData = *response.data; // Dereference the optional
-            m_user.name = userData["name"].toString(); // Save the user's name
-            m_user.email = userData["email"].toString(); // Save the user's email
-            m_user.team_id = userData["team_id"].toInt();
-            emit userInfoReceived(response.data.value());
+            m_user.name = userData["name"_L1].toString(); // Save the user's name
+            m_user.email = userData["email"_L1].toString(); // Save the user's email
+            m_user.team_id = userData["team_id"_L1].toInt();
+            Q_EMIT userInfoReceived(response.data.value());
         } else {
-            emit userInfoError(response.error->message,response.error->status);
+            Q_EMIT userInfoError(response.error->message,response.error->status);
         }
     });
 
@@ -130,7 +131,7 @@ void UserApi::saveToken(const QString &token) {
     } else {
         m_settings.remove("auth/token");
     }
-    emit loginStateChanged(!token.isEmpty());
+    Q_EMIT loginStateChanged(!token.isEmpty());
 }
 
 void UserApi::saveRememberMe(bool rememberMe) {

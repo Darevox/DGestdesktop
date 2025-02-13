@@ -29,7 +29,7 @@ public:
     Q_INVOKABLE QVariantList search(int page, const QString& text,
                                    Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
 
-signals:
+Q_SIGNALS:
     void pathChanged(const QString& newPath);
     void loadedChanged();
     void error(const QString& errorMessage);

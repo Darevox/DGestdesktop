@@ -856,8 +856,8 @@ Kirigami.Dialog {
         maxStockField.value = product.maxStockLevel || 0;
         reorderPointField.value = product.reorderPoint || 0;
         locationField.text = product.location || "";
-        productImageCard.imageUrl = product.image_path ? "https://dim.dervox.com" + product.image_path : "";
-        //productImageCard.imageUrl = product.image_path ? "http://localhost:8000" + product.image_path : "";
+        //productImageCard.imageUrl = product.image_path ? "https://dim.dervox.com" + product.image_path : "";
+        productImageCard.imageUrl = product.image_path ? "http://localhost:8000" + product.image_path : "";
         console.log("productImageCard.imageUrl : ",productImageCard.imageUrl)
         packagesModel.clear();
         if (product.packages) {

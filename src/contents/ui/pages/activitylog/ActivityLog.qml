@@ -61,7 +61,7 @@ Kirigami.Page {
         ColumnLayout {
             spacing: Kirigami.Units.largeSpacing
             Kirigami.Heading{
-                text:"Filtering"
+                text:i18n("Filtering")
 
             }
             FormCard.FormCard {
@@ -404,7 +404,7 @@ Kirigami.Page {
                         color: Kirigami.Theme.neutralTextColor
                         text: {
                             if(modelData == "CashSource")
-                            return "Cash Source"
+                            return i18n("Cash Source")
                             else
                             return modelData;
                         }

@@ -2,7 +2,7 @@
 #include "activitylogmodel.h"
 
 namespace NetworkApi {
-
+using namespace Qt::StringLiterals;
 ActivityLogModel::ActivityLogModel(QObject *parent)
     : QAbstractTableModel(parent)
     , m_api(nullptr)
@@ -10,8 +10,8 @@ ActivityLogModel::ActivityLogModel(QObject *parent)
     , m_totalItems(0)
     , m_currentPage(1)
     , m_totalPages(1)
-    , m_sortField("created_at")
-    , m_sortDirection("desc")
+    , m_sortField(QStringLiteral("created_at"))
+    , m_sortDirection(QStringLiteral("desc"))
 {
 }
 
@@ -128,7 +128,7 @@ void ActivityLogModel::loadPage(int page)
 {
     if (page != m_currentPage && page > 0 && page <= m_totalPages) {
         m_currentPage = page;
-        emit currentPageChanged();
+        Q_EMIT currentPageChanged();
         refresh();
     }
 }
@@ -161,7 +161,7 @@ void ActivityLogModel::setSortField(const QString &field)
 {
     if (m_sortField != field) {
         m_sortField = field;
-        emit sortFieldChanged();
+        Q_EMIT sortFieldChanged();
         refresh();
     }
 }
@@ -170,7 +170,7 @@ void ActivityLogModel::setSortDirection(const QString &direction)
 {
     if (m_sortDirection != direction) {
         m_sortDirection = direction;
-        emit sortDirectionChanged();
+        Q_EMIT sortDirectionChanged();
         refresh();
     }
 }
@@ -182,18 +182,18 @@ void ActivityLogModel::handleLogsReceived(const PaginatedLogs &logs)
     endResetModel();
 
     m_totalItems = logs.total;
-    emit totalItemsChanged();
+    Q_EMIT totalItemsChanged();
 
     m_currentPage = logs.currentPage;
-    emit currentPageChanged();
+    Q_EMIT currentPageChanged();
 
     m_totalPages = logs.lastPage;
-    emit totalPagesChanged();
+    Q_EMIT totalPagesChanged();
 
     setLoading(false);
     setErrorMessage(QString());
 
-    emit dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
+    Q_EMIT dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
 }
 
 void ActivityLogModel::handleLogError(const QString &message, ApiStatus status)
@@ -204,13 +204,13 @@ void ActivityLogModel::handleLogError(const QString &message, ApiStatus status)
 
 void ActivityLogModel::handleStatisticsReceived(const LogStatistics &statistics)
 {
-    emit statisticsReceived(statistics);
+    Q_EMIT statisticsReceived(statistics);
     setLoading(false);
 }
 
 void ActivityLogModel::handleFilterOptionsReceived(const QStringList &logTypes, const QStringList &modelTypes)
 {
-    emit filterOptionsReceived(logTypes, modelTypes);
+    Q_EMIT filterOptionsReceived(logTypes, modelTypes);
     setLoading(false);
 }
 
@@ -218,7 +218,7 @@ void ActivityLogModel::setLoading(bool loading)
 {
     if (m_loading != loading) {
         m_loading = loading;
-        emit loadingChanged();
+        Q_EMIT loadingChanged();
     }
 }
 
@@ -226,27 +226,27 @@ void ActivityLogModel::setErrorMessage(const QString &message)
 {
     if (m_errorMessage != message) {
         m_errorMessage = message;
-        emit errorMessageChanged();
+        Q_EMIT errorMessageChanged();
     }
 }
 
 QVariantMap ActivityLogModel::logToVariantMap(const ActivityLog &log) const
 {
     QVariantMap map;
-    map["id"] = log.id;
-    map["logType"] = log.logType;
-    map["modelType"] = log.modelType;
-    map["modelIdentifier"] = log.modelIdentifier;
-    map["userIdentifier"] = log.userIdentifier;
-    map["createdAt"] = log.createdAt;
-    map["details"] = log.details;
+    map["id"_L1] = log.id;
+    map["logType"_L1] = log.logType;
+    map["modelType"_L1] = log.modelType;
+    map["modelIdentifier"_L1] = log.modelIdentifier;
+    map["userIdentifier"_L1] = log.userIdentifier;
+    map["createdAt"_L1] = log.createdAt;
+    map["details"_L1] = log.details;
     return map;
 }
 void ActivityLogModel::setSearchQuery(const QString &query)
 {
     if (m_searchQuery != query) {
         m_searchQuery = query;
-        emit searchQueryChanged();
+        Q_EMIT searchQueryChanged();
         refresh(); // Refresh with new search query
     }
 }

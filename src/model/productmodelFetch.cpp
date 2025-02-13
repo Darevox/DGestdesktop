@@ -2,7 +2,7 @@
 #include <QDebug>
 
 namespace NetworkApi {
-
+using namespace Qt::StringLiterals;
 ProductModelFetch::ProductModelFetch(QObject *parent)
     : ProductModel(parent)
 {
@@ -55,9 +55,9 @@ void ProductModelFetch::handleProductsReceived(const PaginatedProducts& products
     m_currentPage = products.currentPage;
     m_totalPages = products.lastPage;
 
-    emit totalItemsChanged();
-    emit currentPageChanged();
-    emit totalPagesChanged();
+    Q_EMIT totalItemsChanged();
+    Q_EMIT currentPageChanged();
+    Q_EMIT totalPagesChanged();
 
     setLoading(false);
     setErrorMessage(QString());

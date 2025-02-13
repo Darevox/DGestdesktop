@@ -42,8 +42,8 @@ struct Sale {
     double discount_amount = 0.0;
     double payment_amount = 0.0;
 
-    QString payment_status = "unpaid";
-    QString status = "pending";
+    QString payment_status = QStringLiteral("unpaid");
+    QString status = QStringLiteral("pending");
     QDateTime sale_date;
     QDateTime due_date;
     QString notes;
@@ -78,8 +78,8 @@ public:
 
     // CRUD operations
     Q_INVOKABLE QFuture<void> getSales(const QString &search = QString(),
-                                       const QString &sortBy = "sale_date",
-                                       const QString &sortDirection = "desc",
+                                       const QString &sortBy = QStringLiteral("sale_date"),
+                                       const QString &sortDirection = QStringLiteral("desc"),
                                        int page = 1,
                                        const QString &status = QString(),
                                        const QString &paymentStatus = QString());
@@ -93,7 +93,7 @@ public:
     Q_INVOKABLE QFuture<void> addPayment(int id, const Payment &payment);
     Q_INVOKABLE QFuture<void> generateInvoice(int id);
     Q_INVOKABLE QFuture<QByteArray> generateReceipt(int id);
-    Q_INVOKABLE QFuture<void> getSummary(const QString &period = "month");
+    Q_INVOKABLE QFuture<void> getSummary(const QString &period = QStringLiteral("month"));
 
     // Token management
     Q_INVOKABLE QString getToken() const;
@@ -101,7 +101,7 @@ public:
 
     bool isLoading() const { return m_isLoading; }
 
-signals:
+Q_SIGNALS:
     // Success signals
     void salesReceived(const PaginatedSales &sales);
     void saleReceived(const QVariantMap &sale);
@@ -114,14 +114,14 @@ signals:
     void summaryReceived(const QVariantMap &summary);
 
     // Error signals
-    void errorSalesReceived(const QString &message, ApiStatus status, const QString &details);
-    void errorSaleReceived(const QString &message, ApiStatus status, const QString &details);
-    void errorSaleCreated(const QString &message, ApiStatus status, const QString &details);
-    void errorSaleUpdated(const QString &message, ApiStatus status, const QString &details);
-    void errorSaleDeleted(const QString &message, ApiStatus status, const QString &details);
-    void errorPaymentAdded(const QString &message, ApiStatus status, const QString &details);
-    void errorInvoiceGenerated(const QString &message, ApiStatus status, const QString &details);
-    void errorSummaryReceived(const QString &message, ApiStatus status, const QString &details);
+    void errorSalesReceived(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorSaleReceived(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorSaleCreated(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorSaleUpdated(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorSaleDeleted(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorPaymentAdded(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorInvoiceGenerated(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorSummaryReceived(const QString &message, ApiStatus status, const QByteArray &details);
 
     void isLoadingChanged();
 
@@ -145,7 +145,7 @@ private:
     void setLoading(bool loading) {
         if (m_isLoading != loading) {
             m_isLoading = loading;
-            emit isLoadingChanged();
+            Q_EMIT isLoadingChanged();
         }
     }
 };

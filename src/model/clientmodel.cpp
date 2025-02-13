@@ -3,7 +3,7 @@
 #include <QJsonDocument>
 
 namespace NetworkApi {
-
+using namespace Qt::StringLiterals;
 ClientModel::ClientModel(QObject *parent)
     : QAbstractTableModel(parent)
     , m_api(nullptr)
@@ -11,8 +11,8 @@ ClientModel::ClientModel(QObject *parent)
     , m_totalItems(0)
     , m_currentPage(1)
     , m_totalPages(1)
-    , m_sortField("name")
-    , m_sortDirection("asc")
+    , m_sortField(QStringLiteral("name"))
+    , m_sortDirection(QStringLiteral("asc"))
     , m_hasCheckedItems(false)
 {
 }
@@ -123,7 +123,7 @@ bool ClientModel::setData(const QModelIndex &index, const QVariant &value, int r
     if (role == CheckedRole) {
         if (index.isValid() && index.row() < m_clients.count()) {
             m_clients[index.row()].checked = value.toBool();
-            emit dataChanged(index, index, {role});
+            Q_EMIT dataChanged(index, index, {role});
             updateHasCheckedItems();
             return true;
         }
@@ -144,7 +144,7 @@ void ClientModel::loadPage(int page)
 {
     if (page != m_currentPage && page > 0 && page <= m_totalPages) {
         m_currentPage = page;
-        emit currentPageChanged();
+        Q_EMIT currentPageChanged();
         refresh();
     }
 }
@@ -192,7 +192,7 @@ void ClientModel::setChecked(int row, bool checked)
     if (row >= 0 && row < m_clients.count()) {
         m_clients[row].checked = checked;
         QModelIndex index = createIndex(row, 0);
-        emit dataChanged(index, index, {CheckedRole});
+        Q_EMIT dataChanged(index, index, {CheckedRole});
         updateHasCheckedItems();
     }
 }
@@ -214,7 +214,7 @@ void ClientModel::clearAllChecked()
         if (m_clients[i].checked) {
             m_clients[i].checked = false;
             QModelIndex index = createIndex(i, 0);
-            emit dataChanged(index, index, {CheckedRole});
+            Q_EMIT dataChanged(index, index, {CheckedRole});
         }
     }
     updateHasCheckedItems();
@@ -233,7 +233,7 @@ void ClientModel::toggleAllClientsChecked()
     for (int i = 0; i < m_clients.count(); ++i) {
         m_clients[i].checked = !allChecked;
         QModelIndex index = createIndex(i, 0);
-        emit dataChanged(index, index, {CheckedRole});
+        Q_EMIT dataChanged(index, index, {CheckedRole});
     }
     updateHasCheckedItems();
 }
@@ -243,7 +243,7 @@ void ClientModel::setSortField(const QString &field)
 {
     if (m_sortField != field) {
         m_sortField = field;
-        emit sortFieldChanged();
+        Q_EMIT sortFieldChanged();
         refresh();
     }
 }
@@ -252,7 +252,7 @@ void ClientModel::setSortDirection(const QString &direction)
 {
     if (m_sortDirection != direction) {
         m_sortDirection = direction;
-        emit sortDirectionChanged();
+        Q_EMIT sortDirectionChanged();
         refresh();
     }
 }
@@ -261,7 +261,7 @@ void ClientModel::setSearchQuery(const QString &query)
 {
     if (m_searchQuery != query) {
         m_searchQuery = query;
-        emit searchQueryChanged();
+        Q_EMIT searchQueryChanged();
         refresh();
     }
 }
@@ -282,19 +282,19 @@ void ClientModel::handleClientsReceived(const PaginatedClients &clients)
     endResetModel();
 
     m_totalItems = clients.total;
-    emit totalItemsChanged();
+    Q_EMIT totalItemsChanged();
 
     m_currentPage = clients.currentPage;
-    emit currentPageChanged();
+    Q_EMIT currentPageChanged();
 
     m_totalPages = clients.lastPage;
-    emit totalPagesChanged();
+    Q_EMIT totalPagesChanged();
 
     setLoading(false);
     setErrorMessage(QString());
 
     updateHasCheckedItems();
-    emit dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
+    Q_EMIT dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
 }
 
 void ClientModel::handleClientError(const QString &message, ApiStatus status)
@@ -311,7 +311,7 @@ void ClientModel::handleClientCreated(const Client &client)
 
     setLoading(false);
     setErrorMessage(QString());
-    emit clientCreated();
+    Q_EMIT clientCreated();
 }
 
 void ClientModel::handleClientUpdated(const Client &client)
@@ -320,14 +320,14 @@ void ClientModel::handleClientUpdated(const Client &client)
         if (m_clients[i].id == client.id) {
             m_clients[i] = client;
             QModelIndex index = createIndex(i, 0);
-            emit dataChanged(index, index);
+            Q_EMIT dataChanged(index, index);
             break;
         }
     }
 
     setLoading(false);
     setErrorMessage(QString());
-    emit clientUpdated();
+    Q_EMIT clientUpdated();
 }
 
 void ClientModel::handleClientDeleted(int id)
@@ -343,7 +343,7 @@ void ClientModel::handleClientDeleted(int id)
 
     setLoading(false);
     setErrorMessage(QString());
-    emit clientDeleted();
+    Q_EMIT clientDeleted();
 }
 
 
@@ -352,7 +352,7 @@ void ClientModel::setLoading(bool loading)
 {
     if (m_loading != loading) {
         m_loading = loading;
-        emit loadingChanged();
+        Q_EMIT loadingChanged();
     }
 }
 
@@ -360,39 +360,39 @@ void ClientModel::setErrorMessage(const QString &message)
 {
     if (m_errorMessage != message) {
         m_errorMessage = message;
-        emit errorMessageChanged();
+        Q_EMIT errorMessageChanged();
     }
 }
 
 Client ClientModel::clientFromVariantMap(const QVariantMap &map) const
 {
     Client client;
-    client.id = map["id"].toInt();
-    client.name = map["name"].toString();
-    client.email = map["email"].toString();
-    client.phone = map["phone"].toString();
-    client.address = map["address"].toString();
-    client.tax_number = map["taxNumber"].toString();
-    client.payment_terms = map["paymentTerms"].toString();
-    client.notes = map["notes"].toString();
-    client.status = map["status"].toString();
-    client.balance = map["balance"].toDouble();
+    client.id = map["id"_L1].toInt();
+    client.name = map["name"_L1].toString();
+    client.email = map["email"_L1].toString();
+    client.phone = map["phone"_L1].toString();
+    client.address = map["address"_L1].toString();
+    client.tax_number = map["taxNumber"_L1].toString();
+    client.payment_terms = map["paymentTerms"_L1].toString();
+    client.notes = map["notes"_L1].toString();
+    client.status = map["status"_L1].toString();
+    client.balance = map["balance"_L1].toDouble();
     return client;
 }
 
 QVariantMap ClientModel::clientToVariantMap(const Client &client) const
 {
     QVariantMap map;
-    map["id"] = client.id;
-    map["name"] = client.name;
-    map["email"] = client.email;
-    map["phone"] = client.phone;
-    map["address"] = client.address;
-    map["taxNumber"] = client.tax_number;
-    map["paymentTerms"] = client.payment_terms;
-    map["notes"] = client.notes;
-    map["status"] = client.status;
-    map["balance"] = client.balance;
+    map["id"_L1] = client.id;
+    map["name"_L1] = client.name;
+    map["email"_L1] = client.email;
+    map["phone"_L1] = client.phone;
+    map["address"_L1] = client.address;
+    map["taxNumber"_L1] = client.tax_number;
+    map["paymentTerms"_L1] = client.payment_terms;
+    map["notes"_L1] = client.notes;
+    map["status"_L1] = client.status;
+    map["balance"_L1] = client.balance;
     return map;
 }
 
@@ -408,7 +408,7 @@ void ClientModel::updateHasCheckedItems()
 
     if (hasChecked != m_hasCheckedItems) {
         m_hasCheckedItems = hasChecked;
-        emit hasCheckedItemsChanged();
+        Q_EMIT hasCheckedItemsChanged();
     }
 }
 

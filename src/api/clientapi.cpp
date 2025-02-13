@@ -5,10 +5,10 @@
 #include <QUrlQuery>
 
 namespace NetworkApi {
-
+using namespace Qt::StringLiterals;
 ClientApi::ClientApi(QNetworkAccessManager *netManager, QObject *parent)
     : AbstractApi(netManager, parent)
-    , m_settings("Dervox", "DGest")
+    ,  m_settings(QStringLiteral("Dervox"), QStringLiteral("DGest"))
 {
 }
 
@@ -16,43 +16,43 @@ ClientApi::ClientApi(QNetworkAccessManager *netManager, QObject *parent)
 Client ClientApi::clientFromJson(const QJsonObject &json) const
 {
     Client client;
-    client.id = json["id"].toInt();
-    client.name = json["name"].toString();
-    client.email = json["email"].toString();
-    client.phone = json["phone"].toString();
-    client.address = json["address"].toString();
-    client.tax_number = json["tax_number"].toString();
-    client.payment_terms = json["payment_terms"].toString();
-    client.notes = json["notes"].toString();
-    client.status = json["status"].toString();
-    client.balance = json["balance"].toDouble();
+    client.id = json["id"_L1].toInt();
+    client.name = json["name"_L1].toString();
+    client.email = json["email"_L1].toString();
+    client.phone = json["phone"_L1].toString();
+    client.address = json["address"_L1].toString();
+    client.tax_number = json["tax_number"_L1].toString();
+    client.payment_terms = json["payment_terms"_L1].toString();
+    client.notes = json["notes"_L1].toString();
+    client.status = json["status"_L1].toString();
+    client.balance = json["balance"_L1].toDouble();
     return client;
 }
 
 QJsonObject ClientApi::clientToJson(const Client &client) const
 {
     QJsonObject json;
-    json["name"] = client.name;
-    json["email"] = client.email;
-    json["phone"] = client.phone;
-    json["address"] = client.address;
-    json["tax_number"] = client.tax_number;
-    json["payment_terms"] = client.payment_terms;
-    json["notes"] = client.notes;
-    json["status"] = client.status;
+    json["name"_L1] = client.name;
+    json["email"_L1] = client.email;
+    json["phone"_L1] = client.phone;
+    json["address"_L1] = client.address;
+    json["tax_number"_L1] = client.tax_number;
+    json["payment_terms"_L1] = client.payment_terms;
+    json["notes"_L1] = client.notes;
+    json["status"_L1] = client.status;
     return json;
 }
 
 PaginatedClients ClientApi::paginatedClientsFromJson(const QJsonObject &json) const
 {
     PaginatedClients result;
-    const QJsonObject &meta = json["clients"].toObject();
-    result.currentPage = meta["current_page"].toInt();
-    result.lastPage = meta["last_page"].toInt();
-    result.perPage = meta["per_page"].toInt();
-    result.total = meta["total"].toInt();
+    const QJsonObject &meta = json["clients"_L1].toObject();
+    result.currentPage = meta["current_page"_L1].toInt();
+    result.lastPage = meta["last_page"_L1].toInt();
+    result.perPage = meta["per_page"_L1].toInt();
+    result.total = meta["total"_L1].toInt();
 
-    const QJsonArray &dataArray = meta["data"].toArray();
+    const QJsonArray &dataArray = meta["data"_L1].toArray();
     for (const QJsonValue &value : dataArray) {
         result.data.append(clientFromJson(value.toObject()));
     }
@@ -63,16 +63,16 @@ PaginatedClients ClientApi::paginatedClientsFromJson(const QJsonObject &json) co
 QVariantMap ClientApi::clientToVariantMap(const Client &client) const
 {
     QVariantMap map;
-    map["id"] = client.id;
-    map["name"] = client.name;
-    map["email"] = client.email;
-    map["phone"] = client.phone;
-    map["address"] = client.address;
-    map["tax_number"] = client.tax_number;
-    map["payment_terms"] = client.payment_terms;
-    map["notes"] = client.notes;
-    map["status"] = client.status;
-    map["balance"] = client.balance;
+    map["id"_L1] = client.id;
+    map["name"_L1] = client.name;
+    map["email"_L1] = client.email;
+    map["phone"_L1] = client.phone;
+    map["address"_L1] = client.address;
+    map["tax_number"_L1] = client.tax_number;
+    map["payment_terms"_L1] = client.payment_terms;
+    map["notes"_L1] = client.notes;
+    map["status"_L1] = client.status;
+    map["balance"_L1] = client.balance;
     return map;
 }
 
@@ -82,35 +82,35 @@ QFuture<void> ClientApi::getClients(const QString &search, const QString &sortBy
                                    const QString &status)
 {
     setLoading(true);
-    QString path = "/api/v1/clients";
+    QString path = QStringLiteral("/api/v1/clients");
 
     QStringList queryParts;
     if (!search.isEmpty())
-        queryParts << QString("search=%1").arg(search);
+        queryParts << QStringLiteral("search=%1").arg(search);
     if (!sortBy.isEmpty())
-        queryParts << QString("sort_by=%1").arg(sortBy);
+        queryParts << QStringLiteral("sort_by=%1").arg(sortBy);
     if (!sortDirection.isEmpty())
-        queryParts << QString("sort_direction=%1").arg(sortDirection);
+        queryParts << QStringLiteral("sort_direction=%1").arg(sortDirection);
     if (page > 0)
-        queryParts << QString("page=%1").arg(page);
+        queryParts << QStringLiteral("page=%1").arg(page);
     if (!status.isEmpty())
-        queryParts << QString("status=%1").arg(status);
+        queryParts << QStringLiteral("status=%1").arg(status);
 
     if (!queryParts.isEmpty()) {
-        path += "?" + queryParts.join("&");
+       path += QStringLiteral("?") + queryParts.join(QLatin1String("&"));
     }
 
     QNetworkRequest request = createRequest(path);
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->get(request);
     }).then([=](JsonResponse response) {
         if (response.success) {
             PaginatedClients paginatedClients = paginatedClientsFromJson(*response.data);
-            emit clientsReceived(paginatedClients);
+            Q_EMIT clientsReceived(paginatedClients);
         } else {
-            emit errorClientsReceived(response.error->message, response.error->status,
+            Q_EMIT errorClientsReceived(response.error->message, response.error->status,
                                     QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -122,17 +122,17 @@ QFuture<void> ClientApi::getClients(const QString &search, const QString &sortBy
 QFuture<void> ClientApi::getClient(int id)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QString("/api/v1/clients/%1").arg(id));
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/clients/%1").arg(id));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->get(request);
     }).then([=](JsonResponse response) {
         if (response.success) {
-            Client client = clientFromJson(response.data->value("client").toObject());
-            emit clientReceived(clientToVariantMap(client));
+            Client client = clientFromJson(response.data->value("client"_L1).toObject());
+            Q_EMIT clientReceived(clientToVariantMap(client));
         } else {
-            emit errorClientReceived(response.error->message, response.error->status,
+            Q_EMIT errorClientReceived(response.error->message, response.error->status,
                                    QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -144,9 +144,9 @@ QFuture<void> ClientApi::getClient(int id)
 QFuture<void> ClientApi::createClient(const Client &client)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest("/api/v1/clients");
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/clients"));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json"_L1);
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     QJsonObject jsonData = clientToJson(client);
 
@@ -154,10 +154,10 @@ QFuture<void> ClientApi::createClient(const Client &client)
         return m_netManager->post(request, QJsonDocument(jsonData).toJson());
     }).then([=](JsonResponse response) {
         if (response.success) {
-            Client createdClient = clientFromJson(response.data->value("client").toObject());
-            emit clientCreated(createdClient);
+            Client createdClient = clientFromJson(response.data->value("client"_L1).toObject());
+            Q_EMIT clientCreated(createdClient);
         } else {
-            emit errorClientCreated(response.error->message, response.error->status,
+            Q_EMIT errorClientCreated(response.error->message, response.error->status,
                                   QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -169,9 +169,9 @@ QFuture<void> ClientApi::createClient(const Client &client)
 QFuture<void> ClientApi::updateClient(int id, const Client &client)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QString("/api/v1/clients/%1").arg(id));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/clients/%1").arg(id));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     QJsonObject jsonData = clientToJson(client);
 
@@ -179,10 +179,10 @@ QFuture<void> ClientApi::updateClient(int id, const Client &client)
         return m_netManager->put(request, QJsonDocument(jsonData).toJson());
     }).then([=](JsonResponse response) {
         if (response.success) {
-            Client updatedClient = clientFromJson(response.data->value("client").toObject());
-            emit clientUpdated(updatedClient);
+            Client updatedClient = clientFromJson(response.data->value("client"_L1).toObject());
+            Q_EMIT clientUpdated(updatedClient);
         } else {
-            emit errorClientUpdated(response.error->message, response.error->status,
+            Q_EMIT errorClientUpdated(response.error->message, response.error->status,
                                   QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -194,16 +194,16 @@ QFuture<void> ClientApi::updateClient(int id, const Client &client)
 QFuture<void> ClientApi::deleteClient(int id)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QString("/api/v1/clients/%1").arg(id));
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/clients/%1").arg(id));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<std::monostate>([=]() {
         return m_netManager->deleteResource(request);
     }).then([=](VoidResponse response) {
         if (response.success) {
-            emit clientDeleted(id);
+            Q_EMIT clientDeleted(id);
         } else {
-            emit errorClientDeleted(response.error->message, response.error->status,
+            Q_EMIT errorClientDeleted(response.error->message, response.error->status,
                                   QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -215,21 +215,21 @@ QFuture<void> ClientApi::deleteClient(int id)
 QFuture<void> ClientApi::getSales(int id, int page)
 {
     setLoading(true);
-    QString path = QString("/api/v1/clients/%1/sales").arg(id);
+    QString path = QStringLiteral("/api/v1/clients/%1/sales").arg(id);
     if (page > 0) {
-        path += QString("?page=%1").arg(page);
+        path += QStringLiteral("?page=%1").arg(page);
     }
 
     QNetworkRequest request = createRequest(path);
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->get(request);
     }).then([=](JsonResponse response) {
         if (response.success) {
-            emit salesReceived(response.data->value("sales").toObject().toVariantMap());
+            Q_EMIT salesReceived(response.data->value("sales"_L1).toObject().toVariantMap());
         } else {
-            emit errorSalesReceived(response.error->message, response.error->status,
+            Q_EMIT errorSalesReceived(response.error->message, response.error->status,
                                   QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -241,21 +241,21 @@ QFuture<void> ClientApi::getSales(int id, int page)
 QFuture<void> ClientApi::getPayments(int id, int page)
 {
     setLoading(true);
-    QString path = QString("/api/v1/clients/%1/payments").arg(id);
+    QString path = QStringLiteral("/api/v1/clients/%1/payments").arg(id);
     if (page > 0) {
-        path += QString("?page=%1").arg(page);
+        path += QStringLiteral("?page=%1").arg(page);
     }
 
     QNetworkRequest request = createRequest(path);
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->get(request);
     }).then([=](JsonResponse response) {
         if (response.success) {
-            emit paymentsReceived(response.data->value("payments").toObject().toVariantMap());
+            Q_EMIT paymentsReceived(response.data->value("payments"_L1).toObject().toVariantMap());
         } else {
-            emit errorPaymentsReceived(response.error->message, response.error->status,
+            Q_EMIT errorPaymentsReceived(response.error->message, response.error->status,
                                      QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -267,16 +267,16 @@ QFuture<void> ClientApi::getPayments(int id, int page)
 QFuture<void> ClientApi::getStatistics(int id)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QString("/api/v1/clients/%1/statistics").arg(id));
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/clients/%1/statistics").arg(id));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->get(request);
     }).then([=](JsonResponse response) {
         if (response.success) {
-            emit statisticsReceived(response.data->value("statistics").toObject().toVariantMap());
+            Q_EMIT statisticsReceived(response.data->value("statistics"_L1).toObject().toVariantMap());
         } else {
-            emit errorStatisticsReceived(response.error->message, response.error->status,
+            Q_EMIT errorStatisticsReceived(response.error->message, response.error->status,
                                        QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);

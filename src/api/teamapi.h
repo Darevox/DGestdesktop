@@ -18,6 +18,7 @@ struct Team {
     QString phone;
     QString address;
     QString image_path;
+    QString locale; // Add this field
 };
 
 struct PaginatedTeams {
@@ -38,8 +39,8 @@ public:
 
     // CRUD operations
     Q_INVOKABLE QFuture<void> getTeams(const QString &search = QString(),
-                                       const QString &sortBy = "created_at",
-                                       const QString &sortDirection = "desc",
+                                       const QString &sortBy = QStringLiteral("created_at"),
+                                       const QString &sortDirection = QStringLiteral("desc"),
                                        int page = 1);
     Q_INVOKABLE QFuture<void> getTeam(int id);
     Q_INVOKABLE QFuture<void> createTeam(const Team &team);
@@ -55,8 +56,13 @@ public:
     bool isLoading() const { return m_isLoading; }
 
     static void setSharedNetworkManager(QNetworkAccessManager* manager);
+    Q_INVOKABLE QFuture<void> getTeamLocale(int teamId);
+    Q_INVOKABLE QFuture<void> updateTeamLocale(int teamId, const QString &locale);
 
-signals:
+    // Helper method to validate locale
+    static bool isValidLocale(const QString &locale);
+
+Q_SIGNALS:
     // Success signals
     void teamsReceived(const PaginatedTeams &teams);
     void teamReceived(const QVariantMap &team);
@@ -67,15 +73,18 @@ signals:
     void imageRemoved(int teamId);
 
     // Error signals
-    void teamError(const QString &message, ApiStatus status, const QString &details);
-    void errorTeamsReceived(const QString &message, ApiStatus status, const QString &details);
-    void errorTeamReceived(const QString &message, ApiStatus status, const QString &details);
-    void errorTeamCreated(const QString &message, ApiStatus status, const QString &details);
-    void errorTeamUpdated(const QString &message, ApiStatus status, const QString &details);
-    void errorTeamDeleted(const QString &message, ApiStatus status, const QString &details);
+    void teamError(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorTeamsReceived(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorTeamReceived(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorTeamCreated(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorTeamUpdated(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorTeamDeleted(const QString &message, ApiStatus status, const QByteArray &details);
     void uploadImageError(const QString &message);
 
     void isLoadingChanged();
+    void localeReceived(const QString &locale);
+    void localeUpdated(const QString &locale);
+    void localeError(const QString &message, ApiStatus status, const QByteArray &details);
 
 private:
     Team teamFromJson(const QJsonObject &json) const;
@@ -88,12 +97,13 @@ private:
     void setLoading(bool loading) {
         if (m_isLoading != loading) {
             m_isLoading = loading;
-            emit isLoadingChanged();
+            Q_EMIT isLoadingChanged();
         }
     }
 
     static QNetworkAccessManager* netManager;
     static void ensureSharedNetworkManager();
+     const QStringList m_supportedLocales{QStringLiteral("en"), QStringLiteral("fr")};
 };
 
 } // namespace NetworkApi

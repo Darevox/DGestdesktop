@@ -46,8 +46,8 @@ public:
 
     // CRUD operations
     Q_INVOKABLE QFuture<void> getCashSources(const QString &search = QString(),
-                                            const QString &sortBy = "created_at",
-                                            const QString &sortDirection = "desc",
+                                            const QString &sortBy = QStringLiteral("created_at"),
+                                            const QString &sortDirection = QStringLiteral("desc"),
                                             int page = 1);
     Q_INVOKABLE QFuture<void> getCashSource(int id);
     Q_INVOKABLE QFuture<void> createCashSource(const CashSource &cashSource);
@@ -65,7 +65,7 @@ public:
 
     bool isLoading() const { return m_isLoading; }
 
-signals:
+Q_SIGNALS:
     // Success signals
     void cashSourcesReceived(const PaginatedCashSources &cashSources);
     void cashSourceReceived(const QVariantMap &cashSource);
@@ -77,14 +77,14 @@ signals:
     void transferCompleted(const QVariantMap &transaction);
 
     // Error signals for each operation
-    void errorCashSourcesReceived(const QString &message, ApiStatus status, const QString &details);
-    void errorCashSourceReceived(const QString &message, ApiStatus status, const QString &details);
-    void errorCashSourceCreated(const QString &message, ApiStatus status, const QString &details);
-    void errorCashSourceUpdated(const QString &message, ApiStatus status, const QString &details);
-    void errorCashSourceDeleted(const QString &message, ApiStatus status, const QString &details);
-    void errorDeposit(const QString &message, ApiStatus status, const QString &details);
-    void errorWithdrawal(const QString &message, ApiStatus status, const QString &details);
-    void errorTransfer(const QString &message, ApiStatus status, const QString &details);
+    void errorCashSourcesReceived(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorCashSourceReceived(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorCashSourceCreated(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorCashSourceUpdated(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorCashSourceDeleted(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorDeposit(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorWithdrawal(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorTransfer(const QString &message, ApiStatus status, const QByteArray &details);
     void cashSourceNotFound();
 
     void isLoadingChanged();
@@ -101,7 +101,7 @@ private:
     void setLoading(bool loading) {
         if (m_isLoading != loading) {
             m_isLoading = loading;
-            emit isLoadingChanged();
+            Q_EMIT isLoadingChanged();
         }
     }
 };

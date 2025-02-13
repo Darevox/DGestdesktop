@@ -7,10 +7,12 @@ import org.kde.kirigamiaddons.formcard as FormCard
 import "../../components"
 import "."
 
-Kirigami.PromptDialog {
+Kirigami.Dialog{
     id: purchaseDialog
     title: dialogPurchaseId > 0 ? i18n("Edit Purchase") : i18n("New Purchase")
-    preferredWidth: Kirigami.Units.gridUnit * 60
+    padding: Kirigami.Units.largeSpacing
+    width: Kirigami.Units.gridUnit * 50
+    height : Kirigami.Units.gridUnit * 30
 
     property int dialogPurchaseId: 0
     property bool isCreateAnother: false
@@ -33,338 +35,405 @@ Kirigami.PromptDialog {
         showCloseButton: true
         visible: false
     }
-
-    ColumnLayout {
+    contentItem:   ColumnLayout {
         spacing: Kirigami.Units.largeSpacing
 
-        // Purchase Details Section
-        FormCard.FormCard {
+        QQC2.TabBar {
+            id: tabBar
             Layout.fillWidth: true
 
-            FormCard.FormComboBoxDelegate {
-                id: supplierField
-                text: i18n("Supplier")
-                model: supplierModel
-                textRole: "name"
-                valueRole: "id"
-                enabled: !isEditing
+            QQC2.TabButton {
+                text: i18n("Purchase Details")
             }
-
-            FormCard.FormComboBoxDelegate {
-                id: cashSourceField
-                text: i18n("Cash Source")
-                model: cashSourceModel
-                textRole: "name"
-                valueRole: "id"
-                enabled: !isEditing
-            }
-
-            FormCard.FormDateTimeDelegate {
-                id: purchaseDateField
-                text: i18n("Purchase Date")
-                value: new Date()
-            }
-
-            FormCard.FormDateTimeDelegate {
-                id: dueDateField
-                text: i18n("Due Date")
-                value: new Date()
+            QQC2.TabButton {
+                text: i18n("Products")
             }
         }
-
-        // Items Section
-        FormCard.FormCard {
+        StackLayout {
             Layout.fillWidth: true
+            Layout.fillHeight: true
+            currentIndex: tabBar.currentIndex
 
-            Kirigami.Heading {
-                text: i18n("Purchase Items")
+            ColumnLayout {
+                spacing: Kirigami.Units.largeSpacing
+
+                RowLayout{
+                    Layout.fillWidth: true
+                    FormCard.FormCard {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+
+                        FormCard.FormComboBoxDelegate {
+                            id: supplierField
+                            text: i18n("Supplier")
+                            model: supplierModel
+                            textRole: "name"
+                            valueRole: "id"
+                            enabled: !isEditing
+                        }
+
+                        DSearchableComboBoxCashSource {
+                             id: cashSourceField
+                             model: cashSourceModel
+                             textRole: "name"
+                             valueRole: "id"
+                             enabled: !isEditing
+                         }
+                        FormCard.FormDateTimeDelegate {
+                            id: purchaseDateField
+                            text: i18n("Purchase Date")
+                            value: new Date()
+                            dateTimeDisplay:FormCard.FormDateTimeDelegate.DateTimeDisplay.Date
+                        }
+
+                        FormCard.FormDateTimeDelegate {
+                            id: dueDateField
+                            dateTimeDisplay:FormCard.FormDateTimeDelegate.DateTimeDisplay.Date
+                            text: i18n("Due Date")
+                            value: new Date()
+                        }
+
+                    }
+
+                    // Totals Section
+                    FormCard.FormCard {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Kirigami.Heading {
+                            text: i18n("Totals")
+                        }
+
+                        FormCard.FormTextDelegate {
+                            text: i18n("Subtotal")
+                            description: calculateSubtotal().toLocaleString(Qt.locale(), 'f', 2)
+                        }
+
+                        FormCard.FormTextDelegate {
+                            text: i18n("Tax")
+                            description: calculateTotalTax().toLocaleString(Qt.locale(), 'f', 2)
+                        }
+
+                        FormCard.FormSpinBoxDelegate {
+                            id: discountField
+                            label:  "Discount"
+                            from: 0
+                            to: calculateSubtotal()
+                            onValueChanged: calculateTotal()
+                        }
+
+                        FormCard.FormTextDelegate {
+                            text: i18n("Total")
+                            description: calculateTotal().toLocaleString(Qt.locale(), 'f', 2)
+                        }
+                        // Notes Section
+                        FormCard.FormCard {
+                            Layout.fillWidth: true
+
+                            FormCard.FormTextAreaDelegate {
+                                id: notesField
+                                label: i18n("Notes")
+                                text: ""
+                            }
+                        }
+                    }
+
+
+                }
             }
 
-            // Add Product Button
+
+            // Items Section
             ColumnLayout {
+                spacing: Kirigami.Units.largeSpacing
                 Layout.fillWidth: true
-                spacing: Kirigami.Units.smallSpacing
+                Layout.fillHeight: true
 
-                QQC2.Button {
-                    text: i18n("Add Products")
-                    icon.name: "list-add"
-                    onClicked: productSelectorDialog.open()
-                }
-
-                // Selected products list
-                ListView {
-                    id: selectedProductsList
+                Kirigami.Card {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: Math.min(contentHeight + 60, 300)
-                    model: ListModel {
-                        id: selectedProductsModel
-                        dynamicRoles: true
-                        onCountChanged: {
-                            console.log("selectedProductsModel count changed to:", count)
-                            if (count > 0) {
-                                console.log("Last item added:", get(count - 1))
-                            }
+                    Layout.fillHeight: true
+                    //  width: parent.width
+                    // Layout.preferredWidth : parent.width
+                    ColumnLayout {
+                        anchors.fill: parent
+                        spacing: Kirigami.Units.largeSpacing
+                        anchors.margins : Kirigami.Units.smallSpacing
+                        Kirigami.Heading {
+                            text: i18n("Sale Items")
+                            Layout.fillWidth: true
                         }
-                    }
-                    clip: true
-                    Component.onCompleted: {
-                        console.log("ListView created with model count:", selectedProductsModel.count)
-                    }
-                    // Header
-                    header: Rectangle {
-                        width: parent.width
-                        height: 40
-                        color: Kirigami.Theme.alternateBackgroundColor
-
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.margins: Kirigami.Units.smallSpacing
-                            spacing: Kirigami.Units.largeSpacing
-
-                            QQC2.Label {
-                                text: i18n("Product")
+                        RowLayout{
+                            QQC2.Button {
+                                text: i18n("Add Products")
+                                icon.name: "list-add"
+                                onClicked: productSelectorDialog.open()
+                            }
+                            DSearchableComboBox {
+                                id: productComboBox
                                 Layout.fillWidth: true
-                                font.bold: true
-                            }
-                            QQC2.Label {
-                                text: i18n("Quantity")
-                                font.bold: true
-                            }
-                            QQC2.Label {
-                                text: i18n("Unit Price")
-                                font.bold: true
-                            }
-                            QQC2.Label {
-                                text: i18n("Tax Rate")
-                                font.bold: true
-                            }
-                            QQC2.Label {
-                                text: i18n("Total")
-                                font.bold: true
-                            }
-                            // Spacer for remove button
-                            Item {
-                                Layout.preferredWidth: 40
-                            }
-                        }
-                    }
 
-                    delegate: Rectangle {
-                        width: parent.width
-                        height: 50
-                        color: index % 2 === 0 ? Kirigami.Theme.backgroundColor : Kirigami.Theme.alternateBackgroundColor
-                        required property var model
-                              required property int index
-
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.margins: Kirigami.Units.smallSpacing
-                            spacing: Kirigami.Units.largeSpacing
-
-                            // Product name
-                            QQC2.Label {
-                                text: model.name
-                                Layout.fillWidth: true
-                                elide: Text.ElideRight
-                            }
-
-                            // Package type selection
-                            // In PurchaseDetails.qml, update the ComboBox:
-
-
-                            QQC2.ComboBox {
-                                id: packageTypeCombo
-                                Layout.preferredWidth: 150
-
-                                property var options: {
-                                    let opts = [i18n("Piece")]
-                                    let packages = JSON.parse(selectedProductsModel.get(index).packagesJson || '[]')
-                                    packages.forEach(pkg => {
-                                        if (pkg && pkg.name) {
-                                            opts.push(pkg.name)
-                                        }
-                                    })
-                                    return opts
+                                onItemSelected: function(item) {
+                                    console.log("Selected product:", JSON.stringify(item))
+                                    addOrUpdateProduct(item)
+                                    // Handle selection with full product data
                                 }
 
-                                model: options
+                                onEnterPressed: function(text) {
+                                    productModelFetch.setSortField("barcode")
+                                    productModelFetch.setSearchQuery(text)
 
-                                onCurrentIndexChanged: {
-                                    if (currentIndex >= 0) {
-                                        let item = selectedProductsModel.get(index)
-                                        let packages = JSON.parse(item.packagesJson || '[]')
-
-                                        console.log("Available packages:", JSON.stringify(packages));
-
-                                        if (currentIndex === 0) {
-                                            console.log("Selected piece mode")
-                                            selectedProductsModel.setProperty(index, "packageId", null)
-                                            selectedProductsModel.setProperty(index, "isPackage", false)
-                                            selectedProductsModel.setProperty(index, "piecesPerUnit", 1)
-                                            selectedProductsModel.setProperty(index, "unitPrice", item.originalUnitPrice || item.unitPrice)
-                                            selectedProductsModel.setProperty(index, "sellingPrice", item.originalSellingPrice || item.sellingPrice)
-                                        } else {
-                                            let pkg = packages[currentIndex - 1]
-                                            if (pkg) {
-                                                console.log("Selected package:", JSON.stringify(pkg))
-
-                                                // Create package ID if not exists
-                                                if (!pkg.id) {
-                                                    console.log("Creating package ID for:", pkg.name);
-                                                    pkg.id = Date.now(); // Temporary ID for new package
-                                                    packages[currentIndex - 1] = pkg;
-                                                    selectedProductsModel.setProperty(index, "packagesJson", JSON.stringify(packages));
-                                                }
-
-                                                // Store original piece prices if not stored yet
-                                                if (!item.originalUnitPrice) {
-                                                    selectedProductsModel.setProperty(index, "originalUnitPrice", item.unitPrice)
-                                                    selectedProductsModel.setProperty(index, "originalSellingPrice", item.sellingPrice)
-                                                }
-
-                                                selectedProductsModel.setProperty(index, "packageId", pkg.id)
-                                                selectedProductsModel.setProperty(index, "isPackage", true)
-                                                selectedProductsModel.setProperty(index, "piecesPerUnit", pkg.pieces_per_package || 1)
-                                                selectedProductsModel.setProperty(index, "unitPrice", pkg.purchase_price || 0)
-                                                selectedProductsModel.setProperty(index, "sellingPrice", pkg.selling_price || 0)
-
-                                                console.log("Updated model item:", JSON.stringify({
-                                                    packageId: selectedProductsModel.get(index).packageId,
-                                                    isPackage: selectedProductsModel.get(index).isPackage,
-                                                    piecesPerUnit: selectedProductsModel.get(index).piecesPerUnit,
-                                                    unitPrice: selectedProductsModel.get(index).unitPrice,
-                                                    sellingPrice: selectedProductsModel.get(index).sellingPrice
-                                                }))
+                                    // Wait for the search to complete and select the item if found
+                                    const searchTimer = Qt.createQmlObject('import QtQuick; Timer {interval: 300; repeat: false;}', productComboBox);
+                                    searchTimer.triggered.connect(function() {
+                                        if (productModelFetch.rowCount > 0) {
+                                            // Get the first item's ID (assuming barcode is unique)
+                                            const product = productModelFetch.getProduct(0)  // Get first item                                            console.log("productId : ",productId)
+                                            // Call API to get full product details
+                                            if (product && product.id) {
+                                                productApiFetch.getProduct(product.id)
                                             }
                                         }
+                                    });
+                                    searchTimer.start()
 
-                                        let totalPieces = item.quantity * item.piecesPerUnit
-                                        selectedProductsModel.setProperty(index, "totalPieces", totalPieces)
-                                        calculateItemTotal(index)
+                                    productModelFetch.setSortField("name") // Reset sort field after search
+                                }
+                            }
+
+
+
+                        }
+                        // Selected products list
+                        ListView {
+                            id: selectedProductsList
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            model: ListModel { id: selectedProductsModel }
+                            clip: true
+
+                            // Header
+                            header: Rectangle {
+                                width: parent.width
+                                height: 40
+                                color: Kirigami.Theme.alternateBackgroundColor
+
+                                RowLayout {
+                                    anchors.fill: parent
+                                    anchors.margins: Kirigami.Units.smallSpacing
+                                    spacing: Kirigami.Units.largeSpacing * 2
+
+                                    QQC2.Label {
+                                        text: i18n("Product")
+                                        // Layout.fillWidth: true
+                                        Layout.preferredWidth: parent.width * 0.15
+                                        font.bold: true
+                                    }
+
+                                    QQC2.Label {
+                                        text: i18n("Package")
+                                        Layout.preferredWidth: parent.width * 0.13
+                                        font.bold: true
+                                    }
+                                    QQC2.Label {
+                                        text: i18n("Quantity")
+                                        Layout.preferredWidth: parent.width * 0.13
+                                        font.bold: true
+                                    }
+                                    QQC2.Label {
+                                        id : headerPrice
+                                        text: i18n("Price")
+                                        Layout.preferredWidth: parent.width * 0.13
+                                        font.bold: true
+                                    }
+                                    QQC2.Label {
+                                        text: i18n("Tax Rate")
+                                        Layout.preferredWidth: parent.width * 0.15
+                                        font.bold: true
+                                    }
+                                    QQC2.Label {
+                                        text: i18n("Total")
+                                        Layout.preferredWidth: parent.width * 0.10
+                                        font.bold: true
+                                    }
+                                    Item {
+                                        Layout.preferredWidth: parent.width * 0.01
                                     }
                                 }
-
                             }
 
+                            // Delegate
+                            delegate: Rectangle {
+                                width: selectedProductsList.width
+                                height: 50
+                                color: index % 2 === 0 ? Kirigami.Theme.backgroundColor : Kirigami.Theme.alternateBackgroundColor
+
+                                RowLayout {
+                                    anchors.fill: parent
+                                    anchors.margins: Kirigami.Units.smallSpacing
+                                    spacing: Kirigami.Units.largeSpacing
+
+                                    QQC2.Label {
+                                        text: model.name
+                                        Layout.preferredWidth:  Kirigami.Units.gridUnit  * 6
+                                        elide: Text.ElideRight
+                                    }
+
+                                    QQC2.ComboBox {
+                                        id: packageTypeCombo
+                                        Layout.preferredWidth:  Kirigami.Units.gridUnit  * 6
+
+                                        property var options: {
+                                            let opts = [i18n("Piece (1)")]
+                                            let packages = JSON.parse(selectedProductsModel.get(index).packagesJson || '[]')
+                                            packages.forEach(pkg => {
+                                                                 if (pkg && pkg.name) {
+                                                                     opts.push(pkg.name+" ("+pkg.pieces_per_package+")")
+                                                                 }
+                                                             })
+                                            return opts
+                                        }
+
+                                        model: options
+
+                                        onCurrentIndexChanged: {
+                                            if (currentIndex >= 0) {
+                                                let item = selectedProductsModel.get(index)
+                                                let packages = JSON.parse(item.packagesJson || '[]')
+
+                                                if (currentIndex === 0) {
+                                                    console.log("Selected piece mode")
+                                                    selectedProductsModel.setProperty(index, "packageId", null)
+                                                    selectedProductsModel.setProperty(index, "isPackage", false)
+                                                    selectedProductsModel.setProperty(index, "piecesPerUnit", 1)
+                                                    selectedProductsModel.setProperty(index, "unitPrice", item.originalUnitPrice)
+                                                    selectedProductsModel.setProperty(index, "maxQuantity", item.product.quantity)
+                                                    selectedProductsModel.setProperty(index, "purchase_price", item.product.purchase_price)
+
+                                                } else {
+                                                    let pkg = packages[currentIndex - 1]
+                                                    if (pkg) {
+                                                        console.log("Selected package:", JSON.stringify(pkg))
+
+                                                        selectedProductsModel.setProperty(index, "packageId", pkg.id)
+                                                        selectedProductsModel.setProperty(index, "isPackage", true)
+                                                        selectedProductsModel.setProperty(index, "piecesPerUnit", pkg.pieces_per_package || 1)
+                                                        selectedProductsModel.setProperty(index, "unitPrice", pkg.selling_price || 0)
+                                                        selectedProductsModel.setProperty(index, "purchase_price",  pkg.purchase_price ||0 )
+
+                                                        // Calculate max quantity based on available pieces
+                                                        let maxPackages = Math.floor(item.product.quantity / pkg.pieces_per_package)
+                                                        selectedProductsModel.setProperty(index, "maxQuantity", maxPackages)
+                                                    }
+                                                }
+
+                                                // Update totals
+                                                let totalPieces = item.quantity * item.piecesPerUnit
+                                                selectedProductsModel.setProperty(index, "totalPieces", totalPieces)
+                                                calculateItemTotal(index)
+                                            }
+                                        }
+                                    }
+
+                                    // Update the quantity SpinBox
+                                    QQC2.SpinBox {
+                                        id: quantitySpinBox
+                                        Layout.preferredWidth:  Kirigami.Units.gridUnit  * 5
+                                        value: model.quantity
+                                        from: 1
+                                        to: model.maxQuantity
+                                        editable: true
+
+                                        onValueChanged: {
+                                            if (value !== model.quantity) {
+                                                selectedProductsModel.setProperty(index, "quantity", value);
+                                                let item = selectedProductsModel.get(index);
+                                                let totalPieces = value * item.piecesPerUnit;
+                                                selectedProductsModel.setProperty(index, "totalPieces", totalPieces);
+                                                calculateItemTotal(index);
+                                            }
+                                        }
+                                    }
 
 
-                            QQC2.SpinBox {
-                                  id: purchasePriceSpinBox
-                                  value: model.unitPrice || 0
-                                  from: 0
-                                  to: 999999
-                                  onValueModified: {
-                                      selectedProductsModel.setProperty(index, "unitPrice", value);
-                                      calculateItemTotal(index);
-                                  }
-                              }
 
-                              // Selling Price (what you'll sell for)
-                              QQC2.SpinBox {
-                                  id: sellingPriceSpinBox
-                                  value: model.sellingPrice || 0
-                                  from: 0
-                                  to: 999999
-                                  onValueModified: {
-                                      selectedProductsModel.setProperty(index, "sellingPrice", value);
-                                  }
-                              }
 
-                            // Quantity
-                            QQC2.SpinBox {
-                                id: quantitySpinBox
-                                value: model.quantity
-                                from: 1
-                                to: 9999
-                                onValueModified: {
-                                    selectedProductsModel.setProperty(index, "quantity", value);
-                                    calculateItemTotal(index);
+                                    QQC2.SpinBox {
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                                        value: model.unitPrice
+                                        from: 0
+                                        to: 999999
+
+                                        // Add warning color to the text when price is below purchase price
+                                        contentItem: TextInput {
+                                            text: parent.textFromValue(parent.value, parent.locale)
+                                            font: parent.font
+                                            color: {
+                                                if (model.isPackage) {
+                                                    let packagePurchasePrice = model.purchase_price // * model.piecesPerUnit
+                                                    return parent.value < packagePurchasePrice ?
+                                                                Kirigami.Theme.negativeTextColor :
+                                                                Kirigami.Theme.textColor
+                                                } else {
+                                                    return parent.value < model.purchase_price ?
+                                                                Kirigami.Theme.negativeTextColor :
+                                                                Kirigami.Theme.textColor
+                                                }
+                                            }
+                                            selectionColor: parent.palette.highlight
+                                            selectedTextColor: parent.palette.highlightedText
+                                            horizontalAlignment: Qt.AlignHCenter
+                                            verticalAlignment: Qt.AlignVCenter
+                                            readOnly: !parent.editable
+                                            validator: parent.validator
+                                            inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                        }
+
+                                        onValueModified: {
+                                            selectedProductsModel.setProperty(index, "unitPrice", value)
+                                            calculateItemTotal(index)
+                                        }
+                                    }
+
+
+                                    QQC2.SpinBox {
+                                        Layout.preferredWidth:  Kirigami.Units.gridUnit  * 5
+                                        value: model.taxRate
+                                        from: 0
+                                        to: 100
+                                        onValueModified: {
+                                            selectedProductsModel.setProperty(index, "taxRate", value)
+                                            calculateItemTotal(index)
+                                        }
+                                    }
+
+                                    QQC2.Label {
+                                        Layout.preferredWidth:  Kirigami.Units.gridUnit  * 4
+                                        text: model.totalPrice.toLocaleString(Qt.locale(), 'f', 2)
+                                        horizontalAlignment: Text.AlignRight
+                                    }
+
+                                    QQC2.ToolButton {
+                                        Layout.preferredWidth:  Kirigami.Units.gridUnit  * 2
+                                        icon.name: "list-remove"
+                                        onClicked: selectedProductsModel.remove(index)
+                                    }
                                 }
                             }
 
-                            // Unit Price (read-only, updated by package selection)
-                            QQC2.Label {
-                                text: model.unitPrice.toLocaleString(Qt.locale(), 'f', 2)
-                            }
-
-                            // Tax Rate
-                            QQC2.SpinBox {
-                                value: model.taxRate
-                                from: 0
-                                to: 100
-                                onValueModified: {
-                                    selectedProductsModel.setProperty(index, "taxRate", value);
-                                    calculateItemTotal(index);
-                                }
-                            }
-
-                            // Total
-                            QQC2.Label {
-                                text: model.totalPrice.toLocaleString(Qt.locale(), 'f', 2)
-                            }
-
-                            // Remove button
-                            QQC2.ToolButton {
-                                icon.name: "list-remove"
-                                onClicked: selectedProductsModel.remove(index)
+                            // Empty state message
+                            Kirigami.PlaceholderMessage {
+                                anchors.centerIn: parent
+                                width: parent.width - (Kirigami.Units.largeSpacing * 4)
+                                visible: selectedProductsModel.count === 0
+                                text: i18n("No products added")
+                                explanation: i18n("Click 'Add Products' to select products for this purchase")
+                                icon.name: "package"
                             }
                         }
                     }
-
-                    // Empty state message
-                    Kirigami.PlaceholderMessage {
-                        anchors.centerIn: parent
-                        width: parent.width - (Kirigami.Units.largeSpacing * 4)
-                        visible: selectedProductsModel.count === 0
-                        text: i18n("No products added")
-                        explanation: i18n("Click 'Add Products' to select products for this purchase")
-                        icon.name: "package"
-                    }
                 }
-            }
-        }
 
-        // Totals Section
-        FormCard.FormCard {
-            Layout.fillWidth: true
-
-            Kirigami.Heading {
-                text: i18n("Totals")
             }
 
-            FormCard.FormTextDelegate {
-                text: i18n("Subtotal")
-                description: calculateSubtotal().toLocaleString(Qt.locale(), 'f', 2)
-            }
-
-            FormCard.FormTextDelegate {
-                text: i18n("Tax")
-                description: calculateTotalTax().toLocaleString(Qt.locale(), 'f', 2)
-            }
-
-            FormCard.FormSpinBoxDelegate {
-                id: discountField
-                label:  "Discount"
-                from: 0
-                to: calculateSubtotal()
-                onValueChanged: calculateTotal()
-            }
-
-            FormCard.FormTextDelegate {
-                text: i18n("Total")
-                description: calculateTotal().toLocaleString(Qt.locale(), 'f', 2)
-            }
-        }
-
-        // Notes Section
-        FormCard.FormCard {
-            Layout.fillWidth: true
-
-            FormCard.FormTextAreaDelegate {
-                id: notesField
-                label: i18n("Notes")
-                text: ""
-            }
         }
     }
 

@@ -76,7 +76,7 @@ public:
     Q_INVOKABLE QVariantMap getSale(int row) const;
     Q_INVOKABLE void addPayment(int id, const QVariantMap &paymentData);
     Q_INVOKABLE void generateInvoice(int id);
-    Q_INVOKABLE void getSummary(const QString &period = "month");
+    Q_INVOKABLE void getSummary(const QString &period = QStringLiteral("month"));
 
     // Selection methods
     Q_INVOKABLE void setChecked(int row, bool checked);
@@ -84,14 +84,14 @@ public:
     Q_INVOKABLE void clearAllChecked();
     Q_INVOKABLE void toggleAllSalesChecked();
 
-public slots:
+public Q_SLOTS:
     void setSortField(const QString &field);
     void setSortDirection(const QString &direction);
     void setSearchQuery(const QString &query);
     void setStatus(const QString &status);
     void setPaymentStatus(const QString &paymentStatus);
 
-signals:
+Q_SIGNALS:
     void loadingChanged();
     void errorMessageChanged();
     void totalItemsChanged();
@@ -111,7 +111,7 @@ signals:
     void hasCheckedItemsChanged();
     void rowCountChanged();
 
-private slots:
+private Q_SLOTS:
     void handleSalesReceived(const PaginatedSales &sales);
     void handleSaleError(const QString &message, ApiStatus status);
     void handleSaleCreated(const Sale &sale);

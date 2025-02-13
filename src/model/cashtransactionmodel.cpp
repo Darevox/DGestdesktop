@@ -2,7 +2,7 @@
 #include "cashtransactionmodel.h"
 
 namespace NetworkApi {
-
+using namespace Qt::StringLiterals;
 CashTransactionModel::CashTransactionModel(QObject *parent)
     : QAbstractTableModel(parent)
     , m_api(nullptr)
@@ -10,8 +10,8 @@ CashTransactionModel::CashTransactionModel(QObject *parent)
     , m_totalItems(0)
     , m_currentPage(1)
     , m_totalPages(1)
-    , m_sortField("transaction_date")
-    , m_sortDirection("desc")
+    , m_sortField(QStringLiteral("transaction_date"))
+    , m_sortDirection(QStringLiteral("desc"))
     , m_cashSourceId(0)
     , m_hasCheckedItems(false)
     , m_minAmount(0)
@@ -144,7 +144,7 @@ void CashTransactionModel::loadPage(int page)
 {
     if (page != m_currentPage && page > 0 && page <= m_totalPages) {
         m_currentPage = page;
-        emit currentPageChanged();
+        Q_EMIT currentPageChanged();
         refresh();
     }
 }
@@ -165,17 +165,17 @@ QVariantMap CashTransactionModel::getTransaction(int row) const
 
     const CashTransaction &transaction = m_transactions.at(row);
     QVariantMap map;
-    map["id"] = transaction.id;
-    map["reference_number"] = transaction.reference_number;
-    map["transaction_date"] = transaction.transaction_date;
-    map["cash_source_id"] = transaction.cash_source_id;
-    map["type"] = transaction.type;
-    map["amount"] = transaction.amount;
-    map["category"] = transaction.category;
-    map["payment_method"] = transaction.payment_method;
-    map["description"] = transaction.description;
-    map["cash_source"] = transaction.cash_source;
-    map["transfer_destination"] = transaction.transfer_destination;
+    map["id"_L1] = transaction.id;
+    map["reference_number"_L1] = transaction.reference_number;
+    map["transaction_date"_L1] = transaction.transaction_date;
+    map["cash_source_id"_L1] = transaction.cash_source_id;
+    map["type"_L1] = transaction.type;
+    map["amount"_L1] = transaction.amount;
+    map["category"_L1] = transaction.category;
+    map["payment_method"_L1] = transaction.payment_method;
+    map["description"_L1] = transaction.description;
+    map["cash_source"_L1] = transaction.cash_source;
+    map["transfer_destination"_L1] = transaction.transfer_destination;
     return map;
 }
 
@@ -192,7 +192,7 @@ bool CashTransactionModel::setData(const QModelIndex &index, const QVariant &val
     if (role == CheckedRole) {
         if (index.isValid() && index.row() < m_transactions.count()) {
             m_transactions[index.row()].checked = value.toBool();
-            emit dataChanged(index, index, {role});
+            Q_EMIT dataChanged(index, index, {role});
             updateHasCheckedItems();
             return true;
         }
@@ -209,9 +209,9 @@ void CashTransactionModel::handleTransactionsReceived(const PaginatedCashTransac
     m_currentPage = transactions.currentPage;
     m_totalPages = transactions.lastPage;
 
-    emit totalItemsChanged();
-    emit currentPageChanged();
-    emit totalPagesChanged();
+    Q_EMIT totalItemsChanged();
+    Q_EMIT currentPageChanged();
+    Q_EMIT totalPagesChanged();
 
     setLoading(false);
     updateHasCheckedItems();
@@ -225,7 +225,7 @@ void CashTransactionModel::handleTransactionsBySourceReceived(const PaginatedCas
 void CashTransactionModel::handleSummaryReceived(const QVariantMap &summary)
 {
     m_summary = summary;
-    emit summaryChanged();
+    Q_EMIT summaryChanged();
     setLoading(false);
 }
 
@@ -239,7 +239,7 @@ void CashTransactionModel::setLoading(bool loading)
 {
     if (m_loading != loading) {
         m_loading = loading;
-        emit loadingChanged();
+        Q_EMIT loadingChanged();
     }
 }
 
@@ -247,7 +247,7 @@ void CashTransactionModel::setErrorMessage(const QString &message)
 {
     if (m_errorMessage != message) {
         m_errorMessage = message;
-        emit errorMessageChanged();
+        Q_EMIT errorMessageChanged();
     }
 }
 
@@ -256,7 +256,7 @@ void CashTransactionModel::setChecked(int row, bool checked)
     if (row >= 0 && row < m_transactions.count()) {
         m_transactions[row].checked = checked;
         QModelIndex index = createIndex(row, 0);
-        emit dataChanged(index, index, {CheckedRole});
+        Q_EMIT dataChanged(index, index, {CheckedRole});
         updateHasCheckedItems();
     }
 }
@@ -278,7 +278,7 @@ void CashTransactionModel::clearAllChecked()
         if (m_transactions[i].checked) {
             m_transactions[i].checked = false;
             QModelIndex index = createIndex(i, 0);
-            emit dataChanged(index, index, {CheckedRole});
+            Q_EMIT dataChanged(index, index, {CheckedRole});
         }
     }
     updateHasCheckedItems();
@@ -297,7 +297,7 @@ void CashTransactionModel::toggleAllTransactionsChecked()
     for (int i = 0; i < m_transactions.count(); ++i) {
         m_transactions[i].checked = !allChecked;
         QModelIndex index = createIndex(i, 0);
-        emit dataChanged(index, index, {CheckedRole});
+        Q_EMIT dataChanged(index, index, {CheckedRole});
     }
     updateHasCheckedItems();
 }
@@ -307,7 +307,7 @@ void CashTransactionModel::setSortField(const QString &field)
 {
     if (m_sortField != field) {
         m_sortField = field;
-        emit sortFieldChanged();
+        Q_EMIT sortFieldChanged();
         refresh();
     }
 }
@@ -316,7 +316,7 @@ void CashTransactionModel::setSortDirection(const QString &direction)
 {
     if (m_sortDirection != direction) {
         m_sortDirection = direction;
-        emit sortDirectionChanged();
+        Q_EMIT sortDirectionChanged();
         refresh();
     }
 }
@@ -325,9 +325,9 @@ void CashTransactionModel::setSearchQuery(const QString &query)
 {
     if (m_searchQuery != query) {
         m_searchQuery = query;
-        emit searchQueryChanged();
+        Q_EMIT searchQueryChanged();
         m_currentPage = 1; // Reset to first page when searching
-        emit currentPageChanged();
+        Q_EMIT currentPageChanged();
         refresh();
     }
 }
@@ -336,9 +336,9 @@ void CashTransactionModel::setTransactionType(const QString &type)
 {
     if (m_transactionType != type) {
         m_transactionType = type;
-        emit transactionTypeChanged();
+        Q_EMIT transactionTypeChanged();
         m_currentPage = 1; // Reset to first page when changing type
-        emit currentPageChanged();
+        Q_EMIT currentPageChanged();
         refresh();
     }
 }
@@ -347,9 +347,9 @@ void CashTransactionModel::setCashSourceId(int id)
 {
     if (m_cashSourceId != id) {
         m_cashSourceId = id;
-        emit cashSourceIdChanged();
+        Q_EMIT cashSourceIdChanged();
         m_currentPage = 1; // Reset to first page when changing source
-        emit currentPageChanged();
+        Q_EMIT currentPageChanged();
         refresh();
     }
 }
@@ -357,9 +357,9 @@ void CashTransactionModel::setMinAmount(double amount)
 {
     if (m_minAmount != amount) {
         m_minAmount = amount;
-        emit minAmountChanged();
+        Q_EMIT minAmountChanged();
         m_currentPage = 1; // Reset to first page when changing filter
-        emit currentPageChanged();
+        Q_EMIT currentPageChanged();
         refresh();
     }
 }
@@ -368,9 +368,9 @@ void CashTransactionModel::setMaxAmount(double amount)
 {
     if (m_maxAmount != amount) {
         m_maxAmount = amount;
-        emit maxAmountChanged();
+        Q_EMIT maxAmountChanged();
         m_currentPage = 1; // Reset to first page when changing filter
-        emit currentPageChanged();
+        Q_EMIT currentPageChanged();
         refresh();
     }
 }
@@ -379,9 +379,9 @@ void CashTransactionModel::setStartDate(const QDateTime &date)
 {
     if (m_startDate != date) {
         m_startDate = date;
-        emit startDateChanged();
+        Q_EMIT startDateChanged();
         m_currentPage = 1; // Reset to first page when changing filter
-        emit currentPageChanged();
+        Q_EMIT currentPageChanged();
         refresh();
     }
 }
@@ -390,9 +390,9 @@ void CashTransactionModel::setEndDate(const QDateTime &date)
 {
     if (m_endDate != date) {
         m_endDate = date;
-        emit endDateChanged();
+        Q_EMIT endDateChanged();
         m_currentPage = 1; // Reset to first page when changing filter
-        emit currentPageChanged();
+        Q_EMIT currentPageChanged();
         refresh();
     }
 }
@@ -408,7 +408,7 @@ void CashTransactionModel::updateHasCheckedItems()
 
     if (hasChecked != m_hasCheckedItems) {
         m_hasCheckedItems = hasChecked;
-        emit hasCheckedItemsChanged();
+        Q_EMIT hasCheckedItemsChanged();
     }
 }
 } // namespace NetworkApi

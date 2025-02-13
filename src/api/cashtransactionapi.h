@@ -41,8 +41,8 @@ public:
     // Match controller endpoints
     Q_INVOKABLE QFuture<void> getTransactions(
         const QString &search = QString(),
-        const QString &sortBy = "transaction_date",
-        const QString &sortDirection = "desc",
+        const QString &sortBy = QStringLiteral("transaction_date"),
+        const QString &sortDirection = QStringLiteral("desc"),
         int page = 1,
         const QString &type = QString(),
         int cashSourceId = 0,
@@ -65,7 +65,7 @@ public:
 
     bool isLoading() const { return m_isLoading; }
 
-signals:
+Q_SIGNALS:
     // Success signals
     void transactionsReceived(const PaginatedCashTransactions &transactions);
     void transactionReceived(const QVariantMap &transaction);
@@ -73,10 +73,10 @@ signals:
     void summaryReceived(const QVariantMap &summary);
 
     // Error signals
-    void errorTransactionsReceived(const QString &message, ApiStatus status, const QString &details);
-    void errorTransactionReceived(const QString &message, ApiStatus status, const QString &details);
-    void errorTransactionsBySourceReceived(const QString &message, ApiStatus status, const QString &details);
-    void errorSummaryReceived(const QString &message, ApiStatus status, const QString &details);
+    void errorTransactionsReceived(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorTransactionReceived(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorTransactionsBySourceReceived(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorSummaryReceived(const QString &message, ApiStatus status, const QByteArray &details);
 
     void isLoadingChanged();
 
@@ -90,7 +90,7 @@ private:
     void setLoading(bool loading) {
         if (m_isLoading != loading) {
             m_isLoading = loading;
-            emit isLoadingChanged();
+            Q_EMIT isLoadingChanged();
         }
     }
 };

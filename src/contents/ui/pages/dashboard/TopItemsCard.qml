@@ -7,7 +7,7 @@ Kirigami.AbstractCard {
     id: root
 
     Layout.fillWidth: true
-    Layout.preferredHeight: Kirigami.Units.gridUnit * 15
+    Layout.preferredHeight: Kirigami.Units.gridUnit * 18
 
     property string title: ""
     property var model: []
@@ -63,19 +63,23 @@ Kirigami.AbstractCard {
                             opacity: 0.7
                         }
                     }
+                    Item{
+                        Layout.fillWidth: true
 
+                    }
                     Label {
                         text: {
                             if (modelData.total_spent)
-                                return "€" + Number(modelData.total_spent).toFixed(2)
+                                return  Number(modelData.total_spent).toFixed(2) + " DH"
                             else if (modelData.total_revenue)
-                                return "€" + Number(modelData.total_revenue).toFixed(2)
+                                return  Number(modelData.total_revenue).toFixed(2)  + " DH"
                             else
                                 return modelData.value || ""
                         }
                         color: root.accentColor
                         font.bold: true
                     }
+
                 }
             }
         }

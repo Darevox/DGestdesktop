@@ -76,13 +76,13 @@ public:
     Q_INVOKABLE void clearAllChecked();
     Q_INVOKABLE void toggleAllClientsChecked();
 
-public slots:
+public Q_SLOTS:
     void setSortField(const QString &field);
     void setSortDirection(const QString &direction);
     void setSearchQuery(const QString &query);
     void filterByType(const QString &type);
 
-signals:
+Q_SIGNALS:
     void loadingChanged();
     void errorMessageChanged();
     void totalItemsChanged();
@@ -97,7 +97,7 @@ signals:
     void hasCheckedItemsChanged();
     void rowCountChanged();
 
-private slots:
+private Q_SLOTS:
     virtual void handleClientsReceived(const PaginatedClients &clients);
     void handleClientError(const QString &message, ApiStatus status);
     void handleClientCreated(const Client &client);

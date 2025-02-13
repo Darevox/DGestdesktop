@@ -5,6 +5,7 @@ import org.kde.kirigami as Kirigami
 import org.kde.kirigamiaddons.components as Kcomponents
 import com.dervox.ColorSchemeManager 1.0
 import com.dervox.ApiStatusHandler 1.0
+import com.dervox.dim
 
 import "components"
 import "pages"
@@ -12,7 +13,7 @@ import "pages/user"
 
 Kirigami.ApplicationWindow {
     id: rootWindow
-    title: "DGest"
+    title: "DIMS"
     //header: Kirigami.ApplicationHeaderStyle.None
     property alias gnotification: notification
     property alias  gaboutDialog: aboutDialog
@@ -132,7 +133,7 @@ Kirigami.ApplicationWindow {
         }
     }
     footer:  Kirigami.ApplicationHeaderStyle.None
-    pageStack.initialPage: Qt.resolvedUrl("qrc:/DGest/contents/ui/pages/user/Login.qml")
+    pageStack.initialPage:Qt.createComponent("com.dervox.dim", "Login") // Qt.resolvedUrl("qrc:/dim/contents/ui/pages/user/Login.qml")
 
     Kirigami.MenuDialog {
         id: menuDialog
@@ -195,7 +196,7 @@ Kirigami.ApplicationWindow {
             destroyHeader()
             destroyGlobalDrawer()
             applicationWindow().pageStack.pop()
-            applicationWindow().pageStack.push(Qt.resolvedUrl("qrc:/DGest/contents/ui/pages/user/Login.qml"))
+            applicationWindow().pageStack.push(Qt.createComponent("com.dervox.dim", "Login") )
         }
         function onLogoutError() {
             console.log("GetUserInfo  failed:", arguments[0]);

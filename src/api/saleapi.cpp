@@ -5,10 +5,11 @@
 #include <QUrlQuery>
 
 namespace NetworkApi {
+using namespace Qt::StringLiterals;
 
 SaleApi::SaleApi(QNetworkAccessManager *netManager, QObject *parent)
     : AbstractApi(netManager, parent)
-    , m_settings("Dervox", "DGest")
+    , m_settings(QStringLiteral("Dervox"), QStringLiteral("DGest"))
 {
 }
 
@@ -16,31 +17,31 @@ SaleApi::SaleApi(QNetworkAccessManager *netManager, QObject *parent)
 Sale SaleApi::saleFromJson(const QJsonObject &json) const
 {
     Sale sale;
-    sale.id = json["id"].toInt();
-    sale.team_id = json["team_id"].toInt();
-    sale.client_id = json["client_id"].toInt();
-    sale.cash_source_id = json["cash_source_id"].toInt();
-    sale.reference_number = json["reference_number"].toString();
-    sale.total_amount = json["total_amount"].toString().toDouble();
-    sale.paid_amount = json["paid_amount"].toString().toDouble();
-    sale.tax_amount = json["tax_amount"].toString().toDouble();
-    sale.discount_amount = json["discount_amount"].toString().toDouble();
-    sale.payment_status = json["payment_status"].toString();
-    sale.status = json["status"].toString();
-    sale.sale_date = QDateTime::fromString(json["sale_date"].toString(), Qt::ISODate);
+    sale.id = json["id"_L1].toInt();
+    sale.team_id = json["team_id"_L1].toInt();
+    sale.client_id = json["client_id"_L1].toInt();
+    sale.cash_source_id = json["cash_source_id"_L1].toInt();
+    sale.reference_number = json["reference_number"_L1].toString();
+    sale.total_amount = json["total_amount"_L1].toString().toDouble();
+    sale.paid_amount = json["paid_amount"_L1].toString().toDouble();
+    sale.tax_amount = json["tax_amount"_L1].toString().toDouble();
+    sale.discount_amount = json["discount_amount"_L1].toString().toDouble();
+    sale.payment_status = json["payment_status"_L1].toString();
+    sale.status = json["status"_L1].toString();
+    sale.sale_date = QDateTime::fromString(json["sale_date"_L1].toString(), Qt::ISODate);
 
-    if (json.contains("due_date") && !json["due_date"].isNull()) {
-        sale.due_date = QDateTime::fromString(json["due_date"].toString(), Qt::ISODate);
+    if (json.contains("due_date"_L1) && !json["due_date"_L1].isNull()) {
+        sale.due_date = QDateTime::fromString(json["due_date"_L1].toString(), Qt::ISODate);
     }
 
-    sale.notes = json["notes"].toString();
+    sale.notes = json["notes"_L1].toString();
 
-    if (json.contains("client") && !json["client"].isNull()) {
-        sale.client = json["client"].toObject().toVariantMap();
+    if (json.contains("client"_L1) && !json["client"_L1].isNull()) {
+        sale.client = json["client"_L1].toObject().toVariantMap();
     }
 
-    if (json.contains("items")) {
-        const QJsonArray itemsArray = json["items"].toArray();
+    if (json.contains("items"_L1)) {
+        const QJsonArray itemsArray = json["items"_L1].toArray();
         for (const QJsonValue &value : itemsArray) {
             sale.items.append(saleItemFromJson(value.toObject()));
         }
@@ -52,28 +53,28 @@ Sale SaleApi::saleFromJson(const QJsonObject &json) const
 SaleItem SaleApi::saleItemFromJson(const QJsonObject &json) const
 {
     SaleItem item;
-    item.id = json["id"].toInt();
-    item.product_id = json["product_id"].toInt();
-    item.product_name = json["product_name"].toString();
-    item.quantity = json["quantity"].toInt();
-    item.unit_price = json["unit_price"].toString().toDouble();
-    item.total_price = json["total_price"].toString().toDouble();
-    item.tax_rate = json["tax_rate"].toString().toDouble();
-    item.tax_amount = json["tax_amount"].toString().toDouble();
-    item.discount_amount = json["discount_amount"].toString().toDouble();
-    item.notes = json["notes"].toString();
+    item.id = json["id"_L1].toInt();
+    item.product_id = json["product_id"_L1].toInt();
+    item.product_name = json["product_name"_L1].toString();
+    item.quantity = json["quantity"_L1].toInt();
+    item.unit_price = json["unit_price"_L1].toString().toDouble();
+    item.total_price = json["total_price"_L1].toString().toDouble();
+    item.tax_rate = json["tax_rate"_L1].toString().toDouble();
+    item.tax_amount = json["tax_amount"_L1].toString().toDouble();
+    item.discount_amount = json["discount_amount"_L1].toString().toDouble();
+    item.notes = json["notes"_L1].toString();
 
     // Add package-related fields
-    item.is_package = json["is_package"].toBool();
-    item.package_id = json["package_id"].toInt();
-    item.total_pieces = json["total_pieces"].toInt();
+    item.is_package = json["is_package"_L1].toBool();
+    item.package_id = json["package_id"_L1].toInt();
+    item.total_pieces = json["total_pieces"_L1].toInt();
 
-    if (json.contains("product") && !json["product"].isNull()) {
-        item.product = json["product"].toObject().toVariantMap();
+    if (json.contains("product"_L1) && !json["product"_L1].isNull()) {
+        item.product = json["product"_L1].toObject().toVariantMap();
     }
 
-    if (json.contains("package") && !json["package"].isNull()) {
-        item.package = json["package"].toObject().toVariantMap();
+    if (json.contains("package"_L1) && !json["package"_L1].isNull()) {
+        item.package = json["package"_L1].toObject().toVariantMap();
     }
 
     return item;
@@ -83,30 +84,30 @@ QJsonObject SaleApi::saleToJson(const Sale &sale) const
     QJsonObject json;
 
     // Required fields
-    json["cash_source_id"] = sale.cash_source_id;
-    json["sale_date"] = sale.sale_date.toString("yyyy-MM-dd");
-    json["status"] = sale.status;
-    json["payment_status"] = sale.payment_status;
+    json["cash_source_id"_L1] = sale.cash_source_id;
+    json["sale_date"_L1] = sale.sale_date.toString(QStringLiteral("yyyy-MM-dd"));
+    json["status"_L1] = sale.status;
+    json["payment_status"_L1] = sale.payment_status;
 
     // Amounts
-    json["total_amount"] = sale.total_amount;
-    json["tax_amount"] = sale.tax_amount;
-    json["discount_amount"] = sale.discount_amount;
+    json["total_amount"_L1] = sale.total_amount;
+    json["tax_amount"_L1] = sale.tax_amount;
+    json["discount_amount"_L1] = sale.discount_amount;
     // Auto-payment flag and amount
     if (sale.auto_payment) {
-        json["auto_payment"] = true;
-        json["payment_amount"] = sale.payment_amount;
+        json["auto_payment"_L1] = true;
+        json["payment_amount"_L1] = sale.payment_amount;
     }
     // Optional fields
     if (sale.client_id > 0) {
-        json["client_id"] = sale.client_id;
+        json["client_id"_L1] = sale.client_id;
         if (sale.due_date.isValid()) {
-            json["due_date"] = sale.due_date.toString("yyyy-MM-dd");
+            json["due_date"_L1] = sale.due_date.toString(QStringLiteral("yyyy-MM-dd"));
         }
     }
 
     if (!sale.notes.isEmpty()) {
-        json["notes"] = sale.notes;
+        json["notes"_L1] = sale.notes;
     }
 
     // Items array using existing saleItemToJson method
@@ -114,7 +115,7 @@ QJsonObject SaleApi::saleToJson(const Sale &sale) const
     for (const SaleItem &item : sale.items) {
         itemsArray.append(saleItemToJson(item));
     }
-    json["items"] = itemsArray;
+    json["items"_L1] = itemsArray;
     return json;
 }
 
@@ -122,20 +123,20 @@ QJsonObject SaleApi::saleToJson(const Sale &sale) const
 QJsonObject SaleApi::saleItemToJson(const SaleItem &item) const
 {
     QJsonObject json;
-    json["product_id"] = item.product_id;
-    json["quantity"] = item.quantity;
-    json["unit_price"] = item.unit_price;
-    json["tax_rate"] = item.tax_rate;
-    json["discount_amount"] = item.discount_amount;
-    json["is_package"] = item.is_package;
-    json["total_pieces"] = item.total_pieces;
+    json["product_id"_L1] = item.product_id;
+    json["quantity"_L1] = item.quantity;
+    json["unit_price"_L1] = item.unit_price;
+    json["tax_rate"_L1] = item.tax_rate;
+    json["discount_amount"_L1] = item.discount_amount;
+    json["is_package"_L1] = item.is_package;
+    json["total_pieces"_L1] = item.total_pieces;
 
     if (item.is_package) {
-        json["package_id"] = item.package_id;
+        json["package_id"_L1] = item.package_id;
     }
 
     if (!item.notes.isEmpty()) {
-        json["notes"] = item.notes;
+        json["notes"_L1] = item.notes;
     }
 
     return json;
@@ -144,24 +145,24 @@ QJsonObject SaleApi::saleItemToJson(const SaleItem &item) const
 QJsonObject SaleApi::paymentToJson(const Payment &payment) const
 {
     QJsonObject json;
-    json["cash_source_id"] = payment.cash_source_id;
-    json["amount"] = payment.amount;
-    json["payment_method"] = payment.payment_method;
-    json["reference_number"] = payment.reference_number;
-    json["notes"] = payment.notes;
+    json["cash_source_id"_L1] = payment.cash_source_id;
+    json["amount"_L1] = payment.amount;
+    json["payment_method"_L1] = payment.payment_method;
+    json["reference_number"_L1] = payment.reference_number;
+    json["notes"_L1] = payment.notes;
     return json;
 }
 
 PaginatedSales SaleApi::paginatedSalesFromJson(const QJsonObject &json) const
 {
     PaginatedSales result;
-    const QJsonObject &meta = json["sales"].toObject();
-    result.currentPage = meta["current_page"].toInt();
-    result.lastPage = meta["last_page"].toInt();
-    result.perPage = meta["per_page"].toInt();
-    result.total = meta["total"].toInt();
+    const QJsonObject &meta = json["sales"_L1].toObject();
+    result.currentPage = meta["current_page"_L1].toInt();
+    result.lastPage = meta["last_page"_L1].toInt();
+    result.perPage = meta["per_page"_L1].toInt();
+    result.total = meta["total"_L1].toInt();
 
-    const QJsonArray &dataArray = meta["data"].toArray();
+    const QJsonArray &dataArray = meta["data"_L1].toArray();
     for (const QJsonValue &value : dataArray) {
         result.data.append(saleFromJson(value.toObject()));
     }
@@ -172,27 +173,27 @@ PaginatedSales SaleApi::paginatedSalesFromJson(const QJsonObject &json) const
 QVariantMap SaleApi::saleToVariantMap(const Sale &sale) const
 {
     QVariantMap map;
-    map["id"] = sale.id;
-    map["team_id"] = sale.team_id;
-    map["client_id"] = sale.client_id;
-    map["cash_source_id"] = sale.cash_source_id;
-    map["reference_number"] = sale.reference_number;
-    map["total_amount"] = sale.total_amount;
-    map["paid_amount"] = sale.paid_amount;
-    map["tax_amount"] = sale.tax_amount;
-    map["discount_amount"] = sale.discount_amount;
-    map["payment_status"] = sale.payment_status;
-    map["status"] = sale.status;
-    map["sale_date"] = sale.sale_date;
-    map["due_date"] = sale.due_date;
-    map["notes"] = sale.notes;
-    map["client"] = sale.client;
+    map["id"_L1] = sale.id;
+    map["team_id"_L1] = sale.team_id;
+    map["client_id"_L1] = sale.client_id;
+    map["cash_source_id"_L1] = sale.cash_source_id;
+    map["reference_number"_L1] = sale.reference_number;
+    map["total_amount"_L1] = sale.total_amount;
+    map["paid_amount"_L1] = sale.paid_amount;
+    map["tax_amount"_L1] = sale.tax_amount;
+    map["discount_amount"_L1] = sale.discount_amount;
+    map["payment_status"_L1] = sale.payment_status;
+    map["status"_L1] = sale.status;
+    map["sale_date"_L1] = sale.sale_date;
+    map["due_date"_L1] = sale.due_date;
+    map["notes"_L1] = sale.notes;
+    map["client"_L1] = sale.client;
 
     QVariantList itemsList;
     for (const SaleItem &item : sale.items) {
         itemsList.append(saleItemToVariantMap(item));
     }
-    map["items"] = itemsList;
+    map["items"_L1] = itemsList;
 
     return map;
 }
@@ -200,21 +201,21 @@ QVariantMap SaleApi::saleToVariantMap(const Sale &sale) const
 QVariantMap SaleApi::saleItemToVariantMap(const SaleItem &item) const
 {
     QVariantMap map;
-    map["id"] = item.id;
-    map["product_id"] = item.product_id;
-    map["product_name"] = item.product_name;
-    map["quantity"] = item.quantity;
-    map["unit_price"] = item.unit_price;
-    map["total_price"] = item.total_price;
-    map["tax_rate"] = item.tax_rate;
-    map["tax_amount"] = item.tax_amount;
-    map["discount_amount"] = item.discount_amount;
-    map["notes"] = item.notes;
-    map["product"] = item.product;
-    map["is_package"] = item.is_package;
-    map["package_id"] = item.package_id;
-    map["total_pieces"] = item.total_pieces;
-    map["package"] = item.package;
+    map["id"_L1] = item.id;
+    map["product_id"_L1] = item.product_id;
+    map["product_name"_L1] = item.product_name;
+    map["quantity"_L1] = item.quantity;
+    map["unit_price"_L1] = item.unit_price;
+    map["total_price"_L1] = item.total_price;
+    map["tax_rate"_L1] = item.tax_rate;
+    map["tax_amount"_L1] = item.tax_amount;
+    map["discount_amount"_L1] = item.discount_amount;
+    map["notes"_L1] = item.notes;
+    map["product"_L1] = item.product;
+    map["is_package"_L1] = item.is_package;
+    map["package_id"_L1] = item.package_id;
+    map["total_pieces"_L1] = item.total_pieces;
+    map["package"_L1] = item.package;
     return map;
 }
 
@@ -224,37 +225,37 @@ QFuture<void> SaleApi::getSales(const QString &search, const QString &sortBy,
                                 const QString &status, const QString &paymentStatus)
 {
     setLoading(true);
-    QString path = "/api/v1/sales";
+    QString path = QStringLiteral( "/api/v1/sales");
 
     QStringList queryParts;
     if (!search.isEmpty())
-        queryParts << QString("search=%1").arg(search);
+        queryParts << QStringLiteral("search=%1").arg(search);
     if (!sortBy.isEmpty())
-        queryParts << QString("sort_by=%1").arg(sortBy);
+        queryParts << QStringLiteral("sort_by=%1").arg(sortBy);
     if (!sortDirection.isEmpty())
-        queryParts << QString("sort_direction=%1").arg(sortDirection);
+        queryParts << QStringLiteral("sort_direction=%1").arg(sortDirection);
     if (page > 0)
-        queryParts << QString("page=%1").arg(page);
+        queryParts << QStringLiteral("page=%1").arg(page);
     if (!status.isEmpty())
-        queryParts << QString("status=%1").arg(status);
+        queryParts << QStringLiteral("status=%1").arg(status);
     if (!paymentStatus.isEmpty())
-        queryParts << QString("payment_status=%1").arg(paymentStatus);
+        queryParts << QStringLiteral("payment_status=%1").arg(paymentStatus);
 
     if (!queryParts.isEmpty()) {
-        path += "?" + queryParts.join("&");
+      path += QStringLiteral("?") + queryParts.join(QLatin1String("&"));
     }
 
     QNetworkRequest request = createRequest(path);
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->get(request);
     }).then([=](JsonResponse response) {
         if (response.success) {
             PaginatedSales paginatedSales = paginatedSalesFromJson(*response.data);
-            emit salesReceived(paginatedSales);
+            Q_EMIT salesReceived(paginatedSales);
         } else {
-            emit errorSalesReceived(response.error->message, response.error->status,
+            Q_EMIT errorSalesReceived(response.error->message, response.error->status,
                                     QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -266,17 +267,17 @@ QFuture<void> SaleApi::getSales(const QString &search, const QString &sortBy,
 QFuture<void> SaleApi::getSale(int id)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QString("/api/v1/sales/%1").arg(id));
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/sales/%1").arg(id));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->get(request);
     }).then([=](JsonResponse response) {
         if (response.success) {
-            Sale sale = saleFromJson(response.data->value("sale").toObject());
-            emit saleReceived(saleToVariantMap(sale));
+            Sale sale = saleFromJson(response.data->value("sale"_L1).toObject());
+            Q_EMIT saleReceived(saleToVariantMap(sale));
         } else {
-            emit errorSaleReceived(response.error->message, response.error->status,
+            Q_EMIT errorSaleReceived(response.error->message, response.error->status,
                                    QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -290,9 +291,9 @@ QFuture<void> SaleApi::createSale(const Sale &sale)
     setLoading(true);
     qDebug() << "================== Sale:";
 
-    QNetworkRequest request = createRequest("/api/v1/sales");
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral( "/api/v1/sales"));
+    request.setHeader(QNetworkRequest::ContentTypeHeader,QStringLiteral( "application/json"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     QJsonObject jsonData = saleToJson(sale);
 
@@ -300,14 +301,14 @@ QFuture<void> SaleApi::createSale(const Sale &sale)
         return m_netManager->post(request, QJsonDocument(jsonData).toJson());
     }).then([=](JsonResponse response) {
         if (response.success) {
-            Sale createdSale = saleFromJson(response.data->value("sale").toObject());
+            Sale createdSale = saleFromJson(response.data->value("sale"_L1).toObject());
             qDebug() << "================== Done:";
-            emit saleCreated(createdSale);
-            emit saleMapCreated(saleToVariantMap(createdSale));
+            Q_EMIT saleCreated(createdSale);
+            Q_EMIT saleMapCreated(saleToVariantMap(createdSale));
         } else {
             qDebug() << "Error Sale details:" << response.error->details;
 
-            emit errorSaleCreated(response.error->message, response.error->status,
+            Q_EMIT errorSaleCreated(response.error->message, response.error->status,
                                   QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -319,9 +320,9 @@ QFuture<void> SaleApi::createSale(const Sale &sale)
 QFuture<void> SaleApi::updateSale(int id, const Sale &sale)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QString("/api/v1/sales/%1").arg(id));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/sales/%1").arg(id));
+    request.setHeader(QNetworkRequest::ContentTypeHeader,QStringLiteral( "application/json"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     QJsonObject jsonData = saleToJson(sale);
 
@@ -329,10 +330,10 @@ QFuture<void> SaleApi::updateSale(int id, const Sale &sale)
         return m_netManager->put(request, QJsonDocument(jsonData).toJson());
     }).then([=](JsonResponse response) {
         if (response.success) {
-            Sale updatedSale = saleFromJson(response.data->value("sale").toObject());
-            emit saleUpdated(updatedSale);
+            Sale updatedSale = saleFromJson(response.data->value("sale"_L1).toObject());
+            Q_EMIT saleUpdated(updatedSale);
         } else {
-            emit errorSaleUpdated(response.error->message, response.error->status,
+            Q_EMIT errorSaleUpdated(response.error->message, response.error->status,
                                   QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -344,16 +345,16 @@ QFuture<void> SaleApi::updateSale(int id, const Sale &sale)
 QFuture<void> SaleApi::deleteSale(int id)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QString("/api/v1/sales/%1").arg(id));
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/sales/%1").arg(id));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<std::monostate>([=]() {
         return m_netManager->deleteResource(request);
     }).then([=](VoidResponse response) {
         if (response.success) {
-            emit saleDeleted(id);
+            Q_EMIT saleDeleted(id);
         } else {
-            emit errorSaleDeleted(response.error->message, response.error->status,
+            Q_EMIT errorSaleDeleted(response.error->message, response.error->status,
                                   QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -365,26 +366,26 @@ QFuture<void> SaleApi::deleteSale(int id)
 QFuture<void> SaleApi::addPayment(int id, const Payment &payment)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QString("/api/v1/sales/%1/add-payment").arg(id));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/sales/%1/add-payment").arg(id));
+    request.setHeader(QNetworkRequest::ContentTypeHeader,QStringLiteral( "application/json"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     QJsonObject jsonData;
-    jsonData["amount"] = payment.amount;
-    jsonData["reference_number"] = payment.reference_number;
-    jsonData["notes"] = payment.notes;
+    jsonData["amount"_L1] = payment.amount;
+    jsonData["reference_number"_L1] = payment.reference_number;
+    jsonData["notes"_L1] = payment.notes;
 
     if (payment.cash_source_id > 0) {
-        jsonData["cash_source_id"] = payment.cash_source_id;
+        jsonData["cash_source_id"_L1] = payment.cash_source_id;
     }
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->post(request, QJsonDocument(jsonData).toJson());
     }).then([=](JsonResponse response) {
         if (response.success) {
-            emit paymentAdded(response.data->value("sale").toObject().toVariantMap());
+            Q_EMIT paymentAdded(response.data->value("sale"_L1).toObject().toVariantMap());
         } else {
-            emit errorPaymentAdded(response.error->message, response.error->status,
+            Q_EMIT errorPaymentAdded(response.error->message, response.error->status,
                                    QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -396,16 +397,16 @@ QFuture<void> SaleApi::addPayment(int id, const Payment &payment)
 QFuture<void> SaleApi::generateInvoice(int id)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QString("/api/v1/sales/%1/generate-invoice").arg(id));
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/sales/%1/generate-invoice").arg(id));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->post(request, QByteArray());
     }).then([=](JsonResponse response) {
         if (response.success) {
-            emit invoiceGenerated(response.data->value("invoice").toObject().toVariantMap());
+            Q_EMIT invoiceGenerated(response.data->value("invoice"_L1).toObject().toVariantMap());
         } else {
-            emit errorInvoiceGenerated(response.error->message, response.error->status,
+            Q_EMIT errorInvoiceGenerated(response.error->message, response.error->status,
                                        QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -417,8 +418,8 @@ QFuture<void> SaleApi::generateInvoice(int id)
 QFuture<QByteArray> SaleApi::generateReceipt(int id)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QString("/api/v1/sales/%1/receipt").arg(id));
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(getToken()).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/sales/%1/receipt").arg(id));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(getToken()).toUtf8());
 
     auto promise = std::make_shared<QPromise<QByteArray>>();
 
@@ -430,15 +431,15 @@ QFuture<QByteArray> SaleApi::generateReceipt(int id)
         if (m_currentReply->error() == QNetworkReply::NoError) {
             QString contentType = m_currentReply->header(QNetworkRequest::ContentTypeHeader).toString();
 
-            if (contentType.contains("application/pdf")) {
+            if (contentType.contains("application/pdf"_L1)) {
                 QByteArray pdfData = m_currentReply->readAll();
 
                 // Save to app's data location
                 QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-                QDir().mkpath(appDataPath + "/pdfs");
+               QDir().mkpath(QStringLiteral("%1/pdfs").arg(appDataPath));
 
-                QString fileName = QString("receipt-%1.pdf").arg(QDateTime::currentMSecsSinceEpoch());
-                QString filePath = appDataPath + "/pdfs/" + fileName;
+                QString fileName = QStringLiteral("receipt-%1.pdf").arg(QDateTime::currentMSecsSinceEpoch());
+               QString filePath = QStringLiteral("%1/pdfs/%2").arg(appDataPath, fileName);
 
                 QFile file(filePath);
                 if (file.open(QIODevice::WriteOnly)) {
@@ -447,23 +448,23 @@ QFuture<QByteArray> SaleApi::generateReceipt(int id)
 
                     QString fileUrl = QUrl::fromLocalFile(filePath).toString();
                     qDebug() << "Receipt PDF saved to:" << fileUrl;
-                    emit receiptGenerated(fileUrl);
+                    Q_EMIT receiptGenerated(fileUrl);
                     promise->addResult(pdfData);
                     setLoading(false);
                 } else {
-                    emit errorReceiptGenerated("Failed to save PDF", file.errorString());
+                    Q_EMIT errorReceiptGenerated("Failed to save PDF"_L1, file.errorString());
                     promise->addResult(QByteArray());
                 }
-            } else if (contentType.contains("application/json")) {
+            } else if (contentType.contains("application/json"_L1)) {
                 // Handle error response
                 QJsonDocument jsonResponse = QJsonDocument::fromJson(m_currentReply->readAll());
                 QJsonObject jsonObject = jsonResponse.object();
-                QString errorMessage = jsonObject["message"].toString();
-                emit errorReceiptGenerated("Error", errorMessage);
+                QString errorMessage = jsonObject["message"_L1].toString();
+                Q_EMIT errorReceiptGenerated("Error"_L1, errorMessage);
                 promise->addResult(QByteArray());
             }
         } else {
-            emit errorReceiptGenerated("Network Error", m_currentReply->errorString());
+            Q_EMIT errorReceiptGenerated("Network Error"_L1, m_currentReply->errorString());
             promise->addResult(QByteArray());
         }
 
@@ -478,21 +479,21 @@ QFuture<QByteArray> SaleApi::generateReceipt(int id)
 QFuture<void> SaleApi::getSummary(const QString &period)
 {
     setLoading(true);
-    QString path = "/api/v1/sales/summary";
+    QString path = QStringLiteral( "/api/v1/sales/summary");
     if (!period.isEmpty()) {
-        path += QString("?period=%1").arg(period);
+        path += QStringLiteral("?period=%1").arg(period);
     }
 
     QNetworkRequest request = createRequest(path);
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->get(request);
     }).then([=](JsonResponse response) {
         if (response.success) {
-            emit summaryReceived(response.data->value("summary").toObject().toVariantMap());
+            Q_EMIT summaryReceived(response.data->value("summary"_L1).toObject().toVariantMap());
         } else {
-            emit errorSummaryReceived(response.error->message, response.error->status,
+            Q_EMIT errorSummaryReceived(response.error->message, response.error->status,
                                       QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);

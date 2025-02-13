@@ -19,11 +19,11 @@ PrinterHelper::PrinterHelper(QObject *parent)
 QString PrinterHelper::normalizeFilePath(const QString &path)
 {
     QString filePath = path;
-    if (filePath.startsWith("file:///")) {
+    if (filePath.startsWith(QStringLiteral("file:///"))) {
         filePath = filePath.mid(8);
     }
-    if (!filePath.startsWith("/")) {
-        filePath = "/" + filePath;
+    if (!filePath.startsWith(QStringLiteral("/"))) {
+        filePath = QStringLiteral("/%1").arg(filePath);
     }
     return filePath;
 }

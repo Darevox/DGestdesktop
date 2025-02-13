@@ -39,8 +39,8 @@ public:
 
     // CRUD operations
     Q_INVOKABLE QFuture<void> getClients(const QString &search = QString(),
-                                        const QString &sortBy = "created_at",
-                                        const QString &sortDirection = "desc",
+                                        const QString &sortBy = QStringLiteral("created_at"),
+                                        const QString &sortDirection = QStringLiteral("desc"),
                                         int page = 1,
                                         const QString &status = QString());
 
@@ -60,7 +60,7 @@ public:
 
     bool isLoading() const { return m_isLoading; }
 
-signals:
+Q_SIGNALS:
     // Success signals
     void clientsReceived(const PaginatedClients &clients);
     void clientReceived(const QVariantMap &client);
@@ -72,14 +72,14 @@ signals:
     void statisticsReceived(const QVariantMap &statistics);
 
     // Error signals
-    void errorClientsReceived(const QString &message, ApiStatus status, const QString &details);
-    void errorClientReceived(const QString &message, ApiStatus status, const QString &details);
-    void errorClientCreated(const QString &message, ApiStatus status, const QString &details);
-    void errorClientUpdated(const QString &message, ApiStatus status, const QString &details);
-    void errorClientDeleted(const QString &message, ApiStatus status, const QString &details);
-    void errorSalesReceived(const QString &message, ApiStatus status, const QString &details);
-    void errorPaymentsReceived(const QString &message, ApiStatus status, const QString &details);
-    void errorStatisticsReceived(const QString &message, ApiStatus status, const QString &details);
+    void errorClientsReceived(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorClientReceived(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorClientCreated(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorClientUpdated(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorClientDeleted(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorSalesReceived(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorPaymentsReceived(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorStatisticsReceived(const QString &message, ApiStatus status, const QByteArray &details);
 
     void isLoadingChanged();
 
@@ -94,7 +94,7 @@ private:
     void setLoading(bool loading) {
         if (m_isLoading != loading) {
             m_isLoading = loading;
-            emit isLoadingChanged();
+            Q_EMIT isLoadingChanged();
         }
     }
 };

@@ -2,7 +2,7 @@
 #include "cashsourcemodelfetch.h"
 
 namespace NetworkApi {
-
+using namespace Qt::StringLiterals;
 CashSourceModelFetch::CashSourceModelFetch(QObject *parent)
     : CashSourceModel(parent)
 {
@@ -52,9 +52,9 @@ void CashSourceModelFetch::handleCashSourcesReceived(const PaginatedCashSources 
     m_currentPage = sources.currentPage;
     m_totalPages = sources.lastPage;
 
-    emit totalItemsChanged();
-    emit currentPageChanged();
-    emit totalPagesChanged();
+    Q_EMIT totalItemsChanged();
+    Q_EMIT currentPageChanged();
+    Q_EMIT totalPagesChanged();
 
     setLoading(false);
     setErrorMessage(QString());

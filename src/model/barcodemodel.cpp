@@ -1,7 +1,7 @@
 #include "barcodemodel.h"
 
 namespace NetworkApi {
-
+using namespace Qt::StringLiterals;
 BarcodeModel::BarcodeModel(QObject *parent)
     : QAbstractTableModel(parent)
     , m_api(nullptr)
@@ -53,17 +53,17 @@ QVariant BarcodeModel::data(const QModelIndex &index, int role) const
 
     if (role == Qt::DisplayRole) {
         switch (index.column()) {
-        case 0: return barcode["id"].toInt();
-        case 1: return barcode["barcode"].toString();
-        case 2: return barcode["is_primary"].toBool() ? tr("Yes") : tr("No");
+        case 0: return barcode["id"_L1].toInt();
+        case 1: return barcode["barcode"_L1].toString();
+        case 2: return barcode["is_primary"_L1].toBool() ? tr("Yes") : tr("No");
         }
     }
 
     if (role >= IdRole) {
         switch (role) {
-        case IdRole: return barcode["id"].toInt();
-        case BarcodeRole: return barcode["barcode"].toString();
-        case PrimaryRole: return barcode["is_primary"].toBool();
+        case IdRole: return barcode["id"_L1].toInt();
+        case BarcodeRole: return barcode["barcode"_L1].toString();
+        case PrimaryRole: return barcode["is_primary"_L1].toBool();
         }
     }
 
@@ -143,7 +143,7 @@ void BarcodeModel::handleBarcodeAdded(const QJsonObject &barcode)
 void BarcodeModel::handleBarcodeRemoved(int productId, int barcodeId)
 {
     for (int i = 0; i < m_barcodes.count(); ++i) {
-        if (m_barcodes[i]["id"].toInt() == barcodeId) {
+        if (m_barcodes[i]["id"_L1].toInt() == barcodeId) {
             beginRemoveRows(QModelIndex(), i, i);
             m_barcodes.removeAt(i);
             endRemoveRows();
@@ -165,7 +165,7 @@ void BarcodeModel::setLoading(bool loading)
 {
     if (m_loading != loading) {
         m_loading = loading;
-        emit loadingChanged();
+        Q_EMIT loadingChanged();
     }
 }
 
@@ -173,7 +173,7 @@ void BarcodeModel::setErrorMessage(const QString &message)
 {
     if (m_errorMessage != message) {
         m_errorMessage = message;
-        emit errorMessageChanged();
+        Q_EMIT errorMessageChanged();
     }
 }
 

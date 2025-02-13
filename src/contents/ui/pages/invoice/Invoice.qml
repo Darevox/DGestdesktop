@@ -4,6 +4,7 @@ import QtQuick.Controls as QQC2
 import org.kde.kirigami as Kirigami
 import org.kde.kirigamiaddons.tableview as Tables
 import org.kde.kirigamiaddons.formcard as FormCard
+import com.dervox.dim
 import "../../components"
 import "."
 import com.dervox.InvoiceModel 1.0

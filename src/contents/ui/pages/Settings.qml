@@ -162,7 +162,7 @@ FormCard.FormCardPage {
         }
     }
     FormCard.FormHeader {
-        title: i18nc("@title:group", "DGest")
+        title: i18nc("@title:group", "DIM")
     }
     FormCard.FormCard {
         FormCard.FormTextDelegate {

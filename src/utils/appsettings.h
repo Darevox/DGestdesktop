@@ -20,7 +20,7 @@ public:
     int scaleValue() const;
     void setScaleValue(int value);
 
-signals:
+Q_SIGNALS:
     void scaleValueChanged();
     void restartRequired();
 

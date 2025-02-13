@@ -28,7 +28,7 @@ public:
     Q_INVOKABLE void setDefaultCashSource(int id);
     Q_INVOKABLE int getDefaultCashSource() const;
     Q_INVOKABLE void removeProductFromAllCategories(int productId);
-signals:
+Q_SIGNALS:
     void categoriesChanged();
     void productsChanged(int categoryId);
     void error(const QString &message);

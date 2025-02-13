@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component type="desktop-application">
+    <id>org.kde.dim</id>
+    <name>Dim</name>
+    <summary>inventory management and point of sale software</summary>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>Proprietary</project_license>
+    <description>
+        <p>inventory management and point of sale software</p>
+    </description>
+</component>

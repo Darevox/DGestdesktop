@@ -47,8 +47,8 @@ public:
                                      const QString &userIdentifier = QString(),
                                      const QDate &startDate = QDate(),
                                      const QDate &endDate = QDate(),
-                                     const QString &sortBy = "created_at",
-                                     const QString &sortDirection = "desc",
+                                     const QString &sortBy = QStringLiteral("created_at"),
+                                     const QString &sortDirection = QStringLiteral("desc"),
                                      int page = 1);
 
     Q_INVOKABLE QFuture<void> getLog(int id);
@@ -60,14 +60,14 @@ public:
     Q_INVOKABLE void saveToken(const QString &token);
     bool isLoading() const { return m_isLoading; }
 
-signals:
+Q_SIGNALS:
     void logsReceived(const PaginatedLogs &logs);
     void logReceived(const ActivityLog &log);
     void statisticsReceived(const LogStatistics &statistics);
     void filterOptionsReceived(const QStringList &logTypes, const QStringList &modelTypes);
     void cleanupCompleted(int deletedCount);
 
-    void logError(const QString &message, ApiStatus status, const QString &details);
+    void logError(const QString &message, ApiStatus status, const QByteArray &details);
     void isLoadingChanged();
 
 private:
@@ -80,7 +80,7 @@ private:
     void setLoading(bool loading) {
         if (m_isLoading != loading) {
             m_isLoading = loading;
-            emit isLoadingChanged();
+            Q_EMIT isLoadingChanged();
         }
     }
 };

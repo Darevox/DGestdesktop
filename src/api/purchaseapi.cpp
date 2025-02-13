@@ -5,10 +5,10 @@
 #include <QUrlQuery>
 
 namespace NetworkApi {
-
+using namespace Qt::StringLiterals;
 PurchaseApi::PurchaseApi(QNetworkAccessManager *netManager, QObject *parent)
     : AbstractApi(netManager, parent)
-    , m_settings("Dervox", "DGest")
+    ,  m_settings(QStringLiteral("Dervox"), QStringLiteral("DGest"))
 {
 }
 
@@ -16,23 +16,23 @@ PurchaseApi::PurchaseApi(QNetworkAccessManager *netManager, QObject *parent)
 Purchase PurchaseApi::purchaseFromJson(const QJsonObject &json) const
 {
     Purchase purchase;
-    purchase.id = json["id"].toInt();
-    purchase.reference_number = json["reference_number"].toString();
-    purchase.purchase_date = QDateTime::fromString(json["purchase_date"].toString(), Qt::ISODate);
-    purchase.supplier_id = json["supplier_id"].toInt();
-    purchase.cash_source_id = json["cash_source_id"].toInt();
-    purchase.status = json["status"].toString();
-    purchase.payment_status = json["payment_status"].toString();
-    purchase.total_amount = json["total_amount"].toString().toDouble();
-    purchase.paid_amount = json["paid_amount"].toString().toDouble();
-    purchase.notes = json["notes"].toString();
+    purchase.id = json["id"_L1].toInt();
+    purchase.reference_number = json["reference_number"_L1].toString();
+    purchase.purchase_date = QDateTime::fromString(json["purchase_date"_L1].toString(), Qt::ISODate);
+    purchase.supplier_id = json["supplier_id"_L1].toInt();
+    purchase.cash_source_id = json["cash_source_id"_L1].toInt();
+    purchase.status = json["status"_L1].toString();
+    purchase.payment_status = json["payment_status"_L1].toString();
+    purchase.total_amount = json["total_amount"_L1].toString().toDouble();
+    purchase.paid_amount = json["paid_amount"_L1].toString().toDouble();
+    purchase.notes = json["notes"_L1].toString();
 
-    if (json.contains("supplier") && !json["supplier"].isNull()) {
-        purchase.supplier = json["supplier"].toObject().toVariantMap();
+    if (json.contains("supplier"_L1) && !json["supplier"_L1].isNull()) {
+        purchase.supplier = json["supplier"_L1].toObject().toVariantMap();
     }
 
-    if (json.contains("items")) {
-        const QJsonArray itemsArray = json["items"].toArray();
+    if (json.contains("items"_L1)) {
+        const QJsonArray itemsArray = json["items"_L1].toArray();
         for (const QJsonValue &value : itemsArray) {
             purchase.items.append(purchaseItemFromJson(value.toObject()));
         }
@@ -44,37 +44,37 @@ Purchase PurchaseApi::purchaseFromJson(const QJsonObject &json) const
 PurchaseItem PurchaseApi::purchaseItemFromJson(const QJsonObject &json) const
 {
     PurchaseItem item;
-    item.id = json["id"].toInt();
-    item.product_id = json["product_id"].toInt();
-    item.product_name = json["product_name"].toString();
-    item.quantity = json["quantity"].toInt();
-    item.unit_price = json["unit_price"].toString().toDouble();
-    item.total_price = json["total_price"].toString().toDouble();
-    item.tax_rate = json["tax_rate"].toString().toDouble();
-    item.tax_amount = json["tax_amount"].toString().toDouble();
-    item.discount_amount = json["discount_amount"].toString().toDouble();
-    item.notes = json["notes"].toString();
+    item.id = json["id"_L1].toInt();
+    item.product_id = json["product_id"_L1].toInt();
+    item.product_name = json["product_name"_L1].toString();
+    item.quantity = json["quantity"_L1].toInt();
+    item.unit_price = json["unit_price"_L1].toString().toDouble();
+    item.total_price = json["total_price"_L1].toString().toDouble();
+    item.tax_rate = json["tax_rate"_L1].toString().toDouble();
+    item.tax_amount = json["tax_amount"_L1].toString().toDouble();
+    item.discount_amount = json["discount_amount"_L1].toString().toDouble();
+    item.notes = json["notes"_L1].toString();
 
     // Package-related fields
-    item.is_package = json["is_package"].toBool();
-    item.package_id = json["package_id"].toInt(-1);  // Use -1 as default
-    item.update_package_prices = json["update_package_prices"].toBool();
-    item.package_purchase_price = json["package_purchase_price"].toString().toDouble();
-    item.package_selling_price = json["package_selling_price"].toString().toDouble();
-    item.update_prices = json["update_prices"].toBool();
+    item.is_package = json["is_package"_L1].toBool();
+    item.package_id = json["package_id"_L1].toInt(-1);  // Use -1 as default
+    item.update_package_prices = json["update_package_prices"_L1].toBool();
+    item.package_purchase_price = json["package_purchase_price"_L1].toString().toDouble();
+    item.package_selling_price = json["package_selling_price"_L1].toString().toDouble();
+    item.update_prices = json["update_prices"_L1].toBool();
 
-    if (json.contains("product")) {
-        item.product = json["product"].toObject().toVariantMap();
+    if (json.contains("product"_L1)) {
+        item.product = json["product"_L1].toObject().toVariantMap();
     }
 
-    if (json.contains("package") && !json["package"].isNull()) {
-        const QJsonObject packageObj = json["package"].toObject();
-        item.package.id = packageObj["id"].toInt();
-        item.package.name = packageObj["name"].toString();
-        item.package.pieces_per_package = packageObj["pieces_per_package"].toInt();
-        item.package.purchase_price = packageObj["purchase_price"].toString().toDouble();
-        item.package.selling_price = packageObj["selling_price"].toString().toDouble();
-        item.package.barcode = packageObj["barcode"].toString();
+    if (json.contains("package"_L1) && !json["package"_L1].isNull()) {
+        const QJsonObject packageObj = json["package"_L1].toObject();
+        item.package.id = packageObj["id"_L1].toInt();
+        item.package.name = packageObj["name"_L1].toString();
+        item.package.pieces_per_package = packageObj["pieces_per_package"_L1].toInt();
+        item.package.purchase_price = packageObj["purchase_price"_L1].toString().toDouble();
+        item.package.selling_price = packageObj["selling_price"_L1].toString().toDouble();
+        item.package.barcode = packageObj["barcode"_L1].toString();
     }
 
     return item;
@@ -86,17 +86,17 @@ QJsonObject PurchaseApi::purchaseToJson(const Purchase &purchase) const
     QJsonObject json;
 
     // Required fields
-    json["supplier_id"] = purchase.supplier_id;
-    json["cash_source_id"] = purchase.cash_source_id;
-    json["purchase_date"] = purchase.purchase_date.toString(Qt::ISODate);
+    json["supplier_id"_L1] = purchase.supplier_id;
+    json["cash_source_id"_L1] = purchase.cash_source_id;
+    json["purchase_date"_L1] = purchase.purchase_date.toString(Qt::ISODate);
 
     // Optional fields
     if (purchase.due_date.isValid()) {
-        json["due_date"] = purchase.due_date.toString(Qt::ISODate);
+        json["due_date"_L1] = purchase.due_date.toString(Qt::ISODate);
     }
 
     if (!purchase.notes.isEmpty()) {
-        json["notes"] = purchase.notes;
+        json["notes"_L1] = purchase.notes;
     }
 
     // Items array
@@ -105,7 +105,7 @@ QJsonObject PurchaseApi::purchaseToJson(const Purchase &purchase) const
           QJsonObject itemJson = purchaseItemToJson(item);
           itemsArray.append(itemJson);
       }
-    json["items"] = itemsArray;
+    json["items"_L1] = itemsArray;
 
     // Debug output
     qDebug() << "Purchase JSON:" << QJsonDocument(json).toJson();
@@ -118,29 +118,29 @@ QJsonObject PurchaseApi::purchaseToJson(const Purchase &purchase) const
 QJsonObject PurchaseApi::purchaseItemToJson(const PurchaseItem &item) const
 {
     QJsonObject json;
-    json["product_id"] = item.product_id;
-    json["quantity"] = item.quantity;
-    json["unit_price"] = item.unit_price;
-    json["selling_price"] = item.selling_price;
-    json["tax_rate"] = item.tax_rate;
-    json["discount_amount"] = item.discount_amount;
+    json["product_id"_L1] = item.product_id;
+    json["quantity"_L1] = item.quantity;
+    json["unit_price"_L1] = item.unit_price;
+    json["selling_price"_L1] = item.selling_price;
+    json["tax_rate"_L1] = item.tax_rate;
+    json["discount_amount"_L1] = item.discount_amount;
 
     // Add package-related fields
-    json["is_package"] = item.is_package;
-    json["package_id"] = item.package_id;
+    json["is_package"_L1] = item.is_package;
+    json["package_id"_L1] = item.package_id;
 
     if (item.is_package) {
-        json["update_package_prices"] = item.update_package_prices;
-        json["package_purchase_price"] = item.package_purchase_price;
-        json["package_selling_price"] = item.package_selling_price;
-        json["update_prices"] = false;  // Don't update product prices when it's a package
+        json["update_package_prices"_L1] = item.update_package_prices;
+        json["package_purchase_price"_L1] = item.package_purchase_price;
+        json["package_selling_price"_L1] = item.package_selling_price;
+        json["update_prices"_L1] = false;  // Don't update product prices when it's a package
     } else {
-        json["update_prices"] = item.update_prices;
-        json["update_package_prices"] = false;
+        json["update_prices"_L1] = item.update_prices;
+        json["update_package_prices"_L1] = false;
     }
 
     if (!item.notes.isEmpty()) {
-        json["notes"] = item.notes;
+        json["notes"_L1] = item.notes;
     }
 
     // Add debug output
@@ -153,24 +153,24 @@ QJsonObject PurchaseApi::purchaseItemToJson(const PurchaseItem &item) const
 QJsonObject PurchaseApi::paymentToJson(const PurchasePayment &payment) const
 {
     QJsonObject json;
-    json["cash_source_id"] = payment.cash_source_id;
-    json["amount"] = payment.amount;
-    json["payment_method"] = payment.payment_method;
-    json["reference_number"] = payment.reference_number;
-    json["notes"] = payment.notes;
+    json["cash_source_id"_L1] = payment.cash_source_id;
+    json["amount"_L1] = payment.amount;
+    json["payment_method"_L1] = payment.payment_method;
+    json["reference_number"_L1] = payment.reference_number;
+    json["notes"_L1] = payment.notes;
     return json;
 }
 
 PaginatedPurchases PurchaseApi::paginatedPurchasesFromJson(const QJsonObject &json) const
 {
     PaginatedPurchases result;
-    const QJsonObject &meta = json["purchases"].toObject();
-    result.currentPage = meta["current_page"].toInt();
-    result.lastPage = meta["last_page"].toInt();
-    result.perPage = meta["per_page"].toInt();
-    result.total = meta["total"].toInt();
+    const QJsonObject &meta = json["purchases"_L1].toObject();
+    result.currentPage = meta["current_page"_L1].toInt();
+    result.lastPage = meta["last_page"_L1].toInt();
+    result.perPage = meta["per_page"_L1].toInt();
+    result.total = meta["total"_L1].toInt();
 
-    const QJsonArray &dataArray = meta["data"].toArray();
+    const QJsonArray &dataArray = meta["data"_L1].toArray();
     for (const QJsonValue &value : dataArray) {
         result.data.append(purchaseFromJson(value.toObject()));
     }
@@ -181,23 +181,23 @@ PaginatedPurchases PurchaseApi::paginatedPurchasesFromJson(const QJsonObject &js
 QVariantMap PurchaseApi::purchaseToVariantMap(const Purchase &purchase) const
 {
     QVariantMap map;
-    map["id"] = purchase.id;
-    map["reference_number"] = purchase.reference_number;
-    map["purchase_date"] = purchase.purchase_date;
-    map["supplier_id"] = purchase.supplier_id;
-    map["cash_source_id"] = purchase.cash_source_id;
-    map["supplier"] = purchase.supplier;
-    map["status"] = purchase.status;
-    map["payment_status"] = purchase.payment_status;
-    map["total_amount"] = purchase.total_amount;
-    map["paid_amount"] = purchase.paid_amount;
-    map["notes"] = purchase.notes;
+    map["id"_L1] = purchase.id;
+    map["reference_number"_L1] = purchase.reference_number;
+    map["purchase_date"_L1] = purchase.purchase_date;
+    map["supplier_id"_L1] = purchase.supplier_id;
+    map["cash_source_id"_L1] = purchase.cash_source_id;
+    map["supplier"_L1] = purchase.supplier;
+    map["status"_L1] = purchase.status;
+    map["payment_status"_L1] = purchase.payment_status;
+    map["total_amount"_L1] = purchase.total_amount;
+    map["paid_amount"_L1] = purchase.paid_amount;
+    map["notes"_L1] = purchase.notes;
 
     QVariantList itemsList;
     for (const PurchaseItem &item : purchase.items) {
         itemsList.append(purchaseItemToVariantMap(item));
     }
-    map["items"] = itemsList;
+    map["items"_L1] = itemsList;
 
     return map;
 }
@@ -205,30 +205,30 @@ QVariantMap PurchaseApi::purchaseToVariantMap(const Purchase &purchase) const
 QVariantMap PurchaseApi::purchaseItemToVariantMap(const PurchaseItem &item) const
 {
     QVariantMap map;
-    map["id"] = item.id;
-    map["product_id"] = item.product_id;
-    map["product_name"] = item.product_name;
-    map["quantity"] = item.quantity;
-    map["unit_price"] = item.unit_price;
-    map["selling_price"] = item.selling_price;
-    map["total_price"] = item.total_price;
-    map["notes"] = item.notes;
-    map["product"] = item.product;
-    map["is_package"] = item.is_package;
-    map["package_id"] = item.package_id;
-    map["update_package_prices"] = item.update_package_prices;
-    map["package_purchase_price"] = item.package_purchase_price;
-    map["package_selling_price"] = item.package_selling_price;
+    map["id"_L1] = item.id;
+    map["product_id"_L1] = item.product_id;
+    map["product_name"_L1] = item.product_name;
+    map["quantity"_L1] = item.quantity;
+    map["unit_price"_L1] = item.unit_price;
+    map["selling_price"_L1] = item.selling_price;
+    map["total_price"_L1] = item.total_price;
+    map["notes"_L1] = item.notes;
+    map["product"_L1] = item.product;
+    map["is_package"_L1] = item.is_package;
+    map["package_id"_L1] = item.package_id;
+    map["update_package_prices"_L1] = item.update_package_prices;
+    map["package_purchase_price"_L1] = item.package_purchase_price;
+    map["package_selling_price"_L1] = item.package_selling_price;
 
     if (item.is_package) {
         QVariantMap packageMap;
-        packageMap["id"] = item.package.id;
-        packageMap["name"] = item.package.name;
-        packageMap["pieces_per_package"] = item.package.pieces_per_package;
-        packageMap["purchase_price"] = item.package.purchase_price;
-        packageMap["selling_price"] = item.package.selling_price;
-        packageMap["barcode"] = item.package.barcode;
-        map["package"] = packageMap;
+        packageMap["id"_L1] = item.package.id;
+        packageMap["name"_L1] = item.package.name;
+        packageMap["pieces_per_package"_L1] = item.package.pieces_per_package;
+        packageMap["purchase_price"_L1] = item.package.purchase_price;
+        packageMap["selling_price"_L1] = item.package.selling_price;
+        packageMap["barcode"_L1] = item.package.barcode;
+        map["package"_L1] = packageMap;
     }
 
     return map;
@@ -240,37 +240,37 @@ QFuture<void> PurchaseApi::getPurchases(const QString &search, const QString &so
                                         const QString &status, const QString &paymentStatus)
 {
     setLoading(true);
-    QString path = "/api/v1/purchases";
+    QString path = QStringLiteral("/api/v1/purchases");
 
     QStringList queryParts;
     if (!search.isEmpty())
-        queryParts << QString("search=%1").arg(search);
+        queryParts << QStringLiteral("search=%1").arg(search);
     if (!sortBy.isEmpty())
-        queryParts << QString("sort_by=%1").arg(sortBy);
+        queryParts << QStringLiteral("sort_by=%1").arg(sortBy);
     if (!sortDirection.isEmpty())
-        queryParts << QString("sort_direction=%1").arg(sortDirection);
+        queryParts << QStringLiteral("sort_direction=%1").arg(sortDirection);
     if (page > 0)
-        queryParts << QString("page=%1").arg(page);
+        queryParts << QStringLiteral("page=%1").arg(page);
     if (!status.isEmpty())
-        queryParts << QString("status=%1").arg(status);
+        queryParts << QStringLiteral("status=%1").arg(status);
     if (!paymentStatus.isEmpty())
-        queryParts << QString("payment_status=%1").arg(paymentStatus);
+        queryParts << QStringLiteral("payment_status=%1").arg(paymentStatus);
 
     if (!queryParts.isEmpty()) {
-        path += "?" + queryParts.join("&");
+       path += QStringLiteral("?") + queryParts.join(QLatin1String("&"));
     }
 
     QNetworkRequest request = createRequest(path);
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->get(request);
     }).then([=](JsonResponse response) {
         if (response.success) {
             PaginatedPurchases paginatedPurchases = paginatedPurchasesFromJson(*response.data);
-            emit purchasesReceived(paginatedPurchases);
+            Q_EMIT purchasesReceived(paginatedPurchases);
         } else {
-            emit errorPurchasesReceived(response.error->message, response.error->status,
+            Q_EMIT errorPurchasesReceived(response.error->message, response.error->status,
                                         QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -283,17 +283,17 @@ QFuture<void> PurchaseApi::getPurchases(const QString &search, const QString &so
 QFuture<void> PurchaseApi::getPurchase(int id)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QString("/api/v1/purchases/%1").arg(id));
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/purchases/%1").arg(id));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->get(request);
     }).then([=](JsonResponse response) {
         if (response.success) {
-            Purchase purchase = purchaseFromJson(response.data->value("purchase").toObject());
-            emit purchaseReceived(purchaseToVariantMap(purchase));
+            Purchase purchase = purchaseFromJson(response.data->value("purchase"_L1).toObject());
+            Q_EMIT purchaseReceived(purchaseToVariantMap(purchase));
         } else {
-            emit errorPurchaseReceived(response.error->message, response.error->status,
+            Q_EMIT errorPurchaseReceived(response.error->message, response.error->status,
                                        QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -305,9 +305,9 @@ QFuture<void> PurchaseApi::getPurchase(int id)
 QFuture<void> PurchaseApi::createPurchase(const Purchase &purchase)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest("/api/v1/purchases");
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/purchases"));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     QJsonObject jsonData = purchaseToJson(purchase);
     QByteArray requestData = QJsonDocument(jsonData).toJson();
@@ -330,21 +330,24 @@ QFuture<void> PurchaseApi::createPurchase(const Purchase &purchase)
         return reply;
     }).then([=](JsonResponse response) {
         if (response.success) {
-            Purchase createdPurchase = purchaseFromJson(response.data->value("purchase").toObject());
-            emit purchaseCreated(createdPurchase);
+            Purchase createdPurchase = purchaseFromJson(response.data->value("purchase"_L1).toObject());
+            Q_EMIT purchaseCreated(createdPurchase);
         } else {
             QString errorDetails;
             if (response.error && !response.error->details.isEmpty()) {
-                errorDetails = QJsonDocument(response.error->details).toJson();
+                errorDetails = QString::fromUtf8(
+                    QJsonDocument(response.error->details).toJson(QJsonDocument::Compact)
+                );
             } else {
-                errorDetails = response.error ? response.error->message : "Unknown error";
+                using namespace Qt::StringLiterals;
+                errorDetails = response.error ? response.error->message : "Unknown error"_L1;
             }
 
             qDebug() << "Purchase creation failed:"
-                     << "\nMessage:" << (response.error ? response.error->message : "Unknown error")
+                     << "\nMessage:" << (response.error ? response.error->message : "Unknown error"_L1)
                      << "\nDetails:" << errorDetails;
 
-            emit errorPurchaseCreated(response.error->message, response.error->status,
+            Q_EMIT errorPurchaseCreated(response.error->message, response.error->status,
                                       QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -356,9 +359,9 @@ QFuture<void> PurchaseApi::createPurchase(const Purchase &purchase)
 QFuture<void> PurchaseApi::updatePurchase(int id, const Purchase &purchase)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QString("/api/v1/purchases/%1").arg(id));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/purchases/%1").arg(id));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     QJsonObject jsonData = purchaseToJson(purchase);
 
@@ -366,10 +369,10 @@ QFuture<void> PurchaseApi::updatePurchase(int id, const Purchase &purchase)
         return m_netManager->put(request, QJsonDocument(jsonData).toJson());
     }).then([=](JsonResponse response) {
         if (response.success) {
-            Purchase updatedPurchase = purchaseFromJson(response.data->value("purchase").toObject());
-            emit purchaseUpdated(updatedPurchase);
+            Purchase updatedPurchase = purchaseFromJson(response.data->value("purchase"_L1).toObject());
+            Q_EMIT purchaseUpdated(updatedPurchase);
         } else {
-            emit errorPurchaseUpdated(response.error->message, response.error->status,
+            Q_EMIT errorPurchaseUpdated(response.error->message, response.error->status,
                                       QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -381,16 +384,16 @@ QFuture<void> PurchaseApi::updatePurchase(int id, const Purchase &purchase)
 QFuture<void> PurchaseApi::deletePurchase(int id)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QString("/api/v1/purchases/%1").arg(id));
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/purchases/%1").arg(id));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<std::monostate>([=]() {
         return m_netManager->deleteResource(request);
     }).then([=](VoidResponse response) {
         if (response.success) {
-            emit purchaseDeleted(id);
+            Q_EMIT purchaseDeleted(id);
         } else {
-            emit errorPurchaseDeleted(response.error->message, response.error->status,
+            Q_EMIT errorPurchaseDeleted(response.error->message, response.error->status,
                                       QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -402,9 +405,9 @@ QFuture<void> PurchaseApi::deletePurchase(int id)
 QFuture<void> PurchaseApi::addPayment(int id, const PurchasePayment &payment)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QString("/api/v1/purchases/%1/add-payment").arg(id));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/purchases/%1/add-payment").arg(id));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     QJsonObject jsonData = paymentToJson(payment);
 
@@ -412,9 +415,9 @@ QFuture<void> PurchaseApi::addPayment(int id, const PurchasePayment &payment)
         return m_netManager->post(request, QJsonDocument(jsonData).toJson());
     }).then([=](JsonResponse response) {
         if (response.success) {
-            emit paymentAdded(response.data->value("payment").toObject().toVariantMap());
+            Q_EMIT paymentAdded(response.data->value("payment"_L1).toObject().toVariantMap());
         } else {
-            emit errorPaymentAdded(response.error->message, response.error->status,
+            Q_EMIT errorPaymentAdded(response.error->message, response.error->status,
                                    QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -426,16 +429,16 @@ QFuture<void> PurchaseApi::addPayment(int id, const PurchasePayment &payment)
 QFuture<void> PurchaseApi::generateInvoice(int id)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QString("/api/v1/purchases/%1/generate-invoice").arg(id));
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/purchases/%1/generate-invoice").arg(id));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->post(request, QByteArray());
     }).then([=](JsonResponse response) {
         if (response.success) {
-            emit invoiceGenerated(response.data->value("invoice").toObject().toVariantMap());
+            Q_EMIT invoiceGenerated(response.data->value("invoice"_L1).toObject().toVariantMap());
         } else {
-            emit errorInvoiceGenerated(response.error->message, response.error->status,
+            Q_EMIT errorInvoiceGenerated(response.error->message, response.error->status,
                                        QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
@@ -447,21 +450,21 @@ QFuture<void> PurchaseApi::generateInvoice(int id)
 QFuture<void> PurchaseApi::getSummary(const QString &period)
 {
     setLoading(true);
-    QString path = "/api/v1/purchases/summary";
+    QString path = QStringLiteral("/api/v1/purchases/summary");
     if (!period.isEmpty()) {
-        path += QString("?period=%1").arg(period);
+        path += QStringLiteral("?period=%1").arg(period);
     }
 
     QNetworkRequest request = createRequest(path);
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->get(request);
     }).then([=](JsonResponse response) {
         if (response.success) {
-            emit summaryReceived(response.data->value("summary").toObject().toVariantMap());
+            Q_EMIT summaryReceived(response.data->value("summary"_L1).toObject().toVariantMap());
         } else {
-            emit errorSummaryReceived(response.error->message, response.error->status,
+            Q_EMIT errorSummaryReceived(response.error->message, response.error->status,
                                       QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);

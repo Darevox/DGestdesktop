@@ -78,19 +78,19 @@ public:
     explicit DashboardAnalyticsApi(QNetworkAccessManager *netManager, QObject *parent = nullptr);
 
     // Main analytics methods with default timeframe
-    Q_INVOKABLE QFuture<void> getSalesAnalytics(const QString &timeframe = "daily",
+    Q_INVOKABLE QFuture<void> getSalesAnalytics(const QString &timeframe = QStringLiteral("daily"),
                                                const QDate &startDate = QDate(),
                                                const QDate &endDate = QDate());
-    Q_INVOKABLE QFuture<void> getPurchaseAnalytics(const QString &timeframe = "daily",
+    Q_INVOKABLE QFuture<void> getPurchaseAnalytics(const QString &timeframe = QStringLiteral("daily"),
                                                   const QDate &startDate = QDate(),
                                                   const QDate &endDate = QDate());
-    Q_INVOKABLE QFuture<void> getInventoryAnalytics(const QString &timeframe = "daily",
+    Q_INVOKABLE QFuture<void> getInventoryAnalytics(const QString &timeframe = QStringLiteral("daily"),
                                                     const QDate &startDate = QDate(),
                                                     const QDate &endDate = QDate());
-    Q_INVOKABLE QFuture<void> getCustomerAnalytics(const QString &timeframe = "daily",
+    Q_INVOKABLE QFuture<void> getCustomerAnalytics(const QString &timeframe = QStringLiteral("daily"),
                                                    const QDate &startDate = QDate(),
                                                    const QDate &endDate = QDate());
-    Q_INVOKABLE QFuture<void> getOverallDashboard(const QString &timeframe = "daily",
+    Q_INVOKABLE QFuture<void> getOverallDashboard(const QString &timeframe = QStringLiteral("daily"),
                                                   const QDate &startDate = QDate(),
                                                   const QDate &endDate = QDate());
 
@@ -101,17 +101,17 @@ public:
     void setTestMode(bool test) {
         if (m_testMode != test) {
             m_testMode = test;
-            emit testModeChanged();
+            Q_EMIT testModeChanged();
         }
     }
 
-signals:
+Q_SIGNALS:
     void salesAnalyticsReceived(const SaleAnalytics &analytics);
     void purchaseAnalyticsReceived(const PurchaseAnalytics &analytics);
     void inventoryAnalyticsReceived(const InventoryAnalytics &analytics);
     void customerAnalyticsReceived(const QVariantMap &analytics);
     void overallDashboardReceived(const DashboardOverview &overview);
-    void analyticsError(const QString &message, ApiStatus status, const QString &details);
+    void analyticsError(const QString &message, ApiStatus status, const QByteArray &details);
     void isLoadingChanged();
     void testModeChanged();
 
@@ -126,7 +126,7 @@ private:
     void setLoading(bool loading) {
         if (m_isLoading != loading) {
             m_isLoading = loading;
-            emit isLoadingChanged();
+            Q_EMIT isLoadingChanged();
         }
     }
     bool m_testMode = false;

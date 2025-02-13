@@ -87,7 +87,7 @@ Kirigami.AbstractCard {
                         }
 
                         Label {
-                            text: "€" + root.values[index].toFixed(2)
+                            text:  root.values[index].toFixed(2)  + " DH"
                             font.pointSize: 8
                             opacity: 0.7
                         }

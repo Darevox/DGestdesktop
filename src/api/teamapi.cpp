@@ -7,6 +7,7 @@
 #include <QUuid>
 
 namespace NetworkApi {
+using namespace Qt::StringLiterals;
 
 QNetworkAccessManager* TeamApi::netManager = nullptr;
 
@@ -27,7 +28,7 @@ void TeamApi::ensureSharedNetworkManager()
 
 TeamApi::TeamApi(QObject *parent)
     : AbstractApi(nullptr, parent)
-    , m_settings("Dervox", "DGest")
+    , m_settings(QStringLiteral("Dervox"), QStringLiteral("DGest"))
 {
     ensureSharedNetworkManager();
     setNetworkManager(netManager);
@@ -35,42 +36,42 @@ TeamApi::TeamApi(QObject *parent)
 
 TeamApi::TeamApi(QNetworkAccessManager *netManager, QObject *parent)
     : AbstractApi(netManager, parent)
-    , m_settings("Dervox", "DGest")
+    , m_settings(QStringLiteral("Dervox"), QStringLiteral("DGest"))
 {
 }
 
 QFuture<void> TeamApi::getTeams(const QString &search, const QString &sortBy,
-                               const QString &sortDirection, int page)
+                                const QString &sortDirection, int page)
 {
     setLoading(true);
-    QString path = "/api/v1/teams";
+    QString path = QStringLiteral("/api/v1/teams");
 
     QStringList queryParts;
     if (!search.isEmpty())
-        queryParts << QString("search=%1").arg(search);
+        queryParts << QStringLiteral("search=%1").arg(search);
     if (!sortBy.isEmpty())
-        queryParts << QString("sort_by=%1").arg(sortBy);
+        queryParts << QStringLiteral("sort_by=%1").arg(sortBy);
     if (!sortDirection.isEmpty())
-        queryParts << QString("sort_direction=%1").arg(sortDirection);
+        queryParts << QStringLiteral("sort_direction=%1").arg(sortDirection);
     if (page > 0)
-        queryParts << QString("page=%1").arg(page);
+        queryParts << QStringLiteral("page=%1").arg(page);
 
     if (!queryParts.isEmpty()) {
-        path += "?" + queryParts.join("&");
+        path += QStringLiteral("?") + queryParts.join(QLatin1String("&"));
     }
 
     QNetworkRequest request = createRequest(path);
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->get(request);
     }).then([=](JsonResponse response) {
         if (response.success) {
             PaginatedTeams paginatedTeams = paginatedTeamsFromJson(*response.data);
-            emit teamsReceived(paginatedTeams);
+            Q_EMIT teamsReceived(paginatedTeams);
         } else {
-            emit errorTeamsReceived(response.error->message, response.error->status,
-                                  QJsonDocument(response.error->details).toJson());
+            Q_EMIT errorTeamsReceived(response.error->message, response.error->status,
+                                      QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -81,21 +82,21 @@ QFuture<void> TeamApi::getTeams(const QString &search, const QString &sortBy,
 QFuture<void> TeamApi::getTeam(int id)
 {
     setLoading(true);
-
-    QNetworkRequest request = createRequest(QString("/api/v1/teams/%1").arg(id));
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    qDebug()<<"IDDDDDDDDD : "<<id;
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/teams/%1").arg(id));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->get(request);
     }).then([=](JsonResponse response) {
         if (response.success) {
-            const QJsonObject &teamData = response.data->value("team").toObject();
+            const QJsonObject &teamData = response.data->value("team"_L1).toObject();
             Team team = teamFromJson(teamData);
             QVariantMap teamMap = teamToVariantMap(team);
-            emit teamReceived(teamMap);
+            Q_EMIT teamReceived(teamMap);
         } else {
-            emit errorTeamReceived(response.error->message, response.error->status,
-                                 QJsonDocument(response.error->details).toJson());
+            Q_EMIT errorTeamReceived(response.error->message, response.error->status,
+                                     QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -107,9 +108,9 @@ QFuture<void> TeamApi::createTeam(const Team &team)
 {
     setLoading(true);
 
-    QNetworkRequest request = createRequest("/api/v1/teams");
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral( "/api/v1/teams"));
+    request.setHeader(QNetworkRequest::ContentTypeHeader,QStringLiteral( "application/json"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     QJsonObject jsonData = teamToJson(team);
 
@@ -117,12 +118,12 @@ QFuture<void> TeamApi::createTeam(const Team &team)
         return m_netManager->post(request, QJsonDocument(jsonData).toJson());
     }).then([=](JsonResponse response) {
         if (response.success) {
-            const QJsonObject &teamData = response.data->value("team").toObject();
+            const QJsonObject &teamData = response.data->value("team"_L1).toObject();
             Team createdTeam = teamFromJson(teamData);
-            emit teamCreated(createdTeam);
+            Q_EMIT teamCreated(createdTeam);
         } else {
-            emit errorTeamCreated(response.error->message, response.error->status,
-                                QJsonDocument(response.error->details).toJson());
+            Q_EMIT errorTeamCreated(response.error->message, response.error->status,
+                                    QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -134,9 +135,9 @@ QFuture<void> TeamApi::updateTeam(int id, const QVariantMap &team)
 {
     setLoading(true);
 
-    QNetworkRequest request = createRequest(QString("/api/v1/teams/%1").arg(id));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/teams/%1").arg(id));
+    request.setHeader(QNetworkRequest::ContentTypeHeader,QStringLiteral( "application/json"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
     Team teamDate = teamFromVariantMap(team);
     QJsonObject jsonData = teamToJson(teamDate);
 
@@ -144,12 +145,12 @@ QFuture<void> TeamApi::updateTeam(int id, const QVariantMap &team)
         return m_netManager->put(request, QJsonDocument(jsonData).toJson());
     }).then([=](JsonResponse response) {
         if (response.success) {
-            const QJsonObject &teamData = response.data->value("team").toObject();
+            const QJsonObject &teamData = response.data->value("team"_L1).toObject();
             Team updatedTeam = teamFromJson(teamData);
-            emit teamUpdated(updatedTeam);
+            Q_EMIT teamUpdated(updatedTeam);
         } else {
-            emit errorTeamUpdated(response.error->message, response.error->status,
-                                QJsonDocument(response.error->details).toJson());
+            Q_EMIT errorTeamUpdated(response.error->message, response.error->status,
+                                    QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -161,18 +162,18 @@ QFuture<void> TeamApi::deleteTeam(int id)
 {
     setLoading(true);
 
-    QNetworkRequest request = createRequest(QString("/api/v1/teams/%1").arg(id));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/teams/%1").arg(id));
+    request.setHeader(QNetworkRequest::ContentTypeHeader,QStringLiteral( "application/json"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<std::monostate>([=]() {
         return m_netManager->deleteResource(request);
     }).then([=](VoidResponse response) {
         if (response.success) {
-            emit teamDeleted(id);
+            Q_EMIT teamDeleted(id);
         } else {
-            emit errorTeamDeleted(response.error->message, response.error->status,
-                                QJsonDocument(response.error->details).toJson());
+            Q_EMIT errorTeamDeleted(response.error->message, response.error->status,
+                                    QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -187,34 +188,35 @@ QFuture<void> TeamApi::uploadTeamImage(int teamId, const QString &imagePath)
     QString localPath = QUrl(imagePath).toLocalFile();
     if (localPath.isEmpty()) {
         localPath = imagePath;
-        if (localPath.startsWith("file://")) {
+        if (localPath.startsWith(QStringLiteral("file://"))) {
             localPath = localPath.mid(7);
         }
     }
 
-    QString path = QString("/api/v1/teams/%1/image").arg(teamId);
+    QString path = QStringLiteral("/api/v1/teams/%1/image").arg(teamId);
     QNetworkRequest request = createRequest(path);
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
-    QString boundary = "boundary" + QUuid::createUuid().toString(QUuid::WithoutBraces);
+    QString boundary = QStringLiteral("boundary%1")
+            .arg(QUuid::createUuid().toString(QUuid::WithoutBraces));
     multiPart->setBoundary(boundary.toLatin1());
 
     QFile *file = new QFile(localPath);
     if (!file->open(QIODevice::ReadOnly)) {
         delete file;
         delete multiPart;
-        emit uploadImageError("Failed to open image file");
+        Q_EMIT uploadImageError("Failed to open image file"_L1);
         setLoading(false);
         return QtFuture::makeReadyVoidFuture();
     }
 
     QHttpPart imagePart;
     imagePart.setHeader(QNetworkRequest::ContentTypeHeader,
-                       QVariant(localPath.endsWith(".png", Qt::CaseInsensitive) ? "image/png" : "image/jpeg"));
+                        QVariant(localPath.endsWith(QStringLiteral(".png"), Qt::CaseInsensitive) ? QStringLiteral("image/png") : QStringLiteral("image/jpeg")));
     imagePart.setHeader(QNetworkRequest::ContentDispositionHeader,
-                       QVariant(QString("form-data; name=\"image\"; filename=\"%1\"")
-                               .arg(QFileInfo(localPath).fileName())));
+                        QVariant(QStringLiteral("form-data; name=\"image\"; filename=\"%1\"")
+                                 .arg(QFileInfo(localPath).fileName())));
 
     QByteArray fileData = file->readAll();
     file->close();
@@ -224,7 +226,7 @@ QFuture<void> TeamApi::uploadTeamImage(int teamId, const QString &imagePath)
     multiPart->append(imagePart);
 
     request.setHeader(QNetworkRequest::ContentTypeHeader,
-                     QString("multipart/form-data; boundary=%1").arg(boundary));
+                      QStringLiteral("multipart/form-data; boundary=%1").arg(boundary));
 
     auto future = makeRequest<QJsonObject>([=]() {
         QNetworkReply* reply = m_netManager->post(request, multiPart);
@@ -232,12 +234,12 @@ QFuture<void> TeamApi::uploadTeamImage(int teamId, const QString &imagePath)
         return reply;
     }).then([=](JsonResponse response) {
         if (response.success) {
-            const QJsonObject &teamData = response.data->value("team").toObject();
+            const QJsonObject &teamData = response.data->value("team"_L1).toObject();
             Team updatedTeam = teamFromJson(teamData);
-            emit teamUpdated(updatedTeam);
+            Q_EMIT teamUpdated(updatedTeam);
         } else {
-            emit teamError(response.error->message, response.error->status,
-                         QJsonDocument(response.error->details).toJson());
+            Q_EMIT teamError(response.error->message, response.error->status,
+                             QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -249,18 +251,18 @@ QFuture<void> TeamApi::removeTeamImage(int teamId)
 {
     setLoading(true);
 
-    QNetworkRequest request = createRequest(QString("/api/v1/teams/%1/image").arg(teamId));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization", QString("Bearer %1").arg(m_token).toUtf8());
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/teams/%1/image").arg(teamId));
+    request.setHeader(QNetworkRequest::ContentTypeHeader,QStringLiteral( "application/json"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<std::monostate>([=]() {
         return m_netManager->deleteResource(request);
     }).then([=](VoidResponse response) {
         if (response.success) {
-            emit imageRemoved(teamId);
+            Q_EMIT imageRemoved(teamId);
         } else {
-            emit teamError(response.error->message, response.error->status,
-                         QJsonDocument(response.error->details).toJson());
+            Q_EMIT teamError(response.error->message, response.error->status,
+                             QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -271,35 +273,39 @@ QFuture<void> TeamApi::removeTeamImage(int teamId)
 Team TeamApi::teamFromJson(const QJsonObject &json) const
 {
     Team team;
-    team.id = json["id"].toInt();
-    team.name = json["name"].toString();
-    team.email = json["email"].toString();
-    team.phone = json["phone"].toString();
-    team.address = json["address"].toString();
-    team.image_path = json["image_path"].toString();
+    team.id = json["id"_L1].toInt();
+    team.name = json["name"_L1].toString();
+    team.email = json["email"_L1].toString();
+    team.phone = json["phone"_L1].toString();
+    team.address = json["address"_L1].toString();
+    team.image_path = json["image_path"_L1].toString();
+    team.locale = json["locale"_L1].toString();
     return team;
 }
 
 QJsonObject TeamApi::teamToJson(const Team &team) const
 {
     QJsonObject json;
-    json["name"] = team.name;
-    json["email"] = team.email;
-    json["phone"] = team.phone;
-    json["address"] = team.address;
+    json["name"_L1] = team.name;
+    json["email"_L1] = team.email;
+    json["phone"_L1] = team.phone;
+    json["address"_L1] = team.address;
+    if (!team.locale.isEmpty()) {
+        json["locale"_L1] = team.locale;
+    }
     return json;
 }
 
 PaginatedTeams TeamApi::paginatedTeamsFromJson(const QJsonObject &json) const
 {
     PaginatedTeams result;
-    const QJsonObject &meta = json["teams"].toObject();
-    result.currentPage = meta["current_page"].toInt();
-    result.lastPage = meta["last_page"].toInt();
-    result.perPage = meta["per_page"].toInt();
-    result.total = meta["total"].toInt();
+    const QJsonObject &meta = json["teams"_L1].toObject();
+    result.currentPage = meta["current_page"_L1].toInt();
+    result.lastPage = meta["last_page"_L1].toInt();
+    result.perPage = meta["per_page"_L1].toInt();
+    result.total = meta["total"_L1].toInt();
 
-    const QJsonArray &dataArray = meta["data"].toArray();
+    const QJsonArray &dataArray = meta["data"_L1].toArray();
     for (const QJsonValue &value : dataArray) {
         result.data.append(teamFromJson(value.toObject()));
     }
@@ -310,25 +316,80 @@ PaginatedTeams TeamApi::paginatedTeamsFromJson(const QJsonObject &json) const
 QVariantMap TeamApi::teamToVariantMap(const Team &team) const
 {
     QVariantMap map;
-    map["id"] = team.id;
-    map["name"] = team.name;
-    map["email"] = team.email;
-    map["phone"] = team.phone;
-    map["address"] = team.address;
-    map["image_path"] = team.image_path;
+    map["id"_L1] = team.id;
+    map["name"_L1] = team.name;
+    map["email"_L1] = team.email;
+    map["phone"_L1] = team.phone;
+    map["address"_L1] = team.address;
+    map["image_path"_L1] = team.image_path;
+    map["locale"_L1] = team.locale;
     return map;
 }
 
 Team TeamApi::teamFromVariantMap(const QVariantMap &map) const
 {
     Team team;
-    team.name = map.value("name").toString();
-    team.email = map.value("email").toString();
-    team.phone = map.value("phone").toString();
-    team.address = map.value("address").toString();
+    team.name = map.value("name"_L1).toString();
+    team.email = map.value("email"_L1).toString();
+    team.phone = map.value("phone"_L1).toString();
+    team.address = map.value("address"_L1).toString();
+    team.locale = map.value("locale"_L1).toString();
     return team;
 }
+bool TeamApi::isValidLocale(const QString &locale)
+{
+    return QStringList{QStringLiteral("en"), QStringLiteral("fr")}.contains(locale);
+}
 
+QFuture<void> TeamApi::getTeamLocale(int teamId)
+{
+    setLoading(true);
+
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/teams/%1/language").arg(teamId));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
+
+    auto future = makeRequest<QJsonObject>([=]() {
+        return m_netManager->get(request);
+    }).then([=](JsonResponse response) {
+        if (response.success) {
+            QString locale = response.data->value("language"_L1).toString();
+            Q_EMIT localeReceived(locale);
+        } else {
+            Q_EMIT localeError(response.error->message, response.error->status,
+                               QJsonDocument(response.error->details).toJson());
+        }
+        setLoading(false);
+    });
+
+    return future.then([=]() {});
+}
+
+QFuture<void> TeamApi::updateTeamLocale(int teamId, const QString &locale)
+{
+    setLoading(true);
+
+
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/teams/%1/language").arg(teamId));
+      request.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json"));
+      request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
+
+      QJsonObject jsonData;
+      jsonData.insert(QStringLiteral("lang"), locale);  // Make sure to use "lang" as the key
+
+      auto future = makeRequest<QJsonObject>([=]() {
+          return m_netManager->post(request, QJsonDocument(jsonData).toJson());
+      }).then([=](JsonResponse response) {
+          if (response.success) {
+              Q_EMIT localeUpdated(locale);
+          } else {
+              Q_EMIT localeError(response.error->message, response.error->status,
+                             QJsonDocument(response.error->details).toJson());
+          }
+          setLoading(false);
+      });
+
+      return future.then([=]() {});
+}
 QString TeamApi::getToken() const {
     return m_settings.value("auth/token").toString();
 }

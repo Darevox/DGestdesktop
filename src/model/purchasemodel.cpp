@@ -3,7 +3,7 @@
 #include <QJsonDocument>
 
 namespace NetworkApi {
-
+using namespace Qt::StringLiterals;
 PurchaseModel::PurchaseModel(QObject *parent)
     : QAbstractTableModel(parent)
     , m_api(nullptr)
@@ -11,8 +11,8 @@ PurchaseModel::PurchaseModel(QObject *parent)
     , m_totalItems(0)
     , m_currentPage(1)
     , m_totalPages(1)
-    , m_sortField("purchase_date")
-    , m_sortDirection("desc")
+    , m_sortField(QStringLiteral("purchase_date"))
+    , m_sortDirection(QStringLiteral("desc"))
     , m_hasCheckedItems(false)
 {
 }
@@ -61,7 +61,7 @@ QVariant PurchaseModel::data(const QModelIndex &index, int role) const
         case 0: return purchase.id;
         case 1: return purchase.reference_number;
         case 2: return purchase.purchase_date;
-        case 3: return purchase.supplier.value("name").toString();
+        case 3: return purchase.supplier.value("name"_L1).toString();
         case 4: return purchase.status;
         case 5: return purchase.payment_status;
         case 6: return purchase.total_amount;
@@ -129,7 +129,7 @@ bool PurchaseModel::setData(const QModelIndex &index, const QVariant &value, int
     if (role == CheckedRole) {
         if (index.isValid() && index.row() < m_purchases.count()) {
             m_purchases[index.row()].checked = value.toBool();
-            emit dataChanged(index, index, {role});
+            Q_EMIT dataChanged(index, index, {role});
             updateHasCheckedItems();
             return true;
         }
@@ -150,7 +150,7 @@ void PurchaseModel::loadPage(int page)
 {
     if (page != m_currentPage && page > 0 && page <= m_totalPages) {
         m_currentPage = page;
-        emit currentPageChanged();
+        Q_EMIT currentPageChanged();
         refresh();
     }
 }
@@ -198,11 +198,11 @@ void PurchaseModel::addPayment(int id, const QVariantMap &paymentData)
     setLoading(true);
 
     PurchasePayment payment;
-    payment.cash_source_id = paymentData["cashSourceId"].toInt();
-    payment.amount = paymentData["amount"].toDouble();
-    payment.payment_method = paymentData["paymentMethod"].toString();
-    payment.reference_number = paymentData["referenceNumber"].toString();
-    payment.notes = paymentData["notes"].toString();
+    payment.cash_source_id = paymentData["cashSourceId"_L1].toInt();
+    payment.amount = paymentData["amount"_L1].toDouble();
+    payment.payment_method = paymentData["paymentMethod"_L1].toString();
+    payment.reference_number = paymentData["referenceNumber"_L1].toString();
+    payment.notes = paymentData["notes"_L1].toString();
 
     m_api->addPayment(id, payment);
 }
@@ -231,7 +231,7 @@ void PurchaseModel::setChecked(int row, bool checked)
     if (row >= 0 && row < m_purchases.count()) {
         m_purchases[row].checked = checked;
         QModelIndex index = createIndex(row, 0);
-        emit dataChanged(index, index, {CheckedRole});
+        Q_EMIT dataChanged(index, index, {CheckedRole});
         updateHasCheckedItems();
     }
 }
@@ -253,7 +253,7 @@ void PurchaseModel::clearAllChecked()
         if (m_purchases[i].checked) {
             m_purchases[i].checked = false;
             QModelIndex index = createIndex(i, 0);
-            emit dataChanged(index, index, {CheckedRole});
+            Q_EMIT dataChanged(index, index, {CheckedRole});
         }
     }
     updateHasCheckedItems();
@@ -272,7 +272,7 @@ void PurchaseModel::toggleAllPurchasesChecked()
     for (int i = 0; i < m_purchases.count(); ++i) {
         m_purchases[i].checked = !allChecked;
         QModelIndex index = createIndex(i, 0);
-        emit dataChanged(index, index, {CheckedRole});
+        Q_EMIT dataChanged(index, index, {CheckedRole});
     }
     updateHasCheckedItems();
 }
@@ -282,7 +282,7 @@ void PurchaseModel::setSortField(const QString &field)
 {
     if (m_sortField != field) {
         m_sortField = field;
-        emit sortFieldChanged();
+        Q_EMIT sortFieldChanged();
         refresh();
     }
 }
@@ -291,7 +291,7 @@ void PurchaseModel::setSortDirection(const QString &direction)
 {
     if (m_sortDirection != direction) {
         m_sortDirection = direction;
-        emit sortDirectionChanged();
+        Q_EMIT sortDirectionChanged();
         refresh();
     }
 }
@@ -300,7 +300,7 @@ void PurchaseModel::setSearchQuery(const QString &query)
 {
     if (m_searchQuery != query) {
         m_searchQuery = query;
-        emit searchQueryChanged();
+        Q_EMIT searchQueryChanged();
         refresh();
     }
 }
@@ -309,7 +309,7 @@ void PurchaseModel::setStatus(const QString &status)
 {
     if (m_status != status) {
         m_status = status;
-        emit statusChanged();
+        Q_EMIT statusChanged();
         refresh();
     }
 }
@@ -318,7 +318,7 @@ void PurchaseModel::setPaymentStatus(const QString &paymentStatus)
 {
     if (m_paymentStatus != paymentStatus) {
         m_paymentStatus = paymentStatus;
-        emit paymentStatusChanged();
+        Q_EMIT paymentStatusChanged();
         refresh();
     }
 }
@@ -331,19 +331,19 @@ void PurchaseModel::handlePurchasesReceived(const PaginatedPurchases &purchases)
     endResetModel();
 
     m_totalItems = purchases.total;
-    emit totalItemsChanged();
+    Q_EMIT totalItemsChanged();
 
     m_currentPage = purchases.currentPage;
-    emit currentPageChanged();
+    Q_EMIT currentPageChanged();
 
     m_totalPages = purchases.lastPage;
-    emit totalPagesChanged();
+    Q_EMIT totalPagesChanged();
 
     setLoading(false);
     setErrorMessage(QString());
 
     updateHasCheckedItems();
-    emit dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
+    Q_EMIT dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
 }
 
 void PurchaseModel::handlePurchaseError(const QString &message, ApiStatus status)
@@ -360,7 +360,7 @@ void PurchaseModel::handlePurchaseCreated(const Purchase &purchase)
 
     setLoading(false);
     setErrorMessage(QString());
-    emit purchaseCreated();
+    Q_EMIT purchaseCreated();
 }
 
 void PurchaseModel::handlePurchaseUpdated(const Purchase &purchase)
@@ -369,14 +369,14 @@ void PurchaseModel::handlePurchaseUpdated(const Purchase &purchase)
         if (m_purchases[i].id == purchase.id) {
             m_purchases[i] = purchase;
             QModelIndex index = createIndex(i, 0);
-            emit dataChanged(index, index);
+            Q_EMIT dataChanged(index, index);
             break;
         }
     }
 
     setLoading(false);
     setErrorMessage(QString());
-    emit purchaseUpdated();
+    Q_EMIT purchaseUpdated();
 }
 
 void PurchaseModel::handlePurchaseDeleted(int id)
@@ -392,14 +392,14 @@ void PurchaseModel::handlePurchaseDeleted(int id)
 
     setLoading(false);
     setErrorMessage(QString());
-    emit purchaseDeleted();
+    Q_EMIT purchaseDeleted();
 }
 
 void PurchaseModel::handlePaymentAdded(const QVariantMap &payment)
 {
     setLoading(false);
     setErrorMessage(QString());
-    emit paymentAdded();
+    Q_EMIT paymentAdded();
     refresh(); // Refresh to update the purchase's payment status and amounts
 }
 
@@ -407,14 +407,14 @@ void PurchaseModel::handleInvoiceGenerated(const QVariantMap &invoice)
 {
     setLoading(false);
     setErrorMessage(QString());
-    emit invoiceGenerated(invoice["url"].toString());
+    Q_EMIT invoiceGenerated(invoice["url"_L1].toString());
 }
 
 void PurchaseModel::handleSummaryReceived(const QVariantMap &summary)
 {
     setLoading(false);
     setErrorMessage(QString());
-    emit summaryReceived(summary);
+    Q_EMIT summaryReceived(summary);
 }
 
 // Private methods
@@ -422,7 +422,7 @@ void PurchaseModel::setLoading(bool loading)
 {
     if (m_loading != loading) {
         m_loading = loading;
-        emit loadingChanged();
+        Q_EMIT loadingChanged();
     }
 }
 
@@ -430,60 +430,60 @@ void PurchaseModel::setErrorMessage(const QString &message)
 {
     if (m_errorMessage != message) {
         m_errorMessage = message;
-        emit errorMessageChanged();
+        Q_EMIT errorMessageChanged();
     }
 }
 
 Purchase PurchaseModel::purchaseFromVariantMap(const QVariantMap &map) const
 {
     Purchase purchase;
-    purchase.supplier_id = map["supplier_id"].toInt();
-    purchase.cash_source_id = map["cash_source_id"].toInt();
-    purchase.purchase_date = QDateTime::fromString(map["purchase_date"].toString(), Qt::ISODate);
+    purchase.supplier_id = map["supplier_id"_L1].toInt();
+    purchase.cash_source_id = map["cash_source_id"_L1].toInt();
+    purchase.purchase_date = QDateTime::fromString(map["purchase_date"_L1].toString(), Qt::ISODate);
 
-    if (map.contains("due_date")) {
-        purchase.due_date = QDateTime::fromString(map["due_date"].toString(), Qt::ISODate);
+    if (map.contains("due_date"_L1)) {
+        purchase.due_date = QDateTime::fromString(map["due_date"_L1].toString(), Qt::ISODate);
     }
 
-    if (map.contains("notes")) {
-        purchase.notes = map["notes"].toString();
+    if (map.contains("notes"_L1)) {
+        purchase.notes = map["notes"_L1].toString();
     }
 
-    QVariantList itemsList = map["items"].toList();
+    QVariantList itemsList = map["items"_L1].toList();
     for (const QVariant &itemVar : itemsList) {
         QVariantMap itemMap = itemVar.toMap();
         PurchaseItem item;
-        item.product_id = itemMap["product_id"].toInt();
-        item.quantity = itemMap["quantity"].toInt();
-        item.unit_price = itemMap["unit_price"].toDouble();
-        item.tax_rate = itemMap["tax_rate"].toDouble();
-        item.update_prices = itemMap["update_prices"].toBool();
-        item.selling_price = itemMap["selling_price"].toDouble();
+        item.product_id = itemMap["product_id"_L1].toInt();
+        item.quantity = itemMap["quantity"_L1].toInt();
+        item.unit_price = itemMap["unit_price"_L1].toDouble();
+        item.tax_rate = itemMap["tax_rate"_L1].toDouble();
+        item.update_prices = itemMap["update_prices"_L1].toBool();
+        item.selling_price = itemMap["selling_price"_L1].toDouble();
 
         // Add package-related fields
-        item.is_package = itemMap["is_package"].toBool();
-        item.package_id = itemMap["package_id"].toInt();
-        item.update_package_prices = itemMap["update_package_prices"].toBool();
-        item.package_purchase_price = itemMap["package_purchase_price"].toDouble();
-        item.package_selling_price = itemMap["package_selling_price"].toDouble();
+        item.is_package = itemMap["is_package"_L1].toBool();
+        item.package_id = itemMap["package_id"_L1].toInt();
+        item.update_package_prices = itemMap["update_package_prices"_L1].toBool();
+        item.package_purchase_price = itemMap["package_purchase_price"_L1].toDouble();
+        item.package_selling_price = itemMap["package_selling_price"_L1].toDouble();
 
-        if (itemMap.contains("discount_amount")) {
-            item.discount_amount = itemMap["discount_amount"].toDouble();
+        if (itemMap.contains("discount_amount"_L1)) {
+            item.discount_amount = itemMap["discount_amount"_L1].toDouble();
         }
 
-        if (itemMap.contains("notes")) {
-            item.notes = itemMap["notes"].toString();
+        if (itemMap.contains("notes"_L1)) {
+            item.notes = itemMap["notes"_L1].toString();
         }
 
         // Handle package information if present
-        if (itemMap.contains("package") && !itemMap["package"].isNull()) {
-            QVariantMap packageMap = itemMap["package"].toMap();
-            item.package.id = packageMap["id"].toInt();
-            item.package.name = packageMap["name"].toString();
-            item.package.pieces_per_package = packageMap["pieces_per_package"].toInt();
-            item.package.purchase_price = packageMap["purchase_price"].toDouble();
-            item.package.selling_price = packageMap["selling_price"].toDouble();
-            item.package.barcode = packageMap["barcode"].toString();
+        if (itemMap.contains("package"_L1) && !itemMap["package"_L1].isNull()) {
+            QVariantMap packageMap = itemMap["package"_L1].toMap();
+            item.package.id = packageMap["id"_L1].toInt();
+            item.package.name = packageMap["name"_L1].toString();
+            item.package.pieces_per_package = packageMap["pieces_per_package"_L1].toInt();
+            item.package.purchase_price = packageMap["purchase_price"_L1].toDouble();
+            item.package.selling_price = packageMap["selling_price"_L1].toDouble();
+            item.package.barcode = packageMap["barcode"_L1].toString();
         }
 
         purchase.items.append(item);
@@ -494,52 +494,52 @@ Purchase PurchaseModel::purchaseFromVariantMap(const QVariantMap &map) const
 QVariantMap PurchaseModel::purchaseToVariantMap(const Purchase &purchase) const
 {
     QVariantMap map;
-    map["id"] = purchase.id;
-    map["referenceNumber"] = purchase.reference_number;
-    map["purchaseDate"] = purchase.purchase_date;
-    map["supplierId"] = purchase.supplier_id;
-    map["cash_source_id"] = purchase.cash_source_id;
-    map["status"] = purchase.status;
-    map["paymentStatus"] = purchase.payment_status;
-    map["totalAmount"] = purchase.total_amount;
-    map["paidAmount"] = purchase.paid_amount;
-    map["notes"] = purchase.notes;
-    map["supplier"] = purchase.supplier;
+    map["id"_L1] = purchase.id;
+    map["referenceNumber"_L1] = purchase.reference_number;
+    map["purchaseDate"_L1] = purchase.purchase_date;
+    map["supplierId"_L1] = purchase.supplier_id;
+    map["cash_source_id"_L1] = purchase.cash_source_id;
+    map["status"_L1] = purchase.status;
+    map["paymentStatus"_L1] = purchase.payment_status;
+    map["totalAmount"_L1] = purchase.total_amount;
+    map["paidAmount"_L1] = purchase.paid_amount;
+    map["notes"_L1] = purchase.notes;
+    map["supplier"_L1] = purchase.supplier;
 
     QVariantList itemsList;
     for (const PurchaseItem &item : purchase.items) {
         QVariantMap itemMap;
-        itemMap["id"] = item.id;
-        itemMap["productId"] = item.product_id;
-        itemMap["productName"] = item.product_name;
-        itemMap["quantity"] = item.quantity;
-        itemMap["unitPrice"] = item.unit_price;
-        itemMap["totalPrice"] = item.total_price;
-        itemMap["notes"] = item.notes;
-        itemMap["product"] = item.product;
+        itemMap["id"_L1] = item.id;
+        itemMap["productId"_L1] = item.product_id;
+        itemMap["productName"_L1] = item.product_name;
+        itemMap["quantity"_L1] = item.quantity;
+        itemMap["unitPrice"_L1] = item.unit_price;
+        itemMap["totalPrice"_L1] = item.total_price;
+        itemMap["notes"_L1] = item.notes;
+        itemMap["product"_L1] = item.product;
 
         // Add package-related fields
-        itemMap["is_package"] = item.is_package;
-        itemMap["package_id"] = item.package_id;
-        itemMap["update_package_prices"] = item.update_package_prices;
-        itemMap["package_purchase_price"] = item.package_purchase_price;
-        itemMap["package_selling_price"] = item.package_selling_price;
+        itemMap["is_package"_L1] = item.is_package;
+        itemMap["package_id"_L1] = item.package_id;
+        itemMap["update_package_prices"_L1] = item.update_package_prices;
+        itemMap["package_purchase_price"_L1] = item.package_purchase_price;
+        itemMap["package_selling_price"_L1] = item.package_selling_price;
 
         // Include package information if present
         if (item.is_package) {
             QVariantMap packageMap;
-            packageMap["id"] = item.package.id;
-            packageMap["name"] = item.package.name;
-            packageMap["pieces_per_package"] = item.package.pieces_per_package;
-            packageMap["purchase_price"] = item.package.purchase_price;
-            packageMap["selling_price"] = item.package.selling_price;
-            packageMap["barcode"] = item.package.barcode;
-            itemMap["package"] = packageMap;
+            packageMap["id"_L1] = item.package.id;
+            packageMap["name"_L1] = item.package.name;
+            packageMap["pieces_per_package"_L1] = item.package.pieces_per_package;
+            packageMap["purchase_price"_L1] = item.package.purchase_price;
+            packageMap["selling_price"_L1] = item.package.selling_price;
+            packageMap["barcode"_L1] = item.package.barcode;
+            itemMap["package"_L1] = packageMap;
         }
 
         itemsList.append(itemMap);
     }
-    map["items"] = itemsList;
+    map["items"_L1] = itemsList;
 
     return map;
 }
@@ -555,7 +555,7 @@ void PurchaseModel::updateHasCheckedItems()
 
     if (hasChecked != m_hasCheckedItems) {
         m_hasCheckedItems = hasChecked;
-        emit hasCheckedItemsChanged();
+        Q_EMIT hasCheckedItemsChanged();
     }
 }
 

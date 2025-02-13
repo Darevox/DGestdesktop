@@ -4,13 +4,13 @@
 #include <QDebug>
 #include <QQmlEngine>
 #include <QQmlContext>
-
+using namespace Qt::StringLiterals;
 static QVariantMap convertDestination(const Poppler::LinkDestination& destination)
 {
     QVariantMap result;
-    result["page"] = destination.pageNumber() - 1;
-    result["top"] = destination.top();
-    result["left"] = destination.left();
+    result["page"_L1] = destination.pageNumber() - 1;
+    result["top"_L1] = destination.top();
+    result["left"_L1] = destination.left();
     return result;
 }
 
@@ -26,12 +26,12 @@ void PdfModel::setPath(QString& pathName)
     if (pathName.isEmpty())
     {
         DEBUG << "Can't load the document, path is empty.";
-        emit error("Can't load the document, path is empty.");
+        Q_EMIT error("Can't load the document, path is empty."_L1);
         return;
     }
 
     this->path = pathName;
-    emit pathChanged(pathName);
+    Q_EMIT pathChanged(pathName);
 
     // Load document
     clear();
@@ -40,8 +40,8 @@ void PdfModel::setPath(QString& pathName)
 
     if (!document || document->isLocked())
     {
-        DEBUG << "ERROR : Can't open the document located at " + pathName;
-        emit error("Can't open the document located at " + pathName);
+        DEBUG << QStringLiteral("ERROR : Can't open the document located at %1").arg(pathName);
+        Q_EMIT error(QStringLiteral("Can't open the document located at %1").arg(pathName));
         document.reset();
         return;
     }
@@ -58,8 +58,11 @@ void PdfModel::setPath(QString& pathName)
         std::unique_ptr<Poppler::Page> page(document->page(i));
 
         QVariantMap pageData;
-        pageData["image"] = "image://" + providerName + "/page/" + QString::number(i + 1);
-        pageData["size"] = page->pageSizeF();
+        pageData["image"_L1] = QStringLiteral("image://%1/page/%2")
+                .arg(providerName)
+                .arg(i + 1);
+
+        pageData["size"_L1] = page->pageSizeF();
 
         QVariantList pageLinks;
         auto links = page->links();
@@ -71,20 +74,20 @@ void PdfModel::setPath(QString& pathName)
                 if (gotoLink && !gotoLink->isExternal())
                 {
                     QVariantMap linkMap;
-                    linkMap["rect"] = link->linkArea().normalized();
-                    linkMap["destination"] = convertDestination(gotoLink->destination());
+                    linkMap["rect"_L1] = link->linkArea().normalized();
+                    linkMap["destination"_L1] = convertDestination(gotoLink->destination());
                     pageLinks.append(linkMap);
                 }
             }
         }
-        pageData["links"] = pageLinks;
+        pageData["links"_L1] = pageLinks;
 
         pages.append(pageData);
     }
-    emit pagesChanged();
+    Q_EMIT pagesChanged();
 
     DEBUG << "Document loaded successfully";
-    emit loadedChanged();
+    Q_EMIT loadedChanged();
 }
 
 void PdfModel::loadProvider()
@@ -93,10 +96,11 @@ void PdfModel::loadProvider()
     QQmlEngine* engine = QQmlEngine::contextForObject(this)->engine();
 
     const QString& prefix = QString::number(quintptr(this));
-    providerName = "poppler" + prefix;
+    providerName = QStringLiteral("poppler%1").arg(prefix);
     engine->addImageProvider(providerName, new PageImageProvider(document.get()));
 
-    DEBUG << "Image provider loaded successfully !" << qPrintable("(" + providerName + ")");
+    DEBUG << "Image provider loaded successfully !"
+          << qPrintable(QStringLiteral("(%1)").arg(providerName));
 }
 
 void PdfModel::clear()
@@ -110,9 +114,9 @@ void PdfModel::clear()
     }
 
     document.reset();
-    emit loadedChanged();
+    Q_EMIT loadedChanged();
     pages.clear();
-    emit pagesChanged();
+    Q_EMIT pagesChanged();
 }
 
 QVariantList PdfModel::getPages() const
@@ -142,16 +146,16 @@ QVariantList PdfModel::search(int page, const QString& text, Qt::CaseSensitivity
 
     std::unique_ptr<Poppler::Page> p(document->page(page));
     auto searchResult = p->search(text, caseSensitivity == Qt::CaseInsensitive ?
-                                Poppler::Page::IgnoreCase :
-                                static_cast<Poppler::Page::SearchFlag>(0));
+                                      Poppler::Page::IgnoreCase :
+                                      static_cast<Poppler::Page::SearchFlag>(0));
 
     auto pageSize = p->pageSizeF();
     for (const auto& r : searchResult)
     {
         result.append(QRectF(r.left() / pageSize.width(),
-                            r.top() / pageSize.height(),
-                            r.width() / pageSize.width(),
-                            r.height() / pageSize.height()));
+                             r.top() / pageSize.height(),
+                             r.width() / pageSize.width(),
+                             r.height() / pageSize.height()));
     }
     return result;
 }

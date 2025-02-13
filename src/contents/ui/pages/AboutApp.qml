@@ -21,7 +21,7 @@ Kirigami.PromptDialog {
 
     FormCard.FormCard {
         FormCard.FormTextDelegate {
-            text: i18n("DGest")
+            text: i18n("DIM")
             description: "inventory management and point of sale software"
 
         }

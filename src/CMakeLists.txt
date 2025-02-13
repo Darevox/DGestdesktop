@@ -1,184 +1,299 @@
-cmake_minimum_required(VERSION 3.16)
-
-project(DGest VERSION 0.1 LANGUAGES CXX)
-
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-
-find_package(ECM   REQUIRED NO_MODULE)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH})
-
-find_package(Qt6 6.4 REQUIRED COMPONENTS Quick QuickControls2 Network  Concurrent PrintSupport)
-find_package(KF6  REQUIRED COMPONENTS Kirigami
-    I18n
-    CoreAddons
-    ColorScheme
-    IconThemes
-    StatusNotifierItem
-    Prison
-    QuickCharts
-    QQC2DesktopStyle
-
-)
-find_package(Poppler COMPONENTS Qt6)
-set_package_properties("Poppler" PROPERTIES
-    TYPE RECOMMENDED
-    PURPOSE "Support for PDF file operations.")
-
-qt_standard_project_setup()
-qt_policy(SET QTP0001 OLD)
-qt_add_executable(DGestapp
-    main.cpp
+# Generate QML module
+add_executable(dim
 )
 
-qt_add_qml_module(DGestapp
-    URI DGest
-    VERSION 1.0
-    QML_FILES
-    contents/ui/Main.qml
-    QML_FILES contents/ui/pages/user/Login.qml
-    RESOURCES contents/ui/resources/logo.svg
-    SOURCES api/abstractapi.h api/abstractapi.cpp
-    #SOURCES api/dgestapi.h api/dgestapi.cpp
-    QML_FILES contents/ui/pages/user/Signup.qml
-    QML_FILES contents/ui/pages/Welcome.qml
-    QML_FILES contents/ui/components/VNavigationTabBar.qml
-    QML_FILES contents/ui/pages/AboutApp.qml
-    QML_FILES contents/ui/pages/Settings.qml
-    SOURCES api/userapi.h api/userapi.cpp
-    QML_FILES contents/ui/components/DNotification.qml
-    QML_FILES contents/ui/pages/user/Profile.qml
-    SOURCES colorschememanager.h colorschememanager.cpp
-    QML_FILES contents/ui/components/SkeletonLoaders.qml
-    QML_FILES contents/ui/pages/NoPage.qml
-    QML_FILES contents/ui/pages/ApiStatusHandler.qml
-    SOURCES traymanager.h traymanager.cpp
-    SOURCES api/subscriptionapi.h api/subscriptionapi.cpp
-    QML_FILES contents/ui/pages/ExpiredSubscription.qml
-    SOURCES api/productapi.h api/productapi.cpp
-    SOURCES model/productmodel.h model/productmodel.cpp
-    QML_FILES contents/ui/pages/product/Products.qml
-    QML_FILES contents/ui/components/PaginationBar.qml
-    QML_FILES contents/ui/pages/product/ProductDetails.qml
-    SOURCES model/productunitmodel.h model/productunitmodel.cpp
-    QML_FILES contents/ui/components/DFormTextFieldDelegate.qml
-    QML_FILES contents/ui/components/DKTableView.qml
-    QML_FILES
-    QML_FILES contents/ui/pages/product/Barcode.qml
-    QML_FILES
-    SOURCES model/barcodemodel.h model/barcodemodel.cpp
-    QML_FILES contents/ui/pages/product/BarcodePrint.qml
-    SOURCES api/activitylogapi.h api/activitylogapi.cpp
-    SOURCES model/activitylogmodel.h model/activitylogmodel.cpp
-    QML_FILES contents/ui/pages/activitylog/ActivityLog.qml
-    SOURCES api/supplierapi.h api/supplierapi.cpp
-    SOURCES api/cashsourceapi.h api/cashsourceapi.cpp
-    SOURCES api/saleapi.h api/saleapi.cpp
-    SOURCES api/purchaseapi.h api/purchaseapi.cpp
-    SOURCES api/clientapi.h api/clientapi.cpp
-    SOURCES api/invoiceapi.h api/invoiceapi.cpp
-    SOURCES api/cashtransactionapi.h api/cashtransactionapi.cpp
-    SOURCES model/salemodel.h model/salemodel.cpp
-    SOURCES model/purchasemodel.h model/purchasemodel.cpp
-    SOURCES model/clientmodel.h model/clientmodel.cpp
-    SOURCES model/suppliermodel.h model/suppliermodel.cpp
-    SOURCES model/cashsourcemodel.h model/cashsourcemodel.cpp
-    SOURCES model/cashtransactionmodel.h model/cashtransactionmodel.cpp
-    SOURCES model/invoicemodel.h model/invoicemodel.cpp
-    QML_FILES contents/ui/pages/supplier/Supplier.qml
-    QML_FILES contents/ui/pages/supplier/SupplierDetails.qml
-    QML_FILES contents/ui/pages/cashsource/CashSource.qml
-    QML_FILES contents/ui/pages/cashsource/CashSourceDetails.qml
-    QML_FILES contents/ui/pages/cashsource/TransactionDialog.qml
-    QML_FILES contents/ui/pages/cashsource/TransferDialog.qml
-    QML_FILES contents/ui/components/DKTableViewAbstract.qml
-    QML_FILES contents/ui/pages/cashTransaction/CashTransaction.qml
-    QML_FILES contents/ui/pages/cashTransaction/CashTransactionDetails.qml
-    QML_FILES contents/ui/pages/purchase/Purchase.qml
-    QML_FILES contents/ui/pages/purchase/PurchaseDetails.qml
-    QML_FILES contents/ui/pages/purchase/ProductSelectorDialog.qml
-    QML_FILES contents/ui/pages/client/Client.qml
-    QML_FILES contents/ui/pages/client/ClientDetails.qml
-    QML_FILES contents/ui/pages/client/ClientSalesDialog.qml
-    QML_FILES contents/ui/pages/client/ClientPaymentsDialog.qml
-    QML_FILES contents/ui/pages/client/ClientStatisticsDialog.qml
-    QML_FILES contents/ui/pages/sale/Sale.qml
-    QML_FILES contents/ui/pages/sale/SaleDetails.qml
-    QML_FILES contents/ui/pages/sale/ProductSelectorDialog.qml
-    QML_FILES contents/ui/pages/invoice/Invoice.qml
-    QML_FILES contents/ui/pages/invoice/InvoiceDetails.qml
-    QML_FILES contents/ui/pages/invoice/AddPaymentDialog.qml
-    QML_FILES contents/ui/pages/invoice/InvoiceItemDialog.qml
-    QML_FILES contents/ui/pages/invoice/ViewPdfDialog.qml
-    QML_FILES contents/ui/pages/invoice/InvoiceSummaryCard.qml
-    SOURCES api/dashboardanalyticsapi.h api/dashboardanalyticsapi.cpp
-    SOURCES model/dashboardmodel.h model/dashboardmodel.cpp
-    QML_FILES contents/ui/pages/dashboard/LineChartCard.qml
-    QML_FILES contents/ui/pages/dashboard/StatsCard.qml
-    QML_FILES contents/ui/pages/dashboard/TopItemsCard.qml
-    QML_FILES contents/ui/pages/dashboard/DateRangeSelector.qml
-    QML_FILES contents/ui/pages/dashboard/Dashboard.qml
-    QML_FILES contents/ui/pages/dashboard/PieChartCard.qml
-    QML_FILES contents/ui/components/DStatusBadge.qml
-    SOURCES printerhelper.h printerhelper.cpp
-    QML_FILES contents/ui/pages/product/ProductImageEditor.qml
-    QML_FILES contents/ui/pages/product/ImageFileDialog.qml
-    QML_FILES contents/ui/pages/product/ImageBannerCard.qml
-    QML_FILES contents/ui/components/DSearchableComboBox.qml
-    SOURCES model/productmodelFetch.cpp
-    SOURCES model/productmodelFetch.h
-    QML_FILES contents/ui/components/DSearchableComboBoxClient.qml
-    SOURCES printer.cpp printer.h
-    SOURCES utils/pageImageProvider.cpp utils/pageImageProvider.h utils/pdfModel.cpp utils/pdfModel.h
-    QML_FILES utils/PDFView.qml
-    SOURCES model/clientmodelfetch.h model/clientmodelfetch.cpp
-    SOURCES model/cashsourcemodelfetch.h model/cashsourcemodelfetch.cpp
-    QML_FILES contents/ui/components/DSearchableComboBoxCashSource.qml
-    SOURCES utils/favoritemanager.h utils/favoritemanager.cpp
-    QML_FILES contents/ui/pages/quickSalePage/QuickSalePage.qml
-    QML_FILES contents/ui/pages/quickSalePage/QuickSaleTabContent.qml
-    QML_FILES contents/ui/components/NumPad.qml
-    QML_FILES contents/ui/pages/quickSalePage/FavoriteProductsSettings.qml
-    QML_FILES contents/ui/pages/quickSalePage/SharedFavoritesGrid.qml
-    QML_FILES contents/ui/pages/quickSalePage/CashSourceSettings.qml
-    QML_FILES contents/ui/pages/product/CategoriesSettings.qml
-    SOURCES utils/appsettings.h utils/appsettings.cpp
-    SOURCES api/teamapi.h api/teamapi.cpp
-    QML_FILES contents/ui/pages/team/TeamDialog.qml
-    QML_FILES contents/ui/pages/team/TeamImageEditor.qml contents/ui/pages/team/TeamImageBannerCard.qml contents/ui/pages/team/ImageFileDialog.qml
-)
-if(Qt6PrintSupport_FOUND)
-    target_link_libraries(DGestapp PRIVATE Qt6::PrintSupport)
-else()
-    target_compile_definitions(DGestapp PRIVATE QT_NO_PRINTER)
-endif()
-# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
-# If you are developing for iOS or macOS you should consider setting an
-# explicit, fixed bundle identifier manually though.
-set_target_properties(DGestapp PROPERTIES
-    #    MACOSX_BUNDLE_GUI_IDENTIFIER com.example.DGest
+# Set target properties
+set_target_properties(dim PROPERTIES
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
 
-target_link_libraries(DGestapp
-    PRIVATE Qt6::Quick Qt6::QuickControls2 Qt6::Network  Qt6::Concurrent Qt6::PrintSupport Poppler::Qt6
+
+ecm_add_qml_module(dim
+    URI com.dervox.dim
+    VERSION 1.0
+)
+
+# Declare QML sources grouped by functionality
+set(DIM_QML_PAGES
+    contents/ui/Main.qml
+    # User related pages
+    contents/ui/pages/user/Login.qml
+    contents/ui/pages/user/Signup.qml
+    contents/ui/pages/user/Profile.qml
+    # Main pages
+    contents/ui/pages/Welcome.qml
+    contents/ui/pages/AboutApp.qml
+    contents/ui/pages/Settings.qml
+    contents/ui/pages/NoPage.qml
+    contents/ui/pages/ApiStatusHandler.qml
+    # Product pages
+    contents/ui/pages/product/Products.qml
+    contents/ui/pages/product/ProductDetails.qml
+    contents/ui/pages/product/Barcode.qml
+    contents/ui/pages/product/BarcodePrint.qml
+    contents/ui/pages/product/ProductImageEditor.qml
+    contents/ui/pages/product/ImageFileDialog.qml
+    contents/ui/pages/product/ImageBannerCard.qml
+    contents/ui/pages/product/CategoriesSettings.qml
+    # Activity log pages
+    contents/ui/pages/activitylog/ActivityLog.qml
+    # Supplier pages
+    contents/ui/pages/supplier/Supplier.qml
+    contents/ui/pages/supplier/SupplierDetails.qml
+    # Cash source pages
+    contents/ui/pages/cashsource/CashSource.qml
+    contents/ui/pages/cashsource/CashSourceDetails.qml
+    contents/ui/pages/cashsource/TransactionDialog.qml
+    contents/ui/pages/cashsource/TransferDialog.qml
+    # Cash transaction pages
+    contents/ui/pages/cashTransaction/CashTransaction.qml
+    contents/ui/pages/cashTransaction/CashTransactionDetails.qml
+    # Purchase pages
+    contents/ui/pages/purchase/Purchase.qml
+    contents/ui/pages/purchase/PurchaseDetails.qml
+    contents/ui/pages/purchase/ProductSelectorDialog.qml
+    # Client pages
+    contents/ui/pages/client/Client.qml
+    contents/ui/pages/client/ClientDetails.qml
+    contents/ui/pages/client/ClientSalesDialog.qml
+    contents/ui/pages/client/ClientPaymentsDialog.qml
+    contents/ui/pages/client/ClientStatisticsDialog.qml
+    # Sale pages
+    contents/ui/pages/sale/Sale.qml
+    contents/ui/pages/sale/SaleDetails.qml
+    contents/ui/pages/sale/ProductSelectorDialog.qml
+    # Invoice pages
+    contents/ui/pages/invoice/Invoice.qml
+    contents/ui/pages/invoice/InvoiceDetails.qml
+    contents/ui/pages/invoice/AddPaymentDialog.qml
+    contents/ui/pages/invoice/InvoiceItemDialog.qml
+    contents/ui/pages/invoice/ViewPdfDialog.qml
+    contents/ui/pages/invoice/InvoiceSummaryCard.qml
+    # Dashboard pages
+    contents/ui/pages/dashboard/Dashboard.qml
+    contents/ui/pages/dashboard/LineChartCard.qml
+    contents/ui/pages/dashboard/StatsCard.qml
+    contents/ui/pages/dashboard/TopItemsCard.qml
+    contents/ui/pages/dashboard/DateRangeSelector.qml
+    contents/ui/pages/dashboard/PieChartCard.qml
+    # Quick sale pages
+    contents/ui/pages/quickSalePage/QuickSalePage.qml
+    contents/ui/pages/quickSalePage/QuickSaleTabContent.qml
+    contents/ui/pages/quickSalePage/FavoriteProductsSettings.qml
+    contents/ui/pages/quickSalePage/SharedFavoritesGrid.qml
+    contents/ui/pages/quickSalePage/CashSourceSettings.qml
+    # Team pages
+    contents/ui/pages/team/TeamDialog.qml
+    contents/ui/pages/team/TeamImageEditor.qml
+    contents/ui/pages/team/TeamImageBannerCard.qml
+    contents/ui/pages/team/ImageFileDialog.qml
+)
+
+set(DIM_QML_COMPONENTS
+    contents/ui/components/VNavigationTabBar.qml
+    contents/ui/components/DNotification.qml
+    contents/ui/components/SkeletonLoaders.qml
+    contents/ui/components/PaginationBar.qml
+    contents/ui/components/DFormTextFieldDelegate.qml
+    contents/ui/components/DKTableView.qml
+    contents/ui/components/DKTableViewAbstract.qml
+    contents/ui/components/DStatusBadge.qml
+    contents/ui/components/DSearchableComboBox.qml
+    contents/ui/components/DSearchableComboBoxClient.qml
+    contents/ui/components/DSearchableComboBoxCashSource.qml
+    contents/ui/components/NumPad.qml
+)
+set(DIM_QML_UTILS
+    utils/PDFView.qml
+
+)
+set(DIM_CPP_SOURCES
+    main.cpp
+    # API sources
+    api/abstractapi.cpp
+    api/userapi.cpp
+    api/subscriptionapi.cpp
+    api/productapi.cpp
+    api/activitylogapi.cpp
+    api/supplierapi.cpp
+    api/cashsourceapi.cpp
+    api/saleapi.cpp
+    api/purchaseapi.cpp
+    api/clientapi.cpp
+    api/invoiceapi.cpp
+    api/cashtransactionapi.cpp
+    api/dashboardanalyticsapi.cpp
+    api/teamapi.cpp
+    # Model sources
+    model/productmodel.cpp
+    model/productunitmodel.cpp
+    model/barcodemodel.cpp
+    model/activitylogmodel.cpp
+    model/salemodel.cpp
+    model/purchasemodel.cpp
+    model/clientmodel.cpp
+    model/suppliermodel.cpp
+    model/cashsourcemodel.cpp
+    model/cashtransactionmodel.cpp
+    model/invoicemodel.cpp
+    model/dashboardmodel.cpp
+    model/productmodelFetch.cpp
+    model/clientmodelfetch.cpp
+    model/cashsourcemodelfetch.cpp
+    model/cashsourceproxymodel.cpp
+    # Utils sources
+    utils/pageImageProvider.cpp
+    utils/pdfModel.cpp
+    utils/favoritemanager.cpp
+    utils/appsettings.cpp
+    # Other sources
+    colorschememanager.cpp
+    printer.cpp
+    printerhelper.cpp
+)
+
+set(DIM_HEADERS
+    # API headers
+    api/abstractapi.h
+    api/userapi.h
+    api/subscriptionapi.h
+    api/productapi.h
+    api/activitylogapi.h
+    api/supplierapi.h
+    api/cashsourceapi.h
+    api/saleapi.h
+    api/purchaseapi.h
+    api/clientapi.h
+    api/invoiceapi.h
+    api/cashtransactionapi.h
+    api/dashboardanalyticsapi.h
+    api/teamapi.h
+    # Model headers
+    model/productmodel.h
+    model/productunitmodel.h
+    model/barcodemodel.h
+    model/activitylogmodel.h
+    model/salemodel.h
+    model/purchasemodel.h
+    model/clientmodel.h
+    model/suppliermodel.h
+    model/cashsourcemodel.h
+    model/cashtransactionmodel.h
+    model/invoicemodel.h
+    model/dashboardmodel.h
+    model/productmodelFetch.h
+    model/clientmodelfetch.h
+    model/cashsourcemodelfetch.h
+    model/cashsourceproxymodel.h
+    # Utils headers
+    utils/pageImageProvider.h
+    utils/pdfModel.h
+    utils/favoritemanager.h
+    utils/appsettings.h
+    # Other headers
+    colorschememanager.h
+    printer.h
+    printerhelper.h
+)
+
+# Add QML resources
+qt_target_qml_sources(dim
+    QML_FILES
+    ${DIM_QML_PAGES}
+    ${DIM_QML_COMPONENTS}
+    ${DIM_QML_UTILS}
+    RESOURCES
+    contents/ui/resources/logo.svg
+)
+
+# Add C++ sources
+target_sources(dim PRIVATE
+    ${DIM_CPP_SOURCES}
+    ${DIM_HEADERS}
+)
+
+# Define logging categories if needed
+# ecm_qt_declare_logging_category(dim
+#     HEADER "dim_logging.h"
+#     IDENTIFIER "DIM_GENERAL"
+#     CATEGORY_NAME "org.kde.dim"
+#     DESCRIPTION "Dim Application"
+#     DEFAULT_SEVERITY Info
+#     EXPORT DIM
+# )
+
+
+# Include directories
+target_include_directories(dim PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/api
+    ${CMAKE_CURRENT_SOURCE_DIR}/model
+    ${CMAKE_CURRENT_SOURCE_DIR}/utils
+)
+
+# Link libraries
+target_link_libraries(dim
+    PRIVATE
+    Qt::Core
+    Qt::Quick
+    Qt::QuickControls2
+    Qt::Network
+    Qt::Concurrent
+    Qt::PrintSupport
+    Qt::Svg
     KF6::Kirigami
     KF6::I18n
     KF6::CoreAddons
     KF6::ColorScheme
     KF6::IconThemes
-    KF6::StatusNotifierItem
     KF6::Prison
     KF6::QuickCharts
-
 )
 
-include(GNUInstallDirs)
-install(TARGETS DGestapp
+# Optional Poppler support
+if(Poppler_FOUND)
+    target_link_libraries(dim PRIVATE Poppler::Qt6)
+endif()
+
+# PrintSupport conditional compilation
+if(Qt6PrintSupport_FOUND)
+    target_link_libraries(dim PRIVATE Qt6::PrintSupport)
+else()
+    target_compile_definitions(dim PRIVATE QT_NO_PRINTER)
+endif()
+
+# Android specific settings
+if(ANDROID)
+    target_link_libraries(dim PRIVATE Qt::Svg)
+
+    # Add Android-specific icons
+    kirigami_package_breeze_icons(ICONS
+        "configure"
+        "dialog-ok"
+        "document-edit"
+        "list-add"
+        "edit-delete"
+        # Add more icons as needed
+    )
+
+ecm_add_android_apk(dim ANDROID_DIR ${CMAKE_SOURCE_DIR}/android)
+endif()
+
+# Installation
+install(TARGETS dim
+    ${KF6_INSTALL_TARGETS_DEFAULT_ARGS}
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+
+# Install icons for non-Android platforms
+if(NOT ANDROID)
+    install(DIRECTORY icons/
+        DESTINATION ${KDE_INSTALL_ICONDIR}/hicolor/scalable/apps
+    )
+endif()

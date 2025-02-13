@@ -4,7 +4,7 @@
 #include <QAbstractTableModel>
 #include <QJsonObject>
 
-#include "../api/productapi.h"
+#include <api/productapi.h>
 
 namespace NetworkApi {
 
@@ -39,11 +39,11 @@ public:
     bool isLoading() const { return m_loading; }
     QString errorMessage() const { return m_errorMessage; }
 
-signals:
+Q_SIGNALS:
     void loadingChanged();
     void errorMessageChanged();
 
-private slots:
+private Q_SLOTS:
     void handleBarcodesReceived(const QList<QJsonObject> &barcodes);
     void handleBarcodeAdded(const QJsonObject &barcode);
     void handleBarcodeRemoved(int productId, int barcodeId);

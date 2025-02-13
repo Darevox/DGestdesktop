@@ -3,7 +3,7 @@
 #include <QJsonDocument>
 
 namespace NetworkApi {
-
+using namespace Qt::StringLiterals;
 SupplierModel::SupplierModel(QObject *parent)
     : QAbstractTableModel(parent)
     , m_api(nullptr)
@@ -11,8 +11,8 @@ SupplierModel::SupplierModel(QObject *parent)
     , m_totalItems(0)
     , m_currentPage(1)
     , m_totalPages(1)
-    , m_sortField("name")
-    , m_sortDirection("asc")
+    , m_sortField(QStringLiteral("name"))
+    , m_sortDirection(QStringLiteral("asc"))
     , m_hasCheckedItems(false)
 {
 }
@@ -121,7 +121,7 @@ bool SupplierModel::setData(const QModelIndex &index, const QVariant &value, int
     if (role == CheckedRole) {
         if (index.isValid() && index.row() < m_suppliers.count()) {
             m_suppliers[index.row()].checked = value.toBool();
-            emit dataChanged(index, index, {role});
+            Q_EMIT dataChanged(index, index, {role});
             updateHasCheckedItems();
             return true;
         }
@@ -142,7 +142,7 @@ void SupplierModel::loadPage(int page)
 {
     if (page != m_currentPage && page > 0 && page <= m_totalPages) {
         m_currentPage = page;
-        emit currentPageChanged();
+        Q_EMIT currentPageChanged();
         refresh();
     }
 }
@@ -188,7 +188,7 @@ void SupplierModel::setChecked(int row, bool checked)
     if (row >= 0 && row < m_suppliers.count()) {
         m_suppliers[row].checked = checked;
         QModelIndex index = createIndex(row, 0);
-        emit dataChanged(index, index, {CheckedRole});
+        Q_EMIT dataChanged(index, index, {CheckedRole});
         updateHasCheckedItems();
     }
 }
@@ -210,7 +210,7 @@ void SupplierModel::clearAllChecked()
         if (m_suppliers[i].checked) {
             m_suppliers[i].checked = false;
             QModelIndex index = createIndex(i, 0);
-            emit dataChanged(index, index, {CheckedRole});
+            Q_EMIT dataChanged(index, index, {CheckedRole});
         }
     }
     updateHasCheckedItems();
@@ -229,7 +229,7 @@ void SupplierModel::toggleAllSuppliersChecked()
     for (int i = 0; i < m_suppliers.count(); ++i) {
         m_suppliers[i].checked = !allChecked;
         QModelIndex index = createIndex(i, 0);
-        emit dataChanged(index, index, {CheckedRole});
+        Q_EMIT dataChanged(index, index, {CheckedRole});
     }
     updateHasCheckedItems();
 }
@@ -239,7 +239,7 @@ void SupplierModel::setSortField(const QString &field)
 {
     if (m_sortField != field) {
         m_sortField = field;
-        emit sortFieldChanged();
+        Q_EMIT sortFieldChanged();
         refresh();
     }
 }
@@ -248,7 +248,7 @@ void SupplierModel::setSortDirection(const QString &direction)
 {
     if (m_sortDirection != direction) {
         m_sortDirection = direction;
-        emit sortDirectionChanged();
+        Q_EMIT sortDirectionChanged();
         refresh();
     }
 }
@@ -257,7 +257,7 @@ void SupplierModel::setSearchQuery(const QString &query)
 {
     if (m_searchQuery != query) {
         m_searchQuery = query;
-        emit searchQueryChanged();
+        Q_EMIT searchQueryChanged();
         refresh();
     }
 }
@@ -270,19 +270,19 @@ void SupplierModel::handleSuppliersReceived(const PaginatedSuppliers &suppliers)
     endResetModel();
 
     m_totalItems = suppliers.total;
-    emit totalItemsChanged();
+    Q_EMIT totalItemsChanged();
 
     m_currentPage = suppliers.currentPage;
-    emit currentPageChanged();
+    Q_EMIT currentPageChanged();
 
     m_totalPages = suppliers.lastPage;
-    emit totalPagesChanged();
+    Q_EMIT totalPagesChanged();
 
     setLoading(false);
     setErrorMessage(QString());
 
     updateHasCheckedItems();
-    emit dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
+    Q_EMIT dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
 }
 
 void SupplierModel::handleSupplierError(const QString &message, ApiStatus status)
@@ -299,7 +299,7 @@ void SupplierModel::handleSupplierCreated(const Supplier &supplier)
 
     setLoading(false);
     setErrorMessage(QString());
-    emit supplierCreated();
+    Q_EMIT supplierCreated();
 }
 
 void SupplierModel::handleSupplierUpdated(const Supplier &supplier)
@@ -308,14 +308,14 @@ void SupplierModel::handleSupplierUpdated(const Supplier &supplier)
         if (m_suppliers[i].id == supplier.id) {
             m_suppliers[i] = supplier;
             QModelIndex index = createIndex(i, 0);
-            emit dataChanged(index, index);
+            Q_EMIT dataChanged(index, index);
             break;
         }
     }
 
     setLoading(false);
     setErrorMessage(QString());
-    emit supplierUpdated();
+    Q_EMIT supplierUpdated();
 }
 
 void SupplierModel::handleSupplierDeleted(int id)
@@ -331,7 +331,7 @@ void SupplierModel::handleSupplierDeleted(int id)
 
     setLoading(false);
     setErrorMessage(QString());
-    emit supplierDeleted();
+    Q_EMIT supplierDeleted();
 }
 
 // Private methods
@@ -339,7 +339,7 @@ void SupplierModel::setLoading(bool loading)
 {
     if (m_loading != loading) {
         m_loading = loading;
-        emit loadingChanged();
+        Q_EMIT loadingChanged();
     }
 }
 
@@ -347,39 +347,39 @@ void SupplierModel::setErrorMessage(const QString &message)
 {
     if (m_errorMessage != message) {
         m_errorMessage = message;
-        emit errorMessageChanged();
+        Q_EMIT errorMessageChanged();
     }
 }
 
 Supplier SupplierModel::supplierFromVariantMap(const QVariantMap &map) const
 {
     Supplier supplier;
-    supplier.id = map["id"].toInt();
-    supplier.name = map["name"].toString();
-    supplier.email = map["email"].toString();
-    supplier.phone = map["phone"].toString();
-    supplier.address = map["address"].toString();
-    supplier.payment_terms = map["paymentTerms"].toString();
-    supplier.tax_number = map["taxNumber"].toString();
-    supplier.notes = map["notes"].toString();
-    supplier.status = map["status"].toString();
-    supplier.balance = map["balance"].toDouble();
+    supplier.id = map["id"_L1].toInt();
+    supplier.name = map["name"_L1].toString();
+    supplier.email = map["email"_L1].toString();
+    supplier.phone = map["phone"_L1].toString();
+    supplier.address = map["address"_L1].toString();
+    supplier.payment_terms = map["paymentTerms"_L1].toString();
+    supplier.tax_number = map["taxNumber"_L1].toString();
+    supplier.notes = map["notes"_L1].toString();
+    supplier.status = map["status"_L1].toString();
+    supplier.balance = map["balance"_L1].toDouble();
     return supplier;
 }
 
 QVariantMap SupplierModel::supplierToVariantMap(const Supplier &supplier) const
 {
     QVariantMap map;
-    map["id"] = supplier.id;
-    map["name"] = supplier.name;
-    map["email"] = supplier.email;
-    map["phone"] = supplier.phone;
-    map["address"] = supplier.address;
-    map["paymentTerms"] = supplier.payment_terms;
-    map["taxNumber"] = supplier.tax_number;
-    map["notes"] = supplier.notes;
-    map["status"] = supplier.status;
-    map["balance"] = supplier.balance;
+    map["id"_L1] = supplier.id;
+    map["name"_L1] = supplier.name;
+    map["email"_L1] = supplier.email;
+    map["phone"_L1] = supplier.phone;
+    map["address"_L1] = supplier.address;
+    map["paymentTerms"_L1] = supplier.payment_terms;
+    map["taxNumber"_L1] = supplier.tax_number;
+    map["notes"_L1] = supplier.notes;
+    map["status"_L1] = supplier.status;
+    map["balance"_L1] = supplier.balance;
     return map;
 }
 
@@ -395,7 +395,7 @@ void SupplierModel::updateHasCheckedItems()
 
     if (hasChecked != m_hasCheckedItems) {
         m_hasCheckedItems = hasChecked;
-        emit hasCheckedItemsChanged();
+        Q_EMIT hasCheckedItemsChanged();
     }
 }
 

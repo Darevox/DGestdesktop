@@ -194,7 +194,7 @@ void Printer::setMonochrome(bool toggle)
         return;
 
     m_monochrome = toggle;
-    emit monochromeChanged();
+    Q_EMIT monochromeChanged();
 }
 
 void Printer::setAntialias(bool toggle)
@@ -203,7 +203,7 @@ void Printer::setAntialias(bool toggle)
         return;
 
     m_antialias = toggle;
-    emit antialiasChanged();
+    Q_EMIT antialiasChanged();
 }
 
 void Printer::setFilePath(const QString &filepath)
@@ -212,7 +212,7 @@ void Printer::setFilePath(const QString &filepath)
         return;
 
     m_filepath = filepath;
-    emit filePathChanged();
+    Q_EMIT filePathChanged();
 }
 #endif
 
@@ -222,7 +222,7 @@ void Printer::setItem(QQuickItem *item)
          return;
 
      m_item = item;
-     emit itemChanged();
+     Q_EMIT itemChanged();
 }
 
 #ifndef QT_NO_PRINTER
@@ -233,7 +233,7 @@ void Printer::setMargins(double top, double right, double bottom, double left)
         return;
 
     m_margins = m;
-    emit marginsChanged();
+    Q_EMIT marginsChanged();
 }
 
 bool Printer::setPageSize( const QString &paperSize )
@@ -246,7 +246,7 @@ bool Printer::setPageSize( const QString &paperSize )
         if( size.name() == paperSize )
         {
             bool result = m_printer->setPageSize( size );
-            emit sizeChanged();
+            Q_EMIT sizeChanged();
             return result;
         }
     }
@@ -273,7 +273,7 @@ bool Printer::setPageSize( qreal width, qreal height, Unit unit )
     }
 
     bool result = m_printer->setPageSize(size);
-    emit sizeChanged();
+    Q_EMIT sizeChanged();
     return result;
 }
 
@@ -283,7 +283,7 @@ void Printer::setPrinterName(const QString &printerName)
         return;
 
     m_printer->setPrinterName( printerName );
-    emit printerNameChanged();
+    Q_EMIT printerNameChanged();
 }
 
 void Printer::setResolution(int dpi)
@@ -292,7 +292,7 @@ void Printer::setResolution(int dpi)
         return;
 
     m_printer->setResolution( dpi );
-    emit resolutionChanged();
+    Q_EMIT resolutionChanged();
 }
 
 void Printer::setCopyCount(int count)
@@ -301,7 +301,7 @@ void Printer::setCopyCount(int count)
         return;
 
     m_printer->setCopyCount( count );
-    emit copyCountChanged();
+    Q_EMIT copyCountChanged();
 }
 
 QRectF Printer::getPageRect(Unit unit) const
@@ -410,9 +410,9 @@ void Printer::grabbed()
     m_callback = QJSValue();
 
     if( ret )
-        emit printComplete();
+        Q_EMIT printComplete();
     else
-        emit printError();
+        Q_EMIT printError();
 }
 
 #ifndef QT_NO_PRINTER

@@ -10,73 +10,76 @@ ListView {
     property bool drawerCollapsed: false
 
     model: ListModel {
-        ListElement {
-            name: "Dashboard"
-            icon: "dashboard-show"
-            pathPage: "qrc:/DGest/contents/ui/pages/dashboard/Dashboard.qml"
-        }
-        ListElement {
-            name: "Quick Sale"
-            icon: "view-financial-category-income"
-            pathPage: "qrc:/DGest/contents/ui/pages/quickSalePage/QuickSalePage.qml"
-        }
-        ListElement {
-            name: "Cashier"
-            icon: "view-financial-account-cash"
-            pathPage: "qrc:/DGest/contents/ui/pages/cashsource/CashSource.qml"
-        }
-        ListElement {
-            name: "Cash Transaction"
-            icon: "view-financial-account-reopen"
-            pathPage: "qrc:/DGest/contents/ui/pages/cashTransaction/CashTransaction.qml"
-        }
-        ListElement {
-            name: "Invoices"
-            icon: "view-financial-account-checking"
-            pathPage: "qrc:/DGest/contents/ui/pages/invoice/Invoice.qml"
-        }
-        ListElement {
-            name: "Stock"
-            icon: "package"
-            pathPage: "qrc:/DGest/contents/ui/pages/product/Products.qml"
-        }
-        ListElement {
-            name: "Activity Log"
-            icon: "view-calendar-list"
-            pathPage: "qrc:/DGest/contents/ui/pages/activitylog/ActivityLog.qml"
-        }
-        ListElement {
-            name: "Sales"
-            icon: "view-financial-account-savings"
-            pathPage: "qrc:/DGest/contents/ui/pages/sale/Sale.qml"
-        }
-        ListElement {
-            name: "Purchases"
-            icon: "view-financial-account-investment"
-            pathPage: "qrc:/DGest/contents/ui/pages/purchase/Purchase.qml"
-        }
-        ListElement {
-            name: "Clients"
-            icon: "group"
-            pathPage: "qrc:/DGest/contents/ui/pages/client/Client.qml"
-        }
-        ListElement {
-            name: "Suppliers"
-            icon: "kr_setjumpback"
-            pathPage: "qrc:/DGest/contents/ui/pages/supplier/Supplier.qml"
-        }
-        ListElement {
-            name: "Accounts"
-            icon: "im-user"
-            pathPage: "qrc:/DGest/contents/ui/pages/Accounts.qml"
-        }
-        ListElement {
-            name: "Settings"
-            icon: "settings-configure"
-            pathPage: "qrc:/DGest/contents/ui/pages/Settings.qml"
-        }
-    }
-
+           id: navigationModel
+           Component.onCompleted: {
+               // Add items dynamically
+               append({
+                   name: i18n("Dashboard"),
+                   icon: "dashboard-show",
+                   pathPage: "Dashboard"
+               });
+               append({
+                   name: i18n("Quick Sale"),
+                   icon: "view-financial-category-income",
+                   pathPage: "QuickSalePage"
+               });
+               append({
+                   name: i18n("Cashier"),
+                   icon: "view-financial-account-cash",
+                   pathPage: "CashSource"
+               });
+               append({
+                   name: i18n("Cash Transaction"),
+                   icon: "view-financial-account-reopen",
+                   pathPage: "CashTransaction"
+               });
+               append({
+                   name: i18n("Invoices"),
+                   icon: "view-financial-account-checking",
+                   pathPage: "Invoice"
+               });
+               append({
+                   name: i18n("Stock"),
+                   icon: "package",
+                   pathPage: "Products"
+               });
+               append({
+                   name: i18n("Activity Log"),
+                   icon: "view-calendar-list",
+                   pathPage: "ActivityLog"
+               });
+               append({
+                   name: i18n("Sales"),
+                   icon: "view-financial-account-savings",
+                   pathPage: "Sale"
+               });
+               append({
+                   name: i18n("Purchases"),
+                   icon: "view-financial-account-investment",
+                   pathPage: "Purchase"
+               });
+               append({
+                   name: i18n("Clients"),
+                   icon: "group",
+                   pathPage: "Client"
+               });
+               append({
+                   name: i18n("Suppliers"),
+                   icon: "kr_setjumpback",
+                   pathPage: "Supplier"
+               });
+               append({
+                   name: i18n("Accounts"),
+                   icon: "im-user",
+                   pathPage: "Accounts"
+               });
+               append({
+                   name: i18n("Settings"),
+                   icon: "settings-configure",
+                   pathPage: "Settings"
+               });
+           }
+       }
     delegate: QQC2.ItemDelegate {
         width: ListView.view.width
         height: !root.drawerCollapsed ? 50 : 40
@@ -97,7 +100,7 @@ ListView {
         }
         onClicked: {
             root.currentIndex = index
-            applicationWindow().pageStack.replace(Qt.resolvedUrl(model.pathPage))
+            applicationWindow().pageStack.replace( Qt.createComponent("com.dervox.dim", model.pathPage))
         }
         background: Rectangle {
             color: root.currentIndex === index ?

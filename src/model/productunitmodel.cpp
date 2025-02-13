@@ -1,7 +1,7 @@
 #include "productunitmodel.h"
 
 namespace NetworkApi {
-
+using namespace Qt::StringLiterals;
 ProductUnitModel::ProductUnitModel(QObject *parent)
     : QAbstractListModel(parent)
 {
@@ -63,7 +63,7 @@ void ProductUnitModel::handleUnitsReceived(const QList<ProductUnit>& units)
 
 void ProductUnitModel::handleError(const ApiError& error)
 {
-    // Handle error - you might want to emit a signal or set an error property
+    // Handle error - you might want to Q_EMIT a signal or set an error property
     qWarning() << "Error fetching product units:" << error.message;
 }
 

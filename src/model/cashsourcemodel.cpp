@@ -2,7 +2,7 @@
 #include "cashsourcemodel.h"
 
 namespace NetworkApi {
-
+using namespace Qt::StringLiterals;
 CashSourceModel::CashSourceModel(QObject *parent)
     : QAbstractTableModel(parent)
     , m_api(nullptr)
@@ -10,8 +10,8 @@ CashSourceModel::CashSourceModel(QObject *parent)
     , m_totalItems(0)
     , m_currentPage(1)
     , m_totalPages(1)
-    , m_sortField("name")
-    , m_sortDirection("asc")
+    , m_sortField(QStringLiteral("name"))
+    , m_sortDirection(QStringLiteral("asc"))
     , m_hasCheckedItems(false)
 {
 }
@@ -122,7 +122,7 @@ bool CashSourceModel::setData(const QModelIndex &index, const QVariant &value, i
     if (role == CheckedRole) {
         if (index.isValid() && index.row() < m_sources.count()) {
             m_sources[index.row()].checked = value.toBool();
-            emit dataChanged(index, index, {role});
+            Q_EMIT dataChanged(index, index, {role});
             updateHasCheckedItems();
             return true;
         }
@@ -143,7 +143,7 @@ void CashSourceModel::loadPage(int page)
 {
     if (page != m_currentPage && page > 0 && page <= m_totalPages) {
         m_currentPage = page;
-        emit currentPageChanged();
+        Q_EMIT currentPageChanged();
         refresh();
     }
 }
@@ -167,18 +167,18 @@ void CashSourceModel::updateCashSource(int id, const QVariantMap &sourceData)
 
     CashSource source;
     source.id = id;
-    source.name = sourceData["name"].toString();
-    source.type = sourceData["type"].toString();
-    source.description = sourceData["description"].toString();
-    source.status = sourceData["status"].toString();
-    source.is_default = sourceData["is_default"].toBool();
+    source.name = sourceData["name"_L1].toString();
+    source.type = sourceData["type"_L1].toString();
+    source.description = sourceData["description"_L1].toString();
+    source.status = sourceData["status"_L1].toString();
+    source.is_default = sourceData["is_default"_L1].toBool();
 
     // Only include bank-specific fields if they exist
-    if (sourceData.contains("account_number")) {
-        source.account_number = sourceData["account_number"].toString();
+    if (sourceData.contains("account_number"_L1)) {
+        source.account_number = sourceData["account_number"_L1].toString();
     }
-    if (sourceData.contains("bank_name")) {
-        source.bank_name = sourceData["bank_name"].toString();
+    if (sourceData.contains("bank_name"_L1)) {
+        source.bank_name = sourceData["bank_name"_L1].toString();
     }
 
     setLoading(true);
@@ -232,10 +232,10 @@ void CashSourceModel::transfer(const QVariantMap &transferData)
 TransferData CashSourceModel::transferDataFromVariantMap(const QVariantMap &map) const
 {
     TransferData data;
-    data.sourceId = map["sourceId"].toInt();
-    data.destinationId = map["destinationId"].toInt();
-    data.amount = map["amount"].toDouble();
-    data.notes = map["notes"].toString();
+    data.sourceId = map["sourceId"_L1].toInt();
+    data.destinationId = map["destinationId"_L1].toInt();
+    data.amount = map["amount"_L1].toDouble();
+    data.notes = map["notes"_L1].toString();
     return data;
 }
 
@@ -245,7 +245,7 @@ void CashSourceModel::setChecked(int row, bool checked)
     if (row >= 0 && row < m_sources.count()) {
         m_sources[row].checked = checked;
         QModelIndex index = createIndex(row, 0);
-        emit dataChanged(index, index, {CheckedRole});
+        Q_EMIT dataChanged(index, index, {CheckedRole});
         updateHasCheckedItems();
     }
 }
@@ -267,7 +267,7 @@ void CashSourceModel::clearAllChecked()
         if (m_sources[i].checked) {
             m_sources[i].checked = false;
             QModelIndex index = createIndex(i, 0);
-            emit dataChanged(index, index, {CheckedRole});
+            Q_EMIT dataChanged(index, index, {CheckedRole});
         }
     }
     updateHasCheckedItems();
@@ -286,7 +286,7 @@ void CashSourceModel::toggleAllCashSourcesChecked()
     for (int i = 0; i < m_sources.count(); ++i) {
         m_sources[i].checked = !allChecked;
         QModelIndex index = createIndex(i, 0);
-        emit dataChanged(index, index, {CheckedRole});
+        Q_EMIT dataChanged(index, index, {CheckedRole});
     }
     updateHasCheckedItems();
 }
@@ -296,7 +296,7 @@ void CashSourceModel::setSortField(const QString &field)
 {
     if (m_sortField != field) {
         m_sortField = field;
-        emit sortFieldChanged();
+        Q_EMIT sortFieldChanged();
         refresh();
     }
 }
@@ -305,7 +305,7 @@ void CashSourceModel::setSortDirection(const QString &direction)
 {
     if (m_sortDirection != direction) {
         m_sortDirection = direction;
-        emit sortDirectionChanged();
+        Q_EMIT sortDirectionChanged();
         refresh();
     }
 }
@@ -314,7 +314,7 @@ void CashSourceModel::setSearchQuery(const QString &query)
 {
     if (m_searchQuery != query) {
         m_searchQuery = query;
-        emit searchQueryChanged();
+        Q_EMIT searchQueryChanged();
         refresh();
     }
 }
@@ -327,19 +327,19 @@ void CashSourceModel::handleCashSourcesReceived(const PaginatedCashSources &sour
     endResetModel();
 
     m_totalItems = sources.total;
-    emit totalItemsChanged();
+    Q_EMIT totalItemsChanged();
 
     m_currentPage = sources.currentPage;
-    emit currentPageChanged();
+    Q_EMIT currentPageChanged();
 
     m_totalPages = sources.lastPage;
-    emit totalPagesChanged();
+    Q_EMIT totalPagesChanged();
 
     setLoading(false);
     setErrorMessage(QString());
 
     updateHasCheckedItems();
-    emit dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
+    Q_EMIT dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
 }
 
 void CashSourceModel::handleCashSourceError(const QString &message, ApiStatus status)
@@ -356,7 +356,7 @@ void CashSourceModel::handleCashSourceCreated(const CashSource &source)
 
     setLoading(false);
     setErrorMessage(QString());
-    emit cashSourceCreated();
+    Q_EMIT cashSourceCreated();
 }
 
 void CashSourceModel::handleCashSourceUpdated(const CashSource &source)
@@ -365,14 +365,14 @@ void CashSourceModel::handleCashSourceUpdated(const CashSource &source)
         if (m_sources[i].id == source.id) {
             m_sources[i] = source;
             QModelIndex index = createIndex(i, 0);
-            emit dataChanged(index, index);
+            Q_EMIT dataChanged(index, index);
             break;
         }
     }
 
     setLoading(false);
     setErrorMessage(QString());
-    emit cashSourceUpdated();
+    Q_EMIT cashSourceUpdated();
 }
 
 void CashSourceModel::handleCashSourceDeleted(int id)
@@ -388,14 +388,14 @@ void CashSourceModel::handleCashSourceDeleted(int id)
 
     setLoading(false);
     setErrorMessage(QString());
-    emit cashSourceDeleted();
+    Q_EMIT cashSourceDeleted();
 }
 
 void CashSourceModel::handleDepositCompleted(const QVariantMap &transaction)
 {
     setLoading(false);
     setErrorMessage(QString());
-    emit depositCompleted();
+    Q_EMIT depositCompleted();
     refresh(); // Refresh to update balances
 }
 
@@ -403,7 +403,7 @@ void CashSourceModel::handleWithdrawalCompleted(const QVariantMap &transaction)
 {
     setLoading(false);
     setErrorMessage(QString());
-    emit withdrawalCompleted();
+    Q_EMIT withdrawalCompleted();
     refresh(); // Refresh to update balances
 }
 
@@ -411,7 +411,7 @@ void CashSourceModel::handleTransferCompleted(const QVariantMap &transaction)
 {
     setLoading(false);
     setErrorMessage(QString());
-    emit transferCompleted();
+    Q_EMIT transferCompleted();
     refresh(); // Refresh to update balances
 }
 
@@ -420,7 +420,7 @@ void CashSourceModel::setLoading(bool loading)
 {
     if (m_loading != loading) {
         m_loading = loading;
-        emit loadingChanged();
+        Q_EMIT loadingChanged();
     }
 }
 
@@ -428,28 +428,28 @@ void CashSourceModel::setErrorMessage(const QString &message)
 {
     if (m_errorMessage != message) {
         m_errorMessage = message;
-        emit errorMessageChanged();
+        Q_EMIT errorMessageChanged();
     }
 }
 
 CashSource CashSourceModel::cashSourceFromVariantMap(const QVariantMap &map) const
 {
     CashSource source;
-    source.id = map["id"].toInt();
-    source.name = map["name"].toString();
-    source.description = map["description"].toString();
-    source.type = map["type"].toString();
-    source.balance = map["balance"].toDouble();
-    source.initial_balance = map["initial_balance"].toString().toDouble();  // Make sure this is handled
-    source.account_number = map["account_number"].toString();
-    source.bank_name = map["bank_name"].toString();
-    source.status = map["status"].toString();
+    source.id = map["id"_L1].toInt();
+    source.name = map["name"_L1].toString();
+    source.description = map["description"_L1].toString();
+    source.type = map["type"_L1].toString();
+    source.balance = map["balance"_L1].toDouble();
+    source.initial_balance = map["initial_balance"_L1].toString().toDouble();  // Make sure this is handled
+    source.account_number = map["account_number"_L1].toString();
+    source.bank_name = map["bank_name"_L1].toString();
+    source.status = map["status"_L1].toString();
 
     // Handle both "is_default" and "isDefault" keys for consistency
-    if (map.contains("is_default"))
-        source.is_default = map["is_default"].toBool();
-    else if (map.contains("isDefault"))
-        source.is_default = map["isDefault"].toBool();
+    if (map.contains("is_default"_L1))
+        source.is_default = map["is_default"_L1].toBool();
+    else if (map.contains("isDefault"_L1))
+        source.is_default = map["isDefault"_L1].toBool();
 
     return source;
 }
@@ -458,16 +458,16 @@ CashSource CashSourceModel::cashSourceFromVariantMap(const QVariantMap &map) con
 QVariantMap CashSourceModel::cashSourceToVariantMap(const CashSource &source) const
 {
     QVariantMap map;
-    map["id"] = source.id;
-    map["name"] = source.name;
-    map["description"] = source.description;
-    map["type"] = source.type;
-    map["balance"] = source.balance;
-    map["initial_balance"] = source.initial_balance;
-    map["account_number"] = source.account_number;
-    map["bank_name"] = source.bank_name;
-    map["status"] = source.status;
-    map["isDefault"] = source.is_default;
+    map["id"_L1] = source.id;
+    map["name"_L1] = source.name;
+    map["description"_L1] = source.description;
+    map["type"_L1] = source.type;
+    map["balance"_L1] = source.balance;
+    map["initial_balance"_L1] = source.initial_balance;
+    map["account_number"_L1] = source.account_number;
+    map["bank_name"_L1] = source.bank_name;
+    map["status"_L1] = source.status;
+    map["isDefault"_L1] = source.is_default;
     return map;
 }
 
@@ -483,7 +483,7 @@ void CashSourceModel::updateHasCheckedItems()
 
     if (hasChecked != m_hasCheckedItems) {
         m_hasCheckedItems = hasChecked;
-        emit hasCheckedItemsChanged();
+        Q_EMIT hasCheckedItemsChanged();
     }
 }
 

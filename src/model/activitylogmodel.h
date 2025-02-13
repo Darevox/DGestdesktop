@@ -60,7 +60,7 @@ public:
     Q_INVOKABLE void getStatistics(int days = 30);
     Q_INVOKABLE void getFilterOptions();
 
-public slots:
+public Q_SLOTS:
     void setSortField(const QString &field);
     void setSortDirection(const QString &direction);
     void setSearchQuery(const QString &query);
@@ -70,7 +70,7 @@ public slots:
     void filterByDateRange(const QDateTime &startDate, const QDateTime &endDate);
     void applyFilters();
     void clearFilters();
-signals:
+Q_SIGNALS:
     void loadingChanged();
     void errorMessageChanged();
     void totalItemsChanged();
@@ -82,7 +82,7 @@ signals:
     void filterOptionsReceived(const QStringList &logTypes, const QStringList &modelTypes);
     void rowCountChanged();
     void searchQueryChanged();
-private slots:
+private Q_SLOTS:
     void handleLogsReceived(const PaginatedLogs &logs);
     void handleLogError(const QString &message, ApiStatus status);
     void handleStatisticsReceived(const LogStatistics &statistics);

@@ -34,7 +34,7 @@ QQC2.ComboBox {
         width: root.width - root.indicator.width - root.spacing
         font: root.font
         verticalAlignment: Text.AlignVCenter
-        placeholderText:"Enter Name , Barcode ..."
+        placeholderText:i18n("Enter Name , Barcode ...")
         // Keep focus when model updates
         background: Rectangle {
             color: "transparent"

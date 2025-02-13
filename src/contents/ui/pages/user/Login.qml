@@ -1,261 +1,334 @@
+// Login.qml
 import QtQuick
 import QtQuick.Controls as QQC2
 import org.kde.kirigami as Kirigami
+import org.kde.kirigamiaddons.formcard 1.0 as FormCard
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
+import com.dervox.dim
 import "../."
+
 Kirigami.Page {
-    id:loginPage
-    title: "Login"
+    id: loginPage
+    title: i18n("Login")
     header: Kirigami.ApplicationHeaderStyle.None
     globalToolBarStyle: Kirigami.ApplicationHeaderStyle.None
-    footer:  Kirigami.ApplicationHeaderStyle.None
-    property  bool showNoPage: false
+    footer: Kirigami.ApplicationHeaderStyle.None
 
-    Rectangle {
-        id:loginContainer
-        width: Math.min(parent.width * 2/3, 400)
-        height: Math.min(parent.height * 3/4, 600)
-        anchors.centerIn: parent
-        color:Kirigami.Theme.alternateBackgroundColor
-        radius: 4
-        visible: false
-        Kirigami.InlineMessage {
-            id:statusMessage
-            anchors.top: parent.top
-            width: parent.width
-            visible: false
-            showCloseButton: true
-        }
-        Image {
-            id: logoImageSmall
-            width: loginContainer.width
-            anchors.left: loginContainer.left
-            anchors.right: loginContainer.right
-            height: 120
-            opacity: 1
-            anchors.top: statusMessage.bottom
-            anchors.topMargin: 30
-            source: "qrc:/DGest/contents/ui/resources/logo.svg"
-            fillMode: Image.PreserveAspectFit
-            layer.enabled: true
-            layer.effect: ColorOverlay {
-                color:   Kirigami.Theme.activeTextColor
-            }
-        }
-        Kirigami.Heading {
-            id:welcomeHeading
-            anchors.top: logoImageSmall.bottom
-            horizontalAlignment: Text.AlignHCenter
-            text: "Welcome back !"
-            level: 1
-            anchors.margins: 20
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-        Kirigami.FormLayout {
-            id:loginLayout
-            wideMode: false
-            anchors.top: welcomeHeading.bottom
-            anchors.left: loginContainer.left
-            anchors.right: loginContainer.right
-            anchors.margins: 20
-            anchors.horizontalCenter: loginContainer.horizontalCenter
+    property bool showNoPage: false
+    property bool isLoading: false
 
-            QQC2.TextField {
-                id:emailField
-                padding: 10
-                placeholderText:  "Email"
-            }
-            Kirigami.ActionTextField {
-                id:passwordField
-                padding: 10
-                placeholderText:  "Password"
-                echoMode:TextInput.Password
-                rightActions: Kirigami.Action {
-                    icon.name: "password-show-on"
-                    visible: true
-                    onTriggered: {
-                        if(icon.name=="password-show-on"){
-                            passwordField.echoMode=TextInput.Normal
-                            icon.name="password-show-off"
+    QQC2.ScrollView {
+        id: scrollView
+        anchors.fill: parent
+
+        // Disable horizontal scrolling
+        QQC2.ScrollBar.horizontal.policy: QQC2.ScrollBar.AlwaysOff
+
+        Item {
+            // Ensure the item is at least as tall as the ScrollView
+            width: scrollView.width
+            height: Math.max(scrollView.height, mainLayout.implicitHeight)
+
+            ColumnLayout {
+                id: mainLayout
+                anchors.centerIn: parent  // This centers both vertically and horizontally
+                width: Math.min(parent.width - (Kirigami.Settings.isMobile ? 0 : Kirigami.Units.largeSpacing * 4),
+                              Kirigami.Units.gridUnit * 50)
+
+                // Status message
+                Kirigami.InlineMessage {
+                    id: statusMessage
+                    Layout.fillWidth: true
+                    visible: false
+                    showCloseButton: !Kirigami.Settings.isMobile
+                }
+
+                FormCard.FormCard {
+                    id: formCard
+                    Layout.fillWidth: true
+
+                    // Logo section
+                    FormCard.FormTextDelegate {
+                        contentItem: ColumnLayout {
+                            spacing: Kirigami.Units.largeSpacing
+
+                            Image {
+                                id: logoImage
+                                Layout.alignment: Qt.AlignHCenter
+                                Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 10
+                                source: "qrc:/qt/qml/com/dervox/dim/contents/ui/resources/logo.svg"
+                                fillMode: Image.PreserveAspectFit
+
+                                layer.enabled: true
+                                layer.effect: ColorOverlay {
+                                    color: Kirigami.Theme.activeTextColor
+                                }
+                            }
+
+                            Kirigami.Heading {
+                                Layout.alignment: Qt.AlignHCenter
+                                text: i18n("Welcome back!")
+                                level: 1
+                                wrapMode: Text.WordWrap
+                                horizontalAlignment: Text.AlignHCenter
+                            }
                         }
-                        else{
-                            passwordField.echoMode=TextInput.Password
-                            icon.name="password-show-on"
+                    }
+
+                    FormCard.FormDelegateSeparator {}
+
+                    FormCard.FormTextFieldDelegate {
+                        id: emailField
+                        label: i18n("Email")
+                        statusMessage: ""
+                        status: Kirigami.MessageType.Information
+                        placeholderText: i18n("Enter your email")
+                        enabled: !loginPage.isLoading
+
+                        onAccepted: passwordField.forceActiveFocus()
+
+                        validator: RegularExpressionValidator {
+                            regularExpression: /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/
+                        }
+                    }
+
+                    FormCard.FormPasswordFieldDelegate {
+                        id: passwordField
+                        label: i18n("Password")
+                        statusMessage: ""
+                        status: Kirigami.MessageType.Information
+                        placeholderText: i18n("Enter your password")
+                        enabled: !loginPage.isLoading
+
+                        onAccepted: loginButton.clicked()
+                    }
+
+                    FormCard.FormCheckDelegate {
+                        id: rememberMeCheck
+                        text: i18n("Keep me signed in")
+                        enabled: !loginPage.isLoading
+                    }
+
+                    FormCard.FormDelegateSeparator {}
+
+                    // Login button section
+                    FormCard.FormTextDelegate {
+                        contentItem: ColumnLayout {
+                            spacing: Kirigami.Units.largeSpacing
+
+                            QQC2.Button {
+                                id: loginButton
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                text: i18n("Sign In")
+                                enabled: !loginPage.isLoading &&
+                                        emailField.text.length > 0 &&
+                                        passwordField.text.length > 0
+
+                                onClicked: performLogin()
+                            }
+
+                            QQC2.BusyIndicator {
+                                Layout.alignment: Qt.AlignHCenter
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                running: loginPage.isLoading
+                                visible: running
+                            }
+
+                            RowLayout {
+                                Layout.alignment: Qt.AlignHCenter
+                                spacing: Kirigami.Units.smallSpacing
+
+                                QQC2.Label {
+                                    text: i18n("Don't have an account?")
+                                }
+
+                                QQC2.Label {
+                                    text: i18n("Sign Up!")
+                                    color: Kirigami.Theme.linkColor
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: Qt.openUrlExternally("https://dim.dervox.com")
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
-            QQC2.CheckBox {
-                id:keepSignedIn
-                text: "Keep me signed in"
-                onCheckStateChanged: {
-                    console.log(keepSignedIn.checked)
-                }
-            }
         }
-        QQC2.BusyIndicator{
-            id:loadingLoginBusyIndicator
-            anchors.centerIn: parent
-            running: false
-        }
-        ColumnLayout{
-            id:controlLoginLayout
-            anchors.top: loginLayout.bottom
-            anchors.left: loginContainer.left
-            anchors.right: loginContainer.right
-            //  anchors.bottom: loginContainer.bottom
-            anchors.margins: 20
-
-            QQC2.Button{
-                id:loginBtn
-                text:"Continue"
-                Layout.fillWidth: true
-                anchors.horizontalCenter: loginContainer.horizontalCenter
-                onClicked: {
-                    loginLayout.enabled = false;
-                    loginBtn.enabled = false;
-                    loadingBusyIndicator.running = true;
-                    api.login(emailField.text, passwordField.text, keepSignedIn.checked);
-                }
-            }
-
-        }
-        RowLayout{
-            anchors.top: controlLoginLayout.bottom
-            anchors.margins: 20
-            anchors.horizontalCenter: loginContainer.horizontalCenter
-            Layout.fillWidth: true
-            QQC2.Label {
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-                id: linkLabel
-                text: "Dont't have an account  ? <a href=\"https://dim.dervox.com\">Sign Up!<a/>"
-                onLinkActivated: Qt.openUrlExternally(link)
-            }
-        }
-
     }
 
+    // No page component
     NoPage {
-        id:noPage
-        anchors.fill:parent
+        id: noPage
+        anchors.fill: parent
         visible: loginPage.showNoPage
         onReconnectClicked: {
             loginPage.showNoPage = false
             loginPage.checkLoginStatus()
         }
     }
+
+    // API Connections
     Connections {
         target: api
-
         function onLoginError(message, status, errorMessageDetails) {
-            updateStatusMessage(message + " " + errorMessageDetails,status)
-            resetUIState()
+            showError(message + " " + errorMessageDetails, status)
+            loginPage.isLoading = false
         }
 
         function onUserInfoReceived() {
-            let token = api.getToken();
-            subscriptionApi.getStatus(token);
-            teamApi.saveToken(token);
-            productApi.saveToken(token);
-            productApiFetch.saveToken(token);
-            activityLogApi.saveToken(token);
-            supplierApi.saveToken(token);
-            cashSourceApi.saveToken(token);
-            cashSourceApiFetch.saveToken(token);
-            cashTransactionApi.saveToken(token);
-            purchaseApi.saveToken(token);
-            clientApi.saveToken(token);
-            clientApiFetch.saveToken(token);
-            saleApi.saveToken(token);
-            invoiceApi.saveToken(token);
-            dashboardAnalyticsApi.saveToken(token);
-            // applicationWindow().pageStack.replace(Qt.resolvedUrl("qrc:/DGest/contents/ui/pages/Welcome.qml"))
+            handleSuccessfulLogin()
         }
 
         function onUserInfoError(message, status, errorMessageDetails) {
-            resetUIState()
-            let  messagetype = gApiStatusHandler.getMessageType(status)
-            if(messagetype==Kirigami.MessageType.Error){
-                loginPage.showNoPage=true
-                noPage.isRequasting=false
-            }
-            else if(messagetype = Kirigami.MessageType.Warning ){
-                api.saveToken("");
-                applicationWindow().pageStack.replace(Qt.resolvedUrl("qrc:/DGest/contents/ui/pages/user/Login.qml"))
-            }
-            else {
-                updateStatusMessage( message + " " + errorMessageDetails,status)
+            handleUserInfoError(message, status, errorMessageDetails)
+        }
+    }
+
+    Connections {
+        target: subscriptionApi
+
+        function onStatusReceived() {
+            const statusPlan = subscriptionApi.getStatusString()
+            if (statusPlan !== "active") {
+                expiredDialog.active = true
+            } else {
+                applicationWindow().pageStack.replace(
+                    Qt.createComponent("com.dervox.dim", "Welcome")
+                )
             }
         }
     }
 
-    function updateStatusMessage(message, status) {
-        statusMessage.type = gApiStatusHandler.getMessageType(status)
-        statusMessage.visible = true
-        statusMessage.text = message
-    }
-    function resetUIState() {
-        loginLayout.enabled = true
-        loginBtn.enabled = true
-        loadingBusyIndicator.running = false
-    }
-    QQC2.BusyIndicator{
-        id:loadingBusyIndicator
-        anchors.centerIn: parent
-        running: false
-    }
-    Timer {
-        id: loginCheckTimer
-        interval: 300
-        repeat: false
-        onTriggered: checkLoginStatus()
-    }
-    Connections {
-        target: subscriptionApi
-        function onStatusReceived() {
-            console.log("WWWWWWWWWWW")
-            let statusPlan = subscriptionApi.getStatusString()
-            if(statusPlan !="active"){
-                expiredDialog.active = true
-            }
-            else {
-                applicationWindow().pageStack.replace(Qt.resolvedUrl("qrc:/DGest/contents/ui/pages/Welcome.qml"))
-            }
-        }
-    }
-    function checkLoginStatus() {
-        if (api.getRememberMe() && api.isLoggedIn()) {
-            console.log("checkLoginStatus 1 ")
-            loadingBusyIndicator.running = true;
-            api.getUserInfo();
-        } else {
-            console.log("checkLoginStatus 2 ")
-            loadingBusyIndicator.running = false;
-            loginContainer.visible = true;
-        }
-    }
+    // Subscription expired dialog
     Loader {
         id: expiredDialog
         active: false
         asynchronous: true
-        sourceComponent: ExpiredSubscription {}
 
-        onLoaded: {
-            item.open()
-        }
+        onLoaded: item.open()
 
         Connections {
             target: expiredDialog.item
             function onClosed() {
-                api.logout();
-                resetUIState();
+                api.logout()
+                loginPage.isLoading = false
                 expiredDialog.active = false
             }
         }
     }
-    Component.onCompleted: {
-        loginCheckTimer.start();
+
+    // Auto-login check timer
+    Timer {
+        id: loginCheckTimer
+        interval: 300
+        repeat: false
+        running: true
+
+        onTriggered: checkLoginStatus()
     }
 
+    // Functions
+    function performLogin() {
+        if (!emailField.acceptableInput) {
+            showError(i18n("Please enter a valid email address"),
+                     Kirigami.MessageType.Warning)
+            return
+        }
+
+        loginPage.isLoading = true
+        api.login(emailField.text, passwordField.text, rememberMeCheck.checked)
+    }
+
+    function handleSuccessfulLogin() {
+        const token = api.getToken()
+
+        // Helper function to set token
+        function setApiToken(api, token) {
+            try {
+                if (typeof api.saveToken === "function") {
+                    api.saveToken(token)
+                } else if (api.token !== undefined) {
+                    api.token = token
+                } else {
+                    console.warn("No method to set token for API:", api)
+                }
+            } catch (error) {
+                console.error("Error setting token for API:", api, error)
+            }
+        }
+
+        // List of all APIs
+        const apiList = {
+            subscription: subscriptionApi,
+            team: teamApi,
+            product: productApi,
+            productFetch: productApiFetch,
+            activityLog: activityLogApi,
+            supplier: supplierApi,
+            cashSource: cashSourceApi,
+            cashSourceFetch: cashSourceApiFetch,
+            cashTransaction: cashTransactionApi,
+            purchase: purchaseApi,
+            client: clientApi,
+            clientFetch: clientApiFetch,
+            sale: saleApi,
+            invoice: invoiceApi,
+            dashboardAnalytics: dashboardAnalyticsApi
+        }
+
+        // Set token for each API
+        try {
+            Object.values(apiList).forEach(api => setApiToken(api, token))
+
+            // Get subscription status after setting tokens
+            subscriptionApi.getStatus(token)
+        } catch (error) {
+            console.error("Error in handleSuccessfulLogin:", error)
+            updateStatusMessage(i18n("Error setting up application. Please try again."),
+                              Kirigami.MessageType.Error)
+        }
+    }
+
+
+    function handleUserInfoError(message, status, errorMessageDetails) {
+        loginPage.isLoading = false
+
+        const messageType = gApiStatusHandler.getMessageType(status)
+        if (messageType === Kirigami.MessageType.Error) {
+            loginPage.showNoPage = true
+            scrollView.visible=false
+            noPage.isRequasting = false
+        } else if (messageType === Kirigami.MessageType.Warning) {
+            api.saveToken("")
+            applicationWindow().pageStack.replace(
+                Qt.resolvedUrl("qrc:/dim/contents/ui/pages/user/Login.qml")
+            )
+        } else {
+            showError(message + " " + errorMessageDetails, status)
+        }
+    }
+
+    function showError(message, status) {
+        statusMessage.type = gApiStatusHandler.getMessageType(status)
+        statusMessage.text = message
+        statusMessage.visible = true
+    }
+
+    function checkLoginStatus() {
+        if (api.getRememberMe() && api.isLoggedIn()) {
+            loginPage.isLoading = true
+            api.getUserInfo()
+        } else {
+            loginPage.isLoading = false
+        }
+    }
+    Component.onCompleted:{
+    }
 }
