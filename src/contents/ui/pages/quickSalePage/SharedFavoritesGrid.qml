@@ -100,12 +100,12 @@ Item {
                     Image {
                         id: productImage
                         anchors.fill: parent
-                        // source: root.loadedProducts[modelData]?.image_path ?
-                        //     "https://dim.dervox.com" + root.loadedProducts[modelData].image_path :
-                        //     "package"
                         source: root.loadedProducts[modelData]?.image_path ?
-                            "http://localhost:8000" + root.loadedProducts[modelData].image_path :
+                            "https://dim.dervox.com" + root.loadedProducts[modelData].image_path :
                             "package"
+                        // source: root.loadedProducts[modelData]?.image_path ?
+                        //     "http://localhost:8000" + root.loadedProducts[modelData].image_path :
+                        //     "package"
                         fillMode: Image.PreserveAspectFit
 
                         QQC2.BusyIndicator {
