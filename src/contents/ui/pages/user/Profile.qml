@@ -14,12 +14,12 @@ Kirigami.PromptDialog {
     property string planStatus: ""
     property string planExpiredDate: ""
 
-    title: "Profile"
+    title: i18n("Profile")
     preferredWidth: Kirigami.Units.gridUnit * 24
     standardButtons: Kirigami.Dialog.NoButton
     customFooterActions: [
         Kirigami.Action {
-            text: qsTr("Cancel")
+            text: i18n("Cancel")
             icon.name: "dialog-cancel"
             onTriggered: {
                 profileDialog.close();

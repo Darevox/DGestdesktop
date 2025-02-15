@@ -28,7 +28,7 @@ cd "$BASEDIR"
 catalogs=$(find . -name '*.po')
 for cat in $catalogs; do
   echo "$cat"
-  msgmerge -o "$cat.new" "$cat" "po/$PROJECT.pot"
+  msgmerge --no-fuzzy-matching  -o "$cat.new" "$cat" "po/$PROJECT.pot"
   mv "$cat.new" "$cat"
 done
 

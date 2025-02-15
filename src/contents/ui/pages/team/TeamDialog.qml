@@ -184,8 +184,8 @@ Kirigami.Dialog {
 
         function onTeamReceived(team) {
             teamDialog.teamData = team
-          //  teamImageCard.imageUrl = team.image_path ? "https://dim.dervox.com" + team.image_path : "";
-                   teamImageCard.imageUrl = team.image_path ? "http://localhost:8000" + team.image_path : "";
+           teamImageCard.imageUrl = team.image_path ? "https://dim.dervox.com" + team.image_path : "";
+              //     teamImageCard.imageUrl = team.image_path ? "http://localhost:8000" + team.image_path : "";
             console.log("image_path ",team.image_path)
         }
 
