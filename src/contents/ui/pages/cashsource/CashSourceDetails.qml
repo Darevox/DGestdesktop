@@ -33,7 +33,7 @@ Kirigami.PromptDialog {
     //         opacity: 0.7
     //     }
     // }
-    QQC2.BusyIndicator {
+    DBusyIndicator {
         id: busyIndicator
         anchors.centerIn: parent
         running: cashSourceApi.isLoading

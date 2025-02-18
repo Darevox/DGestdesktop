@@ -22,32 +22,37 @@ Kirigami.Page {
     Kirigami.Theme.colorSet: Kirigami.Theme.View
     Kirigami.Theme.inherit: false
 
-    property var logTypesModel: ListModel {
+    property ListModel logTypesModel: ListModel {
         id: logTypesList
-        ListElement { text: "All"; value: "" }
-        ListElement { text: "Create"; value: "Create" }
-        ListElement { text: "Delete"; value: "Delete" }
-        ListElement { text: "Update"; value: "Update" }
-        ListElement { text: "Download"; value: "download" }
-        ListElement { text: "Send"; value: "send" }
-        ListElement { text: "Status Update"; value: "status update" }
-        ListElement { text: "Payment"; value: "payment" }
-        ListElement { text: "Price Update"; value: "price update" }
-        ListElement { text: "Transfer"; value: "transfer" }
-        ListElement { text: "Deposit"; value: "Withdrawal" }
+        Component.onCompleted: {
+            append({ text: i18n("All"), value: "" })
+            append({ text: i18n("Create"), value: "Create" })
+            append({ text: i18n("Delete"), value: "Delete" })
+            append({ text: i18n("Update"), value: "Update" })
+            append({ text: i18n("Download"), value: "download" })
+            append({ text: i18n("Send"), value: "send" })
+            append({ text: i18nc("@item:inlistbox Status update", "Status Update"), value: "status update" })
+            append({ text: i18n("Payment"), value: "payment" })
+            append({ text: i18nc("@item:inlistbox Price update", "Price Update"), value: "price update" })
+            append({ text: i18n("Transfer"), value: "transfer" })
+            append({ text: i18n("Deposit"), value: "Withdrawal" })
+        }
     }
 
-    property var modelTypesModel: ListModel {
+    property ListModel modelTypesModel: ListModel {
         id: modelTypesList
-        ListElement { text: "All"; value: "" }
-        ListElement { text: "Product"; value: "Product" }
-        ListElement { text: "Cash Source"; value: "cashsource" }
-        ListElement { text: "Purchase"; value: "purchase" }
-        ListElement { text: "Sale"; value: "sale" }
-        ListElement { text: "Invoice"; value: "invoice" }
-        ListElement { text: "Client"; value: "client" }
-        ListElement { text: "Supplier"; value: "supplier" }
+        Component.onCompleted: {
+            append({ text: i18n("All"), value: "" })
+            append({ text: i18n("Product"), value: "Product" })
+            append({ text: i18nc("@item:inlistbox", "Cash Source"), value: "cashsource" })
+            append({ text: i18n("Purchase"), value: "purchase" })
+            append({ text: i18n("Sale"), value: "sale" })
+            append({ text: i18n("Invoice"), value: "invoice" })
+            append({ text: i18n("Client"), value: "client" })
+            append({ text: i18n("Supplier"), value: "supplier" })
+        }
     }
+
     // Left overlay for filters
     Kirigami.OverlayDrawer {
         id: filterSheet
@@ -93,8 +98,11 @@ Kirigami.Page {
                     currentIndex:0
                     description: i18n("Filter by type of model")
                     onCurrentIndexChanged: {
+                        let value = modelTypesModel.get(currentIndex).value
+                        console.log("VVVVVVVVV : ",value)
                         if (currentIndex !== -1) {
                             let value = modelTypesModel.get(currentIndex).value
+                            console.log("VVVVVVVVV 2: ",value)
                             activityLogModel.filterByModelType(value)
                         }
                     }
@@ -268,7 +276,7 @@ Kirigami.Page {
             Layout.fillWidth: true
         }
 
-        QQC2.BusyIndicator {
+        DBusyIndicator {
             running: activityLogModel.loading
         }
 

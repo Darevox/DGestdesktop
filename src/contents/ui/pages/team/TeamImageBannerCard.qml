@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
-
+import "../../components"
 Kirigami.Card {
     id: imageCard
     Layout.preferredHeight: Kirigami.Units.gridUnit * 7
@@ -21,7 +21,7 @@ Kirigami.Card {
         QQC2.ToolButton {
             icon.name: imageUrl ? "edit-image" : "insert-image-symbolic"
             display: QQC2.AbstractButton.IconOnly
-            text: imageUrl ? "Change Logo" : "Add Logo"
+            text: imageUrl ? i18n("Change Logo") : i18n("Add Logo")
             onClicked: imageFileDialog.open()
         }
 
@@ -59,7 +59,7 @@ Kirigami.Card {
                 color: Qt.rgba(0, 0, 0, 0.3)
                 visible: imageBanner.status === Image.Loading
 
-                QQC2.BusyIndicator {
+               DBusyIndicator {
                     anchors.centerIn: parent
                     running: imageBanner.status === Image.Loading
                 }

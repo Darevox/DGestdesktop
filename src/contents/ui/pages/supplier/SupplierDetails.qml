@@ -22,7 +22,7 @@ Kirigami.PromptDialog {
         "inactive": "Inactive"
     }
     // Busy indicator
-    QQC2.BusyIndicator {
+    DBusyIndicator {
         id: busyIndicator
         anchors.centerIn: parent
         running: supplierApi.isLoading
@@ -50,28 +50,28 @@ Kirigami.PromptDialog {
             // Basic Information
             FormCard.FormTextFieldDelegate {
                 id: nameField
-                label: qsTr("Name")
+                label: i18n("Name")
                 text: ""
                 status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
             }
 
             FormCard.FormTextFieldDelegate {
                 id: emailField
-                label: qsTr("Email")
+                label: i18n("Email")
                 text: ""
                 status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
             }
 
             FormCard.FormTextFieldDelegate {
                 id: phoneField
-                label: qsTr("Phone")
+                label: i18n("Phone")
                 text: ""
                 status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
             }
 
             FormCard.FormTextAreaDelegate {
                 id: addressField
-                label: qsTr("Address")
+                label: i18n("Address")
                 text: ""
                 status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
             }
@@ -81,13 +81,13 @@ Kirigami.PromptDialog {
             // Additional Information
             FormCard.FormTextFieldDelegate {
                 id: taxNumberField
-                label: qsTr("Tax Number")
+                label: i18n("Tax Number")
                 text: ""
             }
 
             FormCard.FormTextFieldDelegate {
                 id: paymentTermsField
-                label: qsTr("Payment Terms")
+                label: i18n("Payment Terms")
                 text: ""
             }
 
@@ -100,7 +100,7 @@ Kirigami.PromptDialog {
 
             FormCard.FormTextAreaDelegate {
                 id: notesField
-                label: qsTr("Notes")
+                label: i18n("Notes")
                 text: ""
             }
         }
@@ -109,7 +109,7 @@ Kirigami.PromptDialog {
     // Custom footer actions
     customFooterActions: [
         Kirigami.Action {
-            text: dialogSupplierId > 0 ? "Save" : "Add"
+            text: dialogSupplierId > 0 ? i18n("Save") : i18n("Add")
             icon.name: dialogSupplierId > 0 ? "document-save" : "list-add-symbolic"
             enabled: !supplierApi.isLoading
             onTriggered: {
@@ -120,12 +120,12 @@ Kirigami.PromptDialog {
                 if (dialogSupplierId > 0) {
                     supplierModel.updateSupplier(dialogSupplierId, updatedSupplier)
                 } else {
-                    supplierModel.createSupplier(updatedSupplier)
+                    supplierModel.createSupplier(updatedSuvplier)
                 }
             }
         },
         Kirigami.Action {
-            text: qsTr("Add & Add another")
+            text: i18n("Add & Add another")
             icon.name: "list-add-symbolic"
             visible: dialogSupplierId <= 0
             enabled: !supplierApi.isLoading
@@ -138,7 +138,7 @@ Kirigami.PromptDialog {
             }
         },
         Kirigami.Action {
-            text: qsTr("Delete")
+            text: i18n("Delete")
             icon.name: "edit-delete"
             visible: dialogSupplierId > 0
             enabled: !supplierApi.isLoading
@@ -149,7 +149,7 @@ Kirigami.PromptDialog {
             }
         },
         Kirigami.Action {
-            text: qsTr("Cancel")
+            text: i18n("Cancel")
             icon.name: "dialog-cancel"
             onTriggered: {
                 supplierDialog.close()
@@ -223,7 +223,7 @@ Kirigami.PromptDialog {
         function onSupplierCreated() {
             if (!isCreateAnother) {
                 applicationWindow().gnotification.showNotification("",
-                                                                   "Supplier created successfully",
+                                                                   i18n("Supplier created successfully"),
                                                                    Kirigami.MessageType.Positive,
                                                                    "short",
                                                                    "dialog-close"
@@ -239,7 +239,7 @@ Kirigami.PromptDialog {
 
         function onSupplierUpdated() {
             applicationWindow().gnotification.showNotification("",
-                                                               "Supplier " + nameField.text + " updated successfully",
+                                                               i18n("Supplier %1 updated successfully",nameField.text),
                                                                Kirigami.MessageType.Positive,
                                                                "short",
                                                                "dialog-close"
@@ -249,7 +249,7 @@ Kirigami.PromptDialog {
 
         function onSupplierDeleted() {
             applicationWindow().gnotification.showNotification("",
-                                                               "Supplier " + nameField.text + " deleted successfully",
+                                                               i18n("Supplier %1 deleted successfully",nameField.text),
                                                                Kirigami.MessageType.Positive,
                                                                "short",
                                                                "dialog-close"

@@ -22,7 +22,7 @@ Kirigami.PromptDialog {
     }
 
     // Busy indicator
-    QQC2.BusyIndicator {
+    DBusyIndicator {
         id: busyIndicator
         anchors.centerIn: parent
         running: clientApi.isLoading
@@ -40,7 +40,7 @@ Kirigami.PromptDialog {
         visible: false
     }
 
-    // Main form content
+    // Main form content i18n(
     GridLayout {
         columns: 2
         rows: 1
@@ -50,28 +50,28 @@ Kirigami.PromptDialog {
             // Basic Information
             FormCard.FormTextFieldDelegate {
                 id: nameField
-                label: qsTr("Name")
+                label: i18n("Name")
                 text: ""
                 status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
             }
 
             FormCard.FormTextFieldDelegate {
                 id: emailField
-                label: qsTr("Email")
+                label: i18n("Email")
                 text: ""
                 status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
             }
 
             FormCard.FormTextFieldDelegate {
                 id: phoneField
-                label: qsTr("Phone")
+                label: i18n("Phone")
                 text: ""
                 status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
             }
 
             FormCard.FormTextAreaDelegate {
                 id: addressField
-                label: qsTr("Address")
+                label: i18n("Address")
                 text: ""
                 status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
             }
@@ -81,26 +81,26 @@ Kirigami.PromptDialog {
             // Additional Information
             FormCard.FormTextFieldDelegate {
                 id: taxNumberField
-                label: qsTr("Tax Number")
+                label: i18n("Tax Number")
                 text: ""
             }
 
             FormCard.FormTextFieldDelegate {
                 id: paymentTermsField
-                label: qsTr("Payment Terms")
+                label: i18n("Payment Terms")
                 text: ""
             }
 
             FormCard.FormComboBoxDelegate {
                 id: statusCombo
-                description: qsTr("Status")
+                description: i18n("Status")
                 model: ["Active", "Inactive"]
                 currentIndex: 0
             }
 
             FormCard.FormTextAreaDelegate {
                 id: notesField
-                label: qsTr("Notes")
+                label: i18n("Notes")
                 text: ""
             }
         }
@@ -109,7 +109,7 @@ Kirigami.PromptDialog {
     // Custom footer actions
     customFooterActions: [
         Kirigami.Action {
-            text: dialogClientId > 0 ? "Save" : "Add"
+            text: dialogClientId > 0 ? i18n("Save") : i18n("Add")
             icon.name: dialogClientId > 0 ? "document-save" : "list-add-symbolic"
             enabled: !clientApi.isLoading
             onTriggered: {
@@ -125,7 +125,7 @@ Kirigami.PromptDialog {
             }
         },
         Kirigami.Action {
-            text: qsTr("Add & Add another")
+            text: i18n("Add & Add another")
             icon.name: "list-add-symbolic"
             visible: dialogClientId <= 0
             enabled: !clientApi.isLoading
@@ -138,7 +138,7 @@ Kirigami.PromptDialog {
             }
         },
         Kirigami.Action {
-            text: qsTr("Delete")
+            text: i18n("Delete")
             icon.name: "edit-delete"
             visible: dialogClientId > 0
             enabled: !clientApi.isLoading
@@ -149,7 +149,7 @@ Kirigami.PromptDialog {
             }
         },
         Kirigami.Action {
-            text: qsTr("Cancel")
+            text: i18n("Cancel")
             icon.name: "dialog-cancel"
             onTriggered: {
                 clientDialog.close()
@@ -159,7 +159,7 @@ Kirigami.PromptDialog {
     footerLeadingComponent : RowLayout {
 
         QQC2.Button {
-            text: qsTr("Sales History")
+            text: i18n("Sales History")
             icon.name: "view-list-details"
             visible: dialogClientId > 0
             enabled: !clientApi.isLoading
@@ -170,7 +170,7 @@ Kirigami.PromptDialog {
             }
         }
         QQC2.Button{
-            text: qsTr("Payments")
+            text: i18n("Payments")
             icon.name: "office-chart-line"
             visible: dialogClientId > 0
             enabled: !clientApi.isLoading
@@ -181,7 +181,7 @@ Kirigami.PromptDialog {
             }
         }
         QQC2.Button {
-            text: qsTr("Statistics")
+            text: i18n("Statistics")
             icon.name: "office-chart-bar"
             visible: dialogClientId > 0
             enabled: !clientApi.isLoading
@@ -257,7 +257,7 @@ Kirigami.PromptDialog {
         function onClientCreated() {
             if (!isCreateAnother) {
                 applicationWindow().gnotification.showNotification("",
-                                                                   "Client created successfully",
+                                                                   i18n("Client created successfully"),
                                                                    Kirigami.MessageType.Positive,
                                                                    "short",
                                                                    "dialog-close"
@@ -273,7 +273,7 @@ Kirigami.PromptDialog {
 
         function onClientUpdated() {
             applicationWindow().gnotification.showNotification("",
-                                                               "Client " + nameField.text + " updated successfully",
+                                                               i18n("Client %1 updated successfully", nameField.text),
                                                                Kirigami.MessageType.Positive,
                                                                "short",
                                                                "dialog-close"
@@ -283,7 +283,7 @@ Kirigami.PromptDialog {
 
         function onClientDeleted() {
             applicationWindow().gnotification.showNotification("",
-                                                               "Client " + nameField.text + " deleted successfully",
+                                                             i18n("Client %1 deleted successfully", nameField.text),
                                                                Kirigami.MessageType.Positive,
                                                                "short",
                                                                "dialog-close"

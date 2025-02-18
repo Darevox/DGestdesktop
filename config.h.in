@@ -1,0 +1,8 @@
+#ifndef DIM_CONFIG_H
+#define DIM_CONFIG_H
+
+#define DIM_VERSION "@PROJECT_VERSION@"
+#define DIM_API_BASE_URL "@API_BASE_URL@"
+#define DIM_ENV "@APP_ENV@"
+
+#endif // DIM_CONFIG_H

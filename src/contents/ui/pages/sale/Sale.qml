@@ -236,7 +236,7 @@ Kirigami.Page {
 
         Item { Layout.fillWidth: true }
 
-        QQC2.BusyIndicator {
+       DBusyIndicator {
             running: saleModel.loading
         }
 

@@ -3,7 +3,16 @@ cmake_minimum_required(VERSION 3.16)
 # Set version
 set(PROJECT_VERSION "1.0.0")
 project(dim VERSION ${PROJECT_VERSION})
+# Define environment options
+set(APP_ENV "prod" CACHE STRING "Application environment (dev/prod)")
+set_property(CACHE APP_ENV PROPERTY STRINGS dev prod)
 
+# Define API URLs based on environment
+if(APP_ENV STREQUAL "dev")
+    set(API_BASE_URL "http://localhost:8000")
+else()
+    set(API_BASE_URL "https://dim.dervox.com")
+endif()
 set(KF_MIN_VERSION "6.5.0")
 set(QT_MIN_VERSION "6.5.0")
 
@@ -24,7 +33,11 @@ ecm_setup_version(${PROJECT_VERSION}
     VARIABLE_PREFIX DIM
     VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/dim-version.h"
 )
-
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
+    ${CMAKE_CURRENT_BINARY_DIR}/config.h
+    @ONLY
+)
 # Find required Qt packages
 find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS
     Core

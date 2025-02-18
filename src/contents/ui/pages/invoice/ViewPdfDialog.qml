@@ -8,6 +8,7 @@ import Qt.labs.platform as Platform
 // import com.dervox.PDFView 1.0
 import com.dervox.printing 1.0
 import com.dervox.dim
+import "../../components"
 Kirigami.Dialog {
     id: pdfDialog
     title: i18nc("@title:window", "Invoice PDF")
@@ -124,7 +125,7 @@ Kirigami.Dialog {
                     minimumSize: 0.04
                 }
 
-                QQC2.BusyIndicator {
+                DBusyIndicator {
                     anchors.centerIn: parent
                     running: pdfView.count === 0 && pdfUrl !== ""
                     visible: running

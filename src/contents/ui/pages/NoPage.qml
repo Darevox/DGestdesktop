@@ -4,52 +4,31 @@ import QtQuick.Controls as QQC2
 import org.kde.kirigami as Kirigami
 
 Rectangle {
-    id:root
-    color:"transparent"
+    id: root
+    color: "transparent"
     property string errorDetails: ""
     signal reconnectClicked()
     property bool isRequasting: false
-    ColumnLayout{
-        spacing:Kirigami.Units.largeSpacing * 2
-        anchors.centerIn:parent
-        Kirigami.Icon {
-            source:"network-disconnect-symbolic"
-            implicitWidth:Kirigami.Units.iconSizes.enormous
-            implicitHeight: Kirigami.Units.iconSizes.enormous
 
-        }
-        Item{}
-        Kirigami.Heading{
-            text:"Not internet connection "
-            level : 1
-        }
-        Item{        Layout.fillHeight:true
-        }
-        QQC2.Label {
-            Layout.fillHeight:true
+    Kirigami.PlaceholderMessage {
+        anchors.centerIn: parent
+        width: parent.width - (Kirigami.Units.largeSpacing * 4)
+        icon.name: "network-disconnect-symbolic"
+        text: i18n("No Internet Connection")
+        explanation: i18nc("@info:placeholder",
+            "Please check your network connection and try again. " +
+            "Check network cables, modem, and router, or try reconnecting to Wi-Fi.\n\n" +
+            "Error: %1", errorDetails || i18n("Unknown error"))
 
-            text: "<p><strong>Try : </strong></p>
-                       <ul>
-                       <li>Checking the network cables, modem, and router </li>
-                       <li>Reconnecting to Wi-Fi </li>
-                       </ul>
-                       <p>ERROR : "+errorDetails+" </p>"
-        }
-
-            Kirigami.Action {
-                text: "action 1"
-                icon.name: "view-list-icons"
+        helpfulAction: Kirigami.Action {
+            id: reconnectButton
+            icon.name: "network-connect"
+            text: i18nc("@action:button", "Try Again")
+            onTriggered: {
+                root.isRequasting = true
+                root.reconnectClicked()
             }
-            QQC2.Button {
-                id: reconnectButton
-                icon.name: "network-connect"
-                Layout.alignment: Qt.AlignRight
-                text: "Try Again"
-                onClicked: {
-                    root.isRequasting=true
-                    root.reconnectClicked()
-                }
-                enabled:!root.isRequasting
-            }
+            enabled: !root.isRequasting
         }
     }
+}

@@ -9,7 +9,7 @@ import com.dervox.Printer
 
 Kirigami.Dialog {
     id: barcodeDialog
-    title: "Barcode"
+    title: i18n("Barcode")
     height: Kirigami.Units.gridUnit * 25
     width: Kirigami.Units.gridUnit * 35
     standardButtons: Kirigami.Dialog.NoButton
@@ -40,7 +40,7 @@ Kirigami.Dialog {
 
     customFooterActions: [
         Kirigami.Action {
-            text: qsTr("Print")
+            text: i18n("Print")
             icon.name: "document-print"
             onTriggered: {
                 printer.setMargins(0, 0, 0, 0);
@@ -82,7 +82,7 @@ Kirigami.Dialog {
             }
         },
         Kirigami.Action {
-            text: qsTr("Cancel")
+            text: i18n("Cancel")
             icon.name: "dialog-cancel"
             onTriggered: {
                 barcodeDialog.close()
@@ -180,7 +180,7 @@ Kirigami.Dialog {
             QQC2.Label {
                 id:priceLabel
                 width:printer.pageRect.width
-                text: "Prix : " + barcodeDialog.priceText + " DH"
+                text: i18n("Prix : %1  DH", barcodeDialog.priceText)
                 font.pixelSize: Kirigami.Theme.defaultFont.pixelSize * 1.5
                 font.bold: true
                 color: "black"

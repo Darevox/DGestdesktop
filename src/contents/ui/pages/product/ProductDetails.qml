@@ -21,7 +21,7 @@ Kirigami.Dialog {
     property bool isCreateAnother: false
     property bool isBarcodeRequest: false
 
-    QQC2.BusyIndicator {
+    DBusyIndicator {
         id: busyIndicator
         anchors.centerIn: parent
         running: productApi.isLoading
@@ -74,7 +74,7 @@ Kirigami.Dialog {
     }
     customFooterActions: [
         Kirigami.Action {
-            text: dialogProductId>0? "Save": "Add"
+            text: dialogProductId>0? i18n("Save"): i18n("Add")
             icon.name:  dialogProductId>0? "document-save" : "list-add-symbolic"
             enabled: !productApi.isLoading
             onTriggered: {
@@ -93,7 +93,7 @@ Kirigami.Dialog {
             }
         },
         Kirigami.Action {
-            text: qsTr("Add & Add another")
+            text: i18n("Add & Add another")
             icon.name: "list-add-symbolic"
             visible: dialogProductId<=0
             enabled: !productApi.isLoading
@@ -106,7 +106,7 @@ Kirigami.Dialog {
             }
         },
         Kirigami.Action {
-            text: qsTr("Delete")
+            text: i18n("Delete")
             icon.name: "edit-delete"
             visible: dialogProductId>0
             enabled: !productApi.isLoading
@@ -118,7 +118,7 @@ Kirigami.Dialog {
             }
         },
         Kirigami.Action {
-            text: qsTr("Cancel")
+            text: i18n("Cancel")
             icon.name: "dialog-cancel"
             onTriggered: {
                 productDialog.close()
@@ -135,7 +135,7 @@ Kirigami.Dialog {
         QQC2.TabBar {
             id: tabBar
             Layout.fillWidth: true
-
+            clip:true
             QQC2.TabButton {
                 text: i18n("Basic Info")
                 Layout.fillWidth: true
@@ -170,14 +170,14 @@ Kirigami.Dialog {
 
                 FormCard.FormTextFieldDelegate {
                     id: nameField
-                    label: qsTr("Name")
+                    label: i18n("Name")
                     text:  ""
                     status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
                 }
 
                 FormCard.FormTextAreaDelegate {
                     id: descriptionField
-                    label: qsTr("Description")
+                    label: i18n("Description")
                     text:  ""
                 }
                 FormCard.FormComboBoxDelegate {
@@ -215,7 +215,7 @@ Kirigami.Dialog {
                 }
                 FormCard.FormTextFieldDelegate {
                     id: locationField
-                    label: qsTr("Location")
+                    label: i18n("Location")
                     text:  ""
                 }
 
@@ -225,7 +225,7 @@ Kirigami.Dialog {
                 Layout.alignment: Qt.AlignTop
                 FormCard.FormSpinBoxDelegate {
                     id: quantityField
-                    label: qsTr("Quantity")
+                    label: i18n("Quantity")
                     value: 0
                     from: 0
                     to: 999999
@@ -233,7 +233,7 @@ Kirigami.Dialog {
                 }
                 DFormTextFieldDelegate {
                     id: purchase_priceField
-                    label: qsTr("Purchase Price")
+                    label: i18n("Purchase Price")
                     text: "0"
 
                     // Property to store clean value as integer
@@ -251,18 +251,18 @@ Kirigami.Dialog {
                         var price = Number(priceField.text) || 0           // Selling Price
                         var purchasePrice = Number(purchase_priceField.text) || 0  // Purchase Price
                         var profit = price - purchasePrice
-                        return "Selling Price: " + price.toFixed(2)
+                        return i18n("Selling Price: %1" , price.toFixed(2))
                     }
                     description: {
                         var price = Number(priceField.text) || 0           // Selling Price
                         var purchasePrice = Number(purchase_priceField.text) || 0  // Purchase Price
                         var profit = price - purchasePrice
-                        return "Profit: " + profit.toFixed(2)
+                        return  i18n("Profit: %1" , profit.toFixed(2))
                     }
                 }
                 DFormTextFieldDelegate {
                     id: priceField
-                    label: qsTr("Price")
+                    label: i18n("Price")
                     text: "0"
                     // Only allow digits
                     validator: RegularExpressionValidator {
@@ -273,7 +273,7 @@ Kirigami.Dialog {
                 FormCard.FormTextDelegate {
                     leading: priceField
                     text: {
-                        return "Profit Margin: "
+                        return i18n("Profit Margin: ")
                     }
                     description: {
                         var price = Number(priceField.text) || 0
@@ -288,14 +288,14 @@ Kirigami.Dialog {
                 }
                 FormCard.FormSpinBoxDelegate {
                     id: minStockField
-                    label: qsTr("Min Stock")
+                    label: i18n("Min Stock")
                     value:  0
                     from: 0
                     to: 999999
                 }
                 FormCard.FormSpinBoxDelegate {
                     id: maxStockField
-                    label: qsTr("Max Stock")
+                    label: i18n("Max Stock")
                     value:  0
                     from: 0
                     to: 999999
@@ -307,7 +307,7 @@ Kirigami.Dialog {
                 Layout.alignment: Qt.AlignTop
                 FormCard.FormSpinBoxDelegate {
                     id: reorderPointField
-                    label: qsTr("Reorder Point")
+                    label: i18n("Reorder Point")
                     value:  0
                     from: 0
                     to: 999999
@@ -315,17 +315,17 @@ Kirigami.Dialog {
 
                 FormCard.FormTextFieldDelegate {
                     id: referenceField
-                    label: qsTr("Refernce")
+                    label: i18n("Refernce")
                     text:  ""
                 }
                 FormCard.FormTextFieldDelegate {
                     id: skuField
-                    label: qsTr("SKU")
+                    label: i18n("SKU")
                     text:  ""
                 }
                 FormCard.FormButtonDelegate{
-                    text:"Setup Barcode"
-                    description:"View & print"
+                    text :i18n("Setup Barcode")
+                    description: i18n("View & print")
                     icon.name:"view-barcode"
                     onClicked :{
                         // barcodeDialogLoader.priceText = priceField.text
@@ -776,7 +776,7 @@ Kirigami.Dialog {
                                               barcode: packageBarcodeField.text
                                           })
 
-                        inlineMsgPackagesListDialog.text= "Package updated successfully"
+                        inlineMsgPackagesListDialog.text=  i18n("Package updated successfully")
                         inlineMsgPackagesListDialog.visible=true
                         inlineMsgPackagesListDialog.type= Kirigami.MessageType.Positive
                     } else {
@@ -788,7 +788,7 @@ Kirigami.Dialog {
                                                  barcode: packageBarcodeField.text
                                              })
 
-                        inlineMsgPackagesListDialog.text= "Package added successfully"
+                        inlineMsgPackagesListDialog.text=  i18n("Package added successfully")
                         inlineMsgPackagesListDialog.visible=true
                         inlineMsgPackagesListDialog.type= Kirigami.MessageType.Positive
                     }
@@ -856,7 +856,7 @@ Kirigami.Dialog {
         maxStockField.value = product.maxStockLevel || 0;
         reorderPointField.value = product.reorderPoint || 0;
         locationField.text = product.location || "";
-        productImageCard.imageUrl = product.image_path ? "https://dim.dervox.com" + product.image_path : "";
+        productImageCard.imageUrl = product.image_path ? api.apiHost + product.image_path : "";
        // productImageCard.imageUrl = product.image_path ? "http://localhost:8000" + product.image_path : "";
         console.log("productImageCard.imageUrl : ",productImageCard.imageUrl)
         packagesModel.clear();
@@ -939,7 +939,7 @@ Kirigami.Dialog {
 
         function onProductUpdated(){
             applicationWindow().gnotification.showNotification("",
-                                                               "Product "+ nameField.text +" Updated successfully", // message
+                                                               i18n("Product %1 Updated successfully", nameField.text), // message
                                                                Kirigami.MessageType.Positive, // message type
                                                                "short",
                                                                "dialog-close"
@@ -950,7 +950,7 @@ Kirigami.Dialog {
         }
         function onProductDeleted(){
             applicationWindow().gnotification.showNotification("",
-                                                               "Product "+ nameField.text +" Deleted successfully", // message
+                                                               i18n("Product %1 Updated Deleted", nameField.text),
                                                                Kirigami.MessageType.Positive, // message type
                                                                "short",
                                                                "dialog-close"
@@ -972,7 +972,7 @@ Kirigami.Dialog {
                 if(!isCreateAnother){
 
                     applicationWindow().gnotification.showNotification("",
-                                                                       "Product Added successfully", // message
+                                                                          i18n("Product %1 Added Deleted", nameField.text),
                                                                        Kirigami.MessageType.Positive, // message type
                                                                        "short",
                                                                        "dialog-close"
@@ -981,7 +981,7 @@ Kirigami.Dialog {
 
                 }
                 else {
-                    inlineMsg.text="Product "+ nameField.text +" Added successfully"
+                    inlineMsg.text= i18n("Product %1 Added Deleted", nameField.text)
                     inlineMsg.visible=true
                     cleanField()
                 }

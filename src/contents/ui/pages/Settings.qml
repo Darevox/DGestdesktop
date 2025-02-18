@@ -15,7 +15,7 @@ FormCard.FormCardPage {
     actions: [
         Kirigami.Action {
             icon.name: "gnumeric-group"
-            text: "Team Settings"
+            text:  i18n("Team Settings")
             onTriggered: {
                 teamDetailsDialog.active = true
             }
@@ -70,7 +70,7 @@ FormCard.FormCardPage {
             }
         }
         FormCard.FormSectionText{
-            text: i18nc("@info:whatsthis", "Scale UI")
+            text: i18n("Scale UI")
         }
         FormCard.FormSectionText {
             RowLayout {

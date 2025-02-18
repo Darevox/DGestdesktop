@@ -19,10 +19,12 @@ ecm_add_qml_module(dim
 # Declare QML sources grouped by functionality
 set(DIM_QML_PAGES
     contents/ui/Main.qml
+
     # User related pages
     contents/ui/pages/user/Login.qml
     contents/ui/pages/user/Signup.qml
     contents/ui/pages/user/Profile.qml
+    contents/ui/pages/ExpiredSubscription.qml
     # Main pages
     contents/ui/pages/Welcome.qml
     contents/ui/pages/AboutApp.qml
@@ -105,6 +107,7 @@ set(DIM_QML_COMPONENTS
     contents/ui/components/DSearchableComboBoxClient.qml
     contents/ui/components/DSearchableComboBoxCashSource.qml
     contents/ui/components/NumPad.qml
+    contents/ui/components/DBusyIndicator.qml
 )
 set(DIM_QML_UTILS
     utils/PDFView.qml
@@ -228,6 +231,7 @@ target_sources(dim PRIVATE
 
 # Include directories
 target_include_directories(dim PRIVATE
+    ${CMAKE_CURRENT_BINARY_DIR}/..
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/api

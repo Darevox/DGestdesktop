@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
-
+import "../../components"
 Item {
     id: root
 
@@ -101,14 +101,11 @@ Item {
                         id: productImage
                         anchors.fill: parent
                         source: root.loadedProducts[modelData]?.image_path ?
-                            "https://dim.dervox.com" + root.loadedProducts[modelData].image_path :
+                            api.apiHost + root.loadedProducts[modelData].image_path :
                             "package"
-                        // source: root.loadedProducts[modelData]?.image_path ?
-                        //     "http://localhost:8000" + root.loadedProducts[modelData].image_path :
-                        //     "package"
                         fillMode: Image.PreserveAspectFit
 
-                        QQC2.BusyIndicator {
+                        DBusyIndicator {
                             anchors.centerIn: parent
                             running: productImage.status === Image.Loading
                             visible: running
@@ -190,7 +187,7 @@ Item {
             opacity: 0.7
         }
 
-        QQC2.BusyIndicator {
+        DBusyIndicator {
             anchors.centerIn: parent
             running: parent.visible
         }

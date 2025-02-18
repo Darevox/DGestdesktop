@@ -15,6 +15,7 @@ Kirigami.Page {
     property bool isSourceView: false
     property string sourceViewTitle: ""
     property int currentSourceId: -1
+
     topPadding: 10
     leftPadding: 10
     bottomPadding: 10
@@ -23,7 +24,8 @@ Kirigami.Page {
     Kirigami.Theme.inherit: false
 
     function showSourceTransactions(sourceId, sourceName) {
-
+        root.currentSourceId = sourceId
+        root.sourceViewTitle=sourceName
         cashTransactionModel.loadTransactionsBySource(sourceId)
     }
     // Summary Drawer
@@ -38,7 +40,7 @@ Kirigami.Page {
             Layout.fillWidth: true
 
             FormCard.FormTextDelegate {
-                text: "Total Deposits"
+                text: i18n("Total Deposits")
                 description: cashTransactionModel.summary.total_deposits || "0.00"
             }
 
@@ -48,7 +50,7 @@ Kirigami.Page {
             }
 
             FormCard.FormTextDelegate {
-                text: "Total Transfers"
+                text: i18n("Total Transfers")
                 description: cashTransactionModel.summary.total_transfers || "0.00"
             }
         }
@@ -215,7 +217,7 @@ Kirigami.Page {
         QQC2.ToolButton {
             visible: isSourceView
             icon.name: "draw-arrow-back"
-            text : "Back"
+            text : i18n("Back")
             onClicked: {
                 isSourceView = false
                 currentSourceId = -1
@@ -226,7 +228,7 @@ Kirigami.Page {
 
         Item { Layout.fillWidth: true }
 
-        QQC2.BusyIndicator {
+        DBusyIndicator {
             running: cashTransactionModel.loading
         }
 
@@ -331,6 +333,8 @@ Kirigami.Page {
                                 case "deposit": return i18n("Deposit")
                                 case "withdrawal": return i18n("Withdrawal")
                                 case "transfer": return i18n("Transfer")
+                                case "Sale Payment": return i18n("Sale Payment")
+                                case "Purchase Payment": return i18n("Purchase Payment")
                                 default: return modelData || ""
                             }
                         }
@@ -413,8 +417,8 @@ Kirigami.Page {
         }
         function onTransactionsBySourceReceived(){
             isSourceView = true
-            currentSourceId = sourceId
-            sourceViewTitle = i18n("Transactions for %1", sourceName)
+            currentSourceId = root.currentSourceId
+            sourceViewTitle = i18n("Transactions for %1",  root.sourceViewTitle)
         }
 
 

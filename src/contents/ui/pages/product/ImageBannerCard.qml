@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
-
+import "../../components"
 Kirigami.Card {
     id: imageCard
     Layout.preferredHeight: Kirigami.Units.gridUnit * 7
@@ -58,7 +58,7 @@ Kirigami.Card {
                 color: Qt.rgba(0, 0, 0, 0.3)
                 visible: imageBanner.status === Image.Loading
 
-                QQC2.BusyIndicator {
+                DBusyIndicator {
                     anchors.centerIn: parent
                     running: imageBanner.status === Image.Loading
                 }
@@ -181,7 +181,7 @@ Kirigami.Card {
         color: Qt.rgba(0, 0, 0, 0.5)
         visible: productApi.loading
 
-        QQC2.BusyIndicator {
+        DBusyIndicator {
             anchors.centerIn: parent
             running: productApi.loading
         }

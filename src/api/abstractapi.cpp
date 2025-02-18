@@ -7,8 +7,8 @@ namespace NetworkApi {
 AbstractApi::AbstractApi(QNetworkAccessManager *netManager, QObject *parent)
     : QObject(parent)
     , m_netManager(netManager)
-    , m_apiHost(QStringLiteral("https://dim.dervox.com"))
-   //, m_apiHost(QStringLiteral("http://localhost:8000"))
+    , m_apiHost(QStringLiteral(DIM_API_BASE_URL))
+  // , m_apiHost(QStringLiteral("http://localhost:8000"))
     , m_token(QStringLiteral(""))
 {
 }

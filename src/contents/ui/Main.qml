@@ -19,7 +19,7 @@ Kirigami.ApplicationWindow {
     property alias  gaboutDialog: aboutDialog
     property alias  gprofileDialog: profileDialog
     property alias  gColorSchemeModel: colorSchemeModel
-   // property alias  gProductModel: productModel
+    // property alias  gProductModel: productModel
 
     property alias  gApiStatusHandler: apiStatusHandler
 
@@ -207,11 +207,11 @@ Kirigami.ApplicationWindow {
     function resetUIState() {
         loadingBusyIndicator.running = false;
     }
-    QQC2.BusyIndicator{
-        id:loadingBusyIndicator
-        anchors.centerIn: parent
-        running: false
-    }
+    // DBusyIndicator{
+    //     id:loadingBusyIndicator
+    //     anchors.centerIn: parent
+    //     running: false
+    // }
     DNotification{
         id:notification
     }
@@ -253,40 +253,66 @@ Kirigami.ApplicationWindow {
         id: notificationDrawer
         edge: Qt.RightEdge
         modal: true
-        handleVisible : false
-        width:  Kirigami.Units.gridUnit * 24
+        handleVisible: false
+        width: Kirigami.Units.gridUnit * 24
 
-
+        property bool hasNotifications: false
         contentItem: ColumnLayout {
+            spacing: 0
+            anchors.fill:parent
             RowLayout {
                 Layout.alignment: Qt.AlignTop
                 Layout.fillWidth: true
                 Layout.margins: Kirigami.Units.smallSpacing
-                QQC2.ToolButton {
-                    icon.name: "dialog-close"
-                    onClicked:{
-                        notificationDrawer.close()
-                    }
-                }
-                Item{
+                Item {
                     Layout.fillWidth: true
                 }
                 Kirigami.Heading {
                     Layout.alignment: Qt.AlignHCenter
-                    text: "Notification"
+                    text: i18n("Notifications")
                     level: 2
                 }
-                Item{
+                Item {
                     Layout.fillWidth: true
                 }
-                Item{
+                QQC2.ToolButton {
+                    icon.name: "dialog-close"
+                    onClicked: {
+                        notificationDrawer.close()
+                    }
+                }
+                Item {
                     Layout.fillWidth: true
                 }
+            }
+            Item {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                visible: notificationDrawer.hasNotifications
+            }
+            Item {
+                Layout.fillHeight: true
+                visible: !notificationDrawer.hasNotifications
+            }
+            Kirigami.PlaceholderMessage {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.margins: Kirigami.Units.largeSpacing
+                visible: !notificationDrawer.hasNotifications
+                Layout.preferredWidth:  Kirigami.Units.gridUnit * 22
+                icon.name: "notifications"
+                icon.width: Kirigami.Units.iconSizes.huge
+                icon.height: Kirigami.Units.iconSizes.huge
+                text: i18n("No Notifications")
+            }
 
-
+            Item {
+                Layout.fillHeight: true
+                visible: !notificationDrawer.hasNotifications
             }
         }
     }
+
     ColorSchemeModel {
         id: colorSchemeModel
     }

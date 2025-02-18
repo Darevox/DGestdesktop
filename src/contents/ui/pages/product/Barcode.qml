@@ -21,7 +21,7 @@ Kirigami.Dialog {
 
     customFooterActions: [
         Kirigami.Action {
-            text: qsTr("Cancel")
+            text: i18n("Cancel")
             icon.name: "dialog-cancel"
             onTriggered: {
                 barcodeDialog.close()
@@ -47,7 +47,7 @@ Kirigami.Dialog {
             }
             QQC2.ToolButton {
                 icon.name: "list-add-symbolic"
-                text: "Add"
+                text: i18n("Add")
                 onClicked:{
                     addDialog.open()
                 }
@@ -176,14 +176,14 @@ Kirigami.Dialog {
         }
         customFooterActions: [
             Kirigami.Action {
-                text: "Create Barcode"
+                text: i18n("Create Barcode")
                 icon.name: "dialog-ok"
                 onTriggered: {
                     productApi.addProductBarcode(productId,barcodeText.text)
                 }
             },
             Kirigami.Action {
-                text: "Cancel"
+                text: i18n("Cancel")
                 icon.name: "dialog-cancel"
                 onTriggered: {
                     addDialog.close();
@@ -194,7 +194,7 @@ Kirigami.Dialog {
             QQC2.TextField {
                 id:barcodeText
                 Layout.fillWidth: true
-                placeholderText: "Barcode…"
+                placeholderText: i18n("Barcode…")
             }
         }
         Connections {
@@ -228,7 +228,7 @@ Kirigami.Dialog {
         }
         customFooterActions: [
             Kirigami.Action {
-                text: "Save Barcode"
+                text: i18n("Save Barcode")
                 icon.name: "dialog-ok"
                 onTriggered: {
                     productApi.updateProductBarcode(productId, editDialog.barcodeIDToEdit, barcodeTextToEdit.text)
@@ -236,7 +236,7 @@ Kirigami.Dialog {
                 }
             },
             Kirigami.Action {
-                text: "Cancel"
+                text: i18n("Cancel")
                 icon.name: "dialog-cancel"
                 onTriggered: {
                     editDialog.close();
@@ -301,20 +301,20 @@ Kirigami.Dialog {
         }
         function onBarcodeAdded() {
             addDialog.close()
-            inlineMsgBarcode.text= "Barcode Created successfully"
+            inlineMsgBarcode.text= i18n("Barcode Created successfully")
             inlineMsgBarcode.visible=true
             inlineMsgBarcode.type= Kirigami.MessageType.Positive
             barcodeModel.refresh()
         }
         function onBarcodeRemoved() {
-            inlineMsgBarcode.text= "Barcode Deleted successfully"
+            inlineMsgBarcode.text= i18n("Barcode Deleted successfully")
             inlineMsgBarcode.visible=true
             inlineMsgBarcode.type= Kirigami.MessageType.Positive
             barcodeModel.refresh()
         }
         function onBarcodeUpdated() {
             editDialog.close()
-            inlineMsgBarcode.text= "Barcode Updated successfully"
+            inlineMsgBarcode.text= i18n("Barcode Updated successfully")
             inlineMsgBarcode.visible=true
             inlineMsgBarcode.type= Kirigami.MessageType.Positive
             barcodeModel.refresh()

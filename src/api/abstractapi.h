@@ -12,7 +12,7 @@
 #include <optional>
 #include <QJsonDocument>
 #include <QJsonArray>
-
+#include "config.h"
 namespace NetworkApi {
 
 // Keep your existing enums and structs as they are
@@ -44,6 +44,7 @@ using VoidResponse = ApiResponse<std::monostate>;
 
 class AbstractApi : public QObject {
     Q_OBJECT
+        Q_PROPERTY(QString apiHost READ apiHost NOTIFY apiHostChanged)
 public:
     explicit AbstractApi(QNetworkAccessManager *netManager, QObject *parent = nullptr);
     void setApiHost(const QString &host);

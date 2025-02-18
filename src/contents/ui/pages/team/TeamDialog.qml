@@ -5,6 +5,7 @@ import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 import org.kde.kirigamiaddons.formcard as FormCard
 import "."
+import "../../components"
 Kirigami.Dialog {
     id: teamDialog
     title: i18n("Team Details")
@@ -16,7 +17,7 @@ Kirigami.Dialog {
     property bool isLoading: teamApi.isLoading
     property string currentLocale: teamData.locale || "en"
 
-    QQC2.BusyIndicator {
+    DBusyIndicator {
         id: busyIndicator
         anchors.centerIn: parent
         running: isLoading
@@ -37,7 +38,7 @@ Kirigami.Dialog {
             email: emailField.text,
             phone: phoneField.text,
             address: addressField.text,
-                        locale: languageComboBox.model.get(languageComboBox.currentIndex).value
+            locale: languageComboBox.model.get(languageComboBox.currentIndex).value
         };
         return updatedTeam;
     }
@@ -85,45 +86,45 @@ Kirigami.Dialog {
                 status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
             }
             // Add this after your existing form fields
-                      FormCard.FormComboBoxDelegate {
-                          id: languageComboBox
-                          description: i18n("Language")
-                          model: ListModel {
-                              id: languagesModel
-                              ListElement { text: "English"; value: "en" }
-                              ListElement { text: "Français"; value: "fr" }
-                             // ListElement { text: "العربية"; value: "ar" }
-                          }
-                          textRole: "text"
-                          valueRole: "value"
-                          currentIndex: {
-                              for (let i = 0; i < languagesModel.count; i++) {
-                                  if (languagesModel.get(i).value === currentLocale) {
-                                      return i;
-                                  }
-                              }
-                              return 0; // Default to English if no match
-                          }
-                          onActivated: {
-                              let newLocale = languagesModel.get(currentIndex).value;
-                              if (newLocale !== currentLocale) {
-                                  teamApi.updateTeamLocale(teamData.id, newLocale);
-                              }
-                          }
-                      }
+            FormCard.FormComboBoxDelegate {
+                id: languageComboBox
+                text: i18n("Language")
+                model: ListModel {
+                    id: languagesModel
+                    ListElement { text: "English"; value: "en" }
+                    ListElement { text: "Français"; value: "fr" }
+                    // ListElement { text: "العربية"; value: "ar" }
+                }
+                textRole: "text"
+                valueRole: "value"
+                currentIndex: {
+                    for (let i = 0; i < languagesModel.count; i++) {
+                        if (languagesModel.get(i).value === currentLocale) {
+                            return i;
+                        }
+                    }
+                    return 0; // Default to English if no match
+                }
+                onActivated: {
+                    let newLocale = languagesModel.get(currentIndex).value;
+                    if (newLocale !== currentLocale) {
+                        teamApi.updateTeamLocale(teamData.id, newLocale);
+                    }
+                }
+            }
 
-                      // Optional: Add a separator
-                      Kirigami.Separator {
-                          Layout.fillWidth: true
-                          Layout.topMargin: Kirigami.Units.smallSpacing
-                          Layout.bottomMargin: Kirigami.Units.smallSpacing
-                      }
+            // Optional: Add a separator
+            Kirigami.Separator {
+                Layout.fillWidth: true
+                Layout.topMargin: Kirigami.Units.smallSpacing
+                Layout.bottomMargin: Kirigami.Units.smallSpacing
+            }
 
-                      // Optional: Add a note about language
-                      FormCard.FormTextDelegate {
-                          text: i18n("Language setting affects invoices and documents")
-                          description: i18n("Choose the language for this team's documents")
-                      }
+            // Optional: Add a note about language
+            FormCard.FormTextDelegate {
+                text: i18n("Language setting affects invoices and documents")
+                description: i18n("Choose the language for this team's documents")
+            }
         }
     }
 
@@ -184,8 +185,7 @@ Kirigami.Dialog {
 
         function onTeamReceived(team) {
             teamDialog.teamData = team
-           teamImageCard.imageUrl = team.image_path ? "https://dim.dervox.com" + team.image_path : "";
-              //     teamImageCard.imageUrl = team.image_path ? "http://localhost:8000" + team.image_path : "";
+            teamImageCard.imageUrl = team.image_path ? api.apiHost + team.image_path : "";
             console.log("image_path ",team.image_path)
         }
 
@@ -210,32 +210,32 @@ Kirigami.Dialog {
             }
         }
         function onLocaleReceived(locale) {
-                  currentLocale = locale;
-                  // Update combo box selection
-                  for (let i = 0; i < languagesModel.count; i++) {
-                      if (languagesModel.get(i).value === locale) {
-                          languageComboBox.currentIndex = i;
-                          break;
-                      }
-                  }
-              }
+            currentLocale = locale;
+            // Update combo box selection
+            for (let i = 0; i < languagesModel.count; i++) {
+                if (languagesModel.get(i).value === locale) {
+                    languageComboBox.currentIndex = i;
+                    break;
+                }
+            }
+        }
 
-              function onLocaleUpdated(locale) {
-                  currentLocale = locale;
-                  applicationWindow().gnotification.showNotification(
-                      "",
-                      i18n("Team language updated successfully"),
-                      Kirigami.MessageType.Positive,
-                      "short",
-                      "dialog-ok"
-                  );
-              }
+        function onLocaleUpdated(locale) {
+            currentLocale = locale;
+            applicationWindow().gnotification.showNotification(
+                        "",
+                        i18n("Team language updated successfully"),
+                        Kirigami.MessageType.Positive,
+                        "short",
+                        "dialog-ok"
+                        );
+        }
 
-              function onLocaleError(message, status, details) {
-                  inlineMsg.text = message;
-                  inlineMsg.visible = true;
-                  inlineMsg.type = Kirigami.MessageType.Error;
-              }
+        function onLocaleError(message, status, details) {
+            inlineMsg.text = message;
+            inlineMsg.visible = true;
+            inlineMsg.type = Kirigami.MessageType.Error;
+        }
     }
     onDialogTeamIdChanged:{
         teamApi.getTeam(teamDialog.dialogTeamId);

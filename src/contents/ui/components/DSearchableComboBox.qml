@@ -123,7 +123,7 @@ QQC2.ComboBox {
             Kirigami.ScrollablePage {
 
                 supportsRefreshing: true
-                refreshing: productFetchModel.loading
+                //refreshing: productFetchModel.loading
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
@@ -230,14 +230,15 @@ QQC2.ComboBox {
                         }
                     }
                 }
-            }
 
+            }
             // Loading indicator
-            QQC2.BusyIndicator {
+            DBusyIndicator {
                 Layout.alignment: Qt.AlignCenter
                 running: productFetchModel.loading
                 visible: running
             }
+
         }
     }
 

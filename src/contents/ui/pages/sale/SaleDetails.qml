@@ -23,7 +23,7 @@ Kirigami.Dialog {
     property var currentSale: null
     standardButtons: Kirigami.Dialog.NoButton
     property double remainingAmount: 0
-    QQC2.BusyIndicator {
+    DBusyIndicator {
         id: busyIndicator
         anchors.centerIn: parent
         running: saleModel.loading

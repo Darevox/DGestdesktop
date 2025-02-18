@@ -15,7 +15,7 @@ Kirigami.Dialog {
     property string dialogClientName: ""
 
     // Loading indicator
-    QQC2.BusyIndicator {
+    DBusyIndicator {
         id: busyIndicator
         anchors.centerIn: parent
         running: clientApi.isLoading

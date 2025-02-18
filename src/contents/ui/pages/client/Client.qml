@@ -36,7 +36,7 @@ Kirigami.Page {
                 import org.kde.kirigami as Kirigami
                 Kirigami.Action {
                     icon.name: "list-add"
-                    text: "Add Client"
+                    text: i18n("Add Client")
                     onTriggered: {
                         clientDetailsDialog.clientId = 0
                         clientDetailsDialog.active = true
@@ -49,7 +49,7 @@ Kirigami.Page {
     actions: [
         Kirigami.Action {
             icon.name: "list-add-symbolic"
-            text: "Add"
+            text: i18n("Add")
             onTriggered: {
                 clientDetailsDialog.clientId = 0
                 clientDetailsDialog.active = true
@@ -57,18 +57,18 @@ Kirigami.Page {
         },
         Kirigami.Action {
             icon.name: "delete"
-            text: "Delete"
+            text: i18n("Delete")
             enabled: clientModel.hasCheckedItems
             onTriggered: deleteDialog.open()
         },
         Kirigami.Action {
             icon.name: "overflow-menu"
             Kirigami.Action {
-                text: "Export"
+                text: i18n("Export")
                 onTriggered: showPassiveNotification("Export triggered")
             }
             Kirigami.Action {
-                text: "Print"
+                text: i18n("Print")
                 onTriggered: showPassiveNotification("Print triggered")
             }
         }
@@ -78,7 +78,7 @@ Kirigami.Page {
     header: RowLayout {
         Layout.fillWidth: true
         Item { Layout.fillWidth: true }
-        QQC2.BusyIndicator {
+       DBusyIndicator {
             running: clientModel.loading
         }
         Kirigami.SearchField {
@@ -224,7 +224,7 @@ Kirigami.Page {
         target: clientApi
         function onClientDeleted() {
             applicationWindow().gnotification.showNotification("",
-                "Client deleted successfully",
+                i18n("Client deleted successfully"),
                 Kirigami.MessageType.Positive,
                 "short",
                 "dialog-close"
@@ -270,7 +270,7 @@ Kirigami.Page {
 
         function onClientCreated() {
             applicationWindow().gnotification.showNotification("",
-                "Client created successfully",
+                i18n("Client created successfully"),
                 Kirigami.MessageType.Positive,
                 "short",
                 "dialog-close"
@@ -279,7 +279,7 @@ Kirigami.Page {
 
         function onClientUpdated() {
             applicationWindow().gnotification.showNotification("",
-                "Client updated successfully",
+                i18n("Client updated successfully"),
                 Kirigami.MessageType.Positive,
                 "short",
                 "dialog-close"

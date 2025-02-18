@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 //import com.dervox.DashboardModel 1.0
 import "."
+import "../../components"
 import org.kde.kirigamiaddons.dateandtime as Kdateandtime
 
 Kirigami.Page {
@@ -30,10 +31,16 @@ Kirigami.Page {
             onTriggered: dashboardModel.refresh()
         }
     ]
-
+    DBusyIndicator {
+        anchors.centerIn: parent
+        running: dashboardModel.loading
+        visible: running
+        z:99
+    }
     header: ColumnLayout {
         width: parent.width
         spacing: Kirigami.Units.largeSpacing * 2
+         enabled : !dashboardModel.loading
         Label {
               Layout.margins : Kirigami.Units.largeSpacing * 2
             text: {
@@ -68,7 +75,7 @@ Kirigami.Page {
                 Layout.preferredWidth: parent.width / 4
                 title: i18n("Total Sales")
                 value: dashboardModel.totalSales.toFixed(2)  + " DH"
-                subtitle: i18n("All-time: €%1", dashboardModel.allTimeSales.toFixed(2))
+                subtitle: i18n("All-time: %1 DH", dashboardModel.allTimeSales.toFixed(2))
                 iconCard: "view-financial-category-income"
                 valueColor: Kirigami.Theme.positiveTextColor
             }
@@ -108,7 +115,7 @@ Kirigami.Page {
     ScrollView {
         anchors.fill: parent
         contentWidth: availableWidth
-
+        enabled : !dashboardModel.loading
         ColumnLayout {
             width: parent.width
             spacing: Kirigami.Units.largeSpacing
@@ -220,11 +227,7 @@ Kirigami.Page {
             }
         }
     }
-    BusyIndicator {
-        anchors.centerIn: parent
-        running: dashboardModel.loading
-        visible: running
-    }
+
 
     Component.onCompleted: {
         dashboardAnalyticsApi.testMode = false;  // Enable test mode

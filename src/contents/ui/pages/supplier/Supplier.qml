@@ -36,7 +36,7 @@ Kirigami.Page {
                 import org.kde.kirigami as Kirigami
                 Kirigami.Action {
                     icon.name: "list-add"
-                    text: "Add Supplier"
+                    text:i18n("Add Supplier")
                     onTriggered: {
                         supplierDetailsDialog.supplierId = 0
                         supplierDetailsDialog.active = true
@@ -49,7 +49,7 @@ Kirigami.Page {
     actions: [
         Kirigami.Action {
             icon.name: "list-add-symbolic"
-            text: "Add"
+            text: i18n("Add")
             onTriggered: {
                 supplierDetailsDialog.supplierId = 0
                 supplierDetailsDialog.active = true
@@ -57,18 +57,18 @@ Kirigami.Page {
         },
         Kirigami.Action {
             icon.name: "delete"
-            text: "Delete"
+            text: i18n("Delete")
             enabled: supplierModel.hasCheckedItems
             onTriggered: deleteDialog.open()
         },
         Kirigami.Action {
             icon.name: "overflow-menu"
             Kirigami.Action {
-                text: "Export"
+                text: i18n("Export")
                 onTriggered: showPassiveNotification("Export triggered")
             }
             Kirigami.Action {
-                text: "Print"
+                text: i18n("Print")
                 onTriggered: showPassiveNotification("Print triggered")
             }
         }
@@ -78,7 +78,7 @@ Kirigami.Page {
     header: RowLayout {
         Layout.fillWidth: true
         Item { Layout.fillWidth: true }
-        QQC2.BusyIndicator {
+        DBusyIndicator {
             running: supplierModel.loading
         }
         Kirigami.SearchField {
@@ -223,7 +223,7 @@ Kirigami.Page {
         target: supplierApi
         function onSupplierDeleted() {
             applicationWindow().gnotification.showNotification("",
-                "Supplier deleted successfully",
+               i18n("Supplier deleted successfully"),
                 Kirigami.MessageType.Positive,
                 "short",
                 "dialog-close"
@@ -269,7 +269,7 @@ Kirigami.Page {
 
         function onSupplierCreated() {
             applicationWindow().gnotification.showNotification("",
-                "Supplier created successfully",
+                i18n("Supplier created successfully"),
                 Kirigami.MessageType.Positive,
                 "short",
                 "dialog-close"
@@ -278,7 +278,7 @@ Kirigami.Page {
 
         function onSupplierUpdated() {
             applicationWindow().gnotification.showNotification("",
-                "Supplier updated successfully",
+                i18n("Supplier updated successfully"),
                 Kirigami.MessageType.Positive,
                 "short",
                 "dialog-close"

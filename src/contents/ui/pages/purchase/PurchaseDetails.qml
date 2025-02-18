@@ -21,7 +21,7 @@ Kirigami.Dialog{
     property var currentPurchase: null  // Add this property
     standardButtons: Kirigami.Dialog.NoButton
     property double remainingAmount: currentPurchase ? (currentPurchase.total_amount - currentPurchase.paid_amount) : 0
-    QQC2.BusyIndicator {
+    DBusyIndicator {
         id: busyIndicator
         anchors.centerIn: parent
         running: purchaseModel.loading
@@ -115,7 +115,7 @@ Kirigami.Dialog{
 
                         FormCard.FormSpinBoxDelegate {
                             id: discountField
-                            label:  "Discount"
+                            label:  i18n("Discount")
                             from: 0
                             to: calculateSubtotal()
                             onValueChanged: calculateTotal()

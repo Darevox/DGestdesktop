@@ -7,7 +7,7 @@ import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 import com.dervox.dim
 import "../."
-
+import "../../components"
 Kirigami.Page {
     id: loginPage
     title: i18n("Login")
@@ -130,7 +130,7 @@ Kirigami.Page {
                                 onClicked: performLogin()
                             }
 
-                            QQC2.BusyIndicator {
+                            DBusyIndicator {
                                 Layout.alignment: Qt.AlignHCenter
                                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                                 running: loginPage.isLoading
@@ -213,7 +213,7 @@ Kirigami.Page {
         asynchronous: true
 
         onLoaded: item.open()
-
+        sourceComponent:ExpiredSubscription{}
         Connections {
             target: expiredDialog.item
             function onClosed() {
@@ -330,5 +330,6 @@ Kirigami.Page {
         }
     }
     Component.onCompleted:{
+
     }
 }

@@ -43,7 +43,7 @@ Kirigami.Dialog {
 
             QQC2.Button {
                 icon.name: "list-add-symbolic"
-                text:"Create Product"
+                text:i18n("Create Product")
                 onClicked: {
                     productDialogLoader.productId=0
                     productDialogLoader.active=true

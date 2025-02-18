@@ -70,48 +70,48 @@ Kirigami.Dialog {
 
                             model: favoriteManager.getCategories()  // Set model directly
                             delegate: Kirigami.SwipeListItem {  // Using SwipeListItem for better interaction
-                                       width: ListView.view.width
-                                       contentItem: RowLayout {
-                                           spacing: Kirigami.Units.largeSpacing
+                                width: ListView.view.width
+                                contentItem: RowLayout {
+                                    spacing: Kirigami.Units.largeSpacing
 
-                                           Label {
-                                               text: modelData.name || ""
-                                               Layout.fillWidth: true
-                                               elide: Text.ElideRight
-                                           }
+                                    Label {
+                                        text: modelData.name || ""
+                                        Layout.fillWidth: true
+                                        elide: Text.ElideRight
+                                    }
 
-                                           // Edit button
-                                           Button {
-                                               icon.name: "edit-entry"
-                                               display: Button.IconOnly
-                                               onClicked: {
-                                                   editCategoryDialog.categoryId = modelData.id
-                                                   editCategoryDialog.categoryName = modelData.name
-                                                   editCategoryDialog.open()
-                                               }
-                                           }
+                                    // Edit button
+                                    Button {
+                                        icon.name: "edit-entry"
+                                        display: Button.IconOnly
+                                        onClicked: {
+                                            editCategoryDialog.categoryId = modelData.id
+                                            editCategoryDialog.categoryName = modelData.name
+                                            editCategoryDialog.open()
+                                        }
+                                    }
 
-                                           // Delete button
-                                           Button {
-                                               icon.name: "edit-delete"
-                                               display: Button.IconOnly
-                                               onClicked: {
-                                                   deleteCategoryDialog.categoryId = modelData.id
-                                                   deleteCategoryDialog.categoryName = modelData.name
-                                                   deleteCategoryDialog.open()
-                                               }
-                                           }
-                                       }
-                                   }
+                                    // Delete button
+                                    Button {
+                                        icon.name: "edit-delete"
+                                        display: Button.IconOnly
+                                        onClicked: {
+                                            deleteCategoryDialog.categoryId = modelData.id
+                                            deleteCategoryDialog.categoryName = modelData.name
+                                            deleteCategoryDialog.open()
+                                        }
+                                    }
+                                }
+                            }
 
-                                   // Empty state message
-                                   Kirigami.PlaceholderMessage {
-                                       anchors.centerIn: parent
-                                       width: parent.width - (Kirigami.Units.largeSpacing * 4)
-                                       visible: listCategories.count === 0
-                                       text: i18n("No categories yet")
-                                       icon.name: "folder-symbolic"
-                                   }
+                            // Empty state message
+                            Kirigami.PlaceholderMessage {
+                                anchors.centerIn: parent
+                                width: parent.width - (Kirigami.Units.largeSpacing * 4)
+                                visible: listCategories.count === 0
+                                text: i18n("No categories yet")
+                                icon.name: "folder-symbolic"
+                            }
 
 
                             // delegate: Rectangle {
@@ -218,9 +218,9 @@ Kirigami.Dialog {
                                 onItemSelected: function(product) {
                                     if (categoryCombo.currentValue !== undefined) {
                                         favoriteManager.addProductToCategory(
-                                            categoryCombo.currentValue,
-                                            product.id
-                                        )
+                                                    categoryCombo.currentValue,
+                                                    product.id
+                                                    )
                                     }
                                 }
                             }
@@ -233,7 +233,7 @@ Kirigami.Dialog {
                                 clip: true
 
                                 model: categoryCombo.currentValue !== undefined ?
-                                       favoriteManager.getCategoryProductIds(categoryCombo.currentValue) : []
+                                           favoriteManager.getCategoryProductIds(categoryCombo.currentValue) : []
 
                                 delegate: Kirigami.SwipeListItem {
                                     id: productItem
@@ -242,7 +242,7 @@ Kirigami.Dialog {
                                     contentItem: RowLayout {
                                         spacing: Kirigami.Units.largeSpacing
 
-                                        BusyIndicator {
+                                        DBusyIndicator{
                                             running: !productData.loaded
                                             visible: running
                                             Layout.preferredWidth: Kirigami.Units.iconSizes.small
@@ -274,18 +274,18 @@ Kirigami.Dialog {
                                             display: Button.IconOnly
                                             onClicked: {
                                                 favoriteManager.removeProductFromCategory(
-                                                    categoryCombo.currentValue,
-                                                    modelData
-                                                )
+                                                            categoryCombo.currentValue,
+                                                            modelData
+                                                            )
                                             }
                                         }
                                     }
 
                                     property var productData: ({
-                                        loaded: false,
-                                        name: "",
-                                        reference: ""
-                                    })
+                                                                   loaded: false,
+                                                                   name: "",
+                                                                   reference: ""
+                                                               })
 
                                     Component.onCompleted: {
                                         productFetchApi.getProduct(modelData)
@@ -489,9 +489,9 @@ Kirigami.Dialog {
                 favoriteManager.deleteCategory(categoryId)
                 // Optional: Show notification
                 applicationWindow().showPassiveNotification(
-                    i18n("Category deleted successfully"),
-                    "short"
-                )
+                            i18n("Category deleted successfully"),
+                            "short"
+                            )
             }
         }
 
@@ -505,7 +505,7 @@ Kirigami.Dialog {
     Kirigami.Dialog {
         id: editCategoryDialog
         title: i18n("Edit Category")
-       // standardButtons: Dialog.Ok | Dialog.Cancel
+        // standardButtons: Dialog.Ok | Dialog.Cancel
 
         property int categoryId: -1
         property string categoryName: ""
@@ -537,9 +537,9 @@ Kirigami.Dialog {
                 favoriteManager.updateCategory(categoryId, editCategoryNameField.text.trim())
                 // Optional: Show notification
                 applicationWindow().showPassiveNotification(
-                    i18n("Category updated successfully"),
-                    "short"
-                )
+                            i18n("Category updated successfully"),
+                            "short"
+                            )
             }
         }
 
@@ -552,10 +552,10 @@ Kirigami.Dialog {
     Kirigami.Dialog {
         id: newCategoryDialog
         title: i18n("New Category")
-       // standardButtons: Dialog.Ok | Dialog.Cancel
+        // standardButtons: Dialog.Ok | Dialog.Cancel
 
         property bool isValid: categoryNameField.text.trim() !== ""
-       standardButtons: isValid ? (Dialog.Ok | Dialog.Cancel) : Dialog.Cancel
+        standardButtons: isValid ? (Dialog.Ok | Dialog.Cancel) : Dialog.Cancel
 
         FormCard.FormCard {
             FormCard.FormTextFieldDelegate {
@@ -580,9 +580,9 @@ Kirigami.Dialog {
                 favoriteManager.createCategory(categoryNameField.text.trim())
                 // Optional: Show notification
                 applicationWindow().showPassiveNotification(
-                    i18n("Category created successfully"),
-                    "short"
-                )
+                            i18n("Category created successfully"),
+                            "short"
+                            )
             }
         }
     }

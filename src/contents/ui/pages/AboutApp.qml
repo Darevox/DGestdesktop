@@ -2,12 +2,12 @@ import org.kde.kirigami as Kirigami
 import org.kde.kirigamiaddons.formcard 1.0 as FormCard
 Kirigami.PromptDialog {
     id: aboutDialog
-    title: "About"
+    title: i18n("About")
     preferredWidth: Kirigami.Units.gridUnit * 24
     standardButtons: Kirigami.Dialog.NoButton
     customFooterActions: [
         Kirigami.Action {
-            text: qsTr("Cancel")
+            text: i18n("Cancel")
             icon.name: "dialog-cancel"
             onTriggered: {
                 aboutDialog.close();

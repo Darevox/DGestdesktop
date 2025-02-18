@@ -26,7 +26,7 @@ Kirigami.PromptDialog {
         "sent": "Sent"
     }
 
-    QQC2.BusyIndicator {
+    DBusyIndicator {
         id: busyIndicator
         anchors.centerIn: parent
         running: invoiceApi.isLoading
@@ -235,7 +235,7 @@ Kirigami.PromptDialog {
 
         function onInvoiceMarkedAsPaid() {
 
-            inlineMsg.text = "Invoice paid successfully"
+            inlineMsg.text = i18n("Invoice paid successfully")
             inlineMsg.visible = true
             inlineMsg.type = Kirigami.MessageType.Positive
             invoiceApi.getInvoice(dialogInvoiceId) // Refresh invoice data
@@ -244,14 +244,14 @@ Kirigami.PromptDialog {
         }
         function onInvoiceUpdated() {
 
-            inlineMsg.text = "Invoice updated successfully"
+            inlineMsg.text = i18n("Invoice updated successfully")
             inlineMsg.visible = true
             inlineMsg.type = Kirigami.MessageType.Positive
             invoiceApi.getInvoice(dialogInvoiceId) // Refresh invoice data
             invoiceModel.refresh();
         }
         function onInvoiceSent() {
-            inlineMsg.text = "Invoice sent successfully"
+            inlineMsg.text = i18n("Invoice sent successfully")
             inlineMsg.visible = true
             inlineMsg.type = Kirigami.MessageType.Positive
             invoiceApi.getInvoice(dialogInvoiceId)

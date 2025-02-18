@@ -170,7 +170,7 @@ Kirigami.Page {
                                             import org.kde.kirigami as Kirigami
                                             Kirigami.Action {
                                             icon.name: "list-add"
-                                            text: "Create Invoice"
+                                            text: i18n("Create Invoice")
                                             onTriggered: {
                                             invoiceDetailsDialog.invoiceId = 0
                                             invoiceDetailsDialog.active = true
@@ -225,7 +225,7 @@ Kirigami.Page {
 
         Item { Layout.fillWidth: true }
 
-        QQC2.BusyIndicator {
+        DBusyIndicator {
             running: invoiceApi.isLoading
         }
 
@@ -353,10 +353,10 @@ Kirigami.Page {
                     itemDelegate: DStatusBadge {
                         text: {
                             switch(modelData) {
-                                case "draft": return "Draft"
-                                case "sent": return "Sent"
-                                case "paid": return "Paid"
-                                case "cancelled": return "Cancelled"
+                                case "draft": return i18nc("@item:status", "Draft")
+                                case "sent": return i18nc("@item:status", "Sent")
+                                case "paid": return i18nc("@item:status", "Paid")
+                                case "cancelled": return i18nc("@item:status", "Cancelled")
                                 default: return modelData || ""
                             }
                         }
@@ -450,7 +450,7 @@ Kirigami.Page {
         function onInvoiceDeleted() {
             applicationWindow().gnotification.showNotification(
                         "",
-                        "Invoice deleted successfully",
+                        i18n("Invoice deleted successfully"),
                         Kirigami.MessageType.Positive,
                         "short",
                         "dialog-close"

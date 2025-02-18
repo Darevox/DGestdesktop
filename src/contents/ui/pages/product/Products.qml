@@ -64,7 +64,7 @@ Kirigami.Page {
     actions: [
         Kirigami.Action {
             icon.name: "list-add-symbolic"
-            text:"Add"
+            text:i18n("Add")
             onTriggered: {
                 productDialogLoader.productId=0
                 productDialogLoader.active=true
@@ -72,7 +72,7 @@ Kirigami.Page {
         },
         Kirigami.Action {
             icon.name: "delete"
-            text:"Delete"
+            text:i18n("Delete")
             enabled: productModel.hasCheckedItems
             onTriggered: {
                 deleteDialog.open()
@@ -100,7 +100,7 @@ Kirigami.Page {
             Layout.fillWidth: true
 
         }
-        QQC2.BusyIndicator {
+        DBusyIndicator {
             running: productApi.isLoading
         }
         Kirigami.SearchField {
@@ -120,7 +120,7 @@ Kirigami.Page {
         }
         QQC2.CheckBox {
             id : lowStockCheckBox
-            text: "Show Low Stock Only"
+            text: i18n("Show Low Stock Only")
             onCheckedChanged: productModel.filterLowStock(checked)
         }
         Item{
@@ -426,7 +426,7 @@ Kirigami.Page {
 
                    // Show notification
                    applicationWindow().gnotification.showNotification("",
-                       "Product Deleted successfully",
+                        i18n("Product Deleted successfully"),
                        Kirigami.MessageType.Positive,
                        "short",
                        "dialog-close"
