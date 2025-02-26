@@ -28,8 +28,9 @@ void ProductModel::setApi(ProductApi* api)
         connect(m_api, &ProductApi::productDeleted, this, &ProductModel::handleProductDeleted);
         connect(m_api, &ProductApi::stockUpdated, this, &ProductModel::handleStockUpdated);
 
-        refresh();
+
     }
+     refresh();
 }
 
 int ProductModel::rowCount(const QModelIndex &parent) const

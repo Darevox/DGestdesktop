@@ -549,43 +549,58 @@ Kirigami.Dialog {
         }
     }
 
-    Kirigami.Dialog {
+    Kirigami.PromptDialog {
         id: newCategoryDialog
         title: i18n("New Category")
-        // standardButtons: Dialog.Ok | Dialog.Cancel
+        standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
 
         property bool isValid: categoryNameField.text.trim() !== ""
-        standardButtons: isValid ? (Dialog.Ok | Dialog.Cancel) : Dialog.Cancel
 
-        FormCard.FormCard {
+        // Override the accept method to handle validation
+        function accept() {
+            if (categoryNameField.text.trim() === "") {
+                categoryNameField.statusMessage = i18n("Category name cannot be empty")
+                categoryNameField.status = Kirigami.MessageType.Error
+                return
+            }
+           // Kirigami.Dialog.prototype.accept.call(newCategoryDialog)
+        }
+
+        mainItem: FormCard.FormCard {
             FormCard.FormTextFieldDelegate {
                 id: categoryNameField
                 label: i18n("Category Name")
                 placeholderText: i18n("Enter category name")
-                onAccepted: if (newCategoryDialog.isValid) newCategoryDialog.accept()
+                onAccepted: newCategoryDialog.accept()
 
-                // Optional: Add validation feedback
-                statusMessage: text.trim() === "" ? i18n("Category name cannot be empty") : ""
-                status: text.trim() === "" ? Kirigami.MessageType.Error : Kirigami.MessageType.Positive
+                // Clear error message when user starts typing
+                onTextChanged: {
+                    if (text.trim() !== "") {
+                        statusMessage = ""
+                        status = Kirigami.MessageType.Positive
+                    }
+                }
             }
         }
 
         onOpened: {
             categoryNameField.text = ""
+            categoryNameField.statusMessage = ""
+            categoryNameField.status = Kirigami.MessageType.Information
             categoryNameField.forceActiveFocus()
         }
 
         onAccepted: {
             if (isValid) {
                 favoriteManager.createCategory(categoryNameField.text.trim())
-                // Optional: Show notification
                 applicationWindow().showPassiveNotification(
-                            i18n("Category created successfully"),
-                            "short"
-                            )
+                    i18n("Category created successfully"),
+                    "short"
+                )
             }
         }
     }
+
 
     // New category dialog
     // Kirigami.Dialog {

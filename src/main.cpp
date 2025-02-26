@@ -58,8 +58,7 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling); // DPI support
-    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps); //HiDPI pixmaps
+
     AppSettings::initializeScale();
 #ifdef Q_OS_ANDROID
     QGuiApplication app(argc, argv);

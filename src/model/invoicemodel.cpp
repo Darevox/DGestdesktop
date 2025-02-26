@@ -32,8 +32,9 @@ void InvoiceModel::setApi(InvoiceApi* api)
         connect(m_api, &InvoiceApi::invoiceMarkedAsPaid, this, &InvoiceModel::handleInvoiceMarkedAsPaid);
         connect(m_api, &InvoiceApi::summaryReceived, this, &InvoiceModel::handleSummaryReceived);
 
-        refresh();
+
     }
+         refresh();
 }
 
 int InvoiceModel::rowCount(const QModelIndex &parent) const
@@ -56,7 +57,7 @@ void InvoiceModel::setStartDate(const QDateTime &date)
         Q_EMIT startDateChanged();
         m_currentPage = 1; // Reset to first page when changing filter
         Q_EMIT currentPageChanged();
-        refresh();
+     //   refresh();
     }
 }
 
@@ -67,7 +68,7 @@ void InvoiceModel::setEndDate(const QDateTime &date)
         Q_EMIT endDateChanged();
         m_currentPage = 1; // Reset to first page when changing filter
         Q_EMIT currentPageChanged();
-        refresh();
+       // refresh();
     }
 }
 QVariant InvoiceModel::data(const QModelIndex &index, int role) const
@@ -360,7 +361,7 @@ void InvoiceModel::setStatus(const QString &status)
     if (m_status != status) {
         m_status = status;
         Q_EMIT statusChanged();
-        refresh();
+       // refresh();
     }
 }
 

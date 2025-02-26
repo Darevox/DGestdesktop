@@ -93,8 +93,13 @@ Kirigami.PromptDialog {
 
             FormCard.FormComboBoxDelegate {
                 id: statusCombo
-                description: i18n("Status")
-                model: ["Active", "Inactive"]
+                text: i18n("Status")
+                model: [
+                    { text: i18n("Active"), value: "active" },
+                    { text: i18n("Inactive"), value: "inactive" }
+                ]
+                textRole: "text"
+                valueRole: "value"
                 currentIndex: 0
             }
 
@@ -201,7 +206,7 @@ Kirigami.PromptDialog {
             address: addressField.text,
             tax_number: taxNumberField.text,
             payment_terms: paymentTermsField.text,
-            status: statusMapping[statusCombo.currentText],
+            status: statusCombo.currentValue || statusCombo.currentText,
             notes: notesField.text
         }
     }
@@ -214,7 +219,8 @@ Kirigami.PromptDialog {
         taxNumberField.text = client.taxNumber || ""
         paymentTermsField.text = client.paymentTerms || ""
         notesField.text = client.notes || ""
-        statusCombo.currentIndex = statusCombo.model.indexOf(statusMapping[client.status]) || 0
+         let statusIndex =  statusCombo.model.findIndex(item => item.value === client.status)
+        statusCombo.currentIndex =  statusIndex !== -1 ? statusIndex : 0
     }
 
     function clearStatusMessages() {

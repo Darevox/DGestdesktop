@@ -76,7 +76,7 @@ Kirigami.AbstractCard {
 
     contentItem: ColumnLayout {
         spacing: Kirigami.Units.smallSpacing
-
+        Layout.fillWidth: true
         // Header
         RowLayout {
             Layout.fillWidth: true
@@ -102,9 +102,11 @@ Kirigami.AbstractCard {
                     opacity: 0.7
                 }
             }
-
+            Item{
+                Layout.fillWidth: true
+            }
             Kirigami.Heading {
-                level: 2
+                level: 1
                 text: card.value
                 color: card.chartColor
             }

@@ -217,7 +217,7 @@ QFuture<void> InvoiceApi::getInvoices(const QString &search, const QString &sort
     }
 
     QNetworkRequest request = createRequest(path);
-    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(getToken()).toUtf8());
+        request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->get(request);

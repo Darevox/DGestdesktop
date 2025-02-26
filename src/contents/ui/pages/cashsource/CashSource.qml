@@ -146,7 +146,8 @@ Kirigami.Page {
             alternatingRows: true
             sortOrder: cashSourceModel.sortDirection === "asc" ? Qt.AscendingOrder : Qt.DescendingOrder
             sortRole: CashSourceRoles.NameRole
-
+            selectionMode: TableView.SelectionMode.SingleSelection
+            selectionBehavior: TableView.SelectRows
             property bool isRTL: Qt.application.layoutDirection === Qt.RightToLeft
             property int columnWidth: (root.width - (root.width * 0.05)) / 6.2
 
@@ -190,6 +191,7 @@ Kirigami.Page {
                     leftPadding: Kirigami.Units.largeSpacing
                     rightPadding: Kirigami.Units.largeSpacing
                 }
+                headerDelegate: TableHeaderLabel {}
             }
 
             property var typeHeader: Tables.HeaderComponent {
@@ -211,6 +213,7 @@ Kirigami.Page {
                     leftPadding: Kirigami.Units.largeSpacing
                     rightPadding: Kirigami.Units.largeSpacing
                 }
+                headerDelegate: TableHeaderLabel {}
             }
 
             property var balanceHeader: Tables.HeaderComponent {
@@ -228,6 +231,7 @@ Kirigami.Page {
                     leftPadding: Kirigami.Units.largeSpacing
                     rightPadding: Kirigami.Units.largeSpacing
                 }
+                headerDelegate: TableHeaderLabel {}
             }
 
             property var statusHeader: Tables.HeaderComponent {
@@ -255,6 +259,7 @@ Kirigami.Page {
                         }
                     }
                 }
+                headerDelegate: TableHeaderLabel {}
             }
 
             property var descriptionHeader: Tables.HeaderComponent {
@@ -272,6 +277,7 @@ Kirigami.Page {
                     leftPadding: Kirigami.Units.largeSpacing
                     rightPadding: Kirigami.Units.largeSpacing
                 }
+                headerDelegate: TableHeaderLabel {}
             }
 
             property var initialBalanceHeader: Tables.HeaderComponent {
@@ -289,6 +295,7 @@ Kirigami.Page {
                     leftPadding: Kirigami.Units.largeSpacing
                     rightPadding: Kirigami.Units.largeSpacing
                 }
+                headerDelegate: TableHeaderLabel {}
             }
 
             property var currentBalanceHeader: Tables.HeaderComponent {
@@ -306,6 +313,7 @@ Kirigami.Page {
                     leftPadding: Kirigami.Units.largeSpacing
                     rightPadding: Kirigami.Units.largeSpacing
                 }
+                headerDelegate: TableHeaderLabel {}
             }
 
             onColumnClicked: function(index, headerComponent) {

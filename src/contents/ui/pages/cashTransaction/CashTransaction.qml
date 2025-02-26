@@ -304,6 +304,8 @@ Kirigami.Page {
             alternatingRows: true
             sortOrder: cashTransactionModel.sortDirection === "asc" ? Qt.AscendingOrder : Qt.DescendingOrder
             sortRole: CashTransactionRoles.TransactionDateRole
+            selectionMode: TableView.SelectionMode.SingleSelection
+            selectionBehavior: TableView.SelectRows
             // modelCheck: cashTransactionModel
             onCellDoubleClicked: function(row) {
                 let transaction = cashTransactionModel.getTransaction(row)
@@ -319,6 +321,7 @@ Kirigami.Page {
                     itemDelegate: QQC2.Label {
                         text: modelData || ""
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Type")
@@ -347,6 +350,7 @@ Kirigami.Page {
                             }
                         }
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Amount")
@@ -359,6 +363,7 @@ Kirigami.Page {
                         font.bold : true
                         horizontalAlignment: Text.AlignRight
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Description")
@@ -369,6 +374,7 @@ Kirigami.Page {
                         text: modelData || ""
                         elide: Text.ElideRight
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Date")
@@ -379,6 +385,7 @@ Kirigami.Page {
                         text: Qt.formatDateTime(modelData, "dd/MM/yyyy")
                         horizontalAlignment: Text.AlignRight
                     }
+                    headerDelegate: TableHeaderLabel {}
                 }
             ]
         }

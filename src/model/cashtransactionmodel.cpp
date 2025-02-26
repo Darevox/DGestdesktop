@@ -39,8 +39,9 @@ void CashTransactionModel::setApi(CashTransactionApi* api)
         connect(m_api, &CashTransactionApi::errorSummaryReceived,
                 this, &CashTransactionModel::handleApiError);
 
-        refresh();
+
     }
+      refresh();
 }
 
 int CashTransactionModel::rowCount(const QModelIndex &parent) const
@@ -360,7 +361,7 @@ void CashTransactionModel::setMinAmount(double amount)
         Q_EMIT minAmountChanged();
         m_currentPage = 1; // Reset to first page when changing filter
         Q_EMIT currentPageChanged();
-        refresh();
+        //refresh();
     }
 }
 
@@ -371,7 +372,7 @@ void CashTransactionModel::setMaxAmount(double amount)
         Q_EMIT maxAmountChanged();
         m_currentPage = 1; // Reset to first page when changing filter
         Q_EMIT currentPageChanged();
-        refresh();
+        //refresh();
     }
 }
 
@@ -382,7 +383,7 @@ void CashTransactionModel::setStartDate(const QDateTime &date)
         Q_EMIT startDateChanged();
         m_currentPage = 1; // Reset to first page when changing filter
         Q_EMIT currentPageChanged();
-        refresh();
+       // refresh();
     }
 }
 
@@ -393,7 +394,7 @@ void CashTransactionModel::setEndDate(const QDateTime &date)
         Q_EMIT endDateChanged();
         m_currentPage = 1; // Reset to first page when changing filter
         Q_EMIT currentPageChanged();
-        refresh();
+      //  refresh();
     }
 }
 void CashTransactionModel::updateHasCheckedItems()

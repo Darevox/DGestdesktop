@@ -178,7 +178,8 @@ Kirigami.Page {
             sortOrder : productModel.sortDirection === "asc" ? Qt.AscendingOrder : Qt.DescendingOrder
             sortRole: ProductRoles.NameRole
             //  contentHeight : parent.height
-
+            selectionMode: TableView.SelectionMode.SingleSelection
+            selectionBehavior: TableView.SelectRows
             contentWidth : parent.width
             onCellDoubleClicked:function (row){
                 let idProduct = view.model.data(view.model.index(row, 0), ProductRoles.IdRole);
@@ -246,8 +247,7 @@ Kirigami.Page {
                     title: i18nc("@title:column", "Select")
                     textRole: "checked"
                     role: ProductRoles.CheckedRole
-                    minimumWidth: root.width * 0.04
-                    width: minimumWidth
+                    width:  root.width * 0.04
                     headerDelegate: QQC2.CheckBox {
                         onCheckedChanged: {
                             productModel.toggleAllProductsChecked()
@@ -262,11 +262,11 @@ Kirigami.Page {
                     title: i18nc("@title:column", "Reference")
                     textRole: "reference"
                     role: ProductRoles.ReferenceRole
-                    minimumWidth: root.width * 0.15
-                    width: minimumWidth
+                    width:  root.width * 0.15
                     itemDelegate: QQC2.Label {
                         text: modelData
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Name")
@@ -277,41 +277,40 @@ Kirigami.Page {
                     //     implicitWidth: view.compact ? Kirigami.Units.iconSizes.small : Kirigami.Units.iconSizes.medium
                     //     implicitHeight: implicitWidth
                     // }
-                    minimumWidth: view.width * 0.20
-                    width: minimumWidth
+                    width:  view.width * 0.20
                     itemDelegate: QQC2.Label {
                         text: modelData
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Description")
                     textRole: "description"
                     role: ProductRoles.DescriptionRole
-                    minimumWidth: view.width * 0.25
-                    width: minimumWidth
+                    width: view.width * 0.20
                     itemDelegate: QQC2.Label {
                         text: modelData
                         wrapMode: Text.WordWrap
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Price")
                     textRole: "price"
                     role: ProductRoles.PriceRole
-                    minimumWidth: view.width * 0.10
-                    width: minimumWidth
+                    width: view.width * 0.10
                     itemDelegate: QQC2.Label {
                         text: Number(modelData).toLocaleString(Qt.locale(), 'f', 2)
                         horizontalAlignment: Text.AlignRight
                         font.bold: true
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Quantity")
                     textRole: "quantity"
                     role: ProductRoles.QuantityRole
-                    minimumWidth: view.width * 0.10
-                    width: minimumWidth
+                    width: view.width * 0.10
                     itemDelegate: QQC2.Label {
                         text: modelData
                         horizontalAlignment: Text.AlignRight
@@ -324,27 +323,29 @@ Kirigami.Page {
                         }
                         font.bold: model.quantity <= model.minStockLevel
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "minStock")
                     textRole: "minStockLevel"
                     role: ProductRoles.MinStockLevelRole
-                    minimumWidth: view.width * 0.10
-                    width: minimumWidth
+                    width:  view.width * 0.10
                     itemDelegate: QQC2.Label {
                         text: modelData
                         horizontalAlignment: Text.AlignRight
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Unit")
                     textRole: "productUnit"
                     role: ProductRoles.ProductUnitRole
-                    minimumWidth: view.width * 0.30
-                    width: minimumWidth
+                    // minimumWidth: view.width * 0.30
+                    width: view.width * 0.10
                     itemDelegate: QQC2.Label {
                         text: modelData
                     }
+                    headerDelegate: TableHeaderLabel {}
                 }
             ]
 

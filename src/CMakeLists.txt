@@ -108,6 +108,7 @@ set(DIM_QML_COMPONENTS
     contents/ui/components/DSearchableComboBoxCashSource.qml
     contents/ui/components/NumPad.qml
     contents/ui/components/DBusyIndicator.qml
+    contents/ui/components/TableHeaderLabel.qml
 )
 set(DIM_QML_UTILS
     utils/PDFView.qml

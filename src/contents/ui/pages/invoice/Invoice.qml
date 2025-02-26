@@ -54,7 +54,7 @@ Kirigami.Page {
                     textRole: "text"
                     valueRole: "value"
                     currentIndex : 0
-                    onCurrentValueChanged: invoiceModel.setStatus(currentValue)
+                   onCurrentValueChanged: invoiceModel.setStatus(currentValue)
                 }
 
                 FormCard.FormDateTimeDelegate {
@@ -254,10 +254,13 @@ Kirigami.Page {
         Tables.KTableView {
             id: view
             model: invoiceModel
+            enabled: !invoiceApi.isLoading
             clip: true
             alternatingRows: true
             sortOrder: invoiceModel.sortDirection === "asc" ? Qt.AscendingOrder : Qt.DescendingOrder
             sortRole: InvoiceRoles.IssueDateRole  // Updated from InvoiceDateRole
+            selectionMode: TableView.SelectionMode.SingleSelection
+            selectionBehavior: TableView.SelectRows
             onCellDoubleClicked: function(row) {
                 let invoiceId = view.model.data(view.model.index(row, 0), InvoiceRoles.IdRole)
                 invoiceDetailsDialog.invoiceId = invoiceId
@@ -328,6 +331,7 @@ Kirigami.Page {
                     textRole: "referenceNumber"
                     role: InvoiceRoles.ReferenceNumberRole
                     width: root.width * 0.15
+                    headerDelegate: TableHeaderLabel {}
                 },
 
                 Tables.HeaderComponent {
@@ -344,6 +348,7 @@ Kirigami.Page {
                             }
                         }
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Status")
@@ -370,6 +375,7 @@ Kirigami.Page {
                             }
                         }
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Total")
@@ -382,6 +388,7 @@ Kirigami.Page {
                         font.bold : true
                         horizontalAlignment: Text.AlignRight
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Date")
@@ -393,6 +400,7 @@ Kirigami.Page {
                         horizontalAlignment: Text.AlignRight
 
                     }
+                    headerDelegate: TableHeaderLabel {}
                 }
             ]
         }
@@ -445,8 +453,27 @@ Kirigami.Page {
             }
         }
     }
+    // Connections {
+    //     target: invoiceApi
+
+    // }
+    ViewPdfDialog {
+        id: pdfViewer
+    }
     Connections {
         target: invoiceApi
+        function onPdfGenerated(url) {
+            pdfViewer.pdfUrl = url
+            console.log("url : ", url)
+            pdfViewer.open()
+        }
+
+        function onErrorPdfGenerated(message, status, details) {
+            applicationWindow().showPassiveNotification(
+                        i18n("Error generating PDF: %1", message),
+                        "long"
+                        )
+        }
         function onInvoiceDeleted() {
             applicationWindow().gnotification.showNotification(
                         "",
@@ -465,24 +492,6 @@ Kirigami.Page {
                         Kirigami.MessageType.Error,
                         "short",
                         "dialog-close"
-                        )
-        }
-    }
-    ViewPdfDialog {
-        id: pdfViewer
-    }
-    Connections {
-        target: invoiceApi
-        function onPdfGenerated(url) {
-            pdfViewer.pdfUrl = url
-            console.log("url : ", url)
-            pdfViewer.open()
-        }
-
-        function onErrorPdfGenerated(message, status, details) {
-            applicationWindow().showPassiveNotification(
-                        i18n("Error generating PDF: %1", message),
-                        "long"
                         )
         }
     }

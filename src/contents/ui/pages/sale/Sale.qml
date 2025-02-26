@@ -279,13 +279,15 @@ Kirigami.Page {
             alternatingRows: true
             sortOrder: saleModel.sortDirection === "asc" ? Qt.AscendingOrder : Qt.DescendingOrder
             sortRole: SaleRoles.SaleDateRole
-
+            selectionMode: TableView.SelectionMode.SingleSelection
+            selectionBehavior: TableView.SelectRows
             headerComponents: [
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Reference")
                     textRole: "referenceNumber"
                     role: SaleRoles.ReferenceNumberRole
                     width: root.width * 0.15
+                    headerDelegate: TableHeaderLabel {}
                 },
 
                 Tables.HeaderComponent {
@@ -296,6 +298,7 @@ Kirigami.Page {
                     itemDelegate: QQC2.Label {
                         text: modelData?.name || i18n("Anonymous")
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Status")
@@ -306,9 +309,9 @@ Kirigami.Page {
                     itemDelegate: DStatusBadge {
                         text: {
                             switch(modelData) {
-                                case "completed": return "Completed"
-                                case "cancelled": return "Cancelled"
-                                case "pending": return "Pending"
+                                case "completed": return i18n("Completed")
+                                case "cancelled": return i18n("Cancelled")
+                                case "pending": return i18n("Pending")
                                 default: return modelData || ""
                             }
                         }
@@ -321,6 +324,7 @@ Kirigami.Page {
                             }
                         }
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Payment")
@@ -346,6 +350,7 @@ Kirigami.Page {
                             }
                         }
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Total")
@@ -356,6 +361,7 @@ Kirigami.Page {
                         text: Number(modelData || 0).toLocaleString(Qt.locale(), 'f', 2)
                         horizontalAlignment: Text.AlignRight
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Paid")
@@ -377,6 +383,7 @@ Kirigami.Page {
                         }
                         font.bold: model.paidAmount > 0  // Optional: make non-zero amounts bold
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Date")
@@ -387,6 +394,7 @@ Kirigami.Page {
                         text: Qt.formatDateTime(modelData, "dd/MM/yyyy")
                          horizontalAlignment: Text.AlignRight
                     }
+                    headerDelegate: TableHeaderLabel {}
                 }
 
             ]

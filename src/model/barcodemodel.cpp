@@ -20,6 +20,7 @@ void BarcodeModel::setApi(ProductApi* api)
         connect(m_api, &ProductApi::barcodeRemoved, this, &BarcodeModel::handleBarcodeRemoved);
         connect(m_api, &ProductApi::productError, this, &BarcodeModel::handleProductError);
     }
+        refresh();
 }
 
 void BarcodeModel::setProductId(int productId)

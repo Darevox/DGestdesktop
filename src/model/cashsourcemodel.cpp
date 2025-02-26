@@ -30,8 +30,9 @@ void CashSourceModel::setApi(CashSourceApi* api)
         connect(m_api, &CashSourceApi::withdrawalCompleted, this, &CashSourceModel::handleWithdrawalCompleted);
         connect(m_api, &CashSourceApi::transferCompleted, this, &CashSourceModel::handleTransferCompleted);
 
-        refresh();
+
     }
+     refresh();
 }
 
 int CashSourceModel::rowCount(const QModelIndex &parent) const

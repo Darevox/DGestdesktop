@@ -28,8 +28,9 @@ void ClientModel::setApi(ClientApi* api)
         connect(m_api, &ClientApi::clientUpdated, this, &ClientModel::handleClientUpdated);
         connect(m_api, &ClientApi::clientDeleted, this, &ClientModel::handleClientDeleted);
 
-        refresh();
+
     }
+      refresh();
 }
 
 int ClientModel::rowCount(const QModelIndex &parent) const
@@ -43,7 +44,7 @@ int ClientModel::columnCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
-    return 7; // Adjust based on your needs
+    return 5; // Adjust based on your needs
 }
 
 QVariant ClientModel::data(const QModelIndex &index, int role) const
@@ -376,7 +377,7 @@ Client ClientModel::clientFromVariantMap(const QVariantMap &map) const
     client.payment_terms = map["paymentTerms"_L1].toString();
     client.notes = map["notes"_L1].toString();
     client.status = map["status"_L1].toString();
-    client.balance = map["balance"_L1].toDouble();
+    client.balance = map["balance"_L1].toString().toDouble();
     return client;
 }
 

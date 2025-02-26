@@ -31,8 +31,9 @@ void SaleModel::setApi(SaleApi* api)
         connect(m_api, &SaleApi::invoiceGenerated, this, &SaleModel::handleInvoiceGenerated);
         connect(m_api, &SaleApi::summaryReceived, this, &SaleModel::handleSummaryReceived);
 
-        refresh();
+
     }
+      refresh();
 }
 
 int SaleModel::rowCount(const QModelIndex &parent) const

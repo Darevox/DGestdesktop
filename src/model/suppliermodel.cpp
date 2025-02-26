@@ -28,8 +28,9 @@ void SupplierModel::setApi(SupplierApi* api)
         connect(m_api, &SupplierApi::supplierUpdated, this, &SupplierModel::handleSupplierUpdated);
         connect(m_api, &SupplierApi::supplierDeleted, this, &SupplierModel::handleSupplierDeleted);
 
-        refresh();
+
     }
+     refresh();
 }
 
 int SupplierModel::rowCount(const QModelIndex &parent) const

@@ -7,195 +7,366 @@ import "../../components"
 Kirigami.Dialog {
     id: statisticsDialog
     title: i18n("Statistics - %1", dialogClientName)
-    preferredWidth: Kirigami.Units.gridUnit * 50
-    preferredHeight: Kirigami.Units.gridUnit * 35
+    // preferredWidth: Kirigami.Units.gridUnit * 50
+    // preferredHeight: Kirigami.Units.gridUnit * 35
     standardButtons: Kirigami.Dialog.Close
 
     property int dialogClientId: 0
     property string dialogClientName: ""
 
-    // Loading indicator
-    DBusyIndicator {
-        id: busyIndicator
-        anchors.centerIn: parent
-        running: clientApi.isLoading
-        visible: running
-        z: 999
-    }
 
     // Main content
-    ColumnLayout {
-        anchors.fill: parent
-        visible: !clientApi.isLoading
-
-        // Summary Cards
+    contentItem: GridLayout {
+        // Loading skeleton
         GridLayout {
-            Layout.fillWidth: true
-            columns: 3
+            anchors.fill: parent
+            visible: clientApi.isLoading
+            columns: 1
             rowSpacing: Kirigami.Units.largeSpacing
-            columnSpacing: Kirigami.Units.largeSpacing
 
-            // Total Sales Card
-            Kirigami.Card {
+            // Summary Cards Skeleton
+            GridLayout {
                 Layout.fillWidth: true
-                contentItem: RowLayout {
-                    spacing: Kirigami.Units.smallSpacing
+                Layout.margins: Kirigami.Units.smallSpacing
+                columns: 3
+                columnSpacing: Kirigami.Units.largeSpacing
+                rowSpacing: Kirigami.Units.largeSpacing
 
-                    Kirigami.Icon {
-                        Layout.preferredWidth: Kirigami.Units.iconSizes.medium
-                        Layout.preferredHeight: Kirigami.Units.iconSizes.medium
-                        source: "business-sales"
-                    }
-
-                    ColumnLayout {
+                Repeater {
+                    model: 3
+                    delegate: Kirigami.Card {
                         Layout.fillWidth: true
-                        spacing: Kirigami.Units.smallSpacing
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 13
+                        contentItem: RowLayout {
+                            spacing: Kirigami.Units.smallSpacing
 
-                        QQC2.Label {
-                            text: i18n("Total Sales")
-                            Layout.fillWidth: true
-                            elide: Text.ElideRight
-                        }
+                            // Icon skeleton
+                            SkeletonLoaders {
+                                Layout.preferredWidth: Kirigami.Units.iconSizes.medium
+                                Layout.preferredHeight: Kirigami.Units.iconSizes.medium
+                                color: Kirigami.Theme.disabledTextColor
+                                opacity: 0.3
+                            }
 
-                        QQC2.Label {
-                            text: Number(statistics?.total_sales || 0).toLocaleString(Qt.locale(), 'f', 2)
-                            Layout.fillWidth: true
-                            font.bold: true
-                            font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.2
-                            color: Kirigami.Theme.positiveTextColor
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: Kirigami.Units.smallSpacing
+
+                                // Title skeleton
+                                SkeletonLoaders {
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit
+                                    color: Kirigami.Theme.disabledTextColor
+                                    opacity: 0.3
+                                }
+
+                                // Value skeleton
+                                SkeletonLoaders {
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+                                    color: Kirigami.Theme.disabledTextColor
+                                    opacity: 0.3
+                                }
+                            }
                         }
                     }
                 }
             }
 
-            // Total Payments Card
-            Kirigami.Card {
+            // Details Skeleton
+            RowLayout {
                 Layout.fillWidth: true
-                contentItem: RowLayout {
+                Layout.margins: Kirigami.Units.smallSpacing
+                spacing: Kirigami.Units.gridUnit * 2
+
+                // Left Column Skeleton
+                ColumnLayout {
+                    Layout.fillWidth: true
                     spacing: Kirigami.Units.smallSpacing
 
-                    Kirigami.Icon {
-                        Layout.preferredWidth: Kirigami.Units.iconSizes.medium
-                        Layout.preferredHeight: Kirigami.Units.iconSizes.medium
-                        source: "wallet-open"
-                    }
-
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: Kirigami.Units.smallSpacing
-
-                        QQC2.Label {
-                            text: i18n("Total Payments")
+                    Repeater {
+                        model: 4
+                        delegate: RowLayout {
                             Layout.fillWidth: true
-                            elide: Text.ElideRight
-                        }
+                            spacing: Kirigami.Units.largeSpacing
 
-                        QQC2.Label {
-                            text: Number(statistics?.total_payments || 0).toLocaleString(Qt.locale(), 'f', 2)
-                            Layout.fillWidth: true
-                            font.bold: true
-                            font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.2
-                            color: Kirigami.Theme.neutralTextColor
+                            // Label skeleton
+                            SkeletonLoaders {
+                                Layout.preferredWidth: 100
+                                Layout.preferredHeight : Kirigami.Units.gridUnit
+                                color: Kirigami.Theme.disabledTextColor
+                                opacity: 0.3
+                            }
+
+                            // Value skeleton
+                            SkeletonLoaders {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: Kirigami.Units.gridUnit
+                                color: Kirigami.Theme.disabledTextColor
+                                opacity: 0.3
+                            }
                         }
                     }
                 }
-            }
 
-            // Outstanding Balance Card
-            Kirigami.Card {
-                Layout.fillWidth: true
-                contentItem: RowLayout {
+                // Right Column Skeleton
+                ColumnLayout {
+                    Layout.fillWidth: true
                     spacing: Kirigami.Units.smallSpacing
 
-                    Kirigami.Icon {
-                        Layout.preferredWidth: Kirigami.Units.iconSizes.medium
-                        Layout.preferredHeight: Kirigami.Units.iconSizes.medium
-                        source: "office-chart-bar"
-                    }
-
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: Kirigami.Units.smallSpacing
-
-                        QQC2.Label {
-                            text: i18n("Outstanding Balance")
+                    Repeater {
+                        model: 4
+                        delegate: RowLayout {
                             Layout.fillWidth: true
-                            elide: Text.ElideRight
-                        }
+                            spacing: Kirigami.Units.largeSpacing
 
-                        QQC2.Label {
-                            text: Number(statistics?.outstanding_balance || 0).toLocaleString(Qt.locale(), 'f', 2)
-                            Layout.fillWidth: true
-                            font.bold: true
-                            font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.2
-                            color: Kirigami.Theme.negativeTextColor
+                            // Label skeleton
+                            SkeletonLoaders {
+                                Layout.preferredWidth: 100
+                                Layout.preferredHeight: Kirigami.Units.gridUnit
+                                color: Kirigami.Theme.disabledTextColor
+                                opacity: 0.3
+                            }
+
+                            // Value skeleton
+                            SkeletonLoaders {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: Kirigami.Units.gridUnit
+                                color: Kirigami.Theme.disabledTextColor
+                                opacity: 0.3
+                            }
                         }
                     }
                 }
             }
         }
 
-        // Additional Statistics
-        Kirigami.FormLayout {
-            Layout.fillWidth: true
-            Layout.topMargin: Kirigami.Units.largeSpacing
 
-            QQC2.Label {
-                Kirigami.FormData.label: i18n("Last Sale:")
-                text: statistics?.last_sale_date ? Qt.formatDateTime(new Date(statistics.last_sale_date), "yyyy-MM-dd") : "-"
+
+        ColumnLayout {
+            // anchors.fill: parent
+            visible: !clientApi.isLoading
+            spacing: Kirigami.Units.largeSpacing
+            anchors.fill: parent
+
+            // Summary Cards at the top
+            GridLayout {
+                Layout.fillWidth: true
+                columns: 3
+                rowSpacing: Kirigami.Units.largeSpacing
+                columnSpacing: Kirigami.Units.largeSpacing
+                Layout.margins :  Kirigami.Units.smallSpacing
+                // Current Balance Card
+                Kirigami.Card {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 13
+                    contentItem: RowLayout {
+                        spacing: Kirigami.Units.smallSpacing
+
+                        Kirigami.Icon {
+                            Layout.preferredWidth: Kirigami.Units.iconSizes.medium
+                            Layout.preferredHeight: Kirigami.Units.iconSizes.medium
+                            source: "office-chart-bar"
+                        }
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: Kirigami.Units.smallSpacing
+
+                            QQC2.Label {
+                                text: i18n("Current Balance")
+                                Layout.fillWidth: true
+                                elide: Text.ElideRight
+                                font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.1
+                            }
+
+                            QQC2.Label {
+                                text: Number(statistics?.client?.current_balance || 0).toLocaleString(Qt.locale(), 'f', 2)
+                                Layout.fillWidth: true
+                                font.bold: true
+                                font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.4
+                                color: (statistics?.client?.current_balance || 0) > 0 ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.positiveTextColor
+                            }
+                        }
+                    }
+                }
+
+                // Total Sales Card
+                Kirigami.Card {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 13
+                    contentItem: RowLayout {
+                        spacing: Kirigami.Units.smallSpacing
+
+                        Kirigami.Icon {
+                            Layout.preferredWidth: Kirigami.Units.iconSizes.medium
+                            Layout.preferredHeight: Kirigami.Units.iconSizes.medium
+                            source: "view-financial-transfer-reconciled"
+                        }
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: Kirigami.Units.smallSpacing
+
+                            QQC2.Label {
+                                text: i18n("Total Sales")
+                                Layout.fillWidth: true
+                                elide: Text.ElideRight
+                                font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.1
+                            }
+
+                            QQC2.Label {
+                                text: Number(statistics?.summary?.total_sales || 0).toLocaleString(Qt.locale(), 'f', 2)
+                                Layout.fillWidth: true
+                                font.bold: true
+                                font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.4
+                                color: Kirigami.Theme.positiveTextColor
+                            }
+                        }
+                    }
+                }
+
+                // Total Payments Card
+                Kirigami.Card {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 13
+                    contentItem: RowLayout {
+                        spacing: Kirigami.Units.smallSpacing
+
+                        Kirigami.Icon {
+                            Layout.preferredWidth: Kirigami.Units.iconSizes.medium
+                            Layout.preferredHeight: Kirigami.Units.iconSizes.medium
+                            source: "wallet-open"
+                        }
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: Kirigami.Units.smallSpacing
+
+                            QQC2.Label {
+                                text: i18n("Total Payments")
+                                Layout.fillWidth: true
+                                elide: Text.ElideRight
+                                font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.1
+                            }
+
+                            QQC2.Label {
+                                text: Number(statistics?.summary?.total_payments || 0).toLocaleString(Qt.locale(), 'f', 2)
+                                Layout.fillWidth: true
+                                font.bold: true
+                                font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.4
+                                color: Kirigami.Theme.neutralTextColor
+                            }
+                        }
+                    }
+                }
             }
 
-            QQC2.Label {
-                Kirigami.FormData.label: i18n("Last Payment:")
-                text: statistics?.last_payment_date ? Qt.formatDateTime(new Date(statistics.last_payment_date), "yyyy-MM-dd") : "-"
-            }
+            // Detailed Statistics in Two Columns
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.topMargin: Kirigami.Units.largeSpacing
+                spacing: Kirigami.Units.gridUnit * 2
+                Layout.margins :  Kirigami.Units.smallSpacing
 
-            QQC2.Label {
-                Kirigami.FormData.label: i18n("Total Sales Count:")
-                text: statistics?.total_sales_count || "0"
-            }
+                // Left Column
+                Kirigami.FormLayout {
+                    Layout.fillWidth: true
 
-            QQC2.Label {
-                Kirigami.FormData.label: i18n("Average Sale Amount:")
-                text: Number(statistics?.average_sale_amount || 0).toLocaleString(Qt.locale(), 'f', 2)
-            }
+                    QQC2.Label {
+                        Kirigami.FormData.label: i18n("Opening Balance:")
+                        text: Number(statistics?.opening_balance || 0).toLocaleString(Qt.locale(), 'f', 2)
+                        color: (statistics?.opening_balance || 0) > 0 ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.positiveTextColor
+                    }
 
-            QQC2.Label {
-                Kirigami.FormData.label: i18n("Payment Ratio:")
-                text: statistics?.payment_ratio ? (statistics.payment_ratio * 100).toFixed(2) + "%" : "0%"
-            }
-        }
+                    QQC2.Label {
+                        Kirigami.FormData.label: i18n("Closing Balance:")
+                        text: Number(statistics?.closing_balance || 0).toLocaleString(Qt.locale(), 'f', 2)
+                        color: (statistics?.closing_balance || 0) > 0 ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.positiveTextColor
+                    }
 
-        // Period Statistics
-        Kirigami.FormLayout {
-            Layout.fillWidth: true
-            Layout.topMargin: Kirigami.Units.largeSpacing
-            visible: statistics?.period_statistics
+                    QQC2.Label {
+                        Kirigami.FormData.label: i18n("Total Sales Count:")
+                        text: statistics?.transactions?.length || "0"
+                    }
 
-            Kirigami.Heading {
-                level: 4
-                text: i18n("Last 30 Days")
-            }
+                    QQC2.Label {
+                        Kirigami.FormData.label: i18n("Average Sale:")
+                        text: {
+                            const count = statistics?.transactions?.length || 0
+                            const total = Number(statistics?.summary?.total_sales || 0)
+                            const avg = count > 0 ? total / count : 0
+                            return avg.toLocaleString(Qt.locale(), 'f', 2)
+                        }
+                    }
+                }
 
-            QQC2.Label {
-                Kirigami.FormData.label: i18n("Sales:")
-                text: Number(statistics?.period_statistics?.sales || 0).toLocaleString(Qt.locale(), 'f', 2)
-            }
+                // Right Column
+                Kirigami.FormLayout {
+                    Layout.fillWidth: true
 
-            QQC2.Label {
-                Kirigami.FormData.label: i18n("Payments:")
-                text: Number(statistics?.period_statistics?.payments || 0).toLocaleString(Qt.locale(), 'f', 2)
+                    QQC2.Label {
+                        Kirigami.FormData.label: i18n("Last Sale Date:")
+                        text: {
+                            const transactions = statistics?.transactions || []
+                            if (transactions.length > 0) {
+                                const lastSale = transactions[transactions.length - 1]
+                                return Qt.formatDateTime(new Date(lastSale.date), "yyyy-MM-dd")
+                            }
+                            return "-"
+                        }
+                    }
+
+                    QQC2.Label {
+                        Kirigami.FormData.label: i18n("Last Payment Date:")
+                        text: {
+                            const transactions = statistics?.transactions || []
+                            for (let i = transactions.length - 1; i >= 0; i--) {
+                                if (transactions[i].payment_amount > 0) {
+                                    return Qt.formatDateTime(new Date(transactions[i].date), "yyyy-MM-dd")
+                                }
+                            }
+                            return "-"
+                        }
+                    }
+
+                    QQC2.Label {
+                        Kirigami.FormData.label: i18n("Payment Ratio:")
+                        text: {
+                            const totalSales = Number(statistics?.summary?.total_sales || 0)
+                            const totalPayments = Number(statistics?.summary?.total_payments || 0)
+                            const ratio = totalSales > 0 ? (totalPayments / totalSales * 100) : 0
+                            return ratio.toFixed(1) + "%"
+                        }
+                        color: {
+                            const ratio = Number(statistics?.summary?.total_payments || 0) / Number(statistics?.summary?.total_sales || 1)
+                            return ratio >= 0.9 ? Kirigami.Theme.positiveTextColor :
+                                                  ratio >= 0.7 ? Kirigami.Theme.neutralTextColor :
+                                                                 Kirigami.Theme.negativeTextColor
+                        }
+                    }
+
+                    QQC2.Label {
+                        Kirigami.FormData.label: i18n("Outstanding Amount:")
+                        text: Number(statistics?.summary?.outstanding_balance || 0).toLocaleString(Qt.locale(), 'f', 2)
+                        color: Number(statistics?.summary?.outstanding_balance || 0) > 0 ?
+                                   Kirigami.Theme.negativeTextColor : Kirigami.Theme.positiveTextColor
+                    }
+                }
             }
         }
     }
-
     // Data handling
     property var statistics: ({})
 
     Connections {
         target: clientApi
         function onStatisticsReceived(data) {
-            statistics = data
+            statistics = data.statement
         }
 
         function onErrorStatisticsReceived(message, status, details) {
@@ -203,7 +374,7 @@ Kirigami.Dialog {
         }
     }
 
-    Component.onCompleted: {
+    onDialogClientIdChanged: {
         if (dialogClientId > 0) {
             clientApi.getStatistics(dialogClientId)
         }

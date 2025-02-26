@@ -316,7 +316,8 @@ Kirigami.Page {
             alternatingRows: true
             sortOrder: activityLogModel.sortDirection === "asc" ? Qt.AscendingOrder : Qt.DescendingOrder
             sortRole: ActivityLogRoles.CreatedAtRole
-
+            selectionMode: TableView.SelectionMode.SingleSelection
+            selectionBehavior: TableView.SelectRows
             contentWidth: parent.width
             property var nonSortableColumns: {
                    return {
@@ -371,25 +372,31 @@ Kirigami.Page {
 
             headerComponents: [
                 Tables.HeaderComponent {
-                    title: i18nc("@title:column", "ID")
+                    title: i18nc("@title:column", "Nº")
                     textRole: "id"
                     role: ActivityLogRoles.IdRole
-                    minimumWidth: root.width * 0.05
-                    width: minimumWidth
+                    width: root.width * 0.05
                     itemDelegate: QQC2.Label {
                         text: modelData
                         horizontalAlignment: Text.AlignRight
                         font.weight: Font.Medium
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Log Type")
                     textRole: "logType"
                     role: ActivityLogRoles.LogTypeRole
-                    minimumWidth: root.width * 0.15
-                    width: minimumWidth
+                    width: root.width * 0.20
                     itemDelegate: QQC2.Label {
-                        text: modelData
+                        text: {
+                                for (let i = 0; i < logTypesModel.count; i++) {
+                                    if (logTypesModel.get(i).value.toLowerCase() === modelData.toLowerCase()) {
+                                        return logTypesModel.get(i).text;
+                                    }
+                                }
+                                return modelData;
+                            }
                         color: {
                             switch(modelData.toLowerCase()) {
                                 case 'create': return Kirigami.Theme.positiveTextColor;
@@ -400,54 +407,57 @@ Kirigami.Page {
                         }
                         font.weight: Font.Medium
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Model Type")
                     textRole: "modelType"
                     role: ActivityLogRoles.ModelTypeRole
-                    minimumWidth: root.width * 0.15
-                    width: minimumWidth
+                    width: root.width * 0.15
                     itemDelegate: QQC2.Label {
                         //  text: modelData
                         color: Kirigami.Theme.neutralTextColor
                         text: {
-                            if(modelData == "CashSource")
-                            return i18n("Cash Source")
-                            else
-                            return modelData;
-                        }
+                                 // Find the matching text in modelTypesModel
+                                 for (let i = 0; i < modelTypesModel.count; i++) {
+                                     if (modelTypesModel.get(i).value.toLowerCase() === modelData.toLowerCase()) {
+                                         return modelTypesModel.get(i).text;
+                                     }
+                                 }
+                                 return modelData;
+                             }
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Model ID")
                     textRole: "modelIdentifier"
                     role: ActivityLogRoles.ModelIdentifierRole
-                    minimumWidth: root.width * 0.15
-                    width: minimumWidth
+                    width:  root.width * 0.18
                     itemDelegate: QQC2.Label {
                         text: modelData
                         elide: Text.ElideMiddle
                         horizontalAlignment: Text.AlignLeft
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "User")
                     textRole: "userIdentifier"
                     role: ActivityLogRoles.UserIdentifierRole
-                    minimumWidth: root.width * 0.15
-                    width: minimumWidth
+                    width: root.width * 0.15
                     itemDelegate: QQC2.Label {
                         text: modelData
                         elide: Text.ElideRight
                         font.weight: Font.Medium
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Created At")
                     textRole: "createdAt"
                     role: ActivityLogRoles.CreatedAtRole
-                    minimumWidth: root.width * 0.30
-                    width: minimumWidth
+                    width: root.width * 0.25
                     itemDelegate: QQC2.Label {
                         text: {
                             // Assuming createdAt is a valid date string or timestamp
@@ -457,6 +467,7 @@ Kirigami.Page {
                         horizontalAlignment: Text.AlignRight
                         font.family: "Monospace"
                     }
+                    headerDelegate: TableHeaderLabel {}
                 }
             ]
         }

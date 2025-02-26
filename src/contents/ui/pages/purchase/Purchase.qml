@@ -1,3 +1,4 @@
+// PurchasePage.qml
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
@@ -19,7 +20,6 @@ Kirigami.Page {
 
     Kirigami.Theme.colorSet: Kirigami.Theme.View
     Kirigami.Theme.inherit: false
-
     // Summary Drawer
     Kirigami.OverlaySheet {
         id: summarySheet
@@ -50,7 +50,7 @@ Kirigami.Page {
         FormCard.FormCard {
             Layout.fillWidth: true
 
-           Kirigami.Heading {
+            Kirigami.Heading {
                 text: i18n("Status Breakdown")
             }
 
@@ -66,7 +66,7 @@ Kirigami.Page {
         FormCard.FormCard {
             Layout.fillWidth: true
 
-           Kirigami.Heading {
+            Kirigami.Heading {
                 text: i18n("Top Suppliers")
             }
 
@@ -81,7 +81,6 @@ Kirigami.Page {
             }
         }
     }
-
     // Filter Drawer
     Kirigami.OverlayDrawer {
         id: filterSheet
@@ -94,7 +93,7 @@ Kirigami.Page {
             spacing: Kirigami.Units.largeSpacing
 
             Kirigami.Heading {
-                text: i18n("Filter Purchases")
+                text: i18n("Filtering")
             }
 
             FormCard.FormCard {
@@ -112,6 +111,7 @@ Kirigami.Page {
                     ]
                     textRole: "text"
                     valueRole: "value"
+                    currentIndex: 0
                     onCurrentValueChanged: purchaseModel.setStatus(currentValue)
                 }
 
@@ -126,7 +126,18 @@ Kirigami.Page {
                     ]
                     textRole: "text"
                     valueRole: "value"
+                    currentIndex: 0
                     onCurrentValueChanged: purchaseModel.setPaymentStatus(currentValue)
+                }
+
+                FormCard.FormComboBoxDelegate {
+                    id: supplierField
+                    text: i18n("Supplier")
+                    model: supplierModel
+                    textRole: "name"
+                    valueRole: "id"
+                    currentIndex: 0
+                    onCurrentValueChanged: purchaseModel.setSupplierId(currentValue)
                 }
 
                 FormCard.FormDateTimeDelegate {
@@ -134,21 +145,27 @@ Kirigami.Page {
                     dateTimeDisplay: FormCard.FormDateTimeDelegate.DateTimeDisplay.Date
                     text: i18n("Start Date")
                     onValueChanged: updateDateFilter()
+                    Component.onCompleted: {
+                        let oneMonthAgo = new Date()
+                        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
+                        value = oneMonthAgo
+                    }
                 }
 
                 FormCard.FormDateTimeDelegate {
                     id: endDateField
                     dateTimeDisplay: FormCard.FormDateTimeDelegate.DateTimeDisplay.Date
                     text: i18n("End Date")
+                    value: new Date()
                     onValueChanged: updateDateFilter()
                 }
             }
 
-            RowLayout {
+            FormCard.FormCard {
                 Layout.fillWidth: true
-                Layout.margins: Kirigami.Units.largeSpacing
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 24
 
-                QQC2.Button {
+                FormCard.FormButtonDelegate {
                     text: i18n("Apply Filters")
                     icon.name: "view-filter"
                     onClicked: {
@@ -157,21 +174,23 @@ Kirigami.Page {
                     }
                 }
 
-                QQC2.Button {
+                FormCard.FormButtonDelegate {
                     text: i18n("Clear Filters")
                     icon.name: "edit-clear-all"
                     onClicked: {
                         statusField.currentIndex = 0
                         paymentStatusField.currentIndex = 0
-                        startDateField.value = undefined
-                        endDateField.value = undefined
+                        supplierField.currentIndex = 0
+                        let oneMonthAgo = new Date()
+                        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
+                        startDateField.value = oneMonthAgo
+                        endDateField.value = new Date()
                         purchaseModel.refresh()
                     }
                 }
             }
         }
     }
-
     actions: [
         Kirigami.Action {
             icon.name: "list-add-symbolic"
@@ -207,7 +226,7 @@ Kirigami.Page {
 
         Item { Layout.fillWidth: true }
 
-       DBusyIndicator{
+        DBusyIndicator {
             running: purchaseModel.loading
         }
 
@@ -226,7 +245,6 @@ Kirigami.Page {
 
         Item { Layout.fillWidth: true }
     }
-
     Kirigami.PlaceholderMessage {
         id: emptyStateMessage
         anchors.centerIn: parent
@@ -250,22 +268,28 @@ Kirigami.Page {
             alternatingRows: true
             sortOrder: purchaseModel.sortDirection === "asc" ? Qt.AscendingOrder : Qt.DescendingOrder
             sortRole: PurchaseRoles.PurchaseDateRole
-
+            selectionMode: TableView.SelectionMode.SingleSelection
+            selectionBehavior: TableView.SelectRows
             headerComponents: [
+                Tables.HeaderComponent {
+                    title: i18nc("@title:column", "Select")
+                    textRole: "checked"
+                    role: PurchaseRoles.CheckedRole
+                    width: root.width * 0.05
+                    headerDelegate: QQC2.CheckBox {
+                        onCheckedChanged: purchaseModel.toggleAllPurchasesChecked()
+                    }
+                    itemDelegate: QQC2.CheckBox {
+                        checked: modelData
+                        onCheckedChanged: modelCheck.setChecked(row, checked)
+                    }
+                },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Reference")
                     textRole: "referenceNumber"
                     role: PurchaseRoles.ReferenceNumberRole
                     width: root.width * 0.15
-                },
-                Tables.HeaderComponent {
-                    title: i18nc("@title:column", "Date")
-                    textRole: "purchaseDate"
-                    role: PurchaseRoles.PurchaseDateRole
-                    width: root.width * 0.15
-                    itemDelegate: QQC2.Label {
-                        text: Qt.formatDateTime(modelData, "dd/MM/yyyy")
-                    }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Supplier")
@@ -273,61 +297,103 @@ Kirigami.Page {
                     role: PurchaseRoles.SupplierRole
                     width: root.width * 0.15
                     itemDelegate: QQC2.Label {
-                        text: modelData?.name || ""
+                        text: modelData?.name || i18n("Anonymous")
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Status")
                     textRole: "status"
                     role: PurchaseRoles.StatusRole
                     width: root.width * 0.10
-                    itemDelegate: QQC2.Label {
-                        text: modelData || ""
-                        color: {
+                    itemDelegate: DStatusBadge {
+                        text: {
+                            switch(modelData) {
+                                case "completed": return i18n("Completed")
+                                case "cancelled": return i18n("Cancelled")
+                                case "pending": return i18n("Pending")
+                                default: return modelData || ""
+                            }
+                        }
+                        textColor: {
                             switch(modelData) {
                                 case "completed": return Kirigami.Theme.positiveTextColor
                                 case "cancelled": return Kirigami.Theme.negativeTextColor
+                                case "pending": return Kirigami.Theme.neutralTextColor
                                 default: return Kirigami.Theme.textColor
                             }
                         }
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Payment")
                     textRole: "paymentStatus"
                     role: PurchaseRoles.PaymentStatusRole
-                    width: root.width * 0.10
-                    itemDelegate: QQC2.Label {
-                        text: modelData || ""
-                        color: {
+                    width: root.width * 0.12
+                    itemDelegate: DStatusBadge {
+                        text: {
                             switch(modelData) {
+                                case "partial": return i18n("Partial")
+                                case "unpaid": return i18n("Unpaid")
+                                case "paid": return i18n("Paid")
+                                default: return modelData || ""
+                            }
+                        }
+                        textColor: {
+                            switch(modelData) {
+                                case "partial": return Kirigami.Theme.neutralTextColor
                                 case "paid": return Kirigami.Theme.positiveTextColor
                                 case "unpaid": return Kirigami.Theme.negativeTextColor
-                                case "partial": return Kirigami.Theme.neutralTextColor
                                 default: return Kirigami.Theme.textColor
                             }
                         }
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Total")
                     textRole: "totalAmount"
                     role: PurchaseRoles.TotalAmountRole
-                    width: root.width * 0.15
+                    width: root.width * 0.10
                     itemDelegate: QQC2.Label {
                         text: Number(modelData || 0).toLocaleString(Qt.locale(), 'f', 2)
                         horizontalAlignment: Text.AlignRight
                     }
+                    headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Paid")
                     textRole: "paidAmount"
                     role: PurchaseRoles.PaidAmountRole
-                    width: root.width * 0.15
+                    width: root.width * 0.10
                     itemDelegate: QQC2.Label {
                         text: Number(modelData || 0).toLocaleString(Qt.locale(), 'f', 2)
                         horizontalAlignment: Text.AlignRight
+                        color: {
+                            if (model.paidAmount === 0) {
+                                return Kirigami.Theme.negativeTextColor;
+                            } else if (model.paidAmount === model.totalAmount) {
+                                return Kirigami.Theme.positiveTextColor;
+                            } else if (model.paidAmount < model.totalAmount) {
+                                return Kirigami.Theme.neutralTextColor;
+                            }
+                            return Kirigami.Theme.textColor;
+                        }
+                        font.bold: model.paidAmount > 0
                     }
+                    headerDelegate: TableHeaderLabel {}
+                },
+                Tables.HeaderComponent {
+                    title: i18nc("@title:column", "Date")
+                    textRole: "purchaseDate"
+                    role: PurchaseRoles.PurchaseDateRole
+                    width: root.width * 0.20
+                    itemDelegate: QQC2.Label {
+                        text: Qt.formatDateTime(modelData, "dd/MM/yyyy")
+                        horizontalAlignment: Text.AlignRight
+                    }
+                    headerDelegate: TableHeaderLabel {}
                 }
             ]
 
@@ -346,7 +412,6 @@ Kirigami.Page {
         totalItems: purchaseModel.totalItems
         onPageChanged: purchaseModel.loadPage(page)
     }
-
     Loader {
         id: purchaseDialog
         active: false
@@ -366,7 +431,6 @@ Kirigami.Page {
         }
     }
 
-    // Delete confirmation dialog
     Kirigami.PromptDialog {
         id: deleteDialog
         title: i18n("Delete Purchase")
@@ -380,7 +444,26 @@ Kirigami.Page {
         }
     }
 
+    function updateDateFilter() {
+        if (startDateField.value && endDateField.value) {
+            purchaseModel.setDateRange(startDateField.value, endDateField.value)
+        }
+    }
+
+    Connections {
+        target: purchaseApi
+        function onErrorPurchasesReceived(message, status, details) {
+            applicationWindow().gnotification.showNotification("",
+                message,
+                Kirigami.MessageType.Error,
+                "short",
+                "dialog-close"
+            )
+        }
+    }
+
     Component.onCompleted: {
         purchaseModel.setApi(purchaseApi)
+        supplierModel.setApi(supplierApi)
     }
 }

@@ -37,5 +37,7 @@ Kirigami.ScrollablePage {
     Component.onCompleted: {
         applicationWindow().loadGlobalDrawer()
         applicationWindow().loadHeader()
+
+
     }
 }

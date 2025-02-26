@@ -12,7 +12,7 @@ Kirigami.Dialog {
     id: productDialog
     title: "Product Details"
     padding: Kirigami.Units.largeSpacing
-    width: Kirigami.Units.gridUnit * 30
+   // width: tabBar.contentWidth + Kirigami.Units.largeSpacing
     height : Kirigami.Units.gridUnit * 35
 
     standardButtons: Kirigami.Dialog.NoButton
@@ -130,7 +130,7 @@ Kirigami.Dialog {
         ColumnLayout{
 
         // anchors.fill : parent
-        anchors.margins : 20
+
         enabled: !productApi.isLoading
         QQC2.TabBar {
             id: tabBar

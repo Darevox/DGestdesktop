@@ -199,9 +199,11 @@ Kirigami.Page {
             if (statusPlan !== "active") {
                 expiredDialog.active = true
             } else {
-                applicationWindow().pageStack.replace(
-                    Qt.createComponent("com.dervox.dim", "Welcome")
-                )
+                // applicationWindow().pageStack.replace(
+                //     Qt.createComponent("com.dervox.dim", "Welcome")
+                // )
+                applicationWindow().loadGlobalDrawer()
+                applicationWindow().loadHeader()
             }
         }
     }

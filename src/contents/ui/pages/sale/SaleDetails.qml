@@ -484,24 +484,59 @@ Kirigami.Dialog {
 
         }
     }
-    footerLeadingComponent :RowLayout{
-        visible :  tabBar.currentIndex == 1
-        QQC2.Label {
-            Layout.margins : Kirigami.Units.gridUnit
+    footerLeadingComponent : GridLayout{
+        ColumnLayout {
+            visible :  tabBar.currentIndex == 0
+            spacing: Kirigami.Units.largeSpacing
+            Kirigami.Heading {
+                text: i18n("Options")
+                level: 3
+            }
 
-            text: i18n("Tax : ") +  calculateTotalTax().toLocaleString(Qt.locale(), 'f', 2)
-            font.bold: true
+            RowLayout {
+                spacing: Kirigami.Units.largeSpacing
+                QQC2.Button {
+                    text: i18n("Generate Invoice")
+                    icon.name: "document-print"
+                    visible: isEditing
+                    enabled: !saleModel.loading
+                    onClicked: saleModel.generateInvoice(dialogSaleId)
+                }
+                QQC2.Button {
+                    text: i18n("Print Receipt")
+                    icon.name: "document-print"
+                    visible: isEditing
+                    enabled: !saleModel.loading
+                    onClicked: saleApi.generateReceipt(dialogSaleId)
+                }
+                QQC2.Button {
+                    text: i18n("Add Payment")
+                    icon.name: "money-management"
+                    visible: isEditing && currentSale?.payment_status !== "paid"
+                    enabled: !saleModel.loading
+                    onClicked: paymentDialog.open()
+                }
+
+            }
         }
-        QQC2.Label {
-            Layout.margins : Kirigami.Units.gridUnit
+        RowLayout{
+            visible :  tabBar.currentIndex == 1
+            QQC2.Label {
+                Layout.margins : Kirigami.Units.gridUnit
 
-            text: i18n("Total : ") + calculateTotal().toLocaleString(Qt.locale(), 'f', 2)
-            font.bold: true
+                text: i18n("Tax : ") +  calculateTotalTax().toLocaleString(Qt.locale(), 'f', 2)
+                font.bold: true
+            }
+            QQC2.Label {
+                Layout.margins : Kirigami.Units.gridUnit
+
+                text: i18n("Total : ") + calculateTotal().toLocaleString(Qt.locale(), 'f', 2)
+                font.bold: true
+            }
+
+
         }
-
-
     }
-
 
 
     customFooterActions: [
@@ -523,27 +558,6 @@ Kirigami.Dialog {
                 isCreateAnother = true
                 saveSale()
             }
-        },
-        Kirigami.Action {
-            text: i18n("Add Payment")
-            icon.name: "money-management"
-            visible: isEditing && currentSale?.payment_status !== "paid"
-            enabled: !saleModel.loading
-            onTriggered: paymentDialog.open()
-        },
-        Kirigami.Action {
-            text: i18n("Print Receipt")
-            icon.name: "document-print"
-            visible: isEditing
-            enabled: !saleModel.loading
-            onTriggered: saleApi.generateReceipt(dialogSaleId)
-        },
-        Kirigami.Action {
-            text: i18n("Generate Invoice")
-            icon.name: "document-print"
-            visible: isEditing
-            enabled: !saleModel.loading
-            onTriggered: saleModel.generateInvoice(dialogSaleId)
         },
         Kirigami.Action {
             text: i18n("Cancel")

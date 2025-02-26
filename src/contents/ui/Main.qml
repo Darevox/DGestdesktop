@@ -13,7 +13,7 @@ import "pages/user"
 
 Kirigami.ApplicationWindow {
     id: rootWindow
-    title: "DIMS"
+    title: "DIM"
     //header: Kirigami.ApplicationHeaderStyle.None
     property alias gnotification: notification
     property alias  gaboutDialog: aboutDialog
@@ -28,6 +28,7 @@ Kirigami.ApplicationWindow {
         if (currentHeader === null) {
             currentHeader = headerComponent.createObject(rootWindow)
             rootWindow.header = currentHeader
+
         }
         // currentGlobalDrawer.open()
     }
@@ -105,6 +106,19 @@ Kirigami.ApplicationWindow {
             collapsed : true;
             collapseButtonVisible:false;
             showContentWhenCollapsed:true
+
+
+            property int expandedWidth: Kirigami.Units.gridUnit * 15
+            property int collapsedWidth: Kirigami.Units.gridUnit * 2.3
+
+           width: collapsed ? collapsedWidth : expandedWidth
+
+            Behavior on width {
+                NumberAnimation {
+                    duration: Kirigami.Units.longDuration
+                    easing.type: Easing.InOutQuad
+                }
+            }
             header:
                 ColumnLayout{
                 RowLayout {
@@ -124,13 +138,25 @@ Kirigami.ApplicationWindow {
 
                 }
             }
-            content: VNavigationTabBar {
-                id: navTabBar
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                drawerCollapsed: globalDrawerMain.collapsed
+            content:ColumnLayout{
+
+                VNavigationTabBar {
+                    id: navTabBar
+                    Layout.fillWidth: true
+                    Layout.fillHeight: !globalDrawerMain.collapsed
+                    implicitHeight: globalDrawerMain.collapsed? contentHeight : null
+
+                    drawerCollapsed: globalDrawerMain.collapsed
+                }
+                Item{
+                    visible:globalDrawerMain.collapsed
+
+                }
             }
         }
+
+
+
     }
     footer:  Kirigami.ApplicationHeaderStyle.None
     pageStack.initialPage:Qt.createComponent("com.dervox.dim", "Login") // Qt.resolvedUrl("qrc:/dim/contents/ui/pages/user/Login.qml")
@@ -212,6 +238,7 @@ Kirigami.ApplicationWindow {
     //     anchors.centerIn: parent
     //     running: false
     // }
+
     DNotification{
         id:notification
     }

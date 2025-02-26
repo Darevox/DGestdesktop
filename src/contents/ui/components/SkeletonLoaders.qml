@@ -3,26 +3,46 @@ import org.kde.kirigami as Kirigami
 
 Rectangle {
     id: skeletonLoader
-    //anchors.centerIn: parent
     height: 100
     width: 200
     radius: 4
-    Kirigami.Theme.inherit: false
-    Kirigami.Theme.colorSet: Kirigami.Theme.backgroundColor
+
+    // Use a mix of background and text color for base
+    color: Qt.rgba(
+        (Kirigami.Theme.backgroundColor.r + Kirigami.Theme.textColor.r) / 2,
+        (Kirigami.Theme.backgroundColor.g + Kirigami.Theme.textColor.g) / 2,
+        (Kirigami.Theme.backgroundColor.b + Kirigami.Theme.textColor.b) / 2,
+        0.3
+    )
 
     gradient: Gradient {
         orientation: Gradient.Horizontal
         GradientStop {
             position: shimmerAnimation.position
-            color: Kirigami.Theme.backgroundColor
+            color: Qt.rgba(
+                Kirigami.Theme.textColor.r,
+                Kirigami.Theme.textColor.g,
+                Kirigami.Theme.textColor.b,
+                0.05
+            )
         }
         GradientStop {
             position: Math.min(shimmerAnimation.position + 0.1, 1.0)
-            color: Kirigami.Theme.alternateBackgroundColor
+            color: Qt.rgba(
+                Kirigami.Theme.textColor.r,
+                Kirigami.Theme.textColor.g,
+                Kirigami.Theme.textColor.b,
+                0.15
+            )
         }
         GradientStop {
             position: Math.min(shimmerAnimation.position + 0.2, 1.0)
-            color: Kirigami.Theme.backgroundColor
+            color: Qt.rgba(
+                Kirigami.Theme.textColor.r,
+                Kirigami.Theme.textColor.g,
+                Kirigami.Theme.textColor.b,
+                0.05
+            )
         }
     }
 
@@ -30,14 +50,12 @@ Rectangle {
         id: shimmerAnimation
         target: shimmerAnimation
         property: "position"
-        from: -0.2  // Start more to the left
-        to: 1   // End exactly at the right edge
+        from: -0.2
+        to: 1
         duration: 1500
         running: true
         loops: Animation.Infinite
         property real position: 0
-
-        // Add smooth easing
-        easing.type: Easing.InSine
+        easing.type: Easing.InOutQuad
     }
 }

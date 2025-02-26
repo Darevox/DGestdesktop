@@ -25,8 +25,9 @@ void ActivityLogModel::setApi(ActivityLogApi* api)
         connect(m_api, &ActivityLogApi::statisticsReceived, this, &ActivityLogModel::handleStatisticsReceived);
         connect(m_api, &ActivityLogApi::filterOptionsReceived, this, &ActivityLogModel::handleFilterOptionsReceived);
 
-        refresh();
+
     }
+       refresh();
 }
 
 int ActivityLogModel::rowCount(const QModelIndex &parent) const

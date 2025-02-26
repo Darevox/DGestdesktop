@@ -11,24 +11,24 @@ DashboardModel::DashboardModel(QObject *parent)
 
 void DashboardModel::setApi(DashboardAnalyticsApi* api)
 {
-    if (m_api == api)
-        return;
+    if (m_api != api){
 
-    m_api = api;
 
-    // Connect to API signals
-    connect(m_api, &DashboardAnalyticsApi::overallDashboardReceived,
-            this, &DashboardModel::handleOverallDashboard);
-    connect(m_api, &DashboardAnalyticsApi::salesAnalyticsReceived,
-            this, &DashboardModel::handleSalesAnalytics);
-    connect(m_api, &DashboardAnalyticsApi::purchaseAnalyticsReceived,
-            this, &DashboardModel::handlePurchaseAnalytics);
-    // Add this connection
-    connect(m_api, &DashboardAnalyticsApi::customerAnalyticsReceived,
-            this, &DashboardModel::handleCustomerAnalytics);
-    connect(m_api, &DashboardAnalyticsApi::analyticsError,
-            this, &DashboardModel::handleError);
+        m_api = api;
 
+        // Connect to API signals
+        connect(m_api, &DashboardAnalyticsApi::overallDashboardReceived,
+                this, &DashboardModel::handleOverallDashboard);
+        connect(m_api, &DashboardAnalyticsApi::salesAnalyticsReceived,
+                this, &DashboardModel::handleSalesAnalytics);
+        connect(m_api, &DashboardAnalyticsApi::purchaseAnalyticsReceived,
+                this, &DashboardModel::handlePurchaseAnalytics);
+        // Add this connection
+        connect(m_api, &DashboardAnalyticsApi::customerAnalyticsReceived,
+                this, &DashboardModel::handleCustomerAnalytics);
+        connect(m_api, &DashboardAnalyticsApi::analyticsError,
+                this, &DashboardModel::handleError);
+    }
     refresh();
 }
 

@@ -25,7 +25,7 @@ Client ClientApi::clientFromJson(const QJsonObject &json) const
     client.payment_terms = json["payment_terms"_L1].toString();
     client.notes = json["notes"_L1].toString();
     client.status = json["status"_L1].toString();
-    client.balance = json["balance"_L1].toDouble();
+    client.balance = json["balance"_L1].toString().toDouble();
     return client;
 }
 
@@ -227,7 +227,36 @@ QFuture<void> ClientApi::getSales(int id, int page)
         return m_netManager->get(request);
     }).then([=](JsonResponse response) {
         if (response.success) {
-            Q_EMIT salesReceived(response.data->value("sales"_L1).toObject().toVariantMap());
+            QJsonObject salesObj = response.data->value("sales"_L1).toObject();
+            QVariantMap result;
+
+            // Extract pagination data
+            result["current_page"_L1] = salesObj["current_page"_L1].toInt();
+            result["last_page"_L1] = salesObj["last_page"_L1].toInt();
+            result["total"_L1] = salesObj["total"_L1].toInt();
+            result["per_page"_L1] = salesObj["per_page"_L1].toInt();
+
+            // Convert sales data array
+            QVariantList salesData;
+            QJsonArray dataArray = salesObj["data"_L1].toArray();
+            for (const QJsonValue &value : dataArray) {
+                QJsonObject saleObj = value.toObject();
+                QVariantMap sale;
+
+                // Ensure proper data types
+                sale["reference_number"_L1] = saleObj["reference_number"_L1].toString();
+                sale["sale_date"_L1] = saleObj["sale_date"_L1].toString();
+                sale["total_amount"_L1] = saleObj["total_amount"_L1].toString().toDouble();
+                sale["paid_amount"_L1] = saleObj["paid_amount"_L1].toString().toDouble();
+                sale["balance"_L1] = saleObj["total_amount"_L1].toString().toDouble() -
+                                saleObj["paid_amount"_L1].toString().toDouble();
+                sale["payment_status"_L1] = saleObj["payment_status"_L1].toString();
+
+                salesData.append(sale);
+            }
+            result["data"_L1] = salesData;
+
+            Q_EMIT salesReceived(result);
         } else {
             Q_EMIT errorSalesReceived(response.error->message, response.error->status,
                                   QJsonDocument(response.error->details).toJson());
@@ -238,10 +267,11 @@ QFuture<void> ClientApi::getSales(int id, int page)
     return future.then([=]() {});
 }
 
+
 QFuture<void> ClientApi::getPayments(int id, int page)
 {
     setLoading(true);
-    QString path = QStringLiteral("/api/v1/clients/%1/payments").arg(id);
+    QString path = QStringLiteral("/api/v1/clients/%1/transactions").arg(id);
     if (page > 0) {
         path += QStringLiteral("?page=%1").arg(page);
     }
@@ -253,7 +283,36 @@ QFuture<void> ClientApi::getPayments(int id, int page)
         return m_netManager->get(request);
     }).then([=](JsonResponse response) {
         if (response.success) {
-            Q_EMIT paymentsReceived(response.data->value("payments"_L1).toObject().toVariantMap());
+            QVariantMap result;
+            QJsonArray transactionsArray = response.data->value("transactions"_L1).toArray();
+
+            // Set pagination data
+            result["current_page"_L1] = 1;
+            result["last_page"_L1] = 1;
+            result["total"_L1] = transactionsArray.size();
+            result["per_page"_L1] = transactionsArray.size();
+
+            // Convert transactions data array
+            QVariantList paymentsData;
+            for (const QJsonValue &value : transactionsArray) {
+                QJsonObject transactionObj = value.toObject();
+                QVariantMap payment;
+
+                payment["payment_date"_L1] = transactionObj["transaction_date"_L1].toString();
+                payment["reference_number"_L1] = transactionObj["reference_number"_L1].toString();
+                payment["amount"_L1] = transactionObj["amount"_L1].toString().toDouble();
+                payment["payment_method"_L1] = transactionObj["type"_L1].toString();
+
+                // Format sale reference number safely
+                int transactionId = transactionObj["transactionable_id"_L1].toInt();
+                QString formattedId = QStringLiteral("%1").arg(transactionId, 6, 10, QLatin1Char('0'));
+                payment["sale_reference"_L1] = QStringLiteral("SALE-").append(formattedId);
+
+                paymentsData.append(payment);
+            }
+            result["data"_L1] = paymentsData;
+
+            Q_EMIT paymentsReceived(result);
         } else {
             Q_EMIT errorPaymentsReceived(response.error->message, response.error->status,
                                      QJsonDocument(response.error->details).toJson());
@@ -264,17 +323,20 @@ QFuture<void> ClientApi::getPayments(int id, int page)
     return future.then([=]() {});
 }
 
+// ClientApi.cpp
+// ClientApi.cpp
 QFuture<void> ClientApi::getStatistics(int id)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/clients/%1/statistics").arg(id));
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/clients/%1/statement").arg(id));
     request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->get(request);
     }).then([=](JsonResponse response) {
         if (response.success) {
-            Q_EMIT statisticsReceived(response.data->value("statistics"_L1).toObject().toVariantMap());
+            // Just pass the whole response data
+            Q_EMIT statisticsReceived(response.data->toVariantMap());
         } else {
             Q_EMIT errorStatisticsReceived(response.error->message, response.error->status,
                                        QJsonDocument(response.error->details).toJson());
@@ -284,6 +346,7 @@ QFuture<void> ClientApi::getStatistics(int id)
 
     return future.then([=]() {});
 }
+
 
 QString ClientApi::getToken() const {
     return m_settings.value("auth/token").toString();

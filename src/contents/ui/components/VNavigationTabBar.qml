@@ -6,7 +6,7 @@ import org.kde.kirigami 2.19 as Kirigami
 ListView {
     id: root
     width: parent.width
-    height: parent.height
+    height: contentHeight
     property bool drawerCollapsed: false
 
     model: ListModel {
@@ -68,11 +68,11 @@ ListView {
                    icon: "kr_setjumpback",
                    pathPage: "Supplier"
                });
-               append({
-                   name: i18n("Accounts"),
-                   icon: "im-user",
-                   pathPage: "Accounts"
-               });
+               // append({
+               //     name: i18n("Accounts"),
+               //     icon: "im-user",
+               //     pathPage: "Accounts"
+               // });
                append({
                    name: i18n("Settings"),
                    icon: "settings-configure",
@@ -82,12 +82,12 @@ ListView {
        }
     delegate: QQC2.ItemDelegate {
         width: ListView.view.width
-        height: !root.drawerCollapsed ? 50 : 40
+        height: !root.drawerCollapsed ? Kirigami.Units.gridUnit * 4 : Kirigami.Units.gridUnit * 2
         contentItem: RowLayout {
             spacing: Kirigami.Units.smallSpacing
             Kirigami.Icon {
-                Layout.preferredWidth: !root.drawerCollapsed ? Kirigami.Units.iconSizes.medium : Kirigami.Units.iconSizes.small
-                Layout.preferredHeight: !root.drawerCollapsed ? Kirigami.Units.iconSizes.medium : Kirigami.Units.iconSizes.small
+                Layout.preferredWidth: !root.drawerCollapsed ? Kirigami.Units.iconSizes.large : Kirigami.Units.iconSizes.small
+                Layout.preferredHeight: !root.drawerCollapsed ? Kirigami.Units.iconSizes.large : Kirigami.Units.iconSizes.small
                 source: model.icon
                 color: root.currentIndex === index ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
             }
@@ -96,6 +96,7 @@ ListView {
                 text: model.name
                 visible: !root.drawerCollapsed
                 color: root.currentIndex === index ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
+                font.bold:true
             }
         }
         onClicked: {
@@ -107,5 +108,9 @@ ListView {
                        Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.2) :
                        "transparent"
         }
+    }
+    Component.onCompleted: {
+        root.currentIndex=1
+        applicationWindow().pageStack.replace( Qt.createComponent("com.dervox.dim", "Dashboard"))
     }
 }

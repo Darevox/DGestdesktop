@@ -31,8 +31,9 @@ void PurchaseModel::setApi(PurchaseApi* api)
         connect(m_api, &PurchaseApi::invoiceGenerated, this, &PurchaseModel::handleInvoiceGenerated);
         connect(m_api, &PurchaseApi::summaryReceived, this, &PurchaseModel::handleSummaryReceived);
 
-        refresh();
+
     }
+      refresh();
 }
 
 int PurchaseModel::rowCount(const QModelIndex &parent) const
