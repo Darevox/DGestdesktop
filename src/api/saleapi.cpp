@@ -436,19 +436,22 @@ QFuture<QByteArray> SaleApi::generateReceipt(int id)
 
                 // Save to app's data location
                 QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-               QDir().mkpath(QStringLiteral("%1/pdfs").arg(appDataPath));
+                QDir().mkpath(QStringLiteral("%1/pdfs").arg(appDataPath));
 
                 QString fileName = QStringLiteral("receipt-%1.pdf").arg(QDateTime::currentMSecsSinceEpoch());
-               QString filePath = QStringLiteral("%1/pdfs/%2").arg(appDataPath, fileName);
+                QString filePath = QStringLiteral("%1/pdfs/%2").arg(appDataPath, fileName);
 
                 QFile file(filePath);
                 if (file.open(QIODevice::WriteOnly)) {
                     file.write(pdfData);
                     file.close();
 
-                    QString fileUrl = QUrl::fromLocalFile(filePath).toString();
-                    qDebug() << "Receipt PDF saved to:" << fileUrl;
-                    Q_EMIT receiptGenerated(fileUrl);
+                    // Ensure we create a proper URL using QUrl
+                    QUrl fileUrl = QUrl::fromLocalFile(filePath);
+                    QString fileUrlString = fileUrl.toString();
+
+                    qDebug() << "Receipt PDF saved to:" << fileUrlString;
+                    Q_EMIT receiptGenerated(fileUrlString);
                     promise->addResult(pdfData);
                     setLoading(false);
                 } else {

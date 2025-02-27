@@ -21,31 +21,39 @@ PdfModel::PdfModel(QObject* parent)
 void PdfModel::setPath(QString& pathName)
 {
     if (pathName == path)
-        return;
+         return;
 
-    if (pathName.isEmpty())
-    {
-        DEBUG << "Can't load the document, path is empty.";
-        Q_EMIT error("Can't load the document, path is empty."_L1);
-        return;
-    }
+     if (pathName.isEmpty())
+     {
+         DEBUG << "Can't load the document, path is empty.";
+         Q_EMIT error("Can't load the document, path is empty."_L1);
+         return;
+     }
 
-    this->path = pathName;
-    Q_EMIT pathChanged(pathName);
+     this->path = pathName;
+     Q_EMIT pathChanged(pathName);
 
-    // Load document
-    clear();
-    DEBUG << "Loading document...";
-    document = std::unique_ptr<Poppler::Document>(Poppler::Document::load(path));
+     // Load document
+     clear();
+     DEBUG << "Loading document...";
 
-    if (!document || document->isLocked())
-    {
-        DEBUG << QStringLiteral("ERROR : Can't open the document located at %1").arg(pathName);
-        Q_EMIT error(QStringLiteral("Can't open the document located at %1").arg(pathName));
-        document.reset();
-        return;
-    }
+     // Convert URL to local file path if necessary
+     QString localPath = pathName;
+     if (localPath.startsWith(QStringLiteral("file://")))
+     {
+         localPath = QUrl(localPath).toLocalFile();
+         DEBUG << "Converted URL to local path:" << localPath;
+     }
 
+     document = std::unique_ptr<Poppler::Document>(Poppler::Document::load(localPath));
+
+     if (!document || document->isLocked())
+     {
+         DEBUG << QStringLiteral("ERROR : Can't open the document located at %1").arg(pathName);
+         Q_EMIT error(QStringLiteral("Can't open the document located at %1").arg(pathName));
+         document.reset();
+         return;
+     }
     // Create image provider
     document->setRenderHint(Poppler::Document::Antialiasing, true);
     document->setRenderHint(Poppler::Document::TextAntialiasing, true);
