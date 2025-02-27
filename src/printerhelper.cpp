@@ -6,6 +6,7 @@
 #include <QFileInfo>
 #include <QPainter>
 #include <QDebug>
+#include <QUrl>
 
 PrinterHelper::PrinterHelper(QObject *parent)
     : QObject(parent)
@@ -16,18 +17,30 @@ PrinterHelper::PrinterHelper(QObject *parent)
     printer.setDuplex(QPrinter::DuplexNone);
 }
 
+// QString PrinterHelper::normalizeFilePath(const QString &path)
+// {
+//     QString filePath = path;
+//     if (filePath.startsWith(QStringLiteral("file:///"))) {
+//         filePath = filePath.mid(8);
+//     }
+//     if (!filePath.startsWith(QStringLiteral("/"))) {
+//         filePath = QStringLiteral("/%1").arg(filePath);
+//     }
+//     return filePath;
+
+// }
 QString PrinterHelper::normalizeFilePath(const QString &path)
 {
-    QString filePath = path;
-    if (filePath.startsWith(QStringLiteral("file:///"))) {
-        filePath = filePath.mid(8);
-    }
-    if (!filePath.startsWith(QStringLiteral("/"))) {
-        filePath = QStringLiteral("/%1").arg(filePath);
-    }
-    return filePath;
-}
 
+    QString filePath = path;
+
+       // Remove file:// or file:/// prefix
+       if (filePath.startsWith(QStringLiteral("file://"))) {
+           filePath = QUrl(filePath).toLocalFile();
+       }
+
+       return filePath;
+}
 bool PrinterHelper::setupPrinter(const QString &pdfPath)
 {
     QString filePath = normalizeFilePath(pdfPath);

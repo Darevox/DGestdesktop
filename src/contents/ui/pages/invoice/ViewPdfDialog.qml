@@ -118,7 +118,12 @@ Kirigami.Dialog {
                 id: pdfView
                 anchors.fill: parent
                 anchors.margins: Kirigami.Units.smallSpacing * 5
-                path: pdfUrl.toString().substring(7) // Remove "file://" prefix
+                // path: pdfUrl.toString().substring(7) // Remove "file://" prefix
+                path: {
+                    var url = new URL(pdfUrl);
+                    return url.pathname.replace(/^\/([A-Z]:)/i, "$1"); // Fix Windows paths
+                }
+
                 focus: true
 
                 QQC2.ScrollBar.vertical: QQC2.ScrollBar {
