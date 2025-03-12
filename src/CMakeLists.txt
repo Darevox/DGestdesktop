@@ -212,6 +212,12 @@ qt_target_qml_sources(dim
     RESOURCES
     contents/ui/resources/logo.svg
 )
+# Add app icon to QML resources
+set_source_files_properties(${CMAKE_SOURCE_DIR}/com.dervox.dim.svg PROPERTIES
+    QT_RESOURCE_ALIAS /com.dervox.dim.svg
+)
+
+
 
 # Add C++ sources
 target_sources(dim PRIVATE

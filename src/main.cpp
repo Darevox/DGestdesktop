@@ -18,7 +18,7 @@
 #include <printerhelper.h>
 #include <printer.h>
 #include <KIconThemes/kicontheme.h>
-
+#include <QIcon>
 
 #include <api/userapi.h>
 #include <api/subscriptionapi.h>
@@ -261,7 +261,7 @@ int main(int argc, char *argv[])
                                                          QStringLiteral("Cannot create instances of InvoiceModel"));
 
     qmlRegisterType( QUrl(QStringLiteral("qrc:/dim/contents/ui/pages/ApiStatusHandler.qml")), "com.dervox.ApiStatusHandler", 1, 0, "ApiStatusHandler" );
-
+    QGuiApplication::setWindowIcon(QIcon::fromTheme(QStringLiteral("com.dervox.dim")));
 
 
     engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
