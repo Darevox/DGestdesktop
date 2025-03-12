@@ -192,11 +192,11 @@ Item {
             running: parent.visible
         }
 
-        QQC2.Label {
-            anchors.centerIn: parent
-            anchors.verticalCenterOffset: Kirigami.Units.gridUnit
-            text: i18n("Loading products...")
-            visible: root.isLoading
-        }
+        // QQC2.Label {
+        //     anchors.centerIn: parent
+        //     anchors.verticalCenterOffset: Kirigami.Units.gridUnit
+        //     text: i18n("Loading products...")
+        //     visible: root.isLoading
+        // }
     }
 }

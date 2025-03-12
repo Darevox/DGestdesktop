@@ -77,20 +77,20 @@ Kirigami.Page {
             onTriggered: {
                 deleteDialog.open()
             }
-        },
-        Kirigami.Action {
-            icon.name: "overflow-menu"
-            Kirigami.Action {
-                text: "Product Untis"
-                onTriggered:{
-                    //showPassiveNotification("View Action 1 clicked")
-                }
-            }
-            Kirigami.Action {
-                text: "Print"
-                onTriggered: showPassiveNotification("View Action 2 clicked")
-            }
         }
+        // Kirigami.Action {
+        //     icon.name: "overflow-menu"
+        //     Kirigami.Action {
+        //         text: "Product Untis"
+        //         onTriggered:{
+        //             //showPassiveNotification("View Action 1 clicked")
+        //         }
+        //     }
+        //     Kirigami.Action {
+        //         text: "Print"
+        //         onTriggered: showPassiveNotification("View Action 2 clicked")
+        //     }
+        // }
 
     ]
     header:RowLayout {

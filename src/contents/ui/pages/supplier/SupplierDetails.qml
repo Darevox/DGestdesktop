@@ -93,10 +93,16 @@ Kirigami.PromptDialog {
 
             FormCard.FormComboBoxDelegate {
                 id: statusCombo
-                //label: qsTr("Status")
-                model: ["Active", "Inactive"]
+                text: i18n("Status")
+                model: [
+                    { text: i18n("Active"), value: "active" },
+                    { text: i18n("Inactive"), value: "inactive" }
+                ]
+                textRole: "text"
+                valueRole: "value"
                 currentIndex: 0
             }
+
 
             FormCard.FormTextAreaDelegate {
                 id: notesField
@@ -120,7 +126,7 @@ Kirigami.PromptDialog {
                 if (dialogSupplierId > 0) {
                     supplierModel.updateSupplier(dialogSupplierId, updatedSupplier)
                 } else {
-                    supplierModel.createSupplier(updatedSuvplier)
+                    supplierModel.createSupplier(updatedSupplier)
                 }
             }
         },
@@ -180,7 +186,9 @@ Kirigami.PromptDialog {
         taxNumberField.text = supplier.taxNumber || ""
         paymentTermsField.text = supplier.paymentTerms || ""
         notesField.text = supplier.notes || ""
-        statusCombo.currentIndex = statusCombo.model.indexOf(statusMapping[supplier.status]) || 0
+
+        let statusIndex =  statusCombo.model.findIndex(item => item.value === supplier.status)
+       statusCombo.currentIndex =  statusIndex !== -1 ? statusIndex : 0
     }
 
     function clearStatusMessages() {

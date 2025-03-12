@@ -19,12 +19,52 @@ Item {
     property var sharedLoadedProducts
     property var sharedCurrentProductIds
     property bool isLoadingProducts
-    property int selectedClientId: -1
+    property bool hasClient: false  // Will be set in updateClientComboBox
+    property int selectedClientId:  -1
+    property string clientName: ""
+    property bool isActive: false
     property int selectedCashSourceId: favoriteManager.getDefaultCashSource()
-    property double discountAmount: 0
+    property double discountAmount: saleState ? saleState.discountAmount : 0
     property string saleNotes: ""
     // Signals
     signal categoryChanged(int categoryId)
+    // Replace the current onVisibleChanged handler
+    onVisibleChanged: {
+        if (visible && saleState) {
+            // Load all values from the saleState
+            hasClient = saleState.hasClient || false
+            selectedClientId = saleState.clientId || -1
+            clientName = saleState.clientName || ""
+
+            // Update UI to reflect current state
+            hasClientCheckbox.checked = hasClient
+            clientComboBox.editText = clientName
+            clientComboBox.selectedId = selectedClientId
+
+            // Update other values
+            discountAmountSpinBox.value = saleState.discountAmount || 0
+        }
+    }
+
+
+    // Replace the current updateClientComboBox function with this one
+    function updateClientComboBox() {
+        // Only update if we have a defined saleState
+        if (!saleState) return
+
+        // Update checkbox state from saleState (don't trigger events)
+        hasClientCheckbox.checked = saleState.hasClient || false
+
+        // Reset client combobox first
+        clientComboBox.editText = ""
+        clientComboBox.selectedId = -1
+
+        // If a client is selected in this tab's state, restore it
+        if (saleState.hasClient && saleState.clientId > 0) {
+            // Request the client data with our new function
+            clientComboBox.loadClientByIdExplicit(saleState.clientId)
+        }
+    }
 
     // Computed properties
     readonly property var saleItems: saleState ? saleState.saleItems : null
@@ -62,7 +102,7 @@ Item {
         ColumnLayout {
             Layout.preferredHeight: Kirigami.Units.gridUnit * 6
             Layout.fillHeight: true
-                Layout.fillWidth: true
+            Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 60
             // Favorite categories
             QQC2.TabBar {
@@ -523,10 +563,35 @@ Item {
                     // RowLayout {
                     Layout.margins : Kirigami.Units.smallSpacing
                     RowLayout{
+                        // Replace the current checkbox implementation
                         QQC2.CheckBox {
                             id: hasClientCheckbox
                             text: i18n("Assign to Client")
+
+                            onCheckedChanged: {
+                                hasClient = checked
+
+                                if (saleState) {
+                                    saleState.hasClient = checked
+
+                                    // If unchecked, clear client data
+                                    if (!checked) {
+                                        selectedClientId = -1
+                                        clientName = ""
+
+                                        saleState.clientId = -1
+                                        saleState.clientName = ""
+                                        saleState.clientData = null
+
+                                        // Clear combobox text but don't trigger its events
+                                        clientComboBox.editText = ""
+                                        clientComboBox.selectedId = -1
+                                    }
+                                }
+                            }
                         }
+
+
                         Item{
                             Layout.fillWidth:true
                         }
@@ -536,14 +601,36 @@ Item {
 
                         }
                     }
+                    // Inside QuickSaleTabContent.qml, modify the client search component:
                     DSearchableComboBoxClient {
+                        id: clientComboBox
                         Layout.fillWidth: true
                         enabled: hasClientCheckbox.checked
                         visible: hasClientCheckbox.checked
+
+                        // Force initial state based on current tab
+                        Component.onCompleted: {
+                            if (saleState && saleState.hasClient && saleState.clientName) {
+                                editText = saleState.clientName
+                                selectedId = saleState.clientId
+                            }
+                        }
+
                         onItemSelected: function(client) {
+                            if (!saleState) return
+
+                            // Store the client data in this tab's state
                             selectedClientId = client.id
+                            clientName = client.name || ""
+
+                            // Update the saleState with this client
+                            saleState.clientId = client.id
+                            saleState.clientName = client.name || ""
+                            saleState.hasClient = true
+                            saleState.clientData = client
                         }
                     }
+
                     //  }
 
                     // Cash Source Selection
@@ -578,8 +665,11 @@ Item {
                             to: total
                             value: discountAmount
                             onValueChanged: {
-                                discountAmount = value
-                                updateTotal()
+                                if (saleState) {
+                                    saleState.discountAmount = value
+                                    discountAmount = value
+                                    updateTotal()
+                                }
                             }
                             contentItem: TextInput {
                                 text: parent.textFromValue(parent.value, parent.locale)
@@ -945,20 +1035,28 @@ Item {
                                                     // Clear sale items
                                                     saleState.saleItems.clear()
                                                     saleState.total = 0
+                                                    saleState.discountAmount = 0
+                                                    saleState.hasClient = false
+                                                    saleState.clientId = -1
+                                                    saleState.clientName = ""
+                                                    saleState.clientData = null
+                                                    saleState.autoPayment = false
 
-                                                    // Reset all form fields
+                                                    // Reset UI components
                                                     selectedClientId = -1
-                                                    selectedCashSourceId = 1
+                                                    clientName = ""
+                                                    hasClient = false
+                                                    hasClientCheckbox.checked = false
+                                                    clientComboBox.editText = ""
+                                                    clientComboBox.selectedId = -1
+
+                                                    selectedCashSourceId = favoriteManager.getDefaultCashSource()
                                                     saleNotes = ""
                                                     discountAmount = 0
-                                                    hasClientCheckbox.checked = false
 
                                                     // Reset payment related fields
                                                     numPad.reset()
                                                     numPad.mode = "normal"
-
-                                                    // Reset auto payment
-                                                    saleState.autoPayment = false
                                                 })
     }
 

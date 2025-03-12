@@ -8,7 +8,7 @@ import "."
 
 Kirigami.PromptDialog {
     id: sourceDialog
-    title: dialogSourceId > 0 ? "Edit Cash Source" : "New Cash Source"
+    title: dialogSourceId > 0 ? i18n("Edit Cash Source") : i18n("New Cash Source")
     preferredWidth: Kirigami.Units.gridUnit * 50
 
     property int dialogSourceId: 0

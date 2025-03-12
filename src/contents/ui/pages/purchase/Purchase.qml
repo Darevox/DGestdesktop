@@ -201,18 +201,18 @@ Kirigami.Page {
             }
         },
         Kirigami.Action {
-            icon.name: "filter"
+            icon.name: "view-filter"
             text: i18n("Filter")
             onTriggered: filterSheet.open()
         },
-        Kirigami.Action {
-            icon.name: "view-statistics"
-            text: i18n("Summary")
-            onTriggered: {
-                purchaseModel.getSummary()
-                summarySheet.open()
-            }
-        },
+        // Kirigami.Action {
+        //     icon.name: "view-statistics"
+        //     text: i18n("Summary")
+        //     onTriggered: {
+        //         purchaseModel.getSummary()
+        //         summarySheet.open()
+        //     }
+        // },
         Kirigami.Action {
             icon.name: "edit-delete"
             text: i18n("Delete")
@@ -281,7 +281,7 @@ Kirigami.Page {
                     }
                     itemDelegate: QQC2.CheckBox {
                         checked: modelData
-                        onCheckedChanged: modelCheck.setChecked(row, checked)
+                        onCheckedChanged: purchaseModel.setChecked(row, checked)
                     }
                 },
                 Tables.HeaderComponent {
@@ -401,6 +401,25 @@ Kirigami.Page {
                 let purchase = purchaseModel.getPurchase(row)
                 purchaseDialog.purchaseId = purchase.id
                 purchaseDialog.active = true
+            }
+        }
+    }
+
+
+    // Loading skeleton
+    GridLayout {
+        anchors.fill: parent
+        visible: purchaseModel.loading
+        columns: 6
+        rows: 8
+        columnSpacing: Kirigami.Units.largeSpacing
+        rowSpacing: Kirigami.Units.largeSpacing
+
+        Repeater {
+            model: 6 * 8
+            SkeletonLoaders {
+                Layout.fillWidth: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
             }
         }
     }

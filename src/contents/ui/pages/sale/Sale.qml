@@ -211,18 +211,18 @@ Kirigami.Page {
             }
         },
         Kirigami.Action {
-            icon.name: "filter"
+          icon.name: "view-filter"
             text: i18n("Filter")
             onTriggered: filterSheet.open()
         },
-        Kirigami.Action {
-            icon.name: "view-statistics"
-            text: i18n("Summary")
-            onTriggered: {
-                saleModel.getSummary()
-                summarySheet.open()
-            }
-        },
+        // Kirigami.Action {
+        //     icon.name: "view-statistics"
+        //     text: i18n("Summary")
+        //     onTriggered: {
+        //         saleModel.getSummary()
+        //         summarySheet.open()
+        //     }
+        // },
         Kirigami.Action {
             icon.name: "edit-delete"
             text: i18n("Delete")
@@ -282,6 +282,19 @@ Kirigami.Page {
             selectionMode: TableView.SelectionMode.SingleSelection
             selectionBehavior: TableView.SelectRows
             headerComponents: [
+                Tables.HeaderComponent {
+                    title: i18nc("@title:column", "Select")
+                    textRole: "checked"
+                    role: saleModel.CheckedRole
+                    width: root.width * 0.03
+                    headerDelegate: QQC2.CheckBox {
+                        onCheckedChanged: saleModel.toggleAllSalesChecked()
+                    }
+                    itemDelegate: QQC2.CheckBox {
+                        checked: modelData
+                        onCheckedChanged: saleModel.setChecked(row, checked)
+                    }
+                },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Reference")
                     textRole: "referenceNumber"
@@ -403,6 +416,25 @@ Kirigami.Page {
                 let sale = saleModel.getSale(row)
                 saleDialog.saleId = sale.id
                 saleDialog.active = true
+            }
+        }
+    }
+
+
+    // Loading skeleton
+    GridLayout {
+        anchors.fill: parent
+        visible: saleModel.loading
+        columns: 6
+        rows: 8
+        columnSpacing: Kirigami.Units.largeSpacing
+        rowSpacing: Kirigami.Units.largeSpacing
+
+        Repeater {
+            model: 6 * 8
+            SkeletonLoaders {
+                Layout.fillWidth: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
             }
         }
     }

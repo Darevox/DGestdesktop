@@ -56,11 +56,11 @@ Kirigami.AbstractCard {
         case "24hours":
             return ["00:00", "06:00", "12:00", "18:00", "23:59"];
         case "weekly":
-            return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+            return [i18n("Mon"), i18n("Tue"), i18n("Wed"), i18n("Thu"), i18n("Fri"), i18n("Sat"), i18n("Sun")];
         case "monthly":
-            return ["Week 1", "Week 2", "Week 3", "Week 4"];
+            return [i18n("W 1"), i18n("W 2"), i18n("W 3"), i18n("W 4")];
         case "yearly":
-            return ["Jan", "Mar", "May", "Jul", "Sep", "Nov"];
+            return [i18n("Jan"), i18n("Mar"), i18n("May"), i18n("Jul"), i18n("Sep"), i18n("Nov")];
         case "all":
             // Create labels based on data length
             let labels = [];

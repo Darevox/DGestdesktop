@@ -44,7 +44,7 @@ Kirigami.PromptDialog {
     // Main Content
     RowLayout {
         spacing: Kirigami.Units.largeSpacing
-
+        visible :  !invoiceApi.isLoading
         // Header Section
         FormCard.FormCard {
             Layout.fillWidth: true

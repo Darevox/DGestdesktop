@@ -23,13 +23,13 @@ Kirigami.Dialog {
     property var currentSale: null
     standardButtons: Kirigami.Dialog.NoButton
     property double remainingAmount: 0
-    DBusyIndicator {
-        id: busyIndicator
-        anchors.centerIn: parent
-        running: saleModel.loading
-        visible: running
-        z: 999
-    }
+    // DBusyIndicator {
+    //     id: busyIndicator
+    //     anchors.centerIn: parent
+    //     running: saleModel.loading
+    //     visible: running
+    //     z: 999
+    // }
 
     Kirigami.InlineMessage {
         id: inlineMsg
@@ -40,10 +40,18 @@ Kirigami.Dialog {
 
     contentItem:   ColumnLayout {
         spacing: Kirigami.Units.largeSpacing
+        DBusyIndicator {
+            id: busyIndicator
+            anchors.centerIn: parent
+            running: saleApi.isLoading
+            visible: running
+            z: 999
+        }
 
         QQC2.TabBar {
             id: tabBar
             Layout.fillWidth: true
+            visible:!saleApi.isLoading
 
             QQC2.TabButton {
                 text: i18n("Sale Details")
@@ -56,6 +64,8 @@ Kirigami.Dialog {
             Layout.fillWidth: true
             Layout.fillHeight: true
             currentIndex: tabBar.currentIndex
+            visible:!saleApi.isLoading
+
             ColumnLayout {
                 spacing: Kirigami.Units.largeSpacing
 
@@ -485,6 +495,7 @@ Kirigami.Dialog {
         }
     }
     footerLeadingComponent : GridLayout{
+        enabled:!saleApi.isLoading
         ColumnLayout {
             visible :  tabBar.currentIndex == 0
             spacing: Kirigami.Units.largeSpacing

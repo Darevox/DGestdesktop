@@ -34,7 +34,7 @@ Kirigami.Page {
                 id: mainLayout
                 anchors.centerIn: parent  // This centers both vertically and horizontally
                 width: Math.min(parent.width - (Kirigami.Settings.isMobile ? 0 : Kirigami.Units.largeSpacing * 4),
-                              Kirigami.Units.gridUnit * 50)
+                                Kirigami.Units.gridUnit * 50)
 
                 // Status message
                 Kirigami.InlineMessage {
@@ -49,22 +49,24 @@ Kirigami.Page {
                     Layout.fillWidth: true
 
                     // Logo section
-                    FormCard.FormTextDelegate {
-                        contentItem: ColumnLayout {
+                    // Custom logo item that respects the form layout
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 12  // Give enough height
+
+                        ColumnLayout {
+                            anchors.centerIn: parent
                             spacing: Kirigami.Units.largeSpacing
 
-                            Image {
-                                id: logoImage
+                            Text {
                                 Layout.alignment: Qt.AlignHCenter
-                                Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-                                Layout.preferredHeight: Kirigami.Units.gridUnit * 10
-                                source: "qrc:/qt/qml/com/dervox/dim/contents/ui/resources/logo.svg"
-                                fillMode: Image.PreserveAspectFit
-
-                                layer.enabled: true
-                                layer.effect: ColorOverlay {
-                                    color: Kirigami.Theme.activeTextColor
+                                text: "DIM"
+                                font {
+                                    pointSize: 72
+                                    weight: Font.Bold
+                                    family: "Arial"
                                 }
+                                color: Kirigami.Theme.activeTextColor
                             }
 
                             Kirigami.Heading {
@@ -76,6 +78,7 @@ Kirigami.Page {
                             }
                         }
                     }
+
 
                     FormCard.FormDelegateSeparator {}
 
@@ -124,8 +127,8 @@ Kirigami.Page {
                                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                                 text: i18n("Sign In")
                                 enabled: !loginPage.isLoading &&
-                                        emailField.text.length > 0 &&
-                                        passwordField.text.length > 0
+                                         emailField.text.length > 0 &&
+                                         passwordField.text.length > 0
 
                                 onClicked: performLogin()
                             }
@@ -170,10 +173,17 @@ Kirigami.Page {
         visible: loginPage.showNoPage
         onReconnectClicked: {
             loginPage.showNoPage = false
+            noPage.isRequasting = true
             loginPage.checkLoginStatus()
         }
     }
-
+    DBusyIndicator {
+        anchors.centerIn:  parent
+        Layout.alignment: Qt.AlignHCenter
+        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+        running: noPage.isRequasting
+        visible: running
+    }
     // API Connections
     Connections {
         target: api
@@ -240,7 +250,7 @@ Kirigami.Page {
     function performLogin() {
         if (!emailField.acceptableInput) {
             showError(i18n("Please enter a valid email address"),
-                     Kirigami.MessageType.Warning)
+                      Kirigami.MessageType.Warning)
             return
         }
 
@@ -250,7 +260,7 @@ Kirigami.Page {
 
     function handleSuccessfulLogin() {
         const token = api.getToken()
-
+        noPage.isRequasting = false
         // Helper function to set token
         function setApiToken(api, token) {
             try {
@@ -294,14 +304,14 @@ Kirigami.Page {
         } catch (error) {
             console.error("Error in handleSuccessfulLogin:", error)
             updateStatusMessage(i18n("Error setting up application. Please try again."),
-                              Kirigami.MessageType.Error)
+                                Kirigami.MessageType.Error)
         }
     }
 
 
     function handleUserInfoError(message, status, errorMessageDetails) {
         loginPage.isLoading = false
-
+        noPage.isRequasting = false
         const messageType = gApiStatusHandler.getMessageType(status)
         if (messageType === Kirigami.MessageType.Error) {
             loginPage.showNoPage = true
@@ -310,8 +320,8 @@ Kirigami.Page {
         } else if (messageType === Kirigami.MessageType.Warning) {
             api.saveToken("")
             applicationWindow().pageStack.replace(
-                Qt.resolvedUrl("qrc:/dim/contents/ui/pages/user/Login.qml")
-            )
+                        Qt.resolvedUrl("qrc:/dim/contents/ui/pages/user/Login.qml")
+                        )
         } else {
             showError(message + " " + errorMessageDetails, status)
         }

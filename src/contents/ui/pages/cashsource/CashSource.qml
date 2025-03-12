@@ -64,7 +64,7 @@ Kirigami.Page {
             icon.name: "overflow-menu"
             Kirigami.Action {
                 text: i18n("Transfer Money")
-                icon.name: "transfer"
+                icon.name: "selection-move-to-layer-above"
                 enabled: cashSourceModel.hasCheckedItems
                 onTriggered: {
                     let sourceData = cashSourceModel.getFirstCheckedSource()
@@ -77,11 +77,11 @@ Kirigami.Page {
                 }
             }
 
-            Kirigami.Action {
-                text: i18n("Print Report")
-                icon.name: "document-print"
-                onTriggered: showPassiveNotification("Print functionality not implemented")
-            }
+            // Kirigami.Action {
+            //     text: i18n("Print Report")
+            //     icon.name: "document-print"
+            //     onTriggered: showPassiveNotification("Print functionality not implemented")
+            // }
         }
     ]
 
@@ -174,7 +174,7 @@ Kirigami.Page {
                 }
                 itemDelegate: QQC2.CheckBox {
                     checked: modelData
-                    onCheckedChanged: modelCheck.setChecked(row, checked)
+                    onCheckedChanged: cashSourceModel.setChecked(row, checked)
                 }
             }
 

@@ -549,31 +549,17 @@ Kirigami.Dialog {
         }
     }
 
-    Kirigami.PromptDialog {
+    Kirigami.Dialog {
         id: newCategoryDialog
         title: i18n("New Category")
         standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
 
-        property bool isValid: categoryNameField.text.trim() !== ""
-
-        // Override the accept method to handle validation
-        function accept() {
-            if (categoryNameField.text.trim() === "") {
-                categoryNameField.statusMessage = i18n("Category name cannot be empty")
-                categoryNameField.status = Kirigami.MessageType.Error
-                return
-            }
-           // Kirigami.Dialog.prototype.accept.call(newCategoryDialog)
-        }
-
-        mainItem: FormCard.FormCard {
+        FormCard.FormCard {
             FormCard.FormTextFieldDelegate {
                 id: categoryNameField
                 label: i18n("Category Name")
                 placeholderText: i18n("Enter category name")
-                onAccepted: newCategoryDialog.accept()
 
-                // Clear error message when user starts typing
                 onTextChanged: {
                     if (text.trim() !== "") {
                         statusMessage = ""
@@ -591,7 +577,11 @@ Kirigami.Dialog {
         }
 
         onAccepted: {
-            if (isValid) {
+            if (categoryNameField.text.trim() === "") {
+                categoryNameField.statusMessage = i18n("Category name cannot be empty")
+                categoryNameField.status = Kirigami.MessageType.Error
+                open() // Reopen the dialog
+            } else {
                 favoriteManager.createCategory(categoryNameField.text.trim())
                 applicationWindow().showPassiveNotification(
                     i18n("Category created successfully"),

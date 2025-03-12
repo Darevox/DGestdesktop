@@ -18,81 +18,83 @@ Kirigami.Dialog {
 
     // Main content
     contentItem: Item {
+         clip:true
         QQC2.ScrollView {
-        // anchors.fill: parent
-        anchors.bottomMargin: paginationBar.height
-        visible: !clientApi.isLoading && paymentsData && paymentsData.data && paymentsData.data.length > 0
-        Layout.margins :  Kirigami.Units.largeSpacing
-
-        Tables.KTableView {
-            id: paymentsTable
-            alternatingRows: true
+            // anchors.fill: parent
+            anchors.bottomMargin: paginationBar.height
+            visible: !clientApi.isLoading && paymentsData && paymentsData.data && paymentsData.data.length > 0
             Layout.margins :  Kirigami.Units.largeSpacing
             clip:true
-            model: TableModel {
-                id: tableModel
+            Tables.KTableView {
+                id: paymentsTable
+                alternatingRows: true
+                Layout.margins :  Kirigami.Units.largeSpacing
+                clip:true
+                model: TableModel {
+                    id: tableModel
+                    TableModelColumn { display: "date" }
+                    TableModelColumn { display: "reference" }
+                    TableModelColumn { display: "amount" }
+                    TableModelColumn { display: "method" }
+                    TableModelColumn { display: "sale_reference" }
 
-                TableModelColumn { display: "date" }
-                TableModelColumn { display: "reference" }
-                TableModelColumn { display: "amount" }
-                TableModelColumn { display: "method" }
-                TableModelColumn { display: "sale_reference" }
-
-                rows: []
-            }
-
-            headerComponents: [
-                Tables.HeaderComponent {
-                    title: i18n("Date")
-                    width: paymentsDialog.width * 0.2
-                    role: 1
-                    itemDelegate: QQC2.Label {
-                        text: modelData ? Qt.formatDateTime(new Date(modelData), "dd/MM/yyyy") : ""
-                        padding: Kirigami.Units.smallSpacing
-                    }
-                },
-                Tables.HeaderComponent {
-                    title: i18n("Reference")
-                    width: paymentsDialog.width * 0.2
-                    role: 2
-                    itemDelegate: QQC2.Label {
-                        text: modelData || ""
-                        padding: Kirigami.Units.smallSpacing
-                    }
-                },
-                Tables.HeaderComponent {
-                    title: i18n("Amount")
-                    width: paymentsDialog.width * 0.2
-                    role: 3
-                    itemDelegate: QQC2.Label {
-                        text: modelData ? Number(modelData).toLocaleString(Qt.locale(), 'f', 2) : "0.00"
-                        horizontalAlignment: Text.AlignRight
-                        padding: Kirigami.Units.smallSpacing
-                    }
-                },
-                Tables.HeaderComponent {
-                    title: i18n("Method")
-                    width: paymentsDialog.width * 0.2
-                    role: 4
-                    itemDelegate: QQC2.Label {
-                        text: modelData || ""
-                        padding: Kirigami.Units.smallSpacing
-                    }
-                },
-                Tables.HeaderComponent {
-                    title: i18n("Sale Reference")
-                    width: paymentsDialog.width * 0.2
-                    role: 5
-                    itemDelegate: QQC2.Label {
-                        text: modelData || ""
-                        padding: Kirigami.Units.smallSpacing
-                    }
+                    rows: []
                 }
-            ]
-        }
-    }
 
-    // Loading indicator
+                headerComponents: [
+                    Tables.HeaderComponent {
+                        title: i18n("Date")
+                        width: paymentsDialog.width * 0.2
+
+                        role: 1
+                        itemDelegate: QQC2.Label {
+                            text: modelData ? Qt.formatDateTime(new Date(modelData), "dd/MM/yyyy") : ""
+                            padding: Kirigami.Units.smallSpacing
+                        }
+                    },
+                    Tables.HeaderComponent {
+                        title: i18n("Reference")
+                        width: paymentsDialog.width * 0.2
+
+                        role: 2
+                        itemDelegate: QQC2.Label {
+                            text: modelData || ""
+                            padding: Kirigami.Units.smallSpacing
+                        }
+                    },
+                    Tables.HeaderComponent {
+                        title: i18n("Amount")
+                        width: paymentsDialog.width * 0.2
+                        role: 3
+                        itemDelegate: QQC2.Label {
+                            text: modelData ? Number(modelData).toLocaleString(Qt.locale(), 'f', 2) : "0.00"
+                            horizontalAlignment: Text.AlignRight
+                            padding: Kirigami.Units.smallSpacing
+                        }
+                    },
+                    Tables.HeaderComponent {
+                        title: i18n("Method")
+                        width: paymentsDialog.width * 0.2
+                        role: 4
+                        itemDelegate: QQC2.Label {
+                            text: modelData || ""
+                            padding: Kirigami.Units.smallSpacing
+                        }
+                    },
+                    Tables.HeaderComponent {
+                        title: i18n("Sale Reference")
+                        width: paymentsDialog.width * 0.2
+                        role: 5
+                        itemDelegate: QQC2.Label {
+                            text: modelData || ""
+                            padding: Kirigami.Units.smallSpacing
+                        }
+                    }
+                ]
+            }
+        }
+
+        // Loading indicator
         DBusyIndicator {
             id: busyIndicator
             anchors.centerIn: parent
@@ -109,7 +111,7 @@ Kirigami.Dialog {
             visible: !clientApi.isLoading && (!paymentsData || paymentsData.data.length === 0)
             icon.name: "office-chart-line"
         }
-}
+    }
     // Pagination
     footer: PaginationBar {
         id: paginationBar

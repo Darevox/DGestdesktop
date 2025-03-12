@@ -44,7 +44,7 @@ int SupplierModel::columnCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
-    return 6; // Adjust based on your needs
+    return 5; // Adjust based on your needs
 }
 
 QVariant SupplierModel::data(const QModelIndex &index, int role) const

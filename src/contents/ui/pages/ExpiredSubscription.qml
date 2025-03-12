@@ -27,11 +27,9 @@ Kirigami.PromptDialog {
         }
 
         FormCard.FormTextDelegate {
-            description: i18nc("@info", "<p>We regret to inform you that your subscription has expired.</p>" +
-                "<p>To continue enjoying our services without interruption, " +
-                "please renew your subscription at your earliest convenience.</p>" +
-                "<p>If you have any questions or need assistance, " +
-                "don't hesitate to contact our support team - we're here to help!</p>")
+            description: "<p>" + i18n("We regret to inform you that your subscription has expired.") + "</p>" +
+                 "<p>" + i18n("To continue enjoying our services without interruption, please renew your subscription at your earliest convenience.") + "</p>" +
+                 "<p>" + i18n("If you have any questions or need assistance, don't hesitate to contact our support team - we're here to help!") + "</p>"
         }
 
         FormCard.FormDelegateSeparator {}

@@ -30,6 +30,7 @@ Kirigami.Dialog {
 
     // Main content
     contentItem: Item{
+         clip:true
         QQC2.ScrollView {
         // anchors.fill: parent
         anchors.bottomMargin: paginationBar.height

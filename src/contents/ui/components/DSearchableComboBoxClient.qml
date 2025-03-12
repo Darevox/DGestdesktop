@@ -13,7 +13,18 @@ QQC2.ComboBox {
     property int selectedId: -1  // -1 indicates no selection
     signal itemSelected(var item)
     signal enterPressed(string text)
-
+    property int initialClientId: -1
+    onInitialClientIdChanged: {
+        if (initialClientId > 0) {
+            // Find the client by ID and select it
+            for (let i = 0; i < clientModelFetch.count; i++) {
+                if (clientModelFetch.get(i).id === initialClientId) {
+                    root.currentIndex = i
+                    break
+                }
+            }
+        }
+    }
     editable: true
 
     // Direct access to the TextField
@@ -139,6 +150,11 @@ QQC2.ComboBox {
                                 source: "group"
                                 implicitWidth: Kirigami.Units.iconSizes.small
                                 implicitHeight: Kirigami.Units.iconSizes.small
+                                color :   switch(model.status) {
+                                          case "active": return Kirigami.Theme.textColor
+                                          case "inactive": return Kirigami.Theme.negativeTextColor
+                                          default: return Kirigami.Theme.textColor
+                                          }
                             }
 
                             ColumnLayout {
@@ -150,6 +166,11 @@ QQC2.ComboBox {
                                     text: model.name || ""
                                     elide: Text.ElideRight
                                     font.bold: true
+                                    color :   switch(model.status) {
+                                              case "active": return Kirigami.Theme.textColor
+                                              case "inactive": return Kirigami.Theme.negativeTextColor
+                                              default: return Kirigami.Theme.textColor
+                                              }
                                 }
 
                                 QQC2.Label {
@@ -158,6 +179,11 @@ QQC2.ComboBox {
                                     elide: Text.ElideRight
                                     font.pointSize: Kirigami.Theme.smallFont.pointSize
                                     opacity: 0.7
+                                    color :   switch(model.status) {
+                                              case "active": return Kirigami.Theme.textColor
+                                              case "inactive": return Kirigami.Theme.negativeTextColor
+                                              default: return Kirigami.Theme.textColor
+                                              }
                                 }
                             }
 
@@ -240,15 +266,28 @@ QQC2.ComboBox {
         function onClientReceived(client) {
             if (client) {
                 root.editText = client.name || ""
-                //  root.editText = ""
                 root.selectedId = client.id  // Store the ID
                 root.itemSelected(client)
+
+                // Important: Update initialClientId to match the current client
+                // This prevents re-requesting the same client
+                root.initialClientId = client.id
+
                 inputField.forceActiveFocus()
-                //  inputField.selectAll()
             }
         }
     }
 
+    // Add this function to DSearchableComboBoxClient
+    function loadClientByIdExplicit(id) {
+        if (id > 0) {
+            clientApiFetch.getClient(id)
+        } else {
+            // Clear fields if id is invalid
+            root.editText = ""
+            root.selectedId = -1
+        }
+    }
     // Override default focus handling
     onActiveFocusChanged: {
         if (activeFocus) {

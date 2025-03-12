@@ -473,6 +473,25 @@ Kirigami.Page {
         }
     }
 
+
+    // Loading skeleton
+    GridLayout {
+        anchors.fill: parent
+        visible: activityLogModel.loading
+        columns: 6
+        rows: 8
+        columnSpacing: Kirigami.Units.largeSpacing
+        rowSpacing: Kirigami.Units.largeSpacing
+
+        Repeater {
+            model: 6 * 8
+            SkeletonLoaders {
+                Layout.fillWidth: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+            }
+        }
+    }
+
     footer: PaginationBar {
         id: paginationBar
         anchors {

@@ -52,31 +52,31 @@ Kirigami.Page {
             Repeater {
                 model: saleStates.length
                 QQC2.TabButton {
-                     id: saleTab
+                    id: saleTab
 
-                     contentItem: RowLayout {
-                         spacing: Kirigami.Units.smallSpacing
+                    contentItem: RowLayout {
+                        spacing: Kirigami.Units.smallSpacing
 
-                         QQC2.Label {
-                             text: i18n("Sale %1", modelData + 1)
-                             Layout.fillWidth: true
-                             horizontalAlignment: Text.AlignHCenter
-                         }
+                        QQC2.Label {
+                            text: i18n("Sale %1", modelData + 1)
+                            Layout.fillWidth: true
+                            horizontalAlignment: Text.AlignHCenter
+                        }
 
-                         QQC2.ToolButton {
-                             icon.name: "window-close"
-                             display: QQC2.AbstractButton.IconOnly
-                             visible: saleStates.length > 1
-                             onClicked: closeTab(modelData)
+                        QQC2.ToolButton {
+                            icon.name: "window-close"
+                            display: QQC2.AbstractButton.IconOnly
+                            visible: saleStates.length > 1
+                            onClicked: closeTab(modelData)
 
-                             QQC2.ToolTip {
-                                 text: i18n("Close sale")
-                             }
-                         }
-                     }
+                            QQC2.ToolTip {
+                                text: i18n("Close sale")
+                            }
+                        }
+                    }
 
-                     width: Math.max(120, saleTabBar.width / saleStates.length)
-                 }
+                    width: Math.max(120, saleTabBar.width / saleStates.length)
+                }
             }
         }
 
@@ -126,10 +126,15 @@ Kirigami.Page {
     }
     function addNewSaleTab() {
         saleStates.push({
-            saleItems: Qt.createQmlObject('import QtQuick; ListModel {}', root),
-            total: 0,
-            autoPayment: false
-        })
+                            saleItems: Qt.createQmlObject('import QtQuick; ListModel {}', root),
+                            total: 0,
+                            autoPayment: false,
+                            discountAmount: 0,
+                            hasClient: false,
+                            clientId: -1,
+                            clientName: "",  // Add clientName to store the display name
+                            clientData: null // Store the whole client object if needed
+                        })
         saleStates = [...saleStates]
         saleTabBar.currentIndex = saleStates.length - 1
     }
@@ -146,12 +151,12 @@ Kirigami.Page {
         productFetchApi.saveToken(token)
 
         productIds.forEach(id => {
-            if (!sharedLoadedProducts[id]) {
-                pendingLoads++
-                console.log("Fetching product:", id)
-                productFetchApi.getProduct(id)
-            }
-        })
+                               if (!sharedLoadedProducts[id]) {
+                                   pendingLoads++
+                                   console.log("Fetching product:", id)
+                                   productFetchApi.getProduct(id)
+                               }
+                           })
 
         if (pendingLoads === 0) {
             isLoadingProducts = false
@@ -182,10 +187,10 @@ Kirigami.Page {
 
         let allLoaded = true
         sharedCurrentProductIds.forEach(id => {
-            if (!sharedLoadedProducts[id]) {
-                allLoaded = false
-            }
-        })
+                                            if (!sharedLoadedProducts[id]) {
+                                                allLoaded = false
+                                            }
+                                        })
 
         if (allLoaded) {
             isLoadingProducts = false

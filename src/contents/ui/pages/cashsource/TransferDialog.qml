@@ -60,7 +60,7 @@ Kirigami.PromptDialog {
                     }
 
                     QQC2.Label {
-                        text: i18n("Available Balance: %1").arg(sourceBalance.toFixed(2))
+                        text: i18n("Available Balance: %1 DH",sourceBalance.toFixed(2))
                         opacity: 0.7
                     }
                 }
@@ -145,7 +145,7 @@ Kirigami.PromptDialog {
     customFooterActions: [
         Kirigami.Action {
             text: i18n("Transfer")
-            icon.name: "transfer"
+            icon.name: "selection-move-to-layer-above"
             enabled: !cashSourceApi.isLoading &&
                      destinationField.currentIndex !== -1 &&
                      amountField.text !== "" &&
