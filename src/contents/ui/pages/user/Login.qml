@@ -4,7 +4,7 @@ import QtQuick.Controls as QQC2
 import org.kde.kirigami as Kirigami
 import org.kde.kirigamiaddons.formcard 1.0 as FormCard
 import QtQuick.Layouts
-import Qt5Compat.GraphicalEffects
+//import Qt5Compat.GraphicalEffects
 import com.dervox.dim
 import "../."
 import "../../components"
