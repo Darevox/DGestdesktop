@@ -40,3 +40,11 @@ class subinfo(info.infoclass):
 class Package(CraftPackageObject.get("kde").pattern):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+    def createPackage(self):
+        self.defines["executable"] = r"bin\dim.exe"
+        self.addExecutableFilter(r"(bin|libexec)/(?!(dim|update-mime-database)).*")
+        self.ignoredPackages.append("binary/mysql")
+        if not CraftCore.compiler.isLinux:
+            self.ignoredPackages.append("libs/dbus")
+        return super().createPackage()
