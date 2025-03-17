@@ -233,11 +233,11 @@ Kirigami.ApplicationWindow {
     function resetUIState() {
         loadingBusyIndicator.running = false;
     }
-    // DBusyIndicator{
-    //     id:loadingBusyIndicator
-    //     anchors.centerIn: parent
-    //     running: false
-    // }
+    DBusyIndicator{
+        id:loadingBusyIndicator
+        anchors.centerIn: parent
+        running: false
+    }
 
     DNotification{
         id:notification
