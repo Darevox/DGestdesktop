@@ -15,6 +15,26 @@ ecm_add_qml_module(dim
     URI com.dervox.dim
     VERSION 1.0
 )
+# Define our updater sources
+set(DIM_UPDATER_SOURCES
+    updater/KUpdater.cpp
+    updater/AppUpdater.cpp
+    updater/UpdateHelper.cpp
+)
+
+set(DIM_UPDATER_HEADERS
+    updater/KUpdater.h
+    updater/AppUpdater.h
+    updater/UpdateHelper.h
+)
+
+# Add updater QML files
+set(DIM_QML_UPDATER
+    contents/ui/updater/UpdaterDialog.qml
+    contents/ui/updater/UpdateProgressDialog.qml
+    contents/ui/updater/AutoUpdateCheck.qml
+    contents/ui/updater/UpdateMenuAction.qml
+)
 
 # Declare QML sources grouped by functionality
 set(DIM_QML_PAGES
@@ -201,6 +221,7 @@ set(DIM_HEADERS
     colorschememanager.h
     printer.h
     printerhelper.h
+
 )
 
 # Add QML resources
@@ -209,6 +230,7 @@ qt_target_qml_sources(dim
     ${DIM_QML_PAGES}
     ${DIM_QML_COMPONENTS}
     ${DIM_QML_UTILS}
+    ${DIM_QML_UPDATER}
     RESOURCES
     contents/ui/resources/logo.svg
 )
@@ -223,6 +245,9 @@ set_source_files_properties(${CMAKE_SOURCE_DIR}/com.dervox.dim.svg PROPERTIES
 target_sources(dim PRIVATE
     ${DIM_CPP_SOURCES}
     ${DIM_HEADERS}
+    ${DIM_UPDATER_SOURCES}
+    ${DIM_UPDATER_HEADERS}
+
 )
 
 # Define logging categories if needed
@@ -263,6 +288,7 @@ target_link_libraries(dim
     KF6::IconThemes
     KF6::Prison
     KF6::QuickCharts
+
 )
 
 # Optional Poppler support

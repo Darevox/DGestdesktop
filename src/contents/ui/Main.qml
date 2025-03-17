@@ -10,7 +10,7 @@ import com.dervox.dim
 import "components"
 import "pages"
 import "pages/user"
-
+import "updater"
 Kirigami.ApplicationWindow {
     id: rootWindow
     title: "DIM"
@@ -351,5 +351,17 @@ Kirigami.ApplicationWindow {
     ApiStatusHandler{
         id:apiStatusHandler
     }
+    // In main.qml
+    AutoUpdateCheck {
+        id: autoUpdateCheck
+        checkOnStartup: true
+        startupDelay: 5000 // Check after startup
+    }
 
+    Component.onCompleted: {
+        // Add a dynamic property to appUpdater for skipPrompt
+        if (typeof appUpdater.skipPrompt === "undefined") {
+            appUpdater.skipPrompt = false;
+        }
+    }
 }

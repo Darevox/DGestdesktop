@@ -6,6 +6,7 @@ import org.kde.kirigamiaddons.formcard as FormCard
 import org.kde.kirigamiaddons.components as Kcomponents
 import "../components"
 import "team/"
+import "../updater"
 FormCard.FormCardPage {
     id: root
     property bool isLoading: false
@@ -51,10 +52,10 @@ FormCard.FormCardPage {
             }
         }
 
-        FormCard.FormDelegateSeparator {
-            above: combobox
-            below: checkbox
-        }
+        // FormCard.FormDelegateSeparator {
+        //     above: combobox
+        //     below: checkbox
+        // }
 
         // FormCard.FormCheckDelegate {
         //     id: checkbox
@@ -165,10 +166,61 @@ FormCard.FormCardPage {
         title: i18nc("@title:group", "DIM")
     }
     FormCard.FormCard {
-        FormCard.FormTextDelegate {
-            text: i18nc("@info", "Version")
-            description: "1.0 Mona"
+
+
+        // Update check delegate
+        FormCard.FormButtonDelegate {
+            id: updateCheckButton
+            icon.name: appUpdater.updateAvailable ? "update-low" : "system-software-update"
+            text: appUpdater.updateAvailable ?
+                  i18nc("@action:button", "Update Available: %1", appUpdater.latestVersion) :
+                  i18nc("@action:button", "Check for Updates")
+
+            description: appUpdater.updateAvailable ?
+                         i18n("A new version is available to install") :
+                         i18n("Your current version: %1", appUpdater.currentVersion || "1.0")
+
+            // Badge to show there's an update
+            leading: appUpdater.updateAvailable ? updateBadge : null
+
+            onClicked: {
+                // Set the skip prompt flag before opening the dialog
+                if (typeof appUpdater !== "undefined") {
+                    appUpdater.skipPrompt = true;
+                }
+
+                // Create and open the dialog
+                const component = Qt.createComponent(Qt.resolvedUrl("../updater/UpdaterDialog.qml"));
+
+                if (component.status === Component.Ready) {
+                    const dialog = component.createObject(applicationWindow().overlay);
+                    dialog.open();
+                } else if (component.status === Component.Error) {
+                    console.error("Error loading UpdaterDialog.qml:", component.errorString());
+                }
+            }
         }
+
+
+            // Badge component shown when updates are available
+            Component {
+                id: updateBadge
+
+                Rectangle {
+                    width: Kirigami.Units.gridUnit
+                    height: width
+                    radius: width / 2
+                    color: Kirigami.Theme.positiveTextColor
+
+                    QQC2.Label {
+                        anchors.centerIn: parent
+                        text: "!"
+                        color: "white"
+                        font.bold: true
+                        font.pixelSize: parent.width * 0.7
+                    }
+                }
+            }
         FormCard.FormButtonDelegate {
             id: abooutUs
             icon.name: "documentinfo"

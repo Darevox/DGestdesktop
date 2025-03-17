@@ -56,6 +56,9 @@
 #include <utils/favoritemanager.h>
 #include <utils/appsettings.h>
 
+#include <updater/AppUpdater.h>
+#include <updater/KUpdater.h>
+#include "config.h"
 int main(int argc, char *argv[])
 {
 
@@ -75,15 +78,27 @@ int main(int argc, char *argv[])
 
     qputenv("QML_XHR_ALLOW_FILE_READ", QByteArray("1"));
     qputenv("QML_XHR_ALLOW_FILE_WRITE", QByteArray("1"));
-    QApplication::setWindowIcon(QIcon::fromTheme(QStringLiteral("com.dervox.dim")));
+    app.setWindowIcon(QIcon::fromTheme(QStringLiteral("dim"), QIcon(QStringLiteral(":/contents/ui/resources/logo.svg"))));
 
 #if defined(Q_OS_ANDROID)
-   QApplication::setStyle(QStringLiteral("breeze"));
+    QApplication::setStyle(QStringLiteral("breeze"));
 #else
     QQuickStyle::setStyle(QStringLiteral("org.kde.desktop"));
 #endif
     QQmlApplicationEngine engine;
     //engine.addImportPath("qml");
+    // Create and configure the auto-updater
+    AppUpdater* appUpdater = new AppUpdater(&app);
+
+    // Configure the update URL - replace with your actual update info URL
+    appUpdater->setUpdateUrl(QStringLiteral(DIM_UPDATES_URL));
+
+    // Optionally set specific version if needed (otherwise it uses QApplication::applicationVersion)
+     appUpdater->setCurrentVersion(QStringLiteral(DIM_VERSION));
+
+    // Expose the updater to QML
+    engine.rootContext()->setContextProperty(QStringLiteral("appUpdater"), appUpdater);
+
     QNetworkAccessManager *networkManager = new QNetworkAccessManager();
     NetworkApi::UserApi *userapi = new NetworkApi::UserApi(networkManager);
     NetworkApi::TeamApi *teamApi = new NetworkApi::TeamApi(networkManager);
@@ -261,7 +276,6 @@ int main(int argc, char *argv[])
                                                          QStringLiteral("Cannot create instances of InvoiceModel"));
 
     qmlRegisterType( QUrl(QStringLiteral("qrc:/dim/contents/ui/pages/ApiStatusHandler.qml")), "com.dervox.ApiStatusHandler", 1, 0, "ApiStatusHandler" );
-    QGuiApplication::setWindowIcon(QIcon::fromTheme(QStringLiteral("com.dervox.dim")));
 
 
     engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
