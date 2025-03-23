@@ -187,11 +187,11 @@ Kirigami.Page {
                     role: SupplierRoles.CheckedRole
                     width: root.width * 0.05
                     headerDelegate: QQC2.CheckBox {
-                        onCheckedChanged: supplierModel.toggleAllSuppliersChecked()
+                        onClicked: supplierModel.toggleAllSuppliersChecked()
                     }
                     itemDelegate: QQC2.CheckBox {
                         checked: modelData
-                        onCheckedChanged: supplierModel.setChecked(row, checked)
+                        onClicked: supplierModel.setChecked(row, checked)
                     }
                 },
                 Tables.HeaderComponent {

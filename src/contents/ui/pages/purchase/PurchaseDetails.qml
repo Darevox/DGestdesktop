@@ -73,12 +73,15 @@ Kirigami.Dialog{
                         }
 
                         DSearchableComboBoxCashSource {
-                             id: cashSourceField
-                             model: cashSourceModel
-                             textRole: "name"
-                             valueRole: "id"
-                             enabled: !isEditing
-                         }
+                            id: cashSourceField
+                            model: cashSourceModel
+                            Layout.fillWidth: true
+                            defaultSourceId: favoriteManager.getDefaultCashSource()
+                            Layout.margins : Kirigami.Units.smallSpacing
+                            textRole: "name"
+                            valueRole: "id"
+                            enabled: !isEditing
+                        }
                         FormCard.FormDateTimeDelegate {
                             id: purchaseDateField
                             text: i18n("Purchase Date")
@@ -489,13 +492,13 @@ Kirigami.Dialog{
 
         // Ensure packages have IDs and required fields
         let processedPackages = (product.packages || []).map(pkg => ({
-            id: pkg.id || null,  // Ensure ID exists
-            name: pkg.name || "",
-            pieces_per_package: pkg.pieces_per_package || 1,
-            purchase_price: pkg.purchase_price || 0,
-            selling_price: pkg.selling_price || 0,
-            barcode: pkg.barcode || ""
-        }));
+                                                                         id: pkg.id || null,  // Ensure ID exists
+                                                                         name: pkg.name || "",
+                                                                         pieces_per_package: pkg.pieces_per_package || 1,
+                                                                         purchase_price: pkg.purchase_price || 0,
+                                                                         selling_price: pkg.selling_price || 0,
+                                                                         barcode: pkg.barcode || ""
+                                                                     }));
 
         console.log("Processed packages:", JSON.stringify(processedPackages));
 
@@ -527,10 +530,10 @@ Kirigami.Dialog{
     function debugModelItem(index) {
         let item = selectedProductsModel.get(index)
         console.log("Model item at index", index, ":", JSON.stringify({
-            name: item.name,
-            packagesJson: item.packagesJson,
-            packages: JSON.parse(item.packagesJson || '[]')
-        }))
+                                                                          name: item.name,
+                                                                          packagesJson: item.packagesJson,
+                                                                          packages: JSON.parse(item.packagesJson || '[]')
+                                                                      }))
     }    ProductSelectorDialog {
         id: productSelectorDialog
         onProductsSelected: function(products) {

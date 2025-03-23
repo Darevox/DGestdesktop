@@ -281,6 +281,25 @@ void SaleModel::toggleAllSalesChecked()
     }
     updateHasCheckedItems();
 }
+void SaleModel::uncheckAllSales()
+{
+    // Only perform the operation if there are actually checked items
+    if (!m_hasCheckedItems) {
+        return;
+    }
+
+    for (int i = 0; i < m_sales.count(); ++i) {
+        if (m_sales[i].checked) {
+            m_sales[i].checked = false;
+            QModelIndex index = createIndex(i, 0);
+            Q_EMIT dataChanged(index, index, {CheckedRole});
+        }
+    }
+
+    // Update the checked items flag
+    m_hasCheckedItems = false;
+    Q_EMIT hasCheckedItemsChanged();
+}
 
 // Slots
 void SaleModel::setSortField(const QString &field)

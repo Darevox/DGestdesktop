@@ -415,40 +415,40 @@ Kirigami.Dialog {
                             }
 
                             // List of all cash sources
-                            ListView {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                clip: true
-                                model: cashSourceModel // You'll need to create this
+                            // ListView {
+                            //     Layout.fillWidth: true
+                            //     Layout.fillHeight: true
+                            //     clip: true
+                            //     model: cashSourceModel // You'll need to create this
 
-                                delegate: ItemDelegate {
-                                    width: ListView.view.width
-                                    highlighted: model.id === favoriteManager.getDefaultCashSource()
+                            //     delegate: ItemDelegate {
+                            //         width: ListView.view.width
+                            //         highlighted: model.id === favoriteManager.getDefaultCashSource()
 
-                                    contentItem: RowLayout {
-                                        spacing: Kirigami.Units.largeSpacing
+                            //         contentItem: RowLayout {
+                            //             spacing: Kirigami.Units.largeSpacing
 
-                                        Label {
-                                            text: model.name
-                                            Layout.fillWidth: true
-                                        }
+                            //             Label {
+                            //                 text: model.name
+                            //                 Layout.fillWidth: true
+                            //             }
 
-                                        Button {
-                                            text: i18n("Set as Default")
-                                            visible: !parent.parent.highlighted
-                                            onClicked: favoriteManager.setDefaultCashSource(model.id)
-                                        }
-                                    }
-                                }
+                            //             Button {
+                            //                 text: i18n("Set as Default")
+                            //                 visible: !parent.parent.highlighted
+                            //                 onClicked: favoriteManager.setDefaultCashSource(model.id)
+                            //             }
+                            //         }
+                            //     }
 
-                                // Empty state
-                                Label {
-                                    anchors.centerIn: parent
-                                    text: i18n("No cash sources available")
-                                    visible: parent.count === 0
-                                    opacity: 0.5
-                                }
-                            }
+                            //     // Empty state
+                            //     Label {
+                            //         anchors.centerIn: parent
+                            //         text: i18n("No cash sources available")
+                            //         visible: parent.count === 0
+                            //         opacity: 0.5
+                            //     }
+                            // }
                         }
                     }
                 }

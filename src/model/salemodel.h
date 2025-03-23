@@ -83,6 +83,7 @@ public:
     Q_INVOKABLE QVariantList getCheckedSaleIds() const;
     Q_INVOKABLE void clearAllChecked();
     Q_INVOKABLE void toggleAllSalesChecked();
+    Q_INVOKABLE void uncheckAllSales();
 
 public Q_SLOTS:
     void setSortField(const QString &field);

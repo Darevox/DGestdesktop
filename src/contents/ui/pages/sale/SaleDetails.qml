@@ -111,6 +111,7 @@ Kirigami.Dialog {
                             Layout.fillWidth: true
                             Layout.margins : Kirigami.Units.smallSpacing
                             enabled: !isEditing
+                             defaultSourceId: favoriteManager.getDefaultCashSource()
                             onItemSelected: function(item) {
                                 console.log("Selected CashSoruce:", JSON.stringify(item))
                                 // Handle selection with full product data
@@ -908,6 +909,7 @@ Kirigami.Dialog {
                 inlineMsg.visible = true
                 clearForm()
             }
+    saleModel.uncheckAllSales()
         }
 
         function onSaleUpdated() {

@@ -277,11 +277,11 @@ Kirigami.Page {
                     role: PurchaseRoles.CheckedRole
                     width: root.width * 0.05
                     headerDelegate: QQC2.CheckBox {
-                        onCheckedChanged: purchaseModel.toggleAllPurchasesChecked()
+                        onClicked: purchaseModel.toggleAllPurchasesChecked()
                     }
                     itemDelegate: QQC2.CheckBox {
                         checked: modelData
-                        onCheckedChanged: purchaseModel.setChecked(row, checked)
+                        onClicked: purchaseModel.setChecked(row, checked)
                     }
                 },
                 Tables.HeaderComponent {

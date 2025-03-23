@@ -170,11 +170,11 @@ Kirigami.Page {
                 role: CashSourceRoles.CheckedRole
                 width: root.width * 0.05
                 headerDelegate: QQC2.CheckBox {
-                    onCheckedChanged: cashSourceModel.toggleAllCashSourcesChecked()
+                    onClicked: cashSourceModel.toggleAllCashSourcesChecked()
                 }
                 itemDelegate: QQC2.CheckBox {
                     checked: modelData
-                    onCheckedChanged: cashSourceModel.setChecked(row, checked)
+                    onClicked: cashSourceModel.setChecked(row, checked)
                 }
             }
 

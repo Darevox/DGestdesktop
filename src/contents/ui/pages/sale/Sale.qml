@@ -211,7 +211,7 @@ Kirigami.Page {
             }
         },
         Kirigami.Action {
-          icon.name: "view-filter"
+            icon.name: "view-filter"
             text: i18n("Filter")
             onTriggered: filterSheet.open()
         },
@@ -236,7 +236,7 @@ Kirigami.Page {
 
         Item { Layout.fillWidth: true }
 
-       DBusyIndicator {
+        DBusyIndicator {
             running: saleModel.loading
         }
 
@@ -288,11 +288,11 @@ Kirigami.Page {
                     role: saleModel.CheckedRole
                     width: root.width * 0.03
                     headerDelegate: QQC2.CheckBox {
-                        onCheckedChanged: saleModel.toggleAllSalesChecked()
+                        onClicked: saleModel.toggleAllSalesChecked()
                     }
                     itemDelegate: QQC2.CheckBox {
                         checked: modelData
-                        onCheckedChanged: saleModel.setChecked(row, checked)
+                        onClicked: saleModel.setChecked(row, checked)
                     }
                 },
                 Tables.HeaderComponent {
@@ -405,7 +405,7 @@ Kirigami.Page {
                     width: root.width * 0.15
                     itemDelegate: QQC2.Label {
                         text: Qt.formatDateTime(modelData, "dd/MM/yyyy")
-                         horizontalAlignment: Text.AlignRight
+                        horizontalAlignment: Text.AlignRight
                     }
                     headerDelegate: TableHeaderLabel {}
                 }
