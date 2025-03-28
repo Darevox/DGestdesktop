@@ -11,11 +11,11 @@ import "."
 
 Kirigami.Dialog {
     id: saleDialog
-    title: dialogSaleId > 0 ? i18n("Edit Sale") : i18n("New Sale")
+    title: dialogSaleId > 0 ? i18n("Edit %1", currentSale?.type) : i18n("New %1",typeCombo.currentText)
     //  preferredWidth: Kirigami.Units.gridUnit * 60
     padding: Kirigami.Units.largeSpacing
     width: Kirigami.Units.gridUnit * 50
-    height : Kirigami.Units.gridUnit * 30
+    height : Kirigami.Units.gridUnit * 33
     property int dialogSaleId: 0
     property bool isCreateAnother: false
     property bool isEditing: dialogSaleId > 0
@@ -37,7 +37,13 @@ Kirigami.Dialog {
         showCloseButton: true
         visible: false
     }
-
+    Kirigami.InlineMessage {
+        id: quoteInfoMessage
+        text: i18n("Quotes don't affect inventory until converted to sales.")
+        type: Kirigami.MessageType.Information
+        visible: false
+        Layout.fillWidth: true
+    }
     contentItem:   ColumnLayout {
         spacing: Kirigami.Units.largeSpacing
         DBusyIndicator {
@@ -54,7 +60,7 @@ Kirigami.Dialog {
             visible:!saleApi.isLoading
 
             QQC2.TabButton {
-                text: i18n("Sale Details")
+                text: i18n("%1 Details",typeCombo.currentText)
             }
             QQC2.TabButton {
                 text: i18n("Products")
@@ -111,7 +117,7 @@ Kirigami.Dialog {
                             Layout.fillWidth: true
                             Layout.margins : Kirigami.Units.smallSpacing
                             enabled: !isEditing
-                             defaultSourceId: favoriteManager.getDefaultCashSource()
+                            defaultSourceId: favoriteManager.getDefaultCashSource()
                             onItemSelected: function(item) {
                                 console.log("Selected CashSoruce:", JSON.stringify(item))
                                 // Handle selection with full product data
@@ -120,7 +126,40 @@ Kirigami.Dialog {
                             onEnterPressed: function(text) {
                             }
                         }
+                        FormCard.FormComboBoxDelegate {
+                            id: statusCombo
+                            text: i18n("Status")
+                            model: [
+                                { text: i18n("Pending"), value: "pending" },
+                                { text: i18n("Completed"), value: "completed" },
+                                { text: i18n("Cancelled"), value: "cancelled" }
 
+                            ]
+                            textRole: "text"
+                            valueRole: "value"
+                            currentIndex: 0
+                        }
+                        FormCard.FormComboBoxDelegate {
+                            id: typeCombo
+                            text: i18n("Type")
+                            model: [
+                                { text: i18n("Sale"), value: "sale" },
+                                { text: i18n("Quote"), value: "quote" }
+                            ]
+                            textRole: "text"
+                            valueRole: "value"
+                            currentIndex: 0
+                            enabled: !isEditing // Can't change type after creation
+
+                            onCurrentValueChanged: {
+                                // Show info message when selecting quote
+                                if (currentValue === "quote") {
+                                    quoteInfoMessage.visible = true
+                                } else {
+                                    quoteInfoMessage.visible = false
+                                }
+                            }
+                        }
                         // FormCard.FormComboBoxDelegate {
                         //     id: cashSourceField
                         //     text: i18n("Cash Source")
@@ -503,28 +542,43 @@ Kirigami.Dialog {
             Kirigami.Heading {
                 text: i18n("Options")
                 level: 3
+                visible:isEditing
             }
 
             RowLayout {
                 spacing: Kirigami.Units.largeSpacing
                 QQC2.Button {
-                    text: i18n("Generate Invoice")
+                    text: i18n("Convert to Sale")
+                    icon.name: "document-export"
+                    visible: isEditing && currentSale?.type === "quote"
+                    enabled: !saleApi.isLoading
+                    onClicked: {
+                        convertConfirmDialog.open()
+                    }
+                }
+                QQC2.Button {
+                    text: i18n("Generate %1 Document", currentSale?.type === "quote" ? "Quote":"Invoice")
                     icon.name: "document-print"
                     visible: isEditing
                     enabled: !saleModel.loading
-                    onClicked: saleModel.generateInvoice(dialogSaleId)
+                    onClicked: {
+                        invoiceGenerationDialogLoader.documentId = dialogSaleId
+                        invoiceGenerationDialogLoader.isQuote = currentSale?.type === "quote"
+                        invoiceGenerationDialogLoader.active=true
+                    }
                 }
+
                 QQC2.Button {
                     text: i18n("Print Receipt")
                     icon.name: "document-print"
-                    visible: isEditing
+                    visible:  isEditing && currentSale?.type === "sale"
                     enabled: !saleModel.loading
                     onClicked: saleApi.generateReceipt(dialogSaleId)
                 }
                 QQC2.Button {
                     text: i18n("Add Payment")
                     icon.name: "money-management"
-                    visible: isEditing && currentSale?.payment_status !== "paid"
+                    visible: isEditing && currentSale?.payment_status !== "paid" &&  currentSale?.type === "sale"
                     enabled: !saleModel.loading
                     onClicked: paymentDialog.open()
                 }
@@ -553,9 +607,9 @@ Kirigami.Dialog {
 
     customFooterActions: [
         Kirigami.Action {
-            text: isEditing ? i18n("Save Changes") : i18n("Create Sale")
+            text: isEditing ? i18n("Save Changes") : i18n("Create %1",typeCombo.currentText)
             icon.name: isEditing ? "document-save" : "list-add"
-            enabled: !saleModel.loading && validateForm()
+            enabled: !saleModel.loading //&& validateForm()
             onTriggered: {
                 isCreateAnother = false
                 saveSale()
@@ -602,6 +656,21 @@ Kirigami.Dialog {
                 textRole: "name"
                 valueRole: "id"
             }
+            FormCard.FormComboBoxDelegate {
+                id: paymentMethodField
+                text: i18n("Payment Method")
+                model: [
+                    { text: i18n("Cash"), value: "cash" },
+                    { text: i18n("Bank Transfer"), value: "bank_transfer" },
+                    { text: i18n("Credit Card"), value: "credit_card" },
+                    { text: i18n("Debit Card"), value: "debit_card" },
+                    { text: i18n("Check"), value: "check" },
+                    { text: i18n("Online Payment"), value: "online_payment" },
+                    { text: i18n("Other"), value: "other" }
+                ]
+                textRole: "text"
+                valueRole: "value"
+            }
 
             FormCard.FormTextFieldDelegate {
                 id: paymentAmountField
@@ -637,6 +706,7 @@ Kirigami.Dialog {
             Kirigami.Action {
                 text: i18n("Add Payment")
                 icon.name: "money-management"
+
                 enabled: {
                     let amount = parseFloat(paymentAmountField.text) || 0
                     return amount > 0 &&
@@ -648,6 +718,7 @@ Kirigami.Dialog {
                                              cashSourceId: paymentCashSourceField.currentValue,
                                              amount: parseFloat(paymentAmountField.text),
                                              referenceNumber: paymentReferenceField.text,
+                                             paymentMethod: paymentMethodField.currentValue,
                                              notes: paymentNotesField.text
                                          })
                     paymentDialog.close()
@@ -806,7 +877,9 @@ Kirigami.Dialog {
             cash_source_id: cashSourceField.selectedId,
             sale_date: saleDateField.value.toISOString(),
             due_date: hasClientCheckbox.checked ? dueDateField.value.toISOString() : null,
+            status: statusCombo.currentValue || statusCombo.currentText,
             notes: notesField.text || "",
+            type: !isEditing ? typeCombo.currentValue : undefined, // Only include type when creating new
             items: items
         };
 
@@ -869,6 +942,23 @@ Kirigami.Dialog {
         notesField.text = sale.notes || "";
         discountField.value = sale.discount_amount || 0;
 
+        // Set status
+        let statusIndex = statusCombo.model.findIndex(item => item.value === sale.status)
+        statusCombo.currentIndex = statusIndex !== -1 ? statusIndex : 0
+
+        // Set document type
+        if (sale.type) {
+            let typeIndex = typeCombo.model.findIndex(item => item.value === sale.type)
+            typeCombo.currentIndex = typeIndex !== -1 ? typeIndex : 0
+
+            // Show the quote info message if it's a quote
+            quoteInfoMessage.visible = sale.type === "quote"
+        } else {
+            // Default to sale for backward compatibility
+            typeCombo.currentIndex = 0
+            quoteInfoMessage.visible = false
+        }
+
         // Clear and reload items
         selectedProductsModel.clear();
         sale.items.forEach(item => {
@@ -878,8 +968,16 @@ Kirigami.Dialog {
                                                                 quantity: item.quantity,
                                                                 maxQuantity: item.product.quantity + item.quantity,
                                                                 unitPrice: item.unit_price,
+                                                                originalUnitPrice: item.unit_price,
                                                                 taxRate: item.tax_rate || 0,
-                                                                totalPrice: item.total_price
+                                                                totalPrice: item.total_price,
+                                                                purchase_price: item.product.purchase_price || 0,
+                                                                packagesJson: JSON.stringify(item.product.packages || []),
+                                                                packageId: item.package_id || null,
+                                                                isPackage: item.is_package === true,
+                                                                piecesPerUnit: item.is_package ? (item.total_pieces / item.quantity) : 1,
+                                                                totalPieces: item.total_pieces || item.quantity,
+                                                                product: item.product || {}
                                                             });
                            });
 
@@ -909,11 +1007,12 @@ Kirigami.Dialog {
                 inlineMsg.visible = true
                 clearForm()
             }
-    saleModel.uncheckAllSales()
+            saleModel.refresh()
         }
 
         function onSaleUpdated() {
             saleDialog.close()
+            saleModel.refresh()
         }
 
         function onSaleReceived(sale) {
@@ -935,7 +1034,45 @@ Kirigami.Dialog {
                         )
         }
     }
+    Kirigami.PromptDialog {
+        id: convertConfirmDialog
+        title: i18n("Convert Quote to Sale")
+        subtitle: i18n("This will convert the quote to a sale and reduce product inventory. Are you sure?")
+        standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
 
+        onAccepted: {
+            saleModel.convertToSale(dialogSaleId)
+        }
+    }
+
+    // Add a connection for the conversion response
+    Connections {
+        target: saleModel
+        function onSaleConverted(id) {
+            if (id === dialogSaleId) {
+                // Update the current sale to reflect it's now a sale
+                if (currentSale) {
+                    currentSale.type = "sale"
+                }
+
+                // Show success message
+                inlineMsg.type = Kirigami.MessageType.Positive
+                inlineMsg.text = i18n("Quote successfully converted to sale")
+                inlineMsg.visible = true
+
+                // Optionally close the dialog
+                // saleDialog.close()
+                saleModel.refresh()
+            }
+        }
+
+        function onSaleConversionError(error) {
+            inlineMsg.type = Kirigami.MessageType.Error
+            inlineMsg.text = i18n("Failed to convert quote: %1", error)
+            inlineMsg.visible = true
+            saleModel.refresh()
+        }
+    }
     onDialogSaleIdChanged: {
         if (dialogSaleId > 0) {
             saleApi.getSale(dialogSaleId)
@@ -945,6 +1082,28 @@ Kirigami.Dialog {
         id:printerHelper
 
     }
+    Loader {
+        id: invoiceGenerationDialogLoader
+        active: false
+        property int documentId: -1
+        property bool isQuote: false
+
+        sourceComponent: InvoiceGenerationDialog {
+            id: generationDialog
+            isQuote: invoiceGenerationDialogLoader.isQuote
+            documentId: invoiceGenerationDialogLoader.documentId
+
+            onClosed: {
+                invoiceGenerationDialogLoader.active = false
+            }
+        }
+
+        onLoaded: {
+            item.open()
+        }
+    }
+
+
     Component.onCompleted: {
         clientModel.setApi(clientApi)
         cashSourceModel.setApi(cashSourceApi)

@@ -124,17 +124,21 @@ Kirigami.ApplicationWindow {
                 RowLayout {
                     Layout.fillWidth: true
                     Layout.margins: Kirigami.Units.smallSpacing
+                    Item{
+                     Layout.fillWidth:  !globalDrawer.collapsed ? true : false
+                      visible: !globalDrawer.collapsed
+                    }
                     QQC2.ToolButton {
                         icon.name: "application-menu"
                         visible: globalDrawer.collapsible
                         checked: !globalDrawer.collapsed
                         onClicked: globalDrawer.collapsed = !globalDrawer.collapsed
                     }
-                    Kirigami.SearchField {
-                        visible: !globalDrawer.collapsed
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                    }
+                    // Kirigami.SearchField {
+                    //     visible: !globalDrawer.collapsed
+                    //     Layout.fillWidth: true
+                    //     Layout.fillHeight: true
+                    // }
 
                 }
             }

@@ -1,5 +1,10 @@
 # Generate QML module
 add_executable(dim
+    contents/ui/components/DColorDialog.qml
+
+
+
+
 )
 
 # Set target properties
@@ -87,6 +92,7 @@ set(DIM_QML_PAGES
     contents/ui/pages/sale/Sale.qml
     contents/ui/pages/sale/SaleDetails.qml
     contents/ui/pages/sale/ProductSelectorDialog.qml
+    contents/ui/pages/sale/InvoiceGenerationDialog.qml
     # Invoice pages
     contents/ui/pages/invoice/Invoice.qml
     contents/ui/pages/invoice/InvoiceDetails.qml
@@ -112,6 +118,16 @@ set(DIM_QML_PAGES
     contents/ui/pages/team/TeamImageEditor.qml
     contents/ui/pages/team/TeamImageBannerCard.qml
     contents/ui/pages/team/ImageFileDialog.qml
+
+    contents/ui/pages/settings/GeneralSettingsPage.qml
+    contents/ui/pages/settings/AccountsSettingsPage.qml
+    contents/ui/pages/settings/AboutSettingsPage.qml
+    contents/ui/pages/settings/TeamSettingsPage.qml
+    contents/ui/pages/settings/ConfigPage.qml
+    contents/ui/pages/settings/LanguageAndLocalization.qml
+    contents/ui/pages/settings/DocumentSettingsPage.qml
+    contents/ui/pages/settings/DocumentPreview.qml
+
 )
 
 set(DIM_QML_COMPONENTS
@@ -173,6 +189,7 @@ set(DIM_CPP_SOURCES
     utils/pdfModel.cpp
     utils/favoritemanager.cpp
     utils/appsettings.cpp
+    utils/documentconfigmanager.cpp
     # Other sources
     colorschememanager.cpp
     printer.cpp
@@ -217,6 +234,7 @@ set(DIM_HEADERS
     utils/pdfModel.h
     utils/favoritemanager.h
     utils/appsettings.h
+    utils/documentconfigmanager.h
     # Other headers
     colorschememanager.h
     printer.h

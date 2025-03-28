@@ -373,8 +373,15 @@ Client ClientModel::clientFromVariantMap(const QVariantMap &map) const
     client.email = map["email"_L1].toString();
     client.phone = map["phone"_L1].toString();
     client.address = map["address"_L1].toString();
-    client.tax_number = map["taxNumber"_L1].toString();
-    client.payment_terms = map["paymentTerms"_L1].toString();
+    client.tax_number = map["tax_number"_L1].toString();
+    client.if_number = map["if_number"_L1].toString();
+    client.rc_number = map["rc_number"_L1].toString();
+    client.cnss_number = map["cnss_number"_L1].toString();
+    client.tp_number = map["tp_number"_L1].toString();
+    client.nis_number = map["nis_number"_L1].toString();
+    client.nif_number = map["nif_number"_L1].toString();
+    client.ai_number = map["ai_number"_L1].toString();
+    client.payment_terms = map["payment_terms"_L1].toString();
     client.notes = map["notes"_L1].toString();
     client.status = map["status"_L1].toString();
     client.balance = map["balance"_L1].toString().toDouble();
@@ -389,13 +396,21 @@ QVariantMap ClientModel::clientToVariantMap(const Client &client) const
     map["email"_L1] = client.email;
     map["phone"_L1] = client.phone;
     map["address"_L1] = client.address;
-    map["taxNumber"_L1] = client.tax_number;
-    map["paymentTerms"_L1] = client.payment_terms;
+    map["tax_number"_L1] = client.tax_number;
+    map["if_number"_L1] = client.if_number;
+    map["rc_number"_L1] = client.rc_number;
+    map["cnss_number"_L1] = client.cnss_number;
+    map["tp_number"_L1] = client.tp_number;
+    map["nis_number"_L1] = client.nis_number;
+    map["nif_number"_L1] = client.nif_number;
+    map["ai_number"_L1] = client.ai_number;
+    map["payment_terms"_L1] = client.payment_terms;
     map["notes"_L1] = client.notes;
     map["status"_L1] = client.status;
     map["balance"_L1] = client.balance;
     return map;
 }
+
 
 void ClientModel::updateHasCheckedItems()
 {

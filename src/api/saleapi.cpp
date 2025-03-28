@@ -28,12 +28,15 @@ Sale SaleApi::saleFromJson(const QJsonObject &json) const
     sale.discount_amount = json["discount_amount"_L1].toString().toDouble();
     sale.payment_status = json["payment_status"_L1].toString();
     sale.status = json["status"_L1].toString();
-    sale.sale_date = QDateTime::fromString(json["sale_date"_L1].toString(), Qt::ISODate);
 
+    // Get the type field with a default value of "sale" for backward compatibility
+    sale.type = json.contains("type"_L1) ? json["type"_L1].toString() : QStringLiteral("sale");
+
+    sale.sale_date = QDateTime::fromString(json["sale_date"_L1].toString(), Qt::ISODate);
     if (json.contains("due_date"_L1) && !json["due_date"_L1].isNull()) {
         sale.due_date = QDateTime::fromString(json["due_date"_L1].toString(), Qt::ISODate);
     }
-
+    sale.createdAt = QDateTime::fromString(json[QStringLiteral("created_at")].toString(), Qt::ISODate);
     sale.notes = json["notes"_L1].toString();
 
     if (json.contains("client"_L1) && !json["client"_L1].isNull()) {
@@ -88,16 +91,19 @@ QJsonObject SaleApi::saleToJson(const Sale &sale) const
     json["sale_date"_L1] = sale.sale_date.toString(QStringLiteral("yyyy-MM-dd"));
     json["status"_L1] = sale.status;
     json["payment_status"_L1] = sale.payment_status;
+    json["type"_L1] = sale.type; // Include type field
 
     // Amounts
     json["total_amount"_L1] = sale.total_amount;
     json["tax_amount"_L1] = sale.tax_amount;
     json["discount_amount"_L1] = sale.discount_amount;
-    // Auto-payment flag and amount
-    if (sale.auto_payment) {
+
+    // Auto-payment flag and amount (only for sales, not quotes)
+    if (sale.auto_payment && sale.type != QStringLiteral("quote")) {
         json["auto_payment"_L1] = true;
         json["payment_amount"_L1] = sale.payment_amount;
     }
+
     // Optional fields
     if (sale.client_id > 0) {
         json["client_id"_L1] = sale.client_id;
@@ -118,6 +124,7 @@ QJsonObject SaleApi::saleToJson(const Sale &sale) const
     json["items"_L1] = itemsArray;
     return json;
 }
+
 
 
 QJsonObject SaleApi::saleItemToJson(const SaleItem &item) const
@@ -184,6 +191,7 @@ QVariantMap SaleApi::saleToVariantMap(const Sale &sale) const
     map["discount_amount"_L1] = sale.discount_amount;
     map["payment_status"_L1] = sale.payment_status;
     map["status"_L1] = sale.status;
+    map["type"_L1] = sale.type; // Add type field
     map["sale_date"_L1] = sale.sale_date;
     map["due_date"_L1] = sale.due_date;
     map["notes"_L1] = sale.notes;
@@ -197,6 +205,7 @@ QVariantMap SaleApi::saleToVariantMap(const Sale &sale) const
 
     return map;
 }
+
 
 QVariantMap SaleApi::saleItemToVariantMap(const SaleItem &item) const
 {
@@ -219,13 +228,81 @@ QVariantMap SaleApi::saleItemToVariantMap(const SaleItem &item) const
     return map;
 }
 
+DocumentConfig SaleApi::configFromVariantMap(const QVariantMap &map) const
+{
+    DocumentConfig config;
+
+    // Extract all configuration values from the map
+    if (map.contains("showClientInfo"_L1))
+        config.showClientInfo = map["showClientInfo"_L1].toBool();
+
+    if (map.contains("showAmountInWords"_L1))
+        config.showAmountInWords = map["showAmountInWords"_L1].toBool();
+
+    if (map.contains("showPaymentMethods"_L1))
+        config.showPaymentMethods = map["showPaymentMethods"_L1].toBool();
+
+    if (map.contains("showTaxNumbers"_L1))
+        config.showTaxNumbers = map["showTaxNumbers"_L1].toBool();
+
+    if (map.contains("showNotes"_L1))
+        config.showNotes = map["showNotes"_L1].toBool();
+
+    if (map.contains("showThanksMessage"_L1))
+        config.showThanksMessage = map["showThanksMessage"_L1].toBool();
+
+    if (map.contains("showTermsConditions"_L1))
+        config.showTermsConditions = map["showTermsConditions"_L1].toBool();
+
+    if (map.contains("logoEnabled"_L1))
+        config.logoEnabled = map["logoEnabled"_L1].toBool();
+
+    if (map.contains("primaryColor"_L1) && !map["primaryColor"_L1].toString().isEmpty())
+        config.primaryColor = map["primaryColor"_L1].toString();
+
+    if (map.contains("footerText"_L1))
+        config.footerText = map["footerText"_L1].toString();
+
+    if (map.contains("defaultNotes"_L1))
+        config.defaultNotes = map["defaultNotes"_L1].toString();
+
+    if (map.contains("thanksMessage"_L1))
+        config.thanksMessage = map["thanksMessage"_L1].toString(); // Fixed: was setting defaultNotes again!
+
+    if (map.contains("defaultTerms"_L1))
+        config.defaultTerms = map["defaultTerms"_L1].toString();
+
+    return config;
+}
+
+
+QJsonObject SaleApi::configToJson(const DocumentConfig &config) const
+{
+    QJsonObject json;
+    json["showClientInfo"_L1] = config.showClientInfo;
+    json["showAmountInWords"_L1] = config.showAmountInWords;
+    json["showPaymentMethods"_L1] = config.showPaymentMethods;
+    json["showTaxNumbers"_L1] = config.showTaxNumbers;
+    json["showNotes"_L1] = config.showNotes;
+    json["showThanksMessage"_L1] = config.showThanksMessage;
+    json["showTermsConditions"_L1] = config.showTermsConditions;
+    json["logoEnabled"_L1] = config.logoEnabled;
+    json["primaryColor"_L1] = config.primaryColor;
+    json["footerText"_L1] = config.footerText;
+    json["defaultNotes"_L1] = config.defaultNotes;
+    json["thanksMessage"_L1] = config.thanksMessage;
+    json["defaultTerms"_L1] = config.defaultTerms;
+    return json;
+}
+
 // API Methods
 QFuture<void> SaleApi::getSales(const QString &search, const QString &sortBy,
                                 const QString &sortDirection, int page,
-                                const QString &status, const QString &paymentStatus)
+                                const QString &status, const QString &paymentStatus,
+                                const QString &type) // Add type parameter
 {
     setLoading(true);
-    QString path = QStringLiteral( "/api/v1/sales");
+    QString path = QStringLiteral("/api/v1/sales");
 
     QStringList queryParts;
     if (!search.isEmpty())
@@ -240,9 +317,11 @@ QFuture<void> SaleApi::getSales(const QString &search, const QString &sortBy,
         queryParts << QStringLiteral("status=%1").arg(status);
     if (!paymentStatus.isEmpty())
         queryParts << QStringLiteral("payment_status=%1").arg(paymentStatus);
+    if (!type.isEmpty())
+        queryParts << QStringLiteral("type=%1").arg(type); // Add type filter
 
     if (!queryParts.isEmpty()) {
-      path += QStringLiteral("?") + queryParts.join(QLatin1String("&"));
+        path += QStringLiteral("?") + queryParts.join(QLatin1String("&"));
     }
 
     QNetworkRequest request = createRequest(path);
@@ -256,13 +335,14 @@ QFuture<void> SaleApi::getSales(const QString &search, const QString &sortBy,
             Q_EMIT salesReceived(paginatedSales);
         } else {
             Q_EMIT errorSalesReceived(response.error->message, response.error->status,
-                                    QJsonDocument(response.error->details).toJson());
+                                      QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
 
     return future.then([=]() {});
 }
+
 
 QFuture<void> SaleApi::getSale(int id)
 {
@@ -278,7 +358,7 @@ QFuture<void> SaleApi::getSale(int id)
             Q_EMIT saleReceived(saleToVariantMap(sale));
         } else {
             Q_EMIT errorSaleReceived(response.error->message, response.error->status,
-                                   QJsonDocument(response.error->details).toJson());
+                                     QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -309,7 +389,7 @@ QFuture<void> SaleApi::createSale(const Sale &sale)
             qDebug() << "Error Sale details:" << response.error->details;
 
             Q_EMIT errorSaleCreated(response.error->message, response.error->status,
-                                  QJsonDocument(response.error->details).toJson());
+                                    QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -334,7 +414,7 @@ QFuture<void> SaleApi::updateSale(int id, const Sale &sale)
             Q_EMIT saleUpdated(updatedSale);
         } else {
             Q_EMIT errorSaleUpdated(response.error->message, response.error->status,
-                                  QJsonDocument(response.error->details).toJson());
+                                    QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -355,7 +435,7 @@ QFuture<void> SaleApi::deleteSale(int id)
             Q_EMIT saleDeleted(id);
         } else {
             Q_EMIT errorSaleDeleted(response.error->message, response.error->status,
-                                  QJsonDocument(response.error->details).toJson());
+                                    QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -374,7 +454,7 @@ QFuture<void> SaleApi::addPayment(int id, const Payment &payment)
     jsonData["amount"_L1] = payment.amount;
     jsonData["reference_number"_L1] = payment.reference_number;
     jsonData["notes"_L1] = payment.notes;
-
+    jsonData["payment_method"_L1] = payment.payment_method;
     if (payment.cash_source_id > 0) {
         jsonData["cash_source_id"_L1] = payment.cash_source_id;
     }
@@ -386,7 +466,7 @@ QFuture<void> SaleApi::addPayment(int id, const Payment &payment)
             Q_EMIT paymentAdded(response.data->value("sale"_L1).toObject().toVariantMap());
         } else {
             Q_EMIT errorPaymentAdded(response.error->message, response.error->status,
-                                   QJsonDocument(response.error->details).toJson());
+                                     QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -394,20 +474,61 @@ QFuture<void> SaleApi::addPayment(int id, const Payment &payment)
     return future.then([=]() {});
 }
 
-QFuture<void> SaleApi::generateInvoice(int id)
+// Update in saleapi.cpp
+QFuture<void> SaleApi::generateInvoice(int id, const QVariantMap &configMap)
 {
     setLoading(true);
     QNetworkRequest request = createRequest(QStringLiteral("/api/v1/sales/%1/generate-invoice").arg(id));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
+
+    // Create request JSON object
+    QJsonObject jsonData;
+
+    // Convert QVariantMap to DocumentConfig struct
+    DocumentConfig config = configFromVariantMap(configMap);
+
+    // Convert DocumentConfig to JSON
+    jsonData = configToJson(config);
+
+    // Debug output
+    qDebug() << "Sending invoice generation request:" << QJsonDocument(jsonData).toJson();
+
+    auto future = makeRequest<QJsonObject>([=]() {
+        return m_netManager->post(request, QJsonDocument(jsonData).toJson());
+    }).then([=](JsonResponse response) {
+        if (response.success) {
+            QVariantMap invoice = response.data->toVariantMap();
+            Q_EMIT invoiceGenerated(invoice);
+        } else {
+            Q_EMIT errorInvoiceGenerated(response.error->message, response.error->status,
+                                         QJsonDocument(response.error->details).toJson());
+        }
+        setLoading(false);
+    });
+
+    return future.then([=]() {});
+}
+
+
+
+
+QFuture<void> SaleApi::convertToSale(int id)
+{
+    setLoading(true);
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/sales/%1/convert-to-sale").arg(id));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json"));
     request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->post(request, QByteArray());
     }).then([=](JsonResponse response) {
         if (response.success) {
-            Q_EMIT invoiceGenerated(response.data->value("invoice"_L1).toObject().toVariantMap());
+            Sale convertedSale = saleFromJson(response.data->value("sale"_L1).toObject());
+            Q_EMIT saleConverted(saleToVariantMap(convertedSale));
         } else {
-            Q_EMIT errorInvoiceGenerated(response.error->message, response.error->status,
-                                       QJsonDocument(response.error->details).toJson());
+            Q_EMIT errorSaleConverted(response.error->message, response.error->status,
+                                      QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -497,7 +618,7 @@ QFuture<void> SaleApi::getSummary(const QString &period)
             Q_EMIT summaryReceived(response.data->value("summary"_L1).toObject().toVariantMap());
         } else {
             Q_EMIT errorSummaryReceived(response.error->message, response.error->status,
-                                      QJsonDocument(response.error->details).toJson());
+                                        QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });

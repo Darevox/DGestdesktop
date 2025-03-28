@@ -41,11 +41,12 @@ struct Sale {
     double tax_amount = 0.0;
     double discount_amount = 0.0;
     double payment_amount = 0.0;
-
     QString payment_status = QStringLiteral("unpaid");
     QString status = QStringLiteral("pending");
+    QString type = QStringLiteral("sale");
     QDateTime sale_date;
     QDateTime due_date;
+    QDateTime createdAt;
     QString notes;
     QVariantMap client;
     QList<SaleItem> items;
@@ -68,7 +69,21 @@ struct Payment {
     QString reference_number;
     QString notes;
 };
-
+struct DocumentConfig {
+    bool showClientInfo = true;
+    bool showAmountInWords = true;
+    bool showPaymentMethods = true;
+    bool showTaxNumbers = true;
+    bool showNotes = true;
+    bool showThanksMessage = true;
+    bool showTermsConditions = true;
+    bool logoEnabled = true;
+    QString primaryColor = QStringLiteral("#2563eb");
+    QString footerText;
+    QString defaultNotes = QStringLiteral("Thank you for your business.");
+    QString defaultTerms = QStringLiteral("Payment is due within 30 days of invoice date.");
+    QString thanksMessage = QStringLiteral("Thank you for your business!"); // New field
+};
 class SaleApi : public AbstractApi {
     Q_OBJECT
     Q_PROPERTY(bool isLoading READ isLoading NOTIFY isLoadingChanged)
@@ -82,16 +97,17 @@ public:
                                        const QString &sortDirection = QStringLiteral("desc"),
                                        int page = 1,
                                        const QString &status = QString(),
-                                       const QString &paymentStatus = QString());
+                                       const QString &paymentStatus = QString(),
+                                       const QString &type = QString() );
 
     Q_INVOKABLE QFuture<void> getSale(int id);
     Q_INVOKABLE QFuture<void> createSale(const Sale &sale);
     Q_INVOKABLE QFuture<void> updateSale(int id, const Sale &sale);
     Q_INVOKABLE QFuture<void> deleteSale(int id);
-
+    Q_INVOKABLE QFuture<void> convertToSale(int id);
     // Additional operations
     Q_INVOKABLE QFuture<void> addPayment(int id, const Payment &payment);
-    Q_INVOKABLE QFuture<void> generateInvoice(int id);
+    Q_INVOKABLE QFuture<void> generateInvoice(int id, const QVariantMap &config = QVariantMap());
     Q_INVOKABLE QFuture<QByteArray> generateReceipt(int id);
     Q_INVOKABLE QFuture<void> getSummary(const QString &period = QStringLiteral("month"));
 
@@ -112,7 +128,7 @@ Q_SIGNALS:
     void paymentAdded(const QVariantMap &payment);
     void invoiceGenerated(const QVariantMap &invoice);
     void summaryReceived(const QVariantMap &summary);
-
+    void saleConverted(const QVariantMap &sale);
     // Error signals
     void errorSalesReceived(const QString &message, ApiStatus status, const QByteArray &details);
     void errorSaleReceived(const QString &message, ApiStatus status, const QByteArray &details);
@@ -122,6 +138,7 @@ Q_SIGNALS:
     void errorPaymentAdded(const QString &message, ApiStatus status, const QByteArray &details);
     void errorInvoiceGenerated(const QString &message, ApiStatus status, const QByteArray &details);
     void errorSummaryReceived(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorSaleConverted(const QString &message, ApiStatus status, const QByteArray &details);
 
     void isLoadingChanged();
 
@@ -139,7 +156,8 @@ private:
     PaginatedSales paginatedSalesFromJson(const QJsonObject &json) const;
     QVariantMap saleToVariantMap(const Sale &sale) const;
     QVariantMap saleItemToVariantMap(const SaleItem &item) const;
-
+    DocumentConfig configFromVariantMap(const QVariantMap &map) const;
+    QJsonObject configToJson(const DocumentConfig &config) const;
     QSettings m_settings;
     bool m_isLoading = false;
     void setLoading(bool loading) {

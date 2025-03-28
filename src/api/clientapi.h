@@ -15,12 +15,20 @@ struct Client {
     QString phone;
     QString address;
     QString tax_number;
+    QString if_number;
+    QString rc_number;
+    QString cnss_number;
+    QString tp_number;
+    QString nis_number;
+    QString nif_number;
+    QString ai_number;
     QString payment_terms;
     QString notes;
     QString status;
     double balance;
     bool checked = false;
 };
+
 
 struct PaginatedClients {
     QList<Client> data;

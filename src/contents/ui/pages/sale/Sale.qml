@@ -119,7 +119,18 @@ Kirigami.Page {
             FormCard.FormCard {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 24
-
+                FormCard.FormComboBoxDelegate {
+                    id: typeField
+                    text: i18n("Type")
+                    model: [
+                        { text: i18n("All"), value: "" },
+                        { text: i18n("Sales"), value: "sale" },
+                        { text: i18n("Quotes"), value: "quote" }
+                    ]
+                    textRole: "text"
+                    valueRole: "value"
+                    onCurrentValueChanged: saleModel.setType(currentValue)
+                }
                 FormCard.FormComboBoxDelegate {
                     id: statusField
                     text: i18n("Status")
@@ -204,7 +215,7 @@ Kirigami.Page {
     actions: [
         Kirigami.Action {
             icon.name: "list-add-symbolic"
-            text: i18n("New Sale")
+            text: i18n("New")
             onTriggered: {
                 saleDialog.saleId = 0
                 saleDialog.active = true
@@ -281,6 +292,60 @@ Kirigami.Page {
             sortRole: SaleRoles.SaleDateRole
             selectionMode: TableView.SelectionMode.SingleSelection
             selectionBehavior: TableView.SelectRows
+
+            property var nonSortableColumns: {
+                return {
+                    // [ ProductRoles.ProductUnitRole]: "productUnit",
+                    // [ ProductRoles.MinStockLevelRole]: "minStock",
+
+                }
+            }
+
+            onColumnClicked: function (index, headerComponent) {
+                if (Object.keys(nonSortableColumns).includes(String(headerComponent.role)) ||
+                        Object.values(nonSortableColumns).includes(headerComponent.textRole)) {
+                    return; // Exit if column shouldn't be sortable
+                }
+                if (view.sortRole !== headerComponent.role) {
+
+                    saleModel.sortField=headerComponent.textRole
+                    saleModel.sortDirection="asc"
+
+                    view.sortRole = headerComponent.role;
+
+                    view.sortOrder = Qt.AscendingOrder;
+
+                } else {
+                    //view.sortOrder = view.sortOrder === Qt.AscendingOrder ? Qt.DescendingOrder : Qt.AscendingOrder
+                    // view.sortOrder = view.sortOrder === "asc" ? "desc": "asc"
+                    saleModel.sortDirection=view.sortOrder === Qt.AscendingOrder ? "desc" : "asc"
+                    view.sortOrder = saleModel.sortDirection === "asc" ? Qt.AscendingOrder : Qt.DescendingOrder
+
+
+
+                }
+
+                view.model.sort(view.sortRole, view.sortOrder);
+
+                // After sorting we need update selection
+                __resetSelection();
+            }
+
+            function __resetSelection() {
+                // NOTE: Making a forced copy of the list
+                let selectedIndexes = Array(...view.selectionModel.selectedIndexes)
+
+                let currentRow = view.selectionModel.currentIndex.row;
+                let currentColumn = view.selectionModel.currentIndex.column;
+
+                view.selectionModel.clear();
+                for (let i in selectedIndexes) {
+                    view.selectionModel.select(selectedIndexes[i], ItemSelectionModel.Select);
+                }
+
+                view.selectionModel.setCurrentIndex(view.model.index(currentRow, currentColumn), ItemSelectionModel.Select);
+            }
+
             headerComponents: [
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Select")
@@ -295,9 +360,34 @@ Kirigami.Page {
                         onClicked: saleModel.setChecked(row, checked)
                     }
                 },
+                // Add this to the headerComponents array in Tables.KTableView
+                Tables.HeaderComponent {
+                    title: i18nc("@title:column", "Type")
+                    textRole: "type"
+                    role: SaleRoles.TypeRole
+                    width: root.width * 0.10
+
+                    itemDelegate: DStatusBadge {
+                        text: {
+                            switch(modelData) {
+                                case "quote": return i18n("Quote")
+                                case "sale": return i18n("Sale")
+                                default: return i18n("Sale") // Default for backward compatibility
+                            }
+                        }
+                        textColor: {
+                            switch(modelData) {
+                                case "quote": return  Kirigami.Theme.neutralTextColor// blue
+                                case "sale": return  Kirigami.Theme.positiveTextColor  // green
+                                default: return Kirigami.Theme.positiveTextColor    // green
+                            }
+                        }
+                    }
+                    headerDelegate: TableHeaderLabel {}
+                },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Reference")
-                    textRole: "referenceNumber"
+                    textRole: "reference_number"
                     role: SaleRoles.ReferenceNumberRole
                     width: root.width * 0.15
                     headerDelegate: TableHeaderLabel {}
@@ -341,7 +431,7 @@ Kirigami.Page {
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Payment")
-                    textRole: "paymentStatus"
+                    textRole: "payment_status"
                     role: SaleRoles.PaymentStatusRole
                     width: root.width * 0.10
 
@@ -367,9 +457,9 @@ Kirigami.Page {
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Total")
-                    textRole: "totalAmount"
+                    textRole: "total_amount"
                     role: SaleRoles.TotalAmountRole
-                    width: root.width * 0.15
+                    width: root.width * 0.10
                     itemDelegate: QQC2.Label {
                         text: Number(modelData || 0).toLocaleString(Qt.locale(), 'f', 2)
                         horizontalAlignment: Text.AlignRight
@@ -378,9 +468,9 @@ Kirigami.Page {
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Paid")
-                    textRole: "paidAmount"
+                    textRole: "paid_amount"
                     role: SaleRoles.PaidAmountRole
-                    width: root.width * 0.15
+                    width: root.width * 0.10
                     itemDelegate: QQC2.Label {
                         text: Number(modelData || 0).toLocaleString(Qt.locale(), 'f', 2)
                         horizontalAlignment: Text.AlignRight
@@ -399,17 +489,37 @@ Kirigami.Page {
                     headerDelegate: TableHeaderLabel {}
                 },
                 Tables.HeaderComponent {
-                    title: i18nc("@title:column", "Date")
-                    textRole: "saleDate"
+                    title: i18nc("@title:column", "Sale Date")
+                    textRole: "sale_date"
                     role: SaleRoles.SaleDateRole
                     width: root.width * 0.15
                     itemDelegate: QQC2.Label {
-                        text: Qt.formatDateTime(modelData, "dd/MM/yyyy")
+                        text: {
+                            // Assuming createdAt is a valid date string or timestamp
+                            let date = new Date(modelData);
+                            return Qt.formatDateTime(date, "yyyy-MM-dd");
+                        }
                         horizontalAlignment: Text.AlignRight
+                       // font.family: "Monospace"
                     }
                     headerDelegate: TableHeaderLabel {}
                 }
-
+                // Tables.HeaderComponent {
+                //     title: i18nc("@title:column", "Created At")
+                //     textRole: "createdAt"
+                //     role: SaleRoles.CreatedAtRole
+                //     width: root.width * 0.15
+                //     itemDelegate: QQC2.Label {
+                //         text: {
+                //             // Assuming createdAt is a valid date string or timestamp
+                //             let date = new Date(modelData);
+                //             return Qt.formatDateTime(date, "yyyy-MM-dd HH:mm:ss");
+                //         }
+                //         horizontalAlignment: Text.AlignRight
+                //         font.family: "Monospace"
+                //     }
+                //     headerDelegate: TableHeaderLabel {}
+                // }
             ]
 
             onCellDoubleClicked: function(row) {

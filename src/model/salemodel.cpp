@@ -13,6 +13,7 @@ SaleModel::SaleModel(QObject *parent)
     , m_totalPages(1)
     , m_sortField(QStringLiteral("sale_date"))
     , m_sortDirection(QStringLiteral("desc"))
+    , m_type(QString())
     , m_hasCheckedItems(false)
 {
 }
@@ -30,10 +31,10 @@ void SaleModel::setApi(SaleApi* api)
         connect(m_api, &SaleApi::paymentAdded, this, &SaleModel::handlePaymentAdded);
         connect(m_api, &SaleApi::invoiceGenerated, this, &SaleModel::handleInvoiceGenerated);
         connect(m_api, &SaleApi::summaryReceived, this, &SaleModel::handleSummaryReceived);
-
-
+        connect(m_api, &SaleApi::saleConverted, this, &SaleModel::handleSaleConverted); // Connect conversion signal
+        connect(m_api, &SaleApi::errorSaleConverted, this, &SaleModel::handleSaleConversionError); // Connect error signal
     }
-      refresh();
+    refresh();
 }
 
 int SaleModel::rowCount(const QModelIndex &parent) const
@@ -47,7 +48,7 @@ int SaleModel::columnCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
-    return 8; // Adjust based on your needs
+    return 9; // Adjust based on your needs
 }
 
 QVariant SaleModel::data(const QModelIndex &index, int role) const
@@ -81,7 +82,9 @@ QVariant SaleModel::data(const QModelIndex &index, int role) const
         case PaidAmountRole: return sale.paid_amount;
         case NotesRole: return sale.notes;
         case ItemsRole: return QVariant::fromValue(sale.items);
+        case CreatedAtRole: return sale.createdAt;
         case CheckedRole: return sale.checked;
+        case TypeRole: return sale.type; // Add type role
         }
     }
 
@@ -92,19 +95,22 @@ QHash<int, QByteArray> SaleModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
     roles[IdRole] = "id";
-    roles[ReferenceNumberRole] = "referenceNumber";
-    roles[SaleDateRole] = "saleDate";
+    roles[ReferenceNumberRole] = "reference_number";
+    roles[SaleDateRole] = "sale_date";
     roles[ClientIdRole] = "clientId";
     roles[ClientRole] = "client";
     roles[StatusRole] = "status";
-    roles[PaymentStatusRole] = "paymentStatus";
-    roles[TotalAmountRole] = "totalAmount";
-    roles[PaidAmountRole] = "paidAmount";
+    roles[PaymentStatusRole] = "payment_status";
+    roles[TotalAmountRole] = "total_amount";
+    roles[PaidAmountRole] = "paid_amount";
+    roles[CreatedAtRole] = "createdAt";
     roles[NotesRole] = "notes";
     roles[ItemsRole] = "items";
     roles[CheckedRole] = "checked";
+    roles[TypeRole] = "type"; // Add type role
     return roles;
 }
+
 
 QVariant SaleModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
@@ -121,6 +127,7 @@ QVariant SaleModel::headerData(int section, Qt::Orientation orientation, int rol
         case 5: return tr("Payment Status");
         case 6: return tr("Total");
         case 7: return tr("Paid");
+        case 8: return tr("Created At");
         }
     }
     return QVariant();
@@ -145,9 +152,25 @@ void SaleModel::refresh()
         return;
 
     setLoading(true);
-    m_api->getSales(m_searchQuery, m_sortField, m_sortDirection, m_currentPage, m_status, m_paymentStatus);
+    m_api->getSales(m_searchQuery, m_sortField, m_sortDirection, m_currentPage, m_status, m_paymentStatus, m_type);
+}
+void SaleModel::convertToSale(int id)
+{
+    if (!m_api)
+        return;
+
+    setLoading(true);
+    m_api->convertToSale(id);
 }
 
+void SaleModel::setType(const QString &type)
+{
+    if (m_type != type) {
+        m_type = type;
+        Q_EMIT typeChanged();
+        refresh();
+    }
+}
 void SaleModel::loadPage(int page)
 {
     if (page != m_currentPage && page > 0 && page <= m_totalPages) {
@@ -158,14 +181,45 @@ void SaleModel::loadPage(int page)
 }
 
 void SaleModel::createSale(const QVariantMap &saleData)
-{qDebug()<<"NNNNNNN";
-
+{
     if (!m_api)
         return;
-qDebug()<<"WWWWWWW";
+
     setLoading(true);
     Sale sale = saleFromVariantMap(saleData);
+
+    // Set the type from the provided data, default to "sale"
+    if (saleData.contains("type"_L1)) {
+        sale.type = saleData["type"_L1].toString();
+    }
+
     m_api->createSale(sale);
+}
+void SaleModel::handleSaleConverted(const QVariantMap &sale)
+{
+    setLoading(false);
+    setErrorMessage(QString());
+
+    int id = sale["id"_L1].toInt();
+
+    // Update the sale in the model
+    for (int i = 0; i < m_sales.count(); ++i) {
+        if (m_sales[i].id == id) {
+            m_sales[i].type = QStringLiteral("sale");
+            QModelIndex index = createIndex(i, 0);
+            Q_EMIT dataChanged(index, index);
+            break;
+        }
+    }
+
+    Q_EMIT saleConverted(id);
+}
+
+void SaleModel::handleSaleConversionError(const QString &message, ApiStatus status)
+{
+    setLoading(false);
+    setErrorMessage(message);
+    Q_EMIT saleConversionError(message);
 }
 
 void SaleModel::updateSale(int id, const QVariantMap &saleData)
@@ -205,7 +259,7 @@ void SaleModel::addPayment(int id, const QVariantMap &paymentData)
     Payment payment;
     payment.cash_source_id = paymentData["cash_source_id"_L1].toInt();
     payment.amount = paymentData["amount"_L1].toDouble();
-    payment.payment_method = paymentData["payment_method"_L1].toString();
+    payment.payment_method = paymentData["paymentMethod"_L1].toString();
     payment.reference_number = paymentData["reference_number"_L1].toString();
     payment.notes = paymentData["notes"_L1].toString();
 
@@ -475,6 +529,11 @@ Sale SaleModel::saleFromVariantMap(const QVariantMap &map) const
         sale.due_date = map["due_date"_L1].toDateTime();
     }
 
+    // Set the type
+    if (map.contains("type"_L1) && !map["type"_L1].toString().isEmpty()) {
+        sale.type = map["type"_L1].toString();
+    }
+
     // Payment related fields
     if (map.contains("auto_payment"_L1)) {
         sale.auto_payment = map["auto_payment"_L1].toBool();
@@ -486,33 +545,33 @@ Sale SaleModel::saleFromVariantMap(const QVariantMap &map) const
 
     // Items
     QVariantList itemsList = map["items"_L1].toList();
-      for (const QVariant &itemVar : itemsList) {
-          QVariantMap itemMap = itemVar.toMap();
-          SaleItem item;
-          item.product_id = itemMap["product_id"_L1].toInt();
-          item.quantity = itemMap["quantity"_L1].toInt();
-          item.unit_price = itemMap["unit_price"_L1].toString().toDouble();
-          item.tax_rate = itemMap["tax_rate"_L1].toString().toDouble();
-          item.is_package = itemMap["is_package"_L1].toBool();
-          item.total_pieces = itemMap["total_pieces"_L1].toInt();
+    for (const QVariant &itemVar : itemsList) {
+        QVariantMap itemMap = itemVar.toMap();
+        SaleItem item;
+        item.product_id = itemMap["product_id"_L1].toInt();
+        item.quantity = itemMap["quantity"_L1].toInt();
+        item.unit_price = itemMap["unit_price"_L1].toString().toDouble();
+        item.tax_rate = itemMap["tax_rate"_L1].toString().toDouble();
+        item.is_package = itemMap["is_package"_L1].toBool();
+        item.total_pieces = itemMap["total_pieces"_L1].toInt();
 
-          if (item.is_package) {
-              item.package_id = itemMap["package_id"_L1].toInt();
-          }
+        if (item.is_package) {
+            item.package_id = itemMap["package_id"_L1].toInt();
+        }
 
-          // Calculate amounts
-          double subtotal = item.quantity * item.unit_price;
-          item.tax_amount = (subtotal * item.tax_rate) / 100.0;
-          item.total_price = subtotal + item.tax_amount;
+        // Calculate amounts
+        double subtotal = item.quantity * item.unit_price;
+        item.tax_amount = (subtotal * item.tax_rate) / 100.0;
+        item.total_price = subtotal + item.tax_amount;
 
-          if (itemMap.contains("discount_amount"_L1)) {
-              item.discount_amount = itemMap["discount_amount"_L1].toString().toDouble();
-              item.total_price -= item.discount_amount;
-          }
+        if (itemMap.contains("discount_amount"_L1)) {
+            item.discount_amount = itemMap["discount_amount"_L1].toString().toDouble();
+            item.total_price -= item.discount_amount;
+        }
 
-          item.notes = itemMap["notes"_L1].toString();
-          sale.items.append(item);
-      }
+        item.notes = itemMap["notes"_L1].toString();
+        sale.items.append(item);
+    }
 
     // Additional fields
     sale.notes = map["notes"_L1].toString();
@@ -535,7 +594,6 @@ Sale SaleModel::saleFromVariantMap(const QVariantMap &map) const
 
     return sale;
 }
-
 QVariantMap SaleModel::saleToVariantMap(const Sale &sale) const
 {
     QVariantMap map;
@@ -545,6 +603,7 @@ QVariantMap SaleModel::saleToVariantMap(const Sale &sale) const
     map["team_id"_L1] = sale.team_id;
     map["cash_source_id"_L1] = sale.cash_source_id;
     map["reference_number"_L1] = sale.reference_number;
+    map["type"_L1] = sale.type; // Include type
 
     // Client information (if exists)
     if (sale.client_id > 0) {
@@ -557,7 +616,7 @@ QVariantMap SaleModel::saleToVariantMap(const Sale &sale) const
     if (sale.due_date.isValid()) {
         map["due_date"_L1] = sale.due_date;
     }
-
+    map["createdAt"_L1] = sale.createdAt;
     // Amounts
     map["total_amount"_L1] = sale.total_amount;
     map["paid_amount"_L1] = sale.paid_amount;
@@ -587,6 +646,9 @@ QVariantMap SaleModel::saleToVariantMap(const Sale &sale) const
         itemMap["total_price"_L1] = item.total_price;
         itemMap["notes"_L1] = item.notes;
         itemMap["product"_L1] = item.product;
+        itemMap["is_package"_L1] = item.is_package;
+        itemMap["package_id"_L1] = item.package_id;
+        itemMap["total_pieces"_L1] = item.total_pieces;
         itemsList.append(itemMap);
     }
     map["items"_L1] = itemsList;

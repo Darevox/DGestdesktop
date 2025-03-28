@@ -9,7 +9,7 @@ InvoiceModel::InvoiceModel(QObject *parent)
     , m_totalItems(0)
     , m_currentPage(1)
     , m_totalPages(1)
-    , m_sortField(QStringLiteral("issue_date"))
+    , m_sortField(QStringLiteral("created_at"))
     , m_sortDirection(QStringLiteral("desc"))
     , m_hasCheckedItems(false)
 {
@@ -130,7 +130,7 @@ QHash<int, QByteArray> InvoiceModel::roleNames() const
     roles[TaxAmountRole] = "taxAmount";
     roles[DiscountAmountRole] = "discountAmount";
     roles[StatusRole] = "status";
-    roles[IssueDateRole] = "issueDate";
+    roles[IssueDateRole] = "issue_date";
     roles[DueDateRole] = "dueDate";
     roles[NotesRole] = "notes";
     roles[MetaDataRole] = "metaData";

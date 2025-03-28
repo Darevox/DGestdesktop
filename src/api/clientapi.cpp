@@ -22,12 +22,20 @@ Client ClientApi::clientFromJson(const QJsonObject &json) const
     client.phone = json["phone"_L1].toString();
     client.address = json["address"_L1].toString();
     client.tax_number = json["tax_number"_L1].toString();
+    client.if_number = json["if_number"_L1].toString();
+    client.rc_number = json["rc_number"_L1].toString();
+    client.cnss_number = json["cnss_number"_L1].toString();
+    client.tp_number = json["tp_number"_L1].toString();
+    client.nis_number = json["nis_number"_L1].toString();
+    client.nif_number = json["nif_number"_L1].toString();
+    client.ai_number = json["ai_number"_L1].toString();
     client.payment_terms = json["payment_terms"_L1].toString();
     client.notes = json["notes"_L1].toString();
     client.status = json["status"_L1].toString();
     client.balance = json["balance"_L1].toString().toDouble();
     return client;
 }
+
 
 QJsonObject ClientApi::clientToJson(const Client &client) const
 {
@@ -37,11 +45,19 @@ QJsonObject ClientApi::clientToJson(const Client &client) const
     json["phone"_L1] = client.phone;
     json["address"_L1] = client.address;
     json["tax_number"_L1] = client.tax_number;
+    json["if_number"_L1] = client.if_number;
+    json["rc_number"_L1] = client.rc_number;
+    json["cnss_number"_L1] = client.cnss_number;
+    json["tp_number"_L1] = client.tp_number;
+    json["nis_number"_L1] = client.nis_number;
+    json["nif_number"_L1] = client.nif_number;
+    json["ai_number"_L1] = client.ai_number;
     json["payment_terms"_L1] = client.payment_terms;
     json["notes"_L1] = client.notes;
     json["status"_L1] = client.status;
     return json;
 }
+
 
 PaginatedClients ClientApi::paginatedClientsFromJson(const QJsonObject &json) const
 {
@@ -69,12 +85,20 @@ QVariantMap ClientApi::clientToVariantMap(const Client &client) const
     map["phone"_L1] = client.phone;
     map["address"_L1] = client.address;
     map["tax_number"_L1] = client.tax_number;
+    map["if_number"_L1] = client.if_number;
+    map["rc_number"_L1] = client.rc_number;
+    map["cnss_number"_L1] = client.cnss_number;
+    map["tp_number"_L1] = client.tp_number;
+    map["nis_number"_L1] = client.nis_number;
+    map["nif_number"_L1] = client.nif_number;
+    map["ai_number"_L1] = client.ai_number;
     map["payment_terms"_L1] = client.payment_terms;
     map["notes"_L1] = client.notes;
     map["status"_L1] = client.status;
     map["balance"_L1] = client.balance;
     return map;
 }
+
 
 // API Methods
 QFuture<void> ClientApi::getClients(const QString &search, const QString &sortBy,

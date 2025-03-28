@@ -181,14 +181,14 @@ Kirigami.Page {
 
     // Page actions
     actions: [
-        Kirigami.Action {
-            icon.name: "list-add-symbolic"
-            text: i18n("Create")
-            onTriggered: {
-                invoiceDetailsDialog.invoiceId = 0
-                invoiceDetailsDialog.active = true
-            }
-        },
+        // Kirigami.Action {
+        //     icon.name: "list-add-symbolic"
+        //     text: i18n("Create")
+        //     onTriggered: {
+        //         invoiceDetailsDialog.invoiceId = 0
+        //         invoiceDetailsDialog.active = true
+        //     }
+        // },
         Kirigami.Action {
             icon.name: "delete"
             text: i18n("Delete")
@@ -392,7 +392,7 @@ Kirigami.Page {
                 },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Date")
-                    textRole: "issueDate"
+                    textRole: "issue_date"
                     role: InvoiceRoles.IssueDateRole
                     width: root.width * 0.40
                     itemDelegate: QQC2.Label {

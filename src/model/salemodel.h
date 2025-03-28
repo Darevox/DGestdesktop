@@ -1,4 +1,3 @@
-// salemodel.h
 #ifndef SALEMODEL_H
 #define SALEMODEL_H
 
@@ -22,6 +21,7 @@ class SaleModel : public QAbstractTableModel
     Q_PROPERTY(QString searchQuery READ searchQuery WRITE setSearchQuery NOTIFY searchQueryChanged)
     Q_PROPERTY(QString status READ status WRITE setStatus NOTIFY statusChanged)
     Q_PROPERTY(QString paymentStatus READ paymentStatus WRITE setPaymentStatus NOTIFY paymentStatusChanged)
+    Q_PROPERTY(QString type READ type WRITE setType NOTIFY typeChanged)  // Add type property
     Q_PROPERTY(bool hasCheckedItems READ hasCheckedItems NOTIFY hasCheckedItemsChanged)
     Q_PROPERTY(int rowCount READ rowCount NOTIFY rowCountChanged)
 
@@ -39,7 +39,9 @@ public:
         RemainingAmountRole,
         NotesRole,
         ItemsRole,
-        CheckedRole
+        CreatedAtRole,
+        CheckedRole,
+        TypeRole  // Add TypeRole
     };
     Q_ENUM(SaleRoles)
 
@@ -65,6 +67,7 @@ public:
     QString searchQuery() const { return m_searchQuery; }
     QString status() const { return m_status; }
     QString paymentStatus() const { return m_paymentStatus; }
+    QString type() const { return m_type; }  // Add type accessor
     bool hasCheckedItems() const { return m_hasCheckedItems; }
 
     // Q_INVOKABLE methods for QML
@@ -77,6 +80,7 @@ public:
     Q_INVOKABLE void addPayment(int id, const QVariantMap &paymentData);
     Q_INVOKABLE void generateInvoice(int id);
     Q_INVOKABLE void getSummary(const QString &period = QStringLiteral("month"));
+    Q_INVOKABLE void convertToSale(int id); // Add convert method
 
     // Selection methods
     Q_INVOKABLE void setChecked(int row, bool checked);
@@ -91,6 +95,7 @@ public Q_SLOTS:
     void setSearchQuery(const QString &query);
     void setStatus(const QString &status);
     void setPaymentStatus(const QString &paymentStatus);
+    void setType(const QString &type); // Add type setter
 
 Q_SIGNALS:
     void loadingChanged();
@@ -103,6 +108,7 @@ Q_SIGNALS:
     void searchQueryChanged();
     void statusChanged();
     void paymentStatusChanged();
+    void typeChanged(); // Add type changed signal
     void saleCreated();
     void saleUpdated();
     void saleDeleted();
@@ -111,6 +117,8 @@ Q_SIGNALS:
     void summaryReceived(const QVariantMap &summary);
     void hasCheckedItemsChanged();
     void rowCountChanged();
+    void saleConverted(int id); // Add conversion signal
+    void saleConversionError(const QString &error); // Add error signal
 
 private Q_SLOTS:
     void handleSalesReceived(const PaginatedSales &sales);
@@ -121,6 +129,8 @@ private Q_SLOTS:
     void handlePaymentAdded(const QVariantMap &payment);
     void handleInvoiceGenerated(const QVariantMap &invoice);
     void handleSummaryReceived(const QVariantMap &summary);
+    void handleSaleConverted(const QVariantMap &sale); // Add handler for conversion
+    void handleSaleConversionError(const QString &message, ApiStatus status); // Add error handler
 
 private:
     SaleApi* m_api;
@@ -135,6 +145,7 @@ private:
     QString m_searchQuery;
     QString m_status;
     QString m_paymentStatus;
+    QString m_type; // Add type field
     bool m_hasCheckedItems;
 
     void setLoading(bool loading);

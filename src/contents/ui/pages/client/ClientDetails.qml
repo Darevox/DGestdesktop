@@ -40,73 +40,166 @@ Kirigami.PromptDialog {
         visible: false
     }
 
-    // Main form content i18n(
-    GridLayout {
-        columns: 2
-        rows: 1
+    // Main content with tab bar
+    ColumnLayout {
+        spacing: Kirigami.Units.largeSpacing
         enabled: !clientApi.isLoading
 
-        FormCard.FormCard {
-            // Basic Information
-            FormCard.FormTextFieldDelegate {
-                id: nameField
-                label: i18n("Name")
-                text: ""
-                status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
-            }
+        QQC2.TabBar {
+            id: tabBar
+            Layout.fillWidth: true
+            enabled: !clientApi.isLoading
 
-            FormCard.FormTextFieldDelegate {
-                id: emailField
-                label: i18n("Email")
-                text: ""
-                status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
+            QQC2.TabButton {
+                text: i18n("Basic Info")
             }
-
-            FormCard.FormTextFieldDelegate {
-                id: phoneField
-                label: i18n("Phone")
-                text: ""
-                status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
+            QQC2.TabButton {
+                text: i18n("Tax Information")
             }
-
-            FormCard.FormTextAreaDelegate {
-                id: addressField
-                label: i18n("Address")
-                text: ""
-                status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
+            QQC2.TabButton {
+                text: i18n("Additional Info")
             }
         }
 
-        FormCard.FormCard {
-            // Additional Information
-            FormCard.FormTextFieldDelegate {
-                id: taxNumberField
-                label: i18n("Tax Number")
-                text: ""
+        StackLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            currentIndex: tabBar.currentIndex
+
+            // Tab 1: Basic Information
+            GridLayout {
+                columns: 1
+                rows: 1
+
+                FormCard.FormCard {
+                    // Basic Information
+                    FormCard.FormTextFieldDelegate {
+                        id: nameField
+                        label: i18n("Name")
+                        text: ""
+                        status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
+                    }
+
+                    FormCard.FormTextFieldDelegate {
+                        id: emailField
+                        label: i18n("Email")
+                        text: ""
+                        status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
+                    }
+
+                    FormCard.FormTextFieldDelegate {
+                        id: phoneField
+                        label: i18n("Phone")
+                        text: ""
+                        status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
+                    }
+
+                    FormCard.FormTextAreaDelegate {
+                        id: addressField
+                        label: i18n("Address")
+                        text: ""
+                        status: statusMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
+                    }
+                }
             }
 
-            FormCard.FormTextFieldDelegate {
-                id: paymentTermsField
-                label: i18n("Payment Terms")
-                text: ""
+            // Tab 2: Tax Information
+            GridLayout {
+                columns: 2
+                rows: 2
+
+                FormCard.FormCard {
+                    Layout.fillWidth: true
+                    Layout.column: 0
+                    Layout.row: 0
+
+                    FormCard.FormTextFieldDelegate {
+                        id: taxNumberField
+                        label: i18n("Tax Number")
+                        text: ""
+                    }
+
+                    FormCard.FormTextFieldDelegate {
+                        id: ifNumberField
+                        label: i18n("IF Number")
+                        text: ""
+                    }
+
+                    FormCard.FormTextFieldDelegate {
+                        id: rcNumberField
+                        label: i18n("RC Number")
+                        text: ""
+                    }
+
+                    FormCard.FormTextFieldDelegate {
+                        id: cnssNumberField
+                        label: i18n("CNSS Number")
+                        text: ""
+                    }
+                }
+
+                FormCard.FormCard {
+                    Layout.fillWidth: true
+                    Layout.column: 1
+                    Layout.row: 0
+
+                    FormCard.FormTextFieldDelegate {
+                        id: tpNumberField
+                        label: i18n("TP Number")
+                        text: ""
+                    }
+
+                    FormCard.FormTextFieldDelegate {
+                        id: nisNumberField
+                        label: i18n("NIS Number")
+                        text: ""
+                    }
+
+                    FormCard.FormTextFieldDelegate {
+                        id: nifNumberField
+                        label: i18n("NIF Number")
+                        text: ""
+                    }
+
+                    FormCard.FormTextFieldDelegate {
+                        id: aiNumberField
+                        label: i18n("AI Number")
+                        text: ""
+                    }
+                }
             }
 
-            FormCard.FormComboBoxDelegate {
-                id: statusCombo
-                text: i18n("Status")
-                model: [
-                    { text: i18n("Active"), value: "active" },
-                    { text: i18n("Inactive"), value: "inactive" }
-                ]
-                textRole: "text"
-                valueRole: "value"
-                currentIndex: 0
-            }
+            // Tab 3: Additional Information
+            GridLayout {
+                columns: 1
+                rows: 1
 
-            FormCard.FormTextAreaDelegate {
-                id: notesField
-                label: i18n("Notes")
-                text: ""
+                FormCard.FormCard {
+                    // Additional Information
+                    FormCard.FormTextFieldDelegate {
+                        id: paymentTermsField
+                        label: i18n("Payment Terms")
+                        text: ""
+                    }
+
+                    FormCard.FormComboBoxDelegate {
+                        id: statusCombo
+                        text: i18n("Status")
+                        model: [
+                            { text: i18n("Active"), value: "active" },
+                            { text: i18n("Inactive"), value: "inactive" }
+                        ]
+                        textRole: "text"
+                        valueRole: "value"
+                        currentIndex: 0
+                    }
+
+                    FormCard.FormTextAreaDelegate {
+                        id: notesField
+                        label: i18n("Notes")
+                        text: ""
+                    }
+                }
             }
         }
     }
@@ -161,8 +254,8 @@ Kirigami.PromptDialog {
             }
         }
     ]
-    footerLeadingComponent : RowLayout {
 
+    footerLeadingComponent : RowLayout {
         QQC2.Button {
             text: i18n("Sales History")
             icon.name: "view-list-details"
@@ -197,6 +290,7 @@ Kirigami.PromptDialog {
             }
         }
     }
+
     // Helper functions
     function updateClient() {
         return {
@@ -205,6 +299,13 @@ Kirigami.PromptDialog {
             phone: phoneField.text,
             address: addressField.text,
             tax_number: taxNumberField.text,
+            if_number: ifNumberField.text,
+            rc_number: rcNumberField.text,
+            cnss_number: cnssNumberField.text,
+            tp_number: tpNumberField.text,
+            nis_number: nisNumberField.text,
+            nif_number: nifNumberField.text,
+            ai_number: aiNumberField.text,
             payment_terms: paymentTermsField.text,
             status: statusCombo.currentValue || statusCombo.currentText,
             notes: notesField.text
@@ -216,11 +317,18 @@ Kirigami.PromptDialog {
         emailField.text = client.email || ""
         phoneField.text = client.phone || ""
         addressField.text = client.address || ""
-        taxNumberField.text = client.taxNumber || ""
-        paymentTermsField.text = client.paymentTerms || ""
+        taxNumberField.text = client.tax_number || ""
+        ifNumberField.text = client.if_number || ""
+        rcNumberField.text = client.rc_number || ""
+        cnssNumberField.text = client.cnss_number || ""
+        tpNumberField.text = client.tp_number || ""
+        nisNumberField.text = client.nis_number || ""
+        nifNumberField.text = client.nif_number || ""
+        aiNumberField.text = client.ai_number || ""
+        paymentTermsField.text = client.payment_terms || ""
         notesField.text = client.notes || ""
-         let statusIndex =  statusCombo.model.findIndex(item => item.value === client.status)
-        statusCombo.currentIndex =  statusIndex !== -1 ? statusIndex : 0
+        let statusIndex = statusCombo.model.findIndex(item => item.value === client.status)
+        statusCombo.currentIndex = statusIndex !== -1 ? statusIndex : 0
     }
 
     function clearStatusMessages() {
@@ -238,6 +346,13 @@ Kirigami.PromptDialog {
         phoneField.text = ""
         addressField.text = ""
         taxNumberField.text = ""
+        ifNumberField.text = ""
+        rcNumberField.text = ""
+        cnssNumberField.text = ""
+        tpNumberField.text = ""
+        nisNumberField.text = ""
+        nifNumberField.text = ""
+        aiNumberField.text = ""
         paymentTermsField.text = ""
         notesField.text = ""
         statusCombo.currentIndex = 0
@@ -326,6 +441,7 @@ Kirigami.PromptDialog {
                                           }
                                       })
     }
+
     Loader {
         id: clientSalesDialog
         active: false
@@ -388,6 +504,7 @@ Kirigami.PromptDialog {
             }
         }
     }
+
     onDialogClientIdChanged: {
         if (dialogClientId > 0) {
             clientApi.getClient(dialogClientId)

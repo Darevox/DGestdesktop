@@ -55,6 +55,7 @@
 #include <utils/pdfModel.h>
 #include <utils/favoritemanager.h>
 #include <utils/appsettings.h>
+#include <utils/documentconfigmanager.h>
 
 #include <updater/AppUpdater.h>
 #include <updater/KUpdater.h>
@@ -212,6 +213,8 @@ int main(int argc, char *argv[])
     FavoriteManager *favoriteManager = new FavoriteManager();
     engine.rootContext()->setContextProperty(QStringLiteral("favoriteManager"), favoriteManager);
 
+    DocumentConfigManager *documentConfig = new DocumentConfigManager();
+    engine.rootContext()->setContextProperty(QStringLiteral("documentConfigManager"), documentConfig);
     //qmlRegisterType<FavoriteManager>("com.dervox.FavoriteManager", 1, 0, "FavoriteManager");
 
     qmlRegisterType<NetworkApi::ProductModelFetch>("com.dervox.ProductFetchModel", 1, 0, "ProductFetchModel");
