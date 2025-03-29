@@ -1,9 +1,5 @@
 # Generate QML module
 add_executable(dim
-    contents/ui/components/DColorDialog.qml
-
-
-
 
 )
 
