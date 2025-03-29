@@ -328,6 +328,7 @@ if(ANDROID)
         "document-edit"
         "list-add"
         "edit-delete"
+        ${KIRIGAMI_ADDONS_ICONS}
         # Add more icons as needed
     )
 
