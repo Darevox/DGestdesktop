@@ -345,6 +345,7 @@ if(ANDROID)
         "office-chart-bar"
         "wallet-open"
         "view-financial-transfer-reconciled"
+        "view-list-details"
         ${KIRIGAMI_ADDONS_ICONS}
         # Add more icons as needed
     )
