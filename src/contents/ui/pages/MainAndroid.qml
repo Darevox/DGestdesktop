@@ -116,10 +116,20 @@ Kirigami.ScrollablePage {
             }
         }
         Kirigami.CardsLayout {
+            id: cardsLayout
             visible: !applicationWindow().pageStack.wideMode
             Layout.topMargin: Kirigami.Units.largeSpacing
             Layout.leftMargin: Kirigami.Units.gridUnit
             Layout.rightMargin: Kirigami.Units.gridUnit
+            Layout.fillWidth: true  // Fill available width
+
+            // Force 2 columns
+            maximumColumns: 2
+
+            // Adjust column width limits to ensure the cards fit
+            minimumColumnWidth: Kirigami.Units.gridUnit * 10
+            maximumColumnWidth: Kirigami.Units.gridUnit * 20
+
             Repeater {
                 focus: true
                 model: pagesModel
@@ -129,6 +139,17 @@ Kirigami.ScrollablePage {
                     required property string title
                     required property string targetPage
                     required property string img
+
+                    // Make card responsive but with constraints
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: cardsLayout.width / 2 - Kirigami.Units.gridUnit
+
+                    // Create proper action for keyboard handling
+                    property Kirigami.Action cardAction: Kirigami.Action {
+                        onTriggered: {
+                            applicationWindow().pageStack.push(Qt.createComponent("com.dervox.dim", listItem.targetPage));
+                        }
+                    }
 
                     banner {
                         source: Qt.resolvedUrl(img)
@@ -145,15 +166,15 @@ Kirigami.ScrollablePage {
                     }
                     activeFocusOnTab: true
                     showClickFeedback: true
-                    onClicked:  applicationWindow().pageStack.push(Qt.createComponent("com.dervox.dim", listItem.targetPage));
-                    Keys.onReturnPressed: action.trigger()
-                    Keys.onEnterPressed: action.trigger()
-                    highlighted: action.checked
-                    implicitWidth: Kirigami.Units.gridUnit * 10
-                    Layout.maximumWidth: Kirigami.Units.gridUnit * 20
+                    onClicked: applicationWindow().pageStack.push(Qt.createComponent("com.dervox.dim", listItem.targetPage));
 
+                    // Use the action for keyboard navigation
+                    Keys.onReturnPressed: cardAction.trigger()
+                    Keys.onEnterPressed: cardAction.trigger()
+                    highlighted: false // Remove dependency on action.checked
                 }
             }
         }
+
     }
 }

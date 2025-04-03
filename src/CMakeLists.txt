@@ -341,11 +341,10 @@ if(ANDROID)
         "view-financial-category-income"
         "view-financial-category-expense"
         "view-sort"
-        "table-symbolic"
+        "table"
         "office-chart-bar"
-        "wallet-open-symbolic"
+        "wallet-open"
         "view-financial-transfer-reconciled"
-
         ${KIRIGAMI_ADDONS_ICONS}
         # Add more icons as needed
     )
