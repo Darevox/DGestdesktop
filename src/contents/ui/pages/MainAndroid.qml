@@ -123,17 +123,12 @@ Kirigami.ScrollablePage {
             Layout.rightMargin: Kirigami.Units.gridUnit
             Layout.fillWidth: true  // Fill available width
 
-            // Force exactly 2 columns by overriding the calculation
-            columns: 2
+            // Force 2 columns
+            maximumColumns: 2
 
-            // Set minimum column width very low to prevent auto-switching to 1 column
-            minimumColumnWidth: 1
-
-            // Set maximum column width high enough to allow reasonable card widths
-            maximumColumnWidth: Kirigami.Units.gridUnit * 30
-
-            rowSpacing: Kirigami.Units.largeSpacing * 4
-            columnSpacing: Kirigami.Units.largeSpacing * 4
+            // Adjust column width limits to ensure the cards fit
+            minimumColumnWidth: Kirigami.Units.gridUnit * 10
+            maximumColumnWidth: Kirigami.Units.gridUnit * 15
 
             Repeater {
                 focus: true
@@ -145,11 +140,9 @@ Kirigami.ScrollablePage {
                     required property string targetPage
                     required property string img
 
-                    // Make sure cards get proper width
+                    // Make card responsive but with constraints
                     Layout.fillWidth: true
-
-                    // Optional: Set a maximum width if cards get too wide
-                    Layout.maximumWidth: Kirigami.Units.gridUnit * 20
+                    Layout.preferredWidth: cardsLayout.width / 2 - Kirigami.Units.gridUnit * 5
 
                     // Create proper action for keyboard handling
                     property Kirigami.Action cardAction: Kirigami.Action {
@@ -163,7 +156,6 @@ Kirigami.ScrollablePage {
                         title: title
                         titleAlignment: Qt.AlignBottom | Qt.AlignLeft
                     }
-
                     Rectangle {
                         anchors.fill: parent
                         color: "transparent"
@@ -172,14 +164,14 @@ Kirigami.ScrollablePage {
                             color: Kirigami.Theme.activeTextColor
                         }
                     }
-
                     activeFocusOnTab: true
                     showClickFeedback: true
                     onClicked: applicationWindow().pageStack.push(Qt.createComponent("com.dervox.dim", listItem.targetPage));
 
+                    // Use the action for keyboard navigation
                     Keys.onReturnPressed: cardAction.trigger()
                     Keys.onEnterPressed: cardAction.trigger()
-                    highlighted: false
+                    highlighted: false // Remove dependency on action.checked
                 }
             }
         }

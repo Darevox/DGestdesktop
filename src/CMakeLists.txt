@@ -346,6 +346,7 @@ if(ANDROID)
         "wallet-open"
         "view-financial-transfer-reconciled"
         "view-list-details"
+        "view-statistics"
         ${KIRIGAMI_ADDONS_ICONS}
         # Add more icons as needed
     )
