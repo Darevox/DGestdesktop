@@ -71,7 +71,7 @@ public:
     bool hasCheckedItems() const { return m_hasCheckedItems; }
 
     // Q_INVOKABLE methods for QML
-    Q_INVOKABLE void refresh();
+    virtual  Q_INVOKABLE void refresh();
     Q_INVOKABLE void loadPage(int page);
     Q_INVOKABLE void createSale(const QVariantMap &saleData);
     Q_INVOKABLE void updateSale(int id, const QVariantMap &saleData);
@@ -88,6 +88,19 @@ public:
     Q_INVOKABLE void clearAllChecked();
     Q_INVOKABLE void toggleAllSalesChecked();
     Q_INVOKABLE void uncheckAllSales();
+    SaleApi* m_api;
+    void setLoading(bool loading);
+    QString m_sortField;
+    QString m_sortDirection;
+    QString m_searchQuery;
+    QString m_status;
+    QString m_paymentStatus;
+    QString m_type; // Add type field
+    bool m_loading;
+    QString m_errorMessage;
+    int m_totalItems;
+    int m_currentPage;
+    int m_totalPages;
 
 public Q_SLOTS:
     void setSortField(const QString &field);
@@ -133,22 +146,12 @@ private Q_SLOTS:
     void handleSaleConversionError(const QString &message, ApiStatus status); // Add error handler
 
 private:
-    SaleApi* m_api;
+
     QList<Sale> m_sales;
-    bool m_loading;
-    QString m_errorMessage;
-    int m_totalItems;
-    int m_currentPage;
-    int m_totalPages;
-    QString m_sortField;
-    QString m_sortDirection;
-    QString m_searchQuery;
-    QString m_status;
-    QString m_paymentStatus;
-    QString m_type; // Add type field
+
     bool m_hasCheckedItems;
 
-    void setLoading(bool loading);
+
     void setErrorMessage(const QString &message);
     Sale saleFromVariantMap(const QVariantMap &map) const;
     QVariantMap saleToVariantMap(const Sale &sale) const;

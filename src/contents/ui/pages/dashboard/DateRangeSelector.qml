@@ -1,20 +1,23 @@
+// DateRangeSelector.qml
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 import org.kde.kirigamiaddons.dateandtime as Kdateandtime
-import org.kde.kirigamiaddons.formcard as FormCard
 
-RowLayout {
+ColumnLayout {
     id: root
 
     property date startDate: new Date()
     property date endDate: new Date()
     signal dateRangeChanged(date startDate, date endDate)
     property string currentPeriod: "daily"
+    Layout.alignment: Qt.AlignHCenter || Qt.AlignVCenter
 
     ButtonGroup {
         id: periodGroup
+        Layout.alignment: Qt.AlignHCenter || Qt.AlignVCenter
+
         onCheckedButtonChanged: {
             if (checkedButton) {
                 setPeriod(checkedButton.period)
@@ -22,77 +25,30 @@ RowLayout {
         }
     }
 
-    Repeater {
-        model: [
-            { text: i18n("Today"), period: "daily" },
-            { text: i18n("Past 24h"), period: "24hours" },
-            { text: i18n("Week"), period: "weekly" },
-            { text: i18n("Month"), period: "monthly" },
-            { text: i18n("Year"), period: "yearly" }
-            // { text: i18n("All Time"), period: "all" },
-            // { text: i18n("Custom"), period: "custom" }
-        ]
+    // Use Flow for responsive button layout
+    Flow {
+        Layout.fillWidth: true
+        spacing: Kirigami.Units.smallSpacing
+        Layout.alignment: Qt.AlignHCenter || Qt.AlignVCenter
 
-        Button {
-            property string period: modelData.period
-            text: modelData.text
-            checkable: true
-            ButtonGroup.group: periodGroup
-            checked: index === 0
+        Repeater {
+            model: [
+                { text: i18n("Today"), period: "daily" },
+                { text: i18n("Past 24h"), period: "24hours" },
+                { text: i18n("Week"), period: "weekly" },
+                { text: i18n("Month"), period: "monthly" },
+                { text: i18n("Year"), period: "yearly" }
+            ]
+
+            delegate: Button {
+                property string period: modelData.period
+                text: modelData.text
+                checkable: true
+                ButtonGroup.group: periodGroup
+                checked: index === 0
+            }
         }
     }
-
-    // Rectangle {
-    //     visible: periodGroup.checkedButton?.period === "custom"
-    //     Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-    //     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-    //     color: Kirigami.Theme.backgroundColor
-    //     // border.color: Kirigami.Theme.disabledTextColor
-    //     Kdateandtime.DatePopup{
-    //         id: startDateFieldPopUp
-    //     }
-    //     Kdateandtime.DatePopup {
-    //         id: endDateFieldPopUp
-    //     }
-
-    //     RowLayout {
-    //         anchors.fill: parent
-    //         anchors.margins: Kirigami.Units.smallSpacing
-
-    //         TextField {
-    //             id: startDateField
-    //             placeholderText: i18n("Start Date")
-    //             Layout.fillWidth: true
-    //             text:  Qt.formatDate(startDateFieldPopUp.value, "yyyy-MM-dd")
-    //             horizontalAlignment: TextInput.AlignHCenter
-    //             MouseArea{
-    //                 anchors.fill:parent
-    //                 onClicked:startDateFieldPopUp.open()
-    //             }
-    //         }
-    //         Label {
-    //             text: "–"
-    //         }
-    //         TextField {
-    //             id: endDateField
-    //             placeholderText: i18n("End Date")
-    //             Layout.fillWidth: true
-    //             text:  Qt.formatDate(endDateFieldPopUp.value, "yyyy-MM-dd")
-    //             horizontalAlignment: TextInput.AlignHCenter
-    //             MouseArea{
-    //                 anchors.fill:parent
-    //                 onClicked:endDateFieldPopUp.open()
-    //             }
-    //         }
-    //         Button{
-
-    //             text : "Get Status"
-    //             onClicked: setPeriod("custom")
-
-
-    //         }
-    //     }
-    // }
 
     function setPeriod(period) {
         let start = new Date()

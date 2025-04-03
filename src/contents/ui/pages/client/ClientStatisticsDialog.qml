@@ -179,7 +179,7 @@ Kirigami.Dialog {
                                 text: i18n("Current Balance")
                                 Layout.fillWidth: true
                                 elide: Text.ElideRight
-                                font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.1
+                                font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.
                             }
 
                             QQC2.Label {
@@ -214,7 +214,7 @@ Kirigami.Dialog {
                             QQC2.Label {
                                 text: i18n("Total Sales")
                                 Layout.fillWidth: true
-                                elide: Text.ElideRight
+                                 elide: Text.ElideRight
                                 font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.1
                             }
 

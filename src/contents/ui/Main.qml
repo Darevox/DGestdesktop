@@ -22,15 +22,15 @@ Kirigami.ApplicationWindow {
     // property alias  gProductModel: productModel
 
     property alias  gApiStatusHandler: apiStatusHandler
-
+    pageStack.defaultColumnWidth  : 99999
     property var currentHeader: null
     function loadHeader() {
-        if (currentHeader === null) {
-            currentHeader = headerComponent.createObject(rootWindow)
-            rootWindow.header = currentHeader
+        // if (currentHeader === null) {
+        //     currentHeader = headerComponent.createObject(rootWindow)
+        //     rootWindow.header = currentHeader
 
-        }
-        // currentGlobalDrawer.open()
+        // }
+        // // currentGlobalDrawer.open()
     }
     function destroyHeader() {
         if (currentHeader !== null) {
@@ -41,11 +41,13 @@ Kirigami.ApplicationWindow {
     }
     property var currentGlobalDrawer: null
     function loadGlobalDrawer() {
-        if (currentGlobalDrawer === null) {
-            currentGlobalDrawer = globalDrawerComponent.createObject(rootWindow)
-            rootWindow.globalDrawer = currentGlobalDrawer
-        }
-        currentGlobalDrawer.open()
+        // if (currentGlobalDrawer === null) {
+        //     currentGlobalDrawer = globalDrawerComponent.createObject(rootWindow)
+        //     rootWindow.globalDrawer = currentGlobalDrawer
+        // }
+        // currentGlobalDrawer.open()
+
+        applicationWindow().pageStack.replace(Qt.createComponent("com.dervox.dim", "MainAndroid"))
     }
     Component{
         id: headerComponent
@@ -111,7 +113,7 @@ Kirigami.ApplicationWindow {
             property int expandedWidth: Kirigami.Units.gridUnit * 15
             property int collapsedWidth: Kirigami.Units.gridUnit * 2.3
 
-           width: collapsed ? collapsedWidth : expandedWidth
+            width: collapsed ? collapsedWidth : expandedWidth
 
             Behavior on width {
                 NumberAnimation {
@@ -125,8 +127,8 @@ Kirigami.ApplicationWindow {
                     Layout.fillWidth: true
                     Layout.margins: Kirigami.Units.smallSpacing
                     Item{
-                     Layout.fillWidth:  !globalDrawer.collapsed ? true : false
-                      visible: !globalDrawer.collapsed
+                        Layout.fillWidth:  !globalDrawer.collapsed ? true : false
+                        visible: !globalDrawer.collapsed
                     }
                     QQC2.ToolButton {
                         icon.name: "application-menu"

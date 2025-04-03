@@ -13,7 +13,7 @@ SaleModel::SaleModel(QObject *parent)
     , m_totalPages(1)
     , m_sortField(QStringLiteral("sale_date"))
     , m_sortDirection(QStringLiteral("desc"))
-    , m_type(QString())
+    , m_type(QStringLiteral("sale"))
     , m_hasCheckedItems(false)
 {
 }
@@ -48,7 +48,7 @@ int SaleModel::columnCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
-    return 9; // Adjust based on your needs
+    return 8; // Adjust based on your needs
 }
 
 QVariant SaleModel::data(const QModelIndex &index, int role) const

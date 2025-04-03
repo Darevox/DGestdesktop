@@ -1,6 +1,6 @@
 # Generate QML module
 add_executable(dim
-
+    resources.qrc
 )
 
 # Set target properties
@@ -40,7 +40,7 @@ set(DIM_QML_UPDATER
 # Declare QML sources grouped by functionality
 set(DIM_QML_PAGES
     contents/ui/Main.qml
-
+    contents/ui/pages/MainAndroid.qml
     # User related pages
     contents/ui/pages/user/Login.qml
     contents/ui/pages/user/Signup.qml
@@ -89,6 +89,12 @@ set(DIM_QML_PAGES
     contents/ui/pages/sale/SaleDetails.qml
     contents/ui/pages/sale/ProductSelectorDialog.qml
     contents/ui/pages/sale/InvoiceGenerationDialog.qml
+    # Quote pages
+    contents/ui/pages/quote/Quote.qml
+    contents/ui/pages/quote/QuoteDetails.qml
+    contents/ui/pages/quote/ProductSelectorDialog.qml
+    contents/ui/pages/quote/QuoteGenerationDialog.qml
+
     # Invoice pages
     contents/ui/pages/invoice/Invoice.qml
     contents/ui/pages/invoice/InvoiceDetails.qml
@@ -180,6 +186,7 @@ set(DIM_CPP_SOURCES
     model/clientmodelfetch.cpp
     model/cashsourcemodelfetch.cpp
     model/cashsourceproxymodel.cpp
+    model/quotemodel.cpp
     # Utils sources
     utils/pageImageProvider.cpp
     utils/pdfModel.cpp
@@ -225,6 +232,7 @@ set(DIM_HEADERS
     model/clientmodelfetch.h
     model/cashsourcemodelfetch.h
     model/cashsourceproxymodel.h
+    model/quotemodel.h
     # Utils headers
     utils/pageImageProvider.h
     utils/pdfModel.h
@@ -328,10 +336,20 @@ if(ANDROID)
         "document-edit"
         "list-add"
         "edit-delete"
+        "view-financial-account-investment-security"
+        "package"
+        "view-financial-category-income"
+        "view-financial-category-expense"
+        "view-sort"
+        "table-symbolic"
+        "office-chart-bar"
+        "wallet-open-symbolic"
+        "view-financial-transfer-reconciled"
+
         ${KIRIGAMI_ADDONS_ICONS}
         # Add more icons as needed
     )
-
+install(DIRECTORY icons/ DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/kirigami/breeze-internal/icons/)
 ecm_add_android_apk(dim ANDROID_DIR ${CMAKE_SOURCE_DIR}/android)
 endif()
 

@@ -34,17 +34,17 @@ Kirigami.Page {
 
             FormCard.FormTextDelegate {
                 text: i18n("Total Sales")
-                description: saleModel.summary.total_sales || "0"
+                description: quoteModel.summary.total_sales || "0"
             }
 
             FormCard.FormTextDelegate {
                 text: i18n("Total Amount")
-                description: Number(saleModel.summary.total_amount || 0).toLocaleString(Qt.locale(), 'f', 2)
+                description: Number(quoteModel.summary.total_amount || 0).toLocaleString(Qt.locale(), 'f', 2)
             }
 
             FormCard.FormTextDelegate {
                 text: i18n("Total Paid")
-                description: Number(saleModel.summary.total_paid || 0).toLocaleString(Qt.locale(), 'f', 2)
+                description: Number(quoteModel.summary.total_paid || 0).toLocaleString(Qt.locale(), 'f', 2)
             }
         }
 
@@ -56,7 +56,7 @@ Kirigami.Page {
             }
 
             Repeater {
-                model: saleModel.summary.sales_by_status || []
+                model: quoteModel.summary.sales_by_status || []
                 delegate: FormCard.FormTextDelegate {
                     text: modelData.status
                     description: i18n("%1 sales", modelData.count)
@@ -72,7 +72,7 @@ Kirigami.Page {
             }
 
             Repeater {
-                model: saleModel.summary.top_clients || []
+                model: quoteModel.summary.top_clients || []
                 delegate: FormCard.FormTextDelegate {
                     text: modelData.name || i18n("Anonymous")
                     description: i18n("%1 sales, Total: %2",
@@ -90,7 +90,7 @@ Kirigami.Page {
             }
 
             Repeater {
-                model: saleModel.summary.top_products || []
+                model: quoteModel.summary.top_products || []
                 delegate: FormCard.FormTextDelegate {
                     text: modelData.name
                     description: i18n("Sold: %1, Total: %2",
@@ -129,7 +129,7 @@ Kirigami.Page {
                     ]
                     textRole: "text"
                     valueRole: "value"
-                    onCurrentValueChanged: saleModel.setType(currentValue)
+                    onCurrentValueChanged: quoteModel.setType(currentValue)
                 }
                 FormCard.FormComboBoxDelegate {
                     id: statusField
@@ -142,7 +142,7 @@ Kirigami.Page {
                     ]
                     textRole: "text"
                     valueRole: "value"
-                    onCurrentValueChanged: saleModel.setStatus(currentValue)
+                    onCurrentValueChanged: quoteModel.setStatus(currentValue)
                 }
 
                 FormCard.FormComboBoxDelegate {
@@ -156,7 +156,7 @@ Kirigami.Page {
                     ]
                     textRole: "text"
                     valueRole: "value"
-                    onCurrentValueChanged: saleModel.setPaymentStatus(currentValue)
+                    onCurrentValueChanged: quoteModel.setPaymentStatus(currentValue)
                 }
 
                 FormCard.FormDateTimeDelegate {
@@ -179,7 +179,7 @@ Kirigami.Page {
                     model: clientModel
                     textRole: "name"
                     valueRole: "id"
-                    onCurrentValueChanged: saleModel.setClientId(currentValue)
+                    onCurrentValueChanged: quoteModel.setClientId(currentValue)
                 }
             }
 
@@ -191,7 +191,7 @@ Kirigami.Page {
                     text: i18n("Apply Filters")
                     icon.name: "view-filter"
                     onClicked: {
-                        saleModel.refresh()
+                        quoteModel.refresh()
                         filterSheet.close()
                     }
                 }
@@ -205,7 +205,7 @@ Kirigami.Page {
                         startDateField.value = undefined
                         endDateField.value = undefined
                         clientField.currentIndex = 0
-                        saleModel.refresh()
+                        quoteModel.refresh()
                     }
                 }
             }
@@ -230,14 +230,14 @@ Kirigami.Page {
         //     icon.name: "view-statistics"
         //     text: i18n("Summary")
         //     onTriggered: {
-        //         saleModel.getSummary()
+        //         quoteModel.getSummary()
         //         summarySheet.open()
         //     }
         // },
         Kirigami.Action {
             icon.name: "edit-delete"
             text: i18n("Delete")
-            enabled: saleModel.hasCheckedItems
+            enabled: quoteModel.hasCheckedItems
             onTriggered: deleteDialog.open()
         }
     ]
@@ -248,7 +248,7 @@ Kirigami.Page {
         Item { Layout.fillWidth: true }
 
         DBusyIndicator {
-            running: saleModel.loading
+            running: quoteModel.loading
         }
 
         Kirigami.SearchField {
@@ -259,7 +259,7 @@ Kirigami.Page {
                 id: searchDelayTimer
                 interval: 700
                 repeat: false
-                onTriggered: saleModel.searchQuery = searchField.text
+                onTriggered: quoteModel.searchQuery = searchField.text
             }
             onTextChanged: searchDelayTimer.restart()
         }
@@ -270,7 +270,7 @@ Kirigami.Page {
     Kirigami.PlaceholderMessage {
         id: emptyStateMessage
         anchors.centerIn: parent
-        visible: !saleModel.loading && saleModel.rowCount === 0
+        visible: !quoteModel.loading && quoteModel.rowCount === 0
         text: searchField.text !== "" ?
                   i18n("No sales matching '%1'", searchField.text) :
                   i18n("No sales found")
@@ -281,14 +281,14 @@ Kirigami.Page {
     QQC2.ScrollView {
         anchors.fill: parent
         contentWidth: view.width
-        visible: !saleModel.loading && saleModel.rowCount > 0
+        visible: !quoteModel.loading && quoteModel.rowCount > 0
 
         Tables.KTableView {
             id: view
-            model: saleModel
+            model: quoteModel
             clip: true
             alternatingRows: true
-            sortOrder: saleModel.sortDirection === "asc" ? Qt.AscendingOrder : Qt.DescendingOrder
+            sortOrder: quoteModel.sortDirection === "asc" ? Qt.AscendingOrder : Qt.DescendingOrder
             sortRole: SaleRoles.SaleDateRole
             selectionMode: TableView.SelectionMode.SingleSelection
             selectionBehavior: TableView.SelectRows
@@ -308,8 +308,8 @@ Kirigami.Page {
                 }
                 if (view.sortRole !== headerComponent.role) {
 
-                    saleModel.sortField=headerComponent.textRole
-                    saleModel.sortDirection="asc"
+                    quoteModel.sortField=headerComponent.textRole
+                    quoteModel.sortDirection="asc"
 
                     view.sortRole = headerComponent.role;
 
@@ -318,8 +318,8 @@ Kirigami.Page {
                 } else {
                     //view.sortOrder = view.sortOrder === Qt.AscendingOrder ? Qt.DescendingOrder : Qt.AscendingOrder
                     // view.sortOrder = view.sortOrder === "asc" ? "desc": "asc"
-                    saleModel.sortDirection=view.sortOrder === Qt.AscendingOrder ? "desc" : "asc"
-                    view.sortOrder = saleModel.sortDirection === "asc" ? Qt.AscendingOrder : Qt.DescendingOrder
+                    quoteModel.sortDirection=view.sortOrder === Qt.AscendingOrder ? "desc" : "asc"
+                    view.sortOrder = quoteModel.sortDirection === "asc" ? Qt.AscendingOrder : Qt.DescendingOrder
 
 
 
@@ -350,14 +350,14 @@ Kirigami.Page {
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Select")
                     textRole: "checked"
-                    role: saleModel.CheckedRole
+                    role: quoteModel.CheckedRole
                     width: root.width * 0.03
                     headerDelegate: QQC2.CheckBox {
-                        onClicked: saleModel.toggleAllSalesChecked()
+                        onClicked: quoteModel.toggleAllSalesChecked()
                     }
                     itemDelegate: QQC2.CheckBox {
                         checked: modelData
-                        onClicked: saleModel.setChecked(row, checked)
+                        onClicked: quoteModel.setChecked(row, checked)
                     }
                 },
                 // Add this to the headerComponents array in Tables.KTableView
@@ -500,7 +500,7 @@ Kirigami.Page {
                             return Qt.formatDateTime(date, "yyyy-MM-dd");
                         }
                         horizontalAlignment: Text.AlignRight
-                       // font.family: "Monospace"
+                        // font.family: "Monospace"
                     }
                     headerDelegate: TableHeaderLabel {}
                 }
@@ -523,7 +523,7 @@ Kirigami.Page {
             ]
 
             onCellDoubleClicked: function(row) {
-                let sale = saleModel.getSale(row)
+                let sale = quoteModel.getSale(row)
                 saleDialog.saleId = sale.id
                 saleDialog.active = true
             }
@@ -534,7 +534,7 @@ Kirigami.Page {
     // Loading skeleton
     GridLayout {
         anchors.fill: parent
-        visible: saleModel.loading
+        visible: quoteModel.loading
         columns: 6
         rows: 8
         columnSpacing: Kirigami.Units.largeSpacing
@@ -551,17 +551,17 @@ Kirigami.Page {
 
     footer: PaginationBar {
         id: paginationBar
-        currentPage: saleModel.currentPage
-        totalPages: saleModel.totalPages
-        totalItems: saleModel.totalItems
-        onPageChanged: saleModel.loadPage(page)
+        currentPage: quoteModel.currentPage
+        totalPages: quoteModel.totalPages
+        totalItems: quoteModel.totalItems
+        onPageChanged: quoteModel.loadPage(page)
     }
 
     Loader {
         id: saleDialog
         active: false
         asynchronous: true
-        sourceComponent: SaleDetails {}
+        sourceComponent: QuoteDetails {}
         property int saleId: 0
         onLoaded: {
             item.dialogSaleId = saleDialog.saleId
@@ -583,22 +583,23 @@ Kirigami.Page {
         subtitle: i18n("Are you sure you want to delete the selected sale(s)?")
         standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
         onAccepted: {
-            let checkedIds = saleModel.getCheckedSaleIds()
+            let checkedIds = quoteModel.getCheckedSaleIds()
             checkedIds.forEach(id => {
-                                   saleModel.deleteSale(id)
+                                   quoteModel.deleteSale(id)
                                })
         }
     }
 
     function updateDateFilter() {
         if (startDateField.value && endDateField.value) {
-            saleModel.setDateRange(startDateField.value, endDateField.value)
+            quoteModel.setDateRange(startDateField.value, endDateField.value)
         }
     }
 
     Component.onCompleted: {
-        saleModel.setApi(saleApi)
+      //  quoteModel.setType("quote")
+        quoteModel.setApi(saleApi)
         clientModel.setApi(clientApi)
-      //  saleModel.setType("sale")
+
     }
 }

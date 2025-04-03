@@ -303,6 +303,11 @@ ListView {
                         pathPage: "Sale"
                     },
                     {
+                        name: i18n("Quotes"),
+                        icon: "view-financial-account-savings",
+                        pathPage: "Quote"
+                    },
+                    {
                         name: i18n("Clients"),
                         icon: "group",
                         pathPage: "Client"

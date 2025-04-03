@@ -1,0 +1,27 @@
+<RCC>
+    <qresource prefix="/">
+        <file>contents/ui/img/textfield.svg</file>
+        <file>contents/ui/img/tabbar.svg</file>
+        <file>contents/ui/img/slider.svg</file>
+        <file>contents/ui/img/selection-controls.svg</file>
+        <file>contents/ui/img/progress-bar.svg</file>
+        <file>contents/ui/img/overlay-sheets.svg</file>
+        <file>contents/ui/img/non-scroll-page.svg</file>
+        <file>contents/ui/img/navigation-tabbar.svg</file>
+        <file>contents/ui/img/miscwidgets.svg</file>
+        <file>contents/ui/img/metrics.svg</file>
+        <file>contents/ui/img/listview.svg</file>
+        <file>contents/ui/img/inlinemessage.svg</file>
+        <file>contents/ui/img/headers.svg</file>
+        <file>contents/ui/img/formlayout.svg</file>
+        <file>contents/ui/img/drawers.svg</file>
+        <file>contents/ui/img/columnview.svg</file>
+        <file>contents/ui/img/colorsets.svg</file>
+        <file>contents/ui/img/colors.svg</file>
+        <file>contents/ui/img/chips.svg</file>
+        <file>contents/ui/img/cardlist.svg</file>
+        <file>contents/ui/img/cardlayout.svg</file>
+        <file>contents/ui/img/buttons.svg</file>
+        <file>contents/ui/img/action-tool-bar.svg</file>
+    </qresource>
+</RCC>

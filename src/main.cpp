@@ -46,6 +46,7 @@
 #include <model/suppliermodel.h>
 #include <model/cashsourcemodel.h>
 #include <model/cashsourcemodelfetch.h>
+#include <model/quotemodel.h>
 
 #include <model/cashtransactionmodel.h>
 #include <model/invoicemodel.h>
@@ -60,17 +61,23 @@
 #include <updater/AppUpdater.h>
 #include <updater/KUpdater.h>
 #include "config.h"
+#ifdef Q_OS_ANDROID
+Q_DECL_EXPORT
+#endif
 int main(int argc, char *argv[])
 {
 
     AppSettings::initializeScale();
 #ifdef Q_OS_ANDROID
     QGuiApplication app(argc, argv);
+        QQuickStyle::setStyle(QStringLiteral("org.kde.breeze"));
 #else
     QApplication app(argc, argv);
+    if (qEnvironmentVariableIsEmpty("QT_QUICK_CONTROLS_STYLE")) {
+        QQuickStyle::setStyle(QStringLiteral("org.kde.desktop"));
+    }
 #endif
-    KIconTheme::current();
-    QApplication::setStyle(QStringLiteral("breeze"));
+
     AppSettings *appSettings = new AppSettings(&app);
     //   QLoggingCategory::setFilterRules("*.debug=true");
     KLocalizedString::setApplicationDomain("dim");
@@ -81,11 +88,6 @@ int main(int argc, char *argv[])
     qputenv("QML_XHR_ALLOW_FILE_WRITE", QByteArray("1"));
     app.setWindowIcon(QIcon::fromTheme(QStringLiteral("dim"), QIcon(QStringLiteral(":/contents/ui/resources/logo.svg"))));
 
-#if defined(Q_OS_ANDROID)
-    QApplication::setStyle(QStringLiteral("breeze"));
-#else
-    QQuickStyle::setStyle(QStringLiteral("org.kde.desktop"));
-#endif
     QQmlApplicationEngine engine;
     //engine.addImportPath("qml");
     // Create and configure the auto-updater
@@ -95,7 +97,7 @@ int main(int argc, char *argv[])
     appUpdater->setUpdateUrl(QStringLiteral(DIM_UPDATES_URL));
 
     // Optionally set specific version if needed (otherwise it uses QApplication::applicationVersion)
-     appUpdater->setCurrentVersion(QStringLiteral(DIM_VERSION));
+    appUpdater->setCurrentVersion(QStringLiteral(DIM_VERSION));
 
     // Expose the updater to QML
     engine.rootContext()->setContextProperty(QStringLiteral("appUpdater"), appUpdater);
@@ -151,6 +153,8 @@ int main(int argc, char *argv[])
     NetworkApi::InvoiceModel *invoiceModel = new NetworkApi::InvoiceModel();
     NetworkApi::DashboardModel *dashboardModel = new NetworkApi::DashboardModel();
 
+    NetworkApi::QuoteModel *quoteModel = new NetworkApi::QuoteModel();
+
     NetworkApi::ProductModelFetch *productModelFetch = new NetworkApi::ProductModelFetch();
 
     qmlRegisterType<PrinterHelper>("com.dervox.printing", 1, 0, "PrinterHelper");
@@ -200,6 +204,7 @@ int main(int argc, char *argv[])
 
     engine.rootContext()->setContextProperty(QStringLiteral("invoiceModel"), invoiceModel);
     engine.rootContext()->setContextProperty(QStringLiteral("dashboardModel"), dashboardModel);
+    engine.rootContext()->setContextProperty(QStringLiteral("quoteModel"), quoteModel);
     //   engine.rootContext()->setContextProperty(QStringLiteral("trayManager", &trayManager);
 
 
