@@ -127,8 +127,8 @@ Kirigami.ScrollablePage {
             maximumColumns: 2
 
             // Adjust column width limits to ensure the cards fit
-            minimumColumnWidth: Kirigami.Units.gridUnit * 10
-            maximumColumnWidth: Kirigami.Units.gridUnit * 15
+            minimumColumnWidth: Kirigami.Units.gridUnit * 15
+            maximumColumnWidth: Kirigami.Units.gridUnit * 20
 
             Repeater {
                 focus: true
