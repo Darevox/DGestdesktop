@@ -161,7 +161,7 @@ Item {
                 background: Rectangle {
                     color: parent.pressed ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
                     border.color: Kirigami.Theme.highlightColor
-                    border.width: 2
+                    border.width: 0
                     radius: 4
 
                     // Gradient effect
@@ -372,23 +372,30 @@ Item {
 
                     background: Rectangle {
                         id: buttonBackground
-                        color: numButton.pressed ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
+                        color: numButton.pressed ? Kirigami.Theme.highlightColor : Qt.darker(Kirigami.Theme.backgroundColor,1.05)
                         border.color:{
                             if(modelData === "⌫")
                                 return Kirigami.Theme.negativeTextColor
                             else if(modelData === "Confirm")
                                 return Kirigami.Theme.positiveTextColor
                             else
-                                Kirigami.Theme.textColor
+                                 Qt.lighter(Kirigami.Theme.backgroundColor,1.1)
                         }
-                        border.width: 1
+                        border.width: {
+                            if(modelData === "⌫")
+                                return 1
+                            else if(modelData === "Confirm")
+                                return 1
+                            else
+                                1
+                        }
                         radius: 4
 
                         // Gradient effect
-                        gradient: Gradient {
-                            GradientStop { position: 0.0; color: numButton.pressed ? Qt.darker(Kirigami.Theme.highlightColor, 1.2) : Kirigami.Theme.backgroundColor }
-                            GradientStop { position: 1.0; color: numButton.pressed ? Kirigami.Theme.highlightColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.1) }
-                        }
+                        // gradient: Gradient {
+                        //     GradientStop { position: 0.0; color: numButton.pressed ? Qt.darker(Kirigami.Theme.highlightColor, 1.2) : Kirigami.Theme.backgroundColor }
+                        //     GradientStop { position: 1.0; color: numButton.pressed ? Kirigami.Theme.highlightColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.1) }
+                        // }
 
                         // Ripple effect
                         Rectangle {

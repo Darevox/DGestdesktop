@@ -4,6 +4,7 @@ import QtQuick.Controls as QQC2
 import org.kde.kirigami as Kirigami
 import org.kde.kirigamiaddons.tableview as Tables
 import org.kde.kirigamiaddons.formcard as FormCard
+import org.kde.kirigamiaddons.components 1.0 as KirigamiComponents
 import "../../components"
 import Qt5Compat.GraphicalEffects
 import "."
@@ -15,17 +16,277 @@ Kirigami.Page {
 
     padding: Kirigami.Units.largeSpacing
     Kirigami.Theme.colorSet: Kirigami.Theme.View
-    Kirigami.Theme.inherit: false
+   // globalToolBarStyle : Kirigami.ApplicationHeaderStyle.None
 
+    Kirigami.Theme.inherit: false
     // Properties for sorting and responsive layout
     property string sortRole: ClientRoles.NameRole
     property int sortOrder: Qt.AscendingOrder
     property bool isWideScreen: width > Kirigami.Units.gridUnit * 50
     property bool isNarrowScreen: width < Kirigami.Units.gridUnit * 35
-
     // Property to track if we're in multi-select mode
     property bool multiSelectMode: false
+    // background: Rectangle {
+    //     color: Qt.darker(Kirigami.Theme.backgroundColor, 1.2)
+    //     border.width: 0
+    //     radius: Kirigami.Units.smallSpacing
+    // }
+    // header : Item {
+    //     height: headerLayout.implicitHeight
 
+    //     // Background rectangle that uses Kirigami theme colors
+    //     Rectangle {
+    //             id: headerBackground
+    //             anchors.fill: parent
+    //             // Use the Header color set for the proper header styling
+    //             Kirigami.Theme.inherit: false  // Important! Prevents inheriting color set
+    //             Kirigami.Theme.colorSet: Kirigami.Theme.View
+    //             color: Kirigami.Theme.backgroundColor
+    //         }
+
+    //     RowLayout{
+    //         id:headerLayout
+    //         height:  Kirigami.Units.smallSpacing * 6
+    //         width:parent.width
+    //         Layout.alignment: Qt.AlignHCenter || Qt.AlignVCenter
+
+    //         Kirigami.Heading{
+    //             Layout.alignment: Qt.AlignVCenter
+    //             text:root.title
+    //             Layout.leftMargin: Kirigami.Units.smallSpacing * 2
+
+    //         }
+    //         Kirigami.ActionToolBar {
+
+    //             alignment: Qt.AlignRight || Qt.AlignVCenter
+
+
+
+    //             actions: [
+    //                 Kirigami.Action {
+    //                     text: "Search"
+    //                     icon.name: "search"
+    //                     visible: !clientModel.hasCheckedItems
+    //                     displayComponent:
+    //                     Kirigami.SearchField {
+    //                         id: searchField
+    //                         Layout.topMargin: Kirigami.Units.smallSpacing
+    //                         Layout.bottomMargin: Kirigami.Units.smallSpacing
+    //                         //  Layout.fillHeight: true
+    //                         Layout.fillWidth: true
+
+    //                         placeholderText: i18n("Search clients...")
+    //                         Timer {
+    //                             id: searchDelayTimer
+    //                             interval: 700
+    //                             repeat: false
+    //                             onTriggered: clientModel.searchQuery = searchField.text
+    //                         }
+    //                         onTextChanged: searchDelayTimer.restart()
+    //                     }
+
+
+    //                     //    displayHint: Kirigami.DisplayHints.KeepVisible
+    //                 },
+    //                 Kirigami.Action {
+    //                     icon.name: "list-add-symbolic"
+    //                     text: i18n("New Client")
+    //                     displayHint: Kirigami.DisplayHint.IconOnly
+
+    //                     onTriggered: {
+    //                         clientDetailsDialog.clientId = 0
+    //                         clientDetailsDialog.active = true
+    //                     }
+
+    //                 },
+    //                 Kirigami.Action {
+    //                     icon.name: "edit-delete"
+    //                     displayHint: Kirigami.DisplayHint.IconOnly
+
+    //                     text: i18n("Delete")
+    //                     visible: clientModel.hasCheckedItems
+    //                     onTriggered: deleteDialog.open()
+    //                 },
+    //                 Kirigami.Action {
+    //                     id: sortMenu
+    //                     icon.name: "view-sort"
+    //                     displayHint: Kirigami.DisplayHint.IconOnly
+    //                     text: i18n("Sort")
+    //                     visible : !isWideScreen
+    //                     Kirigami.Action {
+    //                         id: sortNameAsc
+    //                         text: i18n("Name (A-Z)")
+    //                         checkable: true
+    //                         checked:true // root.sortRole === ClientRoles.NameRole && root.sortOrder === Qt.AscendingOrder
+    //                         onTriggered: {
+    //                             // Save current view state
+    //                             let currentScreenMode = isWideScreen
+
+    //                             // Uncheck all other sorting options manually
+    //                             sortNameDesc.checked = false
+    //                             sortBalanceAsc.checked = false
+    //                             sortBalanceDesc.checked = false
+    //                             sortStatus.checked = false
+
+    //                             // Check this option
+    //                             sortNameAsc.checked = true
+
+    //                             // Apply sorting
+    //                             root.sortRole = ClientRoles.NameRole
+    //                             root.sortOrder = Qt.AscendingOrder
+    //                             clientModel.sortField = "name"
+    //                             clientModel.sortDirection = "asc"
+    //                             clientModel.sort(ClientRoles.NameRole, Qt.AscendingOrder)
+
+    //                             // Restore view state if changed
+    //                             if (isWideScreen !== currentScreenMode) {
+    //                                 isWideScreen = currentScreenMode
+    //                             }
+    //                         }
+    //                     }
+
+    //                     Kirigami.Action {
+    //                         id: sortNameDesc
+    //                         text: i18n("Name (Z-A)")
+    //                         checkable: true
+    //                         checked: sortRole === ClientRoles.NameRole && sortOrder === Qt.DescendingOrder
+    //                         onTriggered: {
+    //                             // Save current view state
+    //                             let currentScreenMode = isWideScreen
+
+    //                             // Uncheck all other sorting options manually
+    //                             sortNameAsc.checked = false
+    //                             sortBalanceAsc.checked = false
+    //                             sortBalanceDesc.checked = false
+    //                             sortStatus.checked = false
+
+    //                             // Check this option
+    //                             sortNameDesc.checked = true
+
+    //                             // Apply sorting
+    //                             root.sortRole = ClientRoles.NameRole
+    //                             root.sortOrder = Qt.DescendingOrder
+    //                             clientModel.sortField = "name"
+    //                             clientModel.sortDirection = "desc"
+    //                             clientModel.sort(ClientRoles.NameRole, Qt.DescendingOrder)
+
+    //                             // Restore view state if changed
+    //                             if (isWideScreen !== currentScreenMode) {
+    //                                 isWideScreen = currentScreenMode
+    //                             }
+    //                         }
+    //                     }
+
+    //                     Kirigami.Action {
+    //                         id: sortBalanceAsc
+    //                         text: i18n("Balance (Low to High)")
+    //                         checkable: true
+    //                         checked: sortRole === ClientRoles.BalanceRole && sortOrder === Qt.AscendingOrder
+    //                         onTriggered: {
+    //                             // Save current view state
+    //                             let currentScreenMode = isWideScreen
+
+    //                             // Uncheck all other sorting options manually
+    //                             sortNameAsc.checked = false
+    //                             sortNameDesc.checked = false
+    //                             sortBalanceDesc.checked = false
+    //                             sortStatus.checked = false
+
+    //                             // Check this option
+    //                             sortBalanceAsc.checked = true
+
+    //                             // Apply sorting
+    //                             root.sortRole = ClientRoles.BalanceRole
+    //                             root.sortOrder = Qt.AscendingOrder
+    //                             clientModel.sortField = "balance"
+    //                             clientModel.sortDirection = "asc"
+    //                             clientModel.sort(ClientRoles.BalanceRole, Qt.AscendingOrder)
+
+    //                             // Restore view state if changed
+    //                             if (isWideScreen !== currentScreenMode) {
+    //                                 isWideScreen = currentScreenMode
+    //                             }
+    //                         }
+    //                     }
+
+    //                     Kirigami.Action {
+    //                         id: sortBalanceDesc
+    //                         text: i18n("Balance (High to Low)")
+    //                         checkable: true
+    //                         checked: sortRole === ClientRoles.BalanceRole && sortOrder === Qt.DescendingOrder
+    //                         onTriggered: {
+    //                             // Save current view state
+    //                             let currentScreenMode = isWideScreen
+
+    //                             // Uncheck all other sorting options manually
+    //                             sortNameAsc.checked = false
+    //                             sortNameDesc.checked = false
+    //                             sortBalanceAsc.checked = false
+    //                             sortStatus.checked = false
+
+    //                             // Check this option
+    //                             sortBalanceDesc.checked = true
+
+    //                             // Apply sorting
+    //                             root.sortRole = ClientRoles.BalanceRole
+    //                             root.sortOrder = Qt.DescendingOrder
+    //                             clientModel.sortField = "balance"
+    //                             clientModel.sortDirection = "desc"
+    //                             clientModel.sort(ClientRoles.BalanceRole, Qt.DescendingOrder)
+
+    //                             // Restore view state if changed
+    //                             if (isWideScreen !== currentScreenMode) {
+    //                                 isWideScreen = currentScreenMode
+    //                             }
+    //                         }
+    //                     }
+
+    //                     Kirigami.Action {
+    //                         id: sortStatus
+    //                         text: i18n("Status")
+    //                         checkable: true
+    //                         checked: sortRole === ClientRoles.StatusRole
+    //                         onTriggered: {
+    //                             // Save current view state
+    //                             let currentScreenMode = isWideScreen
+
+    //                             // Uncheck all other sorting options manually
+    //                             sortNameAsc.checked = false
+    //                             sortNameDesc.checked = false
+    //                             sortBalanceAsc.checked = false
+    //                             sortBalanceDesc.checked = false
+
+    //                             // Check this option
+    //                             sortStatus.checked = true
+
+    //                             // Apply sorting
+    //                             root.sortRole = ClientRoles.StatusRole
+    //                             root.sortOrder = Qt.AscendingOrder
+    //                             clientModel.sortField = "status"
+    //                             clientModel.sortDirection = "asc"
+    //                             clientModel.sort(ClientRoles.StatusRole, Qt.AscendingOrder)
+
+    //                             // Restore view state if changed
+    //                             if (isWideScreen !== currentScreenMode) {
+    //                                 isWideScreen = currentScreenMode
+    //                             }
+    //                         }
+    //                     }
+    //                 },
+
+
+
+    //                 Kirigami.Action {
+    //                     icon.name: isWideScreen ? "view-list-details" : "table"
+    //                     displayHint: Kirigami.DisplayHint.IconOnly
+    //                     text: isWideScreen ? i18n("List View") : i18n("Table View")
+    //                     onTriggered: isWideScreen = !isWideScreen
+    //                 }
+    //             ]
+
+    //         }
+    //     }
+    // }
     // Empty state message
     Kirigami.PlaceholderMessage {
         id: emptyStateMessage
@@ -41,12 +302,58 @@ Kirigami.Page {
     }
 
     // Actions
+    header: RowLayout {
+        Layout.fillWidth: true
+
+        Item { Layout.fillWidth: true }
+
+        DBusyIndicator {
+            running: clientModel.loading
+        }
+
+        Kirigami.SearchField {
+            id: searchField
+            Layout.margins: Kirigami.Units.smallSpacing
+            Layout.preferredWidth: parent.width/4
+            placeholderText: i18n("Search clients...")
+            Timer {
+                id: searchDelayTimer
+                interval: 700
+                repeat: false
+                onTriggered: clientModel.searchQuery = searchField.text
+            }
+            onTextChanged: searchDelayTimer.restart()
+        }
+
+        Item { Layout.fillWidth: true }
+    }
 
     actions: [
+        // Kirigami.Action {
+        //     text: "Search"
+        //     icon.name: "search"
+        //     displayComponent:
+        //     Kirigami.SearchField {
+        //         id: searchField
+        //         Layout.topMargin: Kirigami.Units.smallSpacing
+        //         Layout.bottomMargin: Kirigami.Units.smallSpacing
+        //         //  Layout.fillHeight: true
+        //         Layout.fillWidth: true
+        //         placeholderText: i18n("Search clients...")
+        //         Timer {
+        //             id: searchDelayTimer
+        //             interval: 700
+        //             repeat: false
+        //             onTriggered: clientModel.searchQuery = searchField.text
+        //         }
+        //         onTextChanged: searchDelayTimer.restart()
+        //     }
+        // },
+
         Kirigami.Action {
             icon.name: "list-add-symbolic"
             text: i18n("New Client")
-            displayHint: Kirigami.DisplayHint.IconOnly
+           // displayHint: Kirigami.DisplayHint.IconOnly
             onTriggered: {
                 clientDetailsDialog.clientId = 0
                 clientDetailsDialog.active = true
@@ -54,7 +361,7 @@ Kirigami.Page {
         },
         Kirigami.Action {
             icon.name: "edit-delete"
-            displayHint: Kirigami.DisplayHint.IconOnly
+            //displayHint: Kirigami.DisplayHint.IconOnly
             text: i18n("Delete")
             enabled: clientModel.hasCheckedItems
             onTriggered: deleteDialog.open()
@@ -233,6 +540,7 @@ Kirigami.Page {
             displayHint: Kirigami.DisplayHint.IconOnly
             text: isWideScreen ? i18n("List View") : i18n("Table View")
             onTriggered: isWideScreen = !isWideScreen
+            visible : false
         }
     ]
 
@@ -242,31 +550,31 @@ Kirigami.Page {
     // Filter Drawer
 
     // Top toolbar with search and filters
-    header: RowLayout {
-        Layout.fillWidth: true
+    // header: RowLayout {
+    //     Layout.fillWidth: true
 
-        Item { Layout.fillWidth: true }
+    //     Item { Layout.fillWidth: true }
 
-        DBusyIndicator {
-            running: clientModel.loading
-        }
+    //     DBusyIndicator {
+    //         running: clientModel.loading
+    //     }
 
-        Kirigami.SearchField {
-            id: searchField
-            Layout.margins: Kirigami.Units.smallSpacing
-            Layout.preferredWidth: parent.width/2.5
-            placeholderText: i18n("Search clients...")
-            Timer {
-                id: searchDelayTimer
-                interval: 700
-                repeat: false
-                onTriggered: clientModel.searchQuery = searchField.text
-            }
-            onTextChanged: searchDelayTimer.restart()
-        }
+    //     Kirigami.SearchField {
+    //         id: searchField
+    //         Layout.margins: Kirigami.Units.smallSpacing
+    //         Layout.preferredWidth: parent.width/2.5
+    //         placeholderText: i18n("Search clients...")
+    //         Timer {
+    //             id: searchDelayTimer
+    //             interval: 700
+    //             repeat: false
+    //             onTriggered: clientModel.searchQuery = searchField.text
+    //         }
+    //         onTextChanged: searchDelayTimer.restart()
+    //     }
 
-        Item { Layout.fillWidth: true }
-    }
+    //     Item { Layout.fillWidth: true }
+    // }
 
     // Main content area with Stack to switch between views
     StackLayout {
@@ -327,7 +635,7 @@ Kirigami.Page {
                         Item {
                             id: clientCardContainer
                             Layout.fillWidth: true
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 2.5
+                            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                             // Layout.margins: Kirigami.Units.smallSpacing
 
                             // Modern card with subtle elevation
@@ -342,8 +650,10 @@ Kirigami.Page {
                                                    Kirigami.Theme.highlightColor.g,
                                                    Kirigami.Theme.highlightColor.b, 0.5):
                                            Qt.rgba(Kirigami.Theme.backgroundColor.r,
-                                                   Kirigami.Theme.backgroundColor.g,
-                                                   Kirigami.Theme.backgroundColor.b, 0.5)
+                                                         Kirigami.Theme.backgroundColor.g,
+                                                         Kirigami.Theme.backgroundColor.b,
+                                                         0.95) // Almost opaque
+
 
                                 // Elegant shadow effect
                                 layer.enabled: true
@@ -708,6 +1018,7 @@ Kirigami.Page {
                 model: clientModel
                 alternatingRows: true
                 clip: true
+                visible: !clientModel.loading && clientModel.rowCount > 0 && isWideScreen
 
                 selectionMode: TableView.SelectionMode.SingleSelection
                 selectionBehavior: TableView.SelectRows
@@ -872,6 +1183,7 @@ Kirigami.Page {
     footer: PaginationBar {
         id: paginationBar
         Layout.fillWidth: true
+        height: 30
         Layout.alignment: Qt.AlignCenter
         currentPage: clientModel.currentPage
         totalPages: clientModel.totalPages
@@ -984,7 +1296,18 @@ Kirigami.Page {
             // Regular toggle behavior - just toggle the current item
         }
     }
+    // KirigamiComponents.FloatingButton {
+    //     anchors {
+    //         right: parent.right
+    //         bottom: parent.bottom
+    //     }
+    //     margins: Kirigami.Units.largeSpacing
 
+    //     action: Kirigami.Action {
+    //         text: "Add new client"
+    //         icon.name: "list-add"
+    //     }
+    // }
     // Detect when Ctrl key is pressed/released for multi-select mode
     Item {
         anchors.fill: parent

@@ -22,6 +22,12 @@ void QuoteModel::convertToSale(int id)
     // Additional quote-specific logic here
 }
 */
+int QuoteModel::columnCount(const QModelIndex &parent) const
+{
+    if (parent.isValid())
+        return 0;
+    return 6; // Adjust based on your needs
+}
 void QuoteModel::refresh()
 {
     if (!m_api)

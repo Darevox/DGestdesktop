@@ -11,19 +11,21 @@ Rectangle {
     property int pageSize: 15
     property int totalItems: 0
     signal pageChanged(int page)
-    height: 48
+    height: 30
     radius: 4
 
     RowLayout {
         anchors.fill: parent
-        anchors.margins: 8
+        anchors.leftMargin: 8
+
+        anchors.rightMargin: 8
 
         QQC2.Label {
             text: i18n("Page %1 of %2", currentPage, totalPages)
             font.pixelSize: 14
             color: "#666666"
             Layout.alignment: Qt.AlignVCenter
-         //   visible: totalPages > 1  // Only show label if more than one page
+            //   visible: totalPages > 1  // Only show label if more than one page
         }
 
         Item {

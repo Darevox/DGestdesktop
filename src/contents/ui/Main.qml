@@ -23,14 +23,17 @@ Kirigami.ApplicationWindow {
 
     property alias  gApiStatusHandler: apiStatusHandler
     pageStack.defaultColumnWidth  : 99999
-    property var currentHeader: null
-    function loadHeader() {
-        // if (currentHeader === null) {
-        //     currentHeader = headerComponent.createObject(rootWindow)
-        //     rootWindow.header = currentHeader
+    pageStack.interactive :false
 
-        // }
-        // // currentGlobalDrawer.open()
+    property var currentHeader: null
+
+    function loadHeader() {
+        if (currentHeader === null) {
+            currentHeader = headerComponent.createObject(rootWindow)
+            rootWindow.header = currentHeader
+
+        }
+        // currentGlobalDrawer.open()
     }
     function destroyHeader() {
         if (currentHeader !== null) {
@@ -41,13 +44,13 @@ Kirigami.ApplicationWindow {
     }
     property var currentGlobalDrawer: null
     function loadGlobalDrawer() {
-        // if (currentGlobalDrawer === null) {
-        //     currentGlobalDrawer = globalDrawerComponent.createObject(rootWindow)
-        //     rootWindow.globalDrawer = currentGlobalDrawer
-        // }
-        // currentGlobalDrawer.open()
+        if (currentGlobalDrawer === null) {
+            currentGlobalDrawer = globalDrawerComponent.createObject(rootWindow)
+            rootWindow.globalDrawer = currentGlobalDrawer
+        }
+        currentGlobalDrawer.open()
 
-        applicationWindow().pageStack.replace(Qt.createComponent("com.dervox.dim", "MainAndroid"))
+      //  applicationWindow().pageStack.replace(Qt.createComponent("com.dervox.dim", "MainAndroid"))
     }
     Component{
         id: headerComponent
@@ -55,12 +58,14 @@ Kirigami.ApplicationWindow {
             Kirigami.Theme.colorSet: Kirigami.Theme.View
             Kirigami.Theme.inherit: false
             color: Kirigami.Theme.backgroundColor
-
+            anchors.left: parent.left
+            anchors.right: parent.right
             implicitWidth: toolBarGlobal.implicitWidth
             implicitHeight: toolBarGlobal.implicitHeight
             RowLayout{
                 id:toolBarGlobal
                 anchors.fill:parent
+
                 Item{
                     Layout.fillWidth: true
                 }

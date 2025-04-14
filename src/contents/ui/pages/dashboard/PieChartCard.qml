@@ -1,4 +1,4 @@
-// PieChartCard.qml
+// PieChartCard.qml (Fixed Version with Visible Circle)
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -11,7 +11,8 @@ Kirigami.AbstractCard {
 
     Layout.fillWidth: true
     Layout.preferredHeight: Kirigami.Units.gridUnit * 16
- Layout.minimumWidth: Kirigami.Units.gridUnit * 15
+    Layout.minimumWidth: Kirigami.Units.gridUnit * 15
+
     // Card properties
     property string title: ""
     property string subtitle: ""
@@ -19,8 +20,53 @@ Kirigami.AbstractCard {
     property var values: []
     property var colors: []
 
+    // Avoid creating empty chart
+    property bool hasValidData: root.values.length > 0 && root.values.some(function(val) { return val > 0; })
+
+    // Add a property to track data changes
+    property int dataUpdateCounter: 0
+
+    // Function to handle data changes
+    function handleDataChange() {
+        // Forcing update by changing counter
+        dataUpdateCounter++;
+
+        // Clear and reset chart data with a slight delay to ensure UI updates
+        chartResetTimer.restart();
+    }
+
+    // Connect data change signals to handler
+    onNamesChanged: handleDataChange()
+    onValuesChanged: handleDataChange()
+    onColorsChanged: handleDataChange()
+
+    // Timer to delay the chart reset
+    Timer {
+        id: chartResetTimer
+        interval: 50
+        onTriggered: {
+            // This is a simpler approach that uses the existing components
+            // but resets their data bindings
+            if (chart) {
+                // Force recalculation of chart by briefly clearing data then restoring
+                chart.valueSources[0].array = []
+                chart.colorSource.array = []
+
+                // Then restore with original data
+                chart.valueSources[0].array = root.values
+                chart.colorSource.array = root.colors
+            }
+        }
+    }
+
     // Adaptive layout properties
     property bool isNarrow: width < Kirigami.Units.gridUnit * 20
+
+    background: Rectangle {
+        color: Qt.lighter(Kirigami.Theme.backgroundColor, 1.2)
+        border.width: 0
+        radius: Kirigami.Units.smallSpacing
+    }
 
     contentItem: ColumnLayout {
         id: mainLayout
@@ -28,7 +74,7 @@ Kirigami.AbstractCard {
         anchors.fill: parent
         anchors.margins: Kirigami.Units.smallSpacing
 
-        // Header - Similar to LineChartCard
+        // Header
         RowLayout {
             Layout.fillWidth: true
             spacing: Kirigami.Units.smallSpacing
@@ -51,17 +97,6 @@ Kirigami.AbstractCard {
                     Layout.fillWidth: true
                 }
             }
-
-            // Add value if needed
-            // Item {
-            //     Layout.fillWidth: true
-            // }
-            // Kirigami.Heading {
-            //     level: 1
-            //     text: "100 DH" // Sample value if needed
-            //     color: Kirigami.Theme.positiveTextColor
-            //     elide: Text.ElideRight
-            // }
         }
 
         // Main chart content
@@ -69,27 +104,30 @@ Kirigami.AbstractCard {
             id: chartContainer
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.topMargin: Kirigami.Units.smallSpacing
-            Layout.bottomMargin: Kirigami.Units.largeSpacing
-            visible: root.values.length > 0
+            visible: hasValidData
 
-            // Main pie chart - takes most of the space
+            // Main pie chart
             Item {
                 id: chartArea
                 anchors {
                     left: parent.left
                     top: parent.top
-                    bottom: legendContainer.top
-                    bottomMargin: Kirigami.Units.smallSpacing
-                    // Only use part of the width on desktop
-                    right: isNarrow ? parent.right : parent.right - Kirigami.Units.gridUnit * 10
+                    bottom: isNarrow ? legendContainer.top : parent.bottom
+                    bottomMargin: isNarrow ? Kirigami.Units.smallSpacing : 0
+                    right: isNarrow ? parent.horizontalCenter : parent.right - Kirigami.Units.gridUnit * 8
                 }
 
+                // Use direct referencing for the chart
                 Charts.PieChart {
                     id: chart
-                    anchors.fill: parent
-                    anchors.margins: Kirigami.Units.largeSpacing
+                    anchors.centerIn: parent
+                    width: Math.min(parent.width, parent.height) * 0.8
+                    height: width
 
+                    // Ensure chart is created only when we have valid data
+                    visible: hasValidData
+
+                    // Using direct bindings
                     colorSource: Charts.ArraySource {
                         array: root.colors
                     }
@@ -106,25 +144,29 @@ Kirigami.AbstractCard {
             Rectangle {
                 id: desktopLegend
                 anchors {
-                    left: chartArea.right
+                  left: chartArea.right
                     right: parent.right
                     top: parent.top
-                    bottom: legendContainer.top
-                    bottomMargin: Kirigami.Units.smallSpacing
+                    bottom: parent.bottom
                 }
-                visible: !isNarrow && root.values.length > 0
+                visible: !isNarrow && hasValidData
                 color: "transparent"
 
                 ScrollView {
                     anchors.fill: parent
                     anchors.margins: Kirigami.Units.smallSpacing
+                    clip: true
 
                     Column {
+                        id: desktopLegendColumn
                         spacing: Kirigami.Units.smallSpacing
                         width: parent.width
 
+                        // Use direct binding for model
                         Repeater {
+                            id: desktopLegendRepeater
                             model: Math.min(root.names.length, root.values.length)
+
                             delegate: RowLayout {
                                 width: parent.width
                                 spacing: Kirigami.Units.smallSpacing
@@ -154,7 +196,7 @@ Kirigami.AbstractCard {
                 }
             }
 
-            // Bottom legend container - for mobile view
+            // Bottom legend container for mobile view
             Rectangle {
                 id: legendContainer
                 anchors {
@@ -162,25 +204,58 @@ Kirigami.AbstractCard {
                     right: parent.right
                     bottom: parent.bottom
                 }
-                height: isNarrow ? Kirigami.Units.gridUnit * 3 : Kirigami.Units.gridUnit
+                height: isNarrow ? Math.min(Kirigami.Units.gridUnit * 5, parent.height * 0.4) : 0
                 color: "transparent"
-                visible: isNarrow && root.values.length > 0
+                visible: isNarrow && hasValidData
 
-                Flow {
+                // Use ListView instead of GridLayout for more reliable item placement
+                ListView {
+                    id: mobileLegendList
                     anchors.fill: parent
                     anchors.margins: Kirigami.Units.smallSpacing
-                    spacing: Kirigami.Units.smallSpacing
+                    orientation: ListView.Vertical
+                    clip: true
+                    spacing: Kirigami.Units.smallSpacing / 2
 
-                    // Only show in mobile view
-                    visible: isNarrow
+                    // Create a simple model from the data
+                    model: {
+                        if (!root.names || !root.values) return 0;
+                        return Math.min(root.names.length, root.values.length);
+                    }
 
-                    Repeater {
-                        model: Math.min(root.names.length, root.values.length)
+                    // Use cacheBuffer to keep items loaded
+                    cacheBuffer: 1000
 
+                    // Reliable row height calculation
+                    property real delegateHeight: Kirigami.Units.gridUnit * 0.8
+
+                    // Calculate how many columns will fit
+                    property int columnCount: Math.max(2, Math.floor(width / (Kirigami.Units.gridUnit * 8)))
+
+                    // Calculate grid cell width
+                    property real cellWidth: width / columnCount
+
+                    // Distribute items in a grid pattern
+                    delegate: Item {
+                        width: mobileLegendList.cellWidth
+                        height: mobileLegendList.delegateHeight
+
+                        // Calculate grid position (row, column)
+                        property int row: Math.floor(index / mobileLegendList.columnCount)
+                        property int column: index % mobileLegendList.columnCount
+
+                        // Position element in grid cell
+                        x: column * mobileLegendList.cellWidth
+                        y: row * mobileLegendList.delegateHeight
+
+                        // Actual content
                         RowLayout {
-                            height: Kirigami.Units.gridUnit
-                            spacing: 4
-                            width: Math.min(parent.width / 2, Kirigami.Units.gridUnit * 8)
+                            anchors {
+                                fill: parent
+                                leftMargin: Kirigami.Units.smallSpacing
+                                rightMargin: Kirigami.Units.smallSpacing
+                            }
+                            spacing: 2
 
                             Rectangle {
                                 width: Kirigami.Units.iconSizes.small / 1.5
@@ -203,16 +278,35 @@ Kirigami.AbstractCard {
                             }
                         }
                     }
+
+                    // Adjust contentHeight to fit all rows
+                    contentHeight: Math.ceil(count / columnCount) * delegateHeight
                 }
             }
+
         }
 
         // Show message when no data
         Label {
-            visible: root.values.length === 0
+            visible: !hasValidData
             text: i18n("No data available")
             opacity: 0.7
             Layout.alignment: Qt.AlignHCenter
+        }
+    }
+
+    // Public function to force a refresh
+    function forceRefresh() {
+        handleDataChange()
+    }
+
+    // Ensure chart is properly initialized when component is completed
+    Component.onCompleted: {
+        if (hasValidData) {
+            // Initial layout might need a nudge
+            Qt.callLater(function() {
+                handleDataChange()
+            })
         }
     }
 }

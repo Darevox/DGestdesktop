@@ -3,12 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 # SPDX-FileCopyrightText: 2025 Akram Abdeslem Chaima <akram@digital>
 #
+#: src/contents/ui/pages/settings/GeneralSettingsPage.qml:68
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-17 19:20+0100\n"
-"PO-Revision-Date: 2025-03-17 20:29+0100\n"
+"POT-Creation-Date: 2025-04-04 21:40+0100\n"
+"PO-Revision-Date: 2025-04-04 22:02+0100\n"
 "Last-Translator: Akram Abdeslem Chaima <akram@riseup.net>\n"
 "Language-Team: French <kde-i18n-doc@kde.org>\n"
 "Language: fr\n"
@@ -16,33 +17,33 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 24.12.2\n"
+"X-Generator: Lokalize 24.12.3\n"
 
 #: src/traymanager.cpp:28
 msgid "DGest"
 msgstr "DGest "
 
-#: src/contents/ui/Main.qml:166 src/contents/ui/pages/user/Profile.qml:17
+#: src/contents/ui/Main.qml:175 src/contents/ui/pages/user/Profile.qml:17
 msgid "Profile"
 msgstr "Profil"
 
-#: src/contents/ui/Main.qml:192
+#: src/contents/ui/Main.qml:201
 msgid "Profile.."
 msgstr "Profil..."
 
-#: src/contents/ui/Main.qml:193
+#: src/contents/ui/Main.qml:202
 msgid "View profile"
 msgstr "Modifier le profil"
 
-#: src/contents/ui/Main.qml:201 src/contents/ui/Main.qml:202
+#: src/contents/ui/Main.qml:210 src/contents/ui/Main.qml:211
 msgid "Logout"
 msgstr "Déconnexion "
 
-#: src/contents/ui/Main.qml:299
+#: src/contents/ui/Main.qml:308
 msgid "Notifications"
 msgstr "Notifications"
 
-#: src/contents/ui/Main.qml:333
+#: src/contents/ui/Main.qml:342
 msgid "No Notifications"
 msgstr "Aucune notification"
 
@@ -65,10 +66,10 @@ msgstr "Nouveau Fournisseur"
 
 #: src/contents/ui/pages/supplier/Supplier.qml:47
 #: src/contents/ui/pages/activitylog/ActivityLog.qml:256
+#: src/contents/ui/pages/quote/Quote.qml:226
 #: src/contents/ui/pages/cashTransaction/CashTransaction.qml:194
-#: src/contents/ui/pages/sale/Sale.qml:215
+#: src/contents/ui/pages/sale/Sale.qml:226
 #: src/contents/ui/pages/invoice/Invoice.qml:200
-#: src/contents/ui/pages/client/Client.qml:46
 #: src/contents/ui/pages/purchase/Purchase.qml:205
 msgid "Filter"
 msgstr "Filtrer"
@@ -76,13 +77,14 @@ msgstr "Filtrer"
 #: src/contents/ui/pages/supplier/Supplier.qml:52
 #: src/contents/ui/pages/supplier/SupplierDetails.qml:147
 #: src/contents/ui/pages/activitylog/ActivityLog.qml:30
-#: src/contents/ui/pages/sale/Sale.qml:228
+#: src/contents/ui/pages/quote/Quote.qml:239
+#: src/contents/ui/pages/sale/Sale.qml:239
 #: src/contents/ui/pages/cashsource/CashSource.qml:59
 #: src/contents/ui/pages/cashsource/CashSourceDetails.qml:261
 #: src/contents/ui/pages/invoice/Invoice.qml:194
 #: src/contents/ui/pages/invoice/InvoiceDetails_Draft.qml:258
-#: src/contents/ui/pages/client/ClientDetails.qml:146
-#: src/contents/ui/pages/client/Client.qml:51
+#: src/contents/ui/pages/client/ClientDetails.qml:239
+#: src/contents/ui/pages/client/Client.qml:365
 #: src/contents/ui/pages/purchase/Purchase.qml:218
 #: src/contents/ui/pages/product/Products.qml:75
 #: src/contents/ui/pages/product/ProductDetails.qml:109
@@ -91,22 +93,24 @@ msgstr "Supprimer"
 
 #: src/contents/ui/pages/supplier/Supplier.qml:70
 #: src/contents/ui/pages/activitylog/ActivityLog.qml:69
-#: src/contents/ui/pages/client/Client.qml:68
 #: src/contents/ui/pages/purchase/Purchase.qml:96
 msgid "Filtering"
 msgstr "Filtrage"
 
 #: src/contents/ui/pages/supplier/Supplier.qml:79
 #: src/contents/ui/pages/supplier/SupplierDetails.qml:96
+#: src/contents/ui/pages/quote/QuoteDetails.qml:131
+#: src/contents/ui/pages/quote/Quote.qml:136
 #: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:104
 #: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:157
-#: src/contents/ui/pages/sale/Sale.qml:125
+#: src/contents/ui/pages/sale/SaleDetails.qml:131
+#: src/contents/ui/pages/sale/Sale.qml:136
 #: src/contents/ui/pages/invoice/Invoice.qml:45
 #: src/contents/ui/pages/invoice/InvoiceDetails_Draft.qml:94
 #: src/contents/ui/pages/invoice/InvoiceSummaryCard.qml:33
 #: src/contents/ui/pages/client/ClientSalesDialog.qml:108
-#: src/contents/ui/pages/client/ClientDetails.qml:96
-#: src/contents/ui/pages/client/Client.qml:77
+#: src/contents/ui/pages/client/ClientDetails.qml:187
+#: src/contents/ui/pages/client/Client.qml:505
 #: src/contents/ui/pages/purchase/Purchase.qml:105
 msgid "Status"
 msgstr "Statut"
@@ -115,12 +119,14 @@ msgstr "Statut"
 #: src/contents/ui/pages/supplier/Supplier.qml:95
 #: src/contents/ui/pages/activitylog/ActivityLog.qml:28
 #: src/contents/ui/pages/activitylog/ActivityLog.qml:45
+#: src/contents/ui/pages/quote/Quote.qml:126
+#: src/contents/ui/pages/quote/Quote.qml:138
+#: src/contents/ui/pages/quote/Quote.qml:152
 #: src/contents/ui/pages/cashTransaction/CashTransaction.qml:109
-#: src/contents/ui/pages/sale/Sale.qml:127
-#: src/contents/ui/pages/sale/Sale.qml:141
+#: src/contents/ui/pages/sale/Sale.qml:126
+#: src/contents/ui/pages/sale/Sale.qml:138
+#: src/contents/ui/pages/sale/Sale.qml:152
 #: src/contents/ui/pages/invoice/Invoice.qml:47
-#: src/contents/ui/pages/client/Client.qml:79
-#: src/contents/ui/pages/client/Client.qml:93
 #: src/contents/ui/pages/purchase/Purchase.qml:107
 #: src/contents/ui/pages/purchase/Purchase.qml:122
 msgid "All"
@@ -131,9 +137,9 @@ msgstr "Tout"
 #: src/contents/ui/pages/supplier/SupplierDetails.qml:98
 #: src/contents/ui/pages/cashsource/CashSource.qml:247
 #: src/contents/ui/pages/cashsource/CashSourceDetails.qml:195
-#: src/contents/ui/pages/client/ClientDetails.qml:98
-#: src/contents/ui/pages/client/Client.qml:80
-#: src/contents/ui/pages/client/Client.qml:231
+#: src/contents/ui/pages/client/ClientDetails.qml:189
+#: src/contents/ui/pages/client/Client.qml:834
+#: src/contents/ui/pages/client/Client.qml:1120
 msgid "Active"
 msgstr "Actif"
 
@@ -142,44 +148,41 @@ msgstr "Actif"
 #: src/contents/ui/pages/supplier/SupplierDetails.qml:99
 #: src/contents/ui/pages/cashsource/CashSource.qml:248
 #: src/contents/ui/pages/cashsource/CashSourceDetails.qml:196
-#: src/contents/ui/pages/client/ClientDetails.qml:99
-#: src/contents/ui/pages/client/Client.qml:81
-#: src/contents/ui/pages/client/Client.qml:231
+#: src/contents/ui/pages/client/ClientDetails.qml:190
+#: src/contents/ui/pages/client/Client.qml:834
+#: src/contents/ui/pages/client/Client.qml:1120
 msgid "Inactive"
 msgstr "Inactif"
 
 #: src/contents/ui/pages/supplier/Supplier.qml:93
 #: src/contents/ui/pages/client/ClientSalesDialog.qml:98
-#: src/contents/ui/pages/client/Client.qml:91
 msgid "Balance"
 msgstr "Solde"
 
 #: src/contents/ui/pages/supplier/Supplier.qml:96
-#: src/contents/ui/pages/client/Client.qml:94
 msgid "With Balance"
 msgstr "Avec solde"
 
 #: src/contents/ui/pages/supplier/Supplier.qml:97
-#: src/contents/ui/pages/client/Client.qml:95
 msgid "Without Balance"
 msgstr "Sans solde"
 
 #: src/contents/ui/pages/supplier/Supplier.qml:111
 #: src/contents/ui/pages/activitylog/ActivityLog.qml:160
+#: src/contents/ui/pages/quote/Quote.qml:191
 #: src/contents/ui/pages/cashTransaction/CashTransaction.qml:159
-#: src/contents/ui/pages/sale/Sale.qml:180
+#: src/contents/ui/pages/sale/Sale.qml:191
 #: src/contents/ui/pages/invoice/Invoice.qml:84
-#: src/contents/ui/pages/client/Client.qml:109
 #: src/contents/ui/pages/purchase/Purchase.qml:169
 msgid "Apply Filters"
 msgstr "Appliquer les filtres"
 
 #: src/contents/ui/pages/supplier/Supplier.qml:120
 #: src/contents/ui/pages/activitylog/ActivityLog.qml:169
+#: src/contents/ui/pages/quote/Quote.qml:200
 #: src/contents/ui/pages/cashTransaction/CashTransaction.qml:167
-#: src/contents/ui/pages/sale/Sale.qml:189
+#: src/contents/ui/pages/sale/Sale.qml:200
 #: src/contents/ui/pages/invoice/Invoice.qml:92
-#: src/contents/ui/pages/client/Client.qml:118
 #: src/contents/ui/pages/purchase/Purchase.qml:178
 msgid "Clear Filters"
 msgstr "Effacer les filtres"
@@ -189,11 +192,13 @@ msgid "Search suppliers..."
 msgstr "Rechercher des fournisseurs..."
 
 #: src/contents/ui/pages/supplier/Supplier.qml:185
+#: src/contents/ui/pages/quote/ProductSelectorDialog.qml:138
+#: src/contents/ui/pages/quote/Quote.qml:351
 #: src/contents/ui/pages/sale/ProductSelectorDialog.qml:138
-#: src/contents/ui/pages/sale/Sale.qml:286
+#: src/contents/ui/pages/sale/Sale.qml:351
 #: src/contents/ui/pages/cashsource/CashSource.qml:168
 #: src/contents/ui/pages/invoice/Invoice.qml:317
-#: src/contents/ui/pages/client/Client.qml:184
+#: src/contents/ui/pages/client/Client.qml:1074
 #: src/contents/ui/pages/purchase/ProductSelectorDialog.qml:138
 #: src/contents/ui/pages/purchase/Purchase.qml:275
 #: src/contents/ui/pages/product/Products.qml:247
@@ -202,9 +207,10 @@ msgid "Select"
 msgstr "Ajouter la sélection"
 
 #: src/contents/ui/pages/supplier/Supplier.qml:198
+#: src/contents/ui/pages/quote/ProductSelectorDialog.qml:164
 #: src/contents/ui/pages/sale/ProductSelectorDialog.qml:164
 #: src/contents/ui/pages/cashsource/CashSource.qml:182
-#: src/contents/ui/pages/client/Client.qml:197
+#: src/contents/ui/pages/client/Client.qml:1087
 #: src/contents/ui/pages/purchase/ProductSelectorDialog.qml:164
 #: src/contents/ui/pages/product/Products.qml:272
 msgctxt "@title:column"
@@ -212,16 +218,17 @@ msgid "Name"
 msgstr "Nom"
 
 #: src/contents/ui/pages/supplier/Supplier.qml:205
-#: src/contents/ui/pages/client/Client.qml:205
+#: src/contents/ui/pages/client/Client.qml:1094
 msgctxt "@title:column"
 msgid "Contact Info"
 msgstr "Coordonnées"
 
 #: src/contents/ui/pages/supplier/Supplier.qml:226
-#: src/contents/ui/pages/sale/Sale.qml:317
+#: src/contents/ui/pages/quote/Quote.qml:407
+#: src/contents/ui/pages/sale/Sale.qml:407
 #: src/contents/ui/pages/cashsource/CashSource.qml:238
 #: src/contents/ui/pages/invoice/Invoice.qml:354
-#: src/contents/ui/pages/client/Client.qml:226
+#: src/contents/ui/pages/client/Client.qml:1115
 #: src/contents/ui/pages/purchase/Purchase.qml:305
 msgctxt "@title:column"
 msgid "Status"
@@ -229,27 +236,28 @@ msgstr "Statut"
 
 #: src/contents/ui/pages/supplier/Supplier.qml:239
 #: src/contents/ui/pages/cashsource/CashSource.qml:220
-#: src/contents/ui/pages/client/Client.qml:240
+#: src/contents/ui/pages/client/Client.qml:1128
 msgctxt "@title:column"
 msgid "Balance"
 msgstr "Solde"
 
 #: src/contents/ui/pages/supplier/Supplier.qml:254
-#: src/contents/ui/pages/client/Client.qml:255
+#: src/contents/ui/pages/client/Client.qml:1143
 msgid "High Balance"
 msgstr "Solde élevé"
 
 #: src/contents/ui/pages/supplier/Supplier.qml:255
-#: src/contents/ui/pages/client/Client.qml:256
+#: src/contents/ui/pages/client/Client.qml:1144
 msgid "Outstanding Balance"
 msgstr "Solde restant dû"
 
 #: src/contents/ui/pages/supplier/Supplier.qml:256
-#: src/contents/ui/pages/sale/Sale.qml:142
+#: src/contents/ui/pages/quote/Quote.qml:153
+#: src/contents/ui/pages/sale/Sale.qml:153
 #: src/contents/ui/pages/invoice/Invoice.qml:50
 #: src/contents/ui/pages/client/ClientSalesDialog.qml:88
 #: src/contents/ui/pages/client/ClientSalesDialog.qml:114
-#: src/contents/ui/pages/client/Client.qml:257
+#: src/contents/ui/pages/client/Client.qml:1145
 #: src/contents/ui/pages/purchase/Purchase.qml:123
 #: src/contents/ui/pages/purchase/Purchase.qml:339
 msgid "Paid"
@@ -281,43 +289,48 @@ msgstr "Fournisseur mis à jour avec succès"
 #: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:71
 #: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:124
 #: src/contents/ui/pages/cashsource/CashSourceDetails.qml:92
-#: src/contents/ui/pages/client/ClientDetails.qml:53
+#: src/contents/ui/pages/client/ClientDetails.qml:78
 #: src/contents/ui/pages/product/ProductDetails.qml:173
 msgid "Name"
 msgstr "Nom"
 
 #: src/contents/ui/pages/supplier/SupplierDetails.qml:60
 #: src/contents/ui/pages/user/Login.qml:87
+#: src/contents/ui/pages/settings/TeamSettingsPage.qml:111
 #: src/contents/ui/pages/team/TeamDialog.qml:70
-#: src/contents/ui/pages/client/ClientDetails.qml:60
+#: src/contents/ui/pages/client/ClientDetails.qml:85
 msgid "Email"
 msgstr "E-mail"
 
 #: src/contents/ui/pages/supplier/SupplierDetails.qml:67
+#: src/contents/ui/pages/settings/TeamSettingsPage.qml:118
 #: src/contents/ui/pages/team/TeamDialog.qml:77
-#: src/contents/ui/pages/client/ClientDetails.qml:67
+#: src/contents/ui/pages/client/ClientDetails.qml:92
 msgid "Phone"
 msgstr "Téléphone"
 
 #: src/contents/ui/pages/supplier/SupplierDetails.qml:74
+#: src/contents/ui/pages/settings/TeamSettingsPage.qml:125
 #: src/contents/ui/pages/team/TeamDialog.qml:84
-#: src/contents/ui/pages/client/ClientDetails.qml:74
+#: src/contents/ui/pages/client/ClientDetails.qml:99
 msgid "Address"
 msgstr "Adresse"
 
 #: src/contents/ui/pages/supplier/SupplierDetails.qml:84
-#: src/contents/ui/pages/client/ClientDetails.qml:84
+#: src/contents/ui/pages/client/ClientDetails.qml:118
 msgid "Tax Number"
 msgstr "Numéro fiscal"
 
 #: src/contents/ui/pages/supplier/SupplierDetails.qml:90
-#: src/contents/ui/pages/client/ClientDetails.qml:90
+#: src/contents/ui/pages/client/ClientDetails.qml:181
 msgid "Payment Terms"
 msgstr "Conditions de paiement"
 
 #: src/contents/ui/pages/supplier/SupplierDetails.qml:109
-#: src/contents/ui/pages/sale/SaleDetails.qml:189
-#: src/contents/ui/pages/sale/SaleDetails.qml:631
+#: src/contents/ui/pages/quote/QuoteDetails.qml:229
+#: src/contents/ui/pages/quote/QuoteDetails.qml:701
+#: src/contents/ui/pages/sale/SaleDetails.qml:229
+#: src/contents/ui/pages/sale/SaleDetails.qml:701
 #: src/contents/ui/pages/cashsource/TransactionDialog.qml:41
 #: src/contents/ui/pages/cashsource/TransferDialog.qml:138
 #: src/contents/ui/pages/invoice/AddPaymentDialog.qml:83
@@ -325,16 +338,16 @@ msgstr "Conditions de paiement"
 #: src/contents/ui/pages/invoice/InvoiceDetails_Draft.qml:146
 #: src/contents/ui/pages/invoice/InvoiceDetails_Draft.qml:309
 #: src/contents/ui/pages/invoice/InvoiceItemDialog.qml:58
-#: src/contents/ui/pages/client/ClientDetails.qml:108
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:134
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:595
+#: src/contents/ui/pages/client/ClientDetails.qml:199
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:137
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:598
 msgid "Notes"
 msgstr "Notes"
 
 #: src/contents/ui/pages/supplier/SupplierDetails.qml:118
 #: src/contents/ui/pages/team/TeamDialog.qml:133
 #: src/contents/ui/pages/invoice/InvoiceDetails_Draft.qml:225
-#: src/contents/ui/pages/client/ClientDetails.qml:117
+#: src/contents/ui/pages/client/ClientDetails.qml:210
 #: src/contents/ui/pages/product/ProductDetails.qml:77
 msgid "Save"
 msgstr "Enregistrer"
@@ -342,7 +355,7 @@ msgstr "Enregistrer"
 #: src/contents/ui/pages/supplier/SupplierDetails.qml:118
 #: src/contents/ui/pages/cashsource/CashSource.qml:51
 #: src/contents/ui/pages/invoice/InvoiceDetails_Draft.qml:225
-#: src/contents/ui/pages/client/ClientDetails.qml:117
+#: src/contents/ui/pages/client/ClientDetails.qml:210
 #: src/contents/ui/pages/product/Barcode.qml:50
 #: src/contents/ui/pages/product/Products.qml:67
 #: src/contents/ui/pages/product/ProductDetails.qml:77
@@ -352,24 +365,26 @@ msgstr "Ajouter"
 
 #: src/contents/ui/pages/supplier/SupplierDetails.qml:134
 #: src/contents/ui/pages/invoice/InvoiceDetails_Draft.qml:243
-#: src/contents/ui/pages/client/ClientDetails.qml:133
+#: src/contents/ui/pages/client/ClientDetails.qml:226
 #: src/contents/ui/pages/product/ProductDetails.qml:96
 msgid "Add & Add another"
 msgstr "Ajouter et ajouter un autre"
 
 #: src/contents/ui/pages/supplier/SupplierDetails.qml:158
 #: src/contents/ui/pages/user/Profile.qml:22
-#: src/contents/ui/pages/sale/SaleDetails.qml:574
-#: src/contents/ui/pages/sale/SaleDetails.qml:656
+#: src/contents/ui/pages/quote/QuoteDetails.qml:629
+#: src/contents/ui/pages/quote/QuoteDetails.qml:728
+#: src/contents/ui/pages/sale/SaleDetails.qml:629
+#: src/contents/ui/pages/sale/SaleDetails.qml:728
 #: src/contents/ui/pages/AboutApp.qml:10
 #: src/contents/ui/pages/cashsource/CashSourceDetails.qml:271
 #: src/contents/ui/pages/cashsource/TransferDialog.qml:170
 #: src/contents/ui/pages/team/TeamImageEditor.qml:205
 #: src/contents/ui/pages/team/TeamDialog.qml:144
 #: src/contents/ui/pages/invoice/InvoiceDetails_Draft.qml:269
-#: src/contents/ui/pages/client/ClientDetails.qml:157
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:475
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:621
+#: src/contents/ui/pages/client/ClientDetails.qml:250
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:478
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:624
 #: src/contents/ui/pages/product/Barcode.qml:24
 #: src/contents/ui/pages/product/Barcode.qml:186
 #: src/contents/ui/pages/product/Barcode.qml:239
@@ -395,7 +410,6 @@ msgid "Activity Logs"
 msgstr "Journal d'activité"
 
 #: src/contents/ui/pages/activitylog/ActivityLog.qml:29
-#: src/contents/ui/pages/invoice/Invoice.qml:186
 msgid "Create"
 msgstr "Créer"
 
@@ -446,9 +460,10 @@ msgid "Deposit"
 msgstr "Dépôt"
 
 #: src/contents/ui/pages/activitylog/ActivityLog.qml:46
+#: src/contents/ui/pages/quote/QuoteDetails.qml:321
 #: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:168
-#: src/contents/ui/pages/sale/SaleDetails.qml:281
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:225
+#: src/contents/ui/pages/sale/SaleDetails.qml:321
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:228
 msgid "Product"
 msgstr "Produit"
 
@@ -462,6 +477,8 @@ msgid "Purchase"
 msgstr "Achat"
 
 #: src/contents/ui/pages/activitylog/ActivityLog.qml:49
+#: src/contents/ui/pages/quote/QuoteDetails.qml:146
+#: src/contents/ui/pages/sale/SaleDetails.qml:146
 msgid "Sale"
 msgstr "Vente"
 
@@ -470,7 +487,8 @@ msgid "Invoice"
 msgstr "Facture"
 
 #: src/contents/ui/pages/activitylog/ActivityLog.qml:51
-#: src/contents/ui/pages/sale/Sale.qml:167
+#: src/contents/ui/pages/quote/Quote.qml:178
+#: src/contents/ui/pages/sale/Sale.qml:178
 #: src/contents/ui/pages/invoice/InvoiceSummaryCard.qml:18
 msgid "Client"
 msgstr "Client"
@@ -613,15 +631,16 @@ msgstr "Vous n'avez pas de compte ?"
 msgid "Sign Up!"
 msgstr "S'inscrire !"
 
-#: src/contents/ui/pages/user/Login.qml:252
+#: src/contents/ui/pages/user/Login.qml:254
 msgid "Please enter a valid email address"
 msgstr "Veuillez saisir un ID facturable valide"
 
-#: src/contents/ui/pages/user/Login.qml:306
+#: src/contents/ui/pages/user/Login.qml:308
 msgid "Error setting up application. Please try again."
 msgstr "Erreur lors de la configuration de l'application. Veuillez réessayer."
 
 #: src/contents/ui/pages/user/Profile.qml:31
+#: src/contents/ui/pages/settings/AccountsSettingsPage.qml:55
 msgid "Plan"
 msgstr "Abonnement"
 
@@ -630,41 +649,797 @@ msgid "Current plan : "
 msgstr "Plan actuel : "
 
 #: src/contents/ui/pages/user/Profile.qml:41
+#: src/contents/ui/pages/settings/AccountsSettingsPage.qml:395
 msgid "Plan Status : "
 msgstr "Statut du plan : "
 
 #: src/contents/ui/pages/user/Profile.qml:47
+#: src/contents/ui/pages/settings/AccountsSettingsPage.qml:401
 msgid "Upgrade plan"
 msgstr "Changer l'abonnement"
 
 #: src/contents/ui/pages/user/Profile.qml:75
+#: src/contents/ui/pages/settings/AccountsSettingsPage.qml:429
 msgid "User information"
 msgstr "Information utilisateur"
 
 #: src/contents/ui/pages/user/Profile.qml:80
+#: src/contents/ui/pages/settings/AccountsSettingsPage.qml:434
 msgid "Full name : "
 msgstr "Nom complet : "
 
 #: src/contents/ui/pages/user/Profile.qml:83
+#: src/contents/ui/pages/settings/AccountsSettingsPage.qml:437
 msgid "Email : "
 msgstr "E-mail : "
 
 #: src/contents/ui/pages/user/Profile.qml:88
+#: src/contents/ui/pages/settings/AccountsSettingsPage.qml:442
 msgid "Edit profile"
 msgstr "Modifier le profil"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:14
+#: src/contents/ui/pages/sale/SaleDetails.qml:14
+msgid "Edit %1"
+msgstr "Modifier %1"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:14
+#: src/contents/ui/pages/sale/SaleDetails.qml:14
+msgid "New %1"
+msgstr "Nouveau %1"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:42
+#: src/contents/ui/pages/sale/SaleDetails.qml:42
+msgid "Quotes don't affect inventory until converted to sales."
+msgstr ""
+"Les devis n'affectent pas l'inventaire jusqu'à leur conversion en ventes."
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:63
+#: src/contents/ui/pages/sale/SaleDetails.qml:63
+msgid "%1 Details"
+msgstr "%1 Détails"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:66
+#: src/contents/ui/pages/sale/SaleDetails.qml:66
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:49
+msgid "Products"
+msgstr "Produits"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:87
+#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:569
+#: src/contents/ui/pages/sale/SaleDetails.qml:87
+msgid "Assign to Client"
+msgstr "Attribuer au client"
+
+# Should I continue with the next set of translations?
+#: src/contents/ui/pages/quote/QuoteDetails.qml:133
+#: src/contents/ui/pages/quote/Quote.qml:139
+#: src/contents/ui/pages/quote/Quote.qml:417
+#: src/contents/ui/pages/sale/SaleDetails.qml:133
+#: src/contents/ui/pages/sale/Sale.qml:139
+#: src/contents/ui/pages/sale/Sale.qml:417
+#: src/contents/ui/pages/cashsource/CashSource.qml:249
+#: src/contents/ui/pages/purchase/Purchase.qml:108
+#: src/contents/ui/pages/purchase/Purchase.qml:314
+msgid "Pending"
+msgstr "En attente"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:134
+#: src/contents/ui/pages/quote/Quote.qml:140
+#: src/contents/ui/pages/quote/Quote.qml:415
+#: src/contents/ui/pages/sale/SaleDetails.qml:134
+#: src/contents/ui/pages/sale/Sale.qml:140
+#: src/contents/ui/pages/sale/Sale.qml:415
+#: src/contents/ui/pages/purchase/Purchase.qml:109
+#: src/contents/ui/pages/purchase/Purchase.qml:312
+msgid "Completed"
+msgstr "Terminé"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:135
+#: src/contents/ui/pages/quote/Quote.qml:141
+#: src/contents/ui/pages/quote/Quote.qml:416
+#: src/contents/ui/pages/sale/SaleDetails.qml:135
+#: src/contents/ui/pages/sale/Sale.qml:141
+#: src/contents/ui/pages/sale/Sale.qml:416
+#: src/contents/ui/pages/invoice/Invoice.qml:52
+#: src/contents/ui/pages/purchase/Purchase.qml:110
+#: src/contents/ui/pages/purchase/Purchase.qml:313
+msgid "Cancelled"
+msgstr "Annulé"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:144
+#: src/contents/ui/pages/quote/Quote.qml:124
+#: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:32
+#: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:76
+#: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:129
+#: src/contents/ui/pages/sale/SaleDetails.qml:144
+#: src/contents/ui/pages/sale/Sale.qml:124
+msgid "Type"
+msgstr "Type"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:147
+#: src/contents/ui/pages/sale/SaleDetails.qml:147
+msgid "Quote"
+msgstr "Devis"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:176
+#: src/contents/ui/pages/sale/SaleDetails.qml:176
+msgid "Sale Date"
+msgstr "Date de vente"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:184
+#: src/contents/ui/pages/sale/SaleDetails.qml:184
+#: src/contents/ui/pages/invoice/InvoiceDetails.qml:77
+#: src/contents/ui/pages/invoice/InvoiceDetails_Draft.qml:108
+#: src/contents/ui/pages/invoice/InvoiceSummaryCard.qml:28
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:95
+msgid "Due Date"
+msgstr "Date d'échéance"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:198
+#: src/contents/ui/pages/sale/SaleDetails.qml:198
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:106
+msgid "Totals"
+msgstr "Totaux"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:202
+#: src/contents/ui/pages/sale/SaleDetails.qml:202
+#: src/contents/ui/pages/invoice/InvoiceDetails.qml:107
+#: src/contents/ui/pages/invoice/InvoiceDetails_Draft.qml:135
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:110
+msgid "Subtotal"
+msgstr "Sous-total"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:207
+#: src/contents/ui/pages/sale/SaleDetails.qml:207
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:115
+msgid "Tax"
+msgstr "TVA"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:220
+#: src/contents/ui/pages/quote/QuoteDetails.qml:349
+#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:198
+#: src/contents/ui/pages/sale/SaleDetails.qml:220
+#: src/contents/ui/pages/sale/SaleDetails.qml:349
+#: src/contents/ui/pages/invoice/InvoiceDetails_Draft.qml:313
+#: src/contents/ui/pages/invoice/InvoiceItemDialog.qml:52
+#: src/contents/ui/pages/client/ClientSalesDialog.qml:78
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:128
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:256
+msgid "Total"
+msgstr "Total"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:257
+#: src/contents/ui/pages/sale/SaleDetails.qml:257
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:164
+msgid "Sale Items"
+msgstr "Articles de la vente"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:262
+#: src/contents/ui/pages/sale/SaleDetails.qml:262
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:169
+msgid "Add Products"
+msgstr "Ajouter des produits"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:328
+#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:174
+#: src/contents/ui/pages/sale/SaleDetails.qml:328
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:235
+msgid "Package"
+msgstr "Paquet"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:333
+#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:180
+#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:373
+#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:389
+#: src/contents/ui/pages/sale/SaleDetails.qml:333
+#: src/contents/ui/pages/invoice/InvoiceDetails_Draft.qml:293
+#: src/contents/ui/pages/invoice/InvoiceItemDialog.qml:32
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:240
+#: src/contents/ui/pages/product/ProductDetails.qml:228
+msgid "Quantity"
+msgstr "Quantité"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:339
+#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:186
+#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:441
+#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:457
+#: src/contents/ui/pages/sale/SaleDetails.qml:339
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:246
+#: src/contents/ui/pages/product/ProductDetails.qml:265
+msgid "Price"
+msgstr "Prix"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:344
+#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:192
+#: src/contents/ui/pages/sale/SaleDetails.qml:344
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:251
+msgid "Tax Rate"
+msgstr "Taux de TVA"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:381
+#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:231
+#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:239
+#: src/contents/ui/pages/sale/SaleDetails.qml:381
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:288
+msgid "Piece (1)"
+msgstr "Pièce (1)"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:523
+#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:547
+#: src/contents/ui/pages/sale/SaleDetails.qml:523
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:430
+msgid "No products added"
+msgstr "Aucun produit ajouté"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:524
+#: src/contents/ui/pages/sale/SaleDetails.qml:524
+msgid "Click 'Add Products' to select products for this sale"
+msgstr ""
+"Cliquez sur 'Ajouter des produits' pour sélectionner des produits pour cette "
+"vente"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:543
+#: src/contents/ui/pages/sale/SaleDetails.qml:543
+msgid "Options"
+msgstr "OptionsModifier la source de trésorerie"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:551
+#: src/contents/ui/pages/sale/SaleDetails.qml:551
+msgid "Convert to Sale"
+msgstr "Convertir en vente"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:560
+#: src/contents/ui/pages/sale/SaleDetails.qml:560
+msgid "Generate %1 Document"
+msgstr "Générer le document %1"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:572
+#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:1150
+#: src/contents/ui/pages/sale/SaleDetails.qml:572
+msgid "Print Receipt"
+msgstr "Imprimer le reçu"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:579
+#: src/contents/ui/pages/quote/QuoteDetails.qml:638
+#: src/contents/ui/pages/quote/QuoteDetails.qml:707
+#: src/contents/ui/pages/sale/SaleDetails.qml:579
+#: src/contents/ui/pages/sale/SaleDetails.qml:638
+#: src/contents/ui/pages/sale/SaleDetails.qml:707
+#: src/contents/ui/pages/invoice/AddPaymentDialog.qml:12
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:464
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:550
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:604
+msgid "Add Payment"
+msgstr "Ajouter un paiement"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:593
+#: src/contents/ui/pages/sale/SaleDetails.qml:593
+msgid "Tax : "
+msgstr "TVA : "
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:599
+#: src/contents/ui/pages/sale/SaleDetails.qml:599
+msgid "Total : "
+msgstr "Total : "
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:610
+#: src/contents/ui/pages/sale/SaleDetails.qml:610
+#: src/contents/ui/pages/settings/TeamSettingsPage.qml:24
+#: src/contents/ui/pages/cashsource/CashSourceDetails.qml:233
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:445
+msgid "Save Changes"
+msgstr "Enregistrer les modifications"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:610
+#: src/contents/ui/pages/sale/SaleDetails.qml:610
+msgid "Create %1"
+msgstr "Créer %1"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:619
+#: src/contents/ui/pages/sale/SaleDetails.qml:619
+#: src/contents/ui/pages/cashsource/CashSourceDetails.qml:250
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:454
+msgid "Create & Add Another"
+msgstr "Créer et ajouter un autre"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:654
+#: src/contents/ui/pages/sale/SaleDetails.qml:654
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:561
+msgid "Cash Source"
+msgstr "Source de trésorerie"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:661
+#: src/contents/ui/pages/sale/SaleDetails.qml:661
+#: src/contents/ui/pages/invoice/AddPaymentDialog.qml:64
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:592
+msgid "Payment Method"
+msgstr "Méthode de paiement"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:663
+#: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:79
+#: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:132
+#: src/contents/ui/pages/sale/SaleDetails.qml:663
+#: src/contents/ui/pages/cashsource/CashSource.qml:206
+#: src/contents/ui/pages/cashsource/CashSourceDetails.qml:104
+#: src/contents/ui/pages/invoice/AddPaymentDialog.qml:66
+msgid "Cash"
+msgstr "Espèces"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:664
+#: src/contents/ui/pages/sale/SaleDetails.qml:664
+#: src/contents/ui/pages/invoice/AddPaymentDialog.qml:67
+msgid "Bank Transfer"
+msgstr "Virement bancaire"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:665
+#: src/contents/ui/pages/sale/SaleDetails.qml:665
+#: src/contents/ui/pages/invoice/AddPaymentDialog.qml:69
+msgid "Credit Card"
+msgstr "Carte de crédit"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:666
+#: src/contents/ui/pages/sale/SaleDetails.qml:666
+msgid "Debit Card"
+msgstr "Carte de débit"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:667
+#: src/contents/ui/pages/sale/SaleDetails.qml:667
+#: src/contents/ui/pages/invoice/AddPaymentDialog.qml:68
+msgid "Check"
+msgstr "Chèque"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:668
+#: src/contents/ui/pages/sale/SaleDetails.qml:668
+msgid "Online Payment"
+msgstr "Paiement en ligne"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:669
+#: src/contents/ui/pages/sale/SaleDetails.qml:669
+#: src/contents/ui/pages/cashsource/CashSourceDetails.qml:106
+msgid "Other"
+msgstr "Autre"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:677
+#: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:44
+#: src/contents/ui/pages/sale/SaleDetails.qml:677
+#: src/contents/ui/pages/cashsource/TransactionDialog.qml:31
+#: src/contents/ui/pages/cashsource/TransferDialog.qml:113
+#: src/contents/ui/pages/client/ClientPaymentsDialog.qml:66
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:569
+msgid "Amount"
+msgstr "Montant"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:694
+#: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:22
+#: src/contents/ui/pages/sale/SaleDetails.qml:694
+#: src/contents/ui/pages/invoice/AddPaymentDialog.qml:77
+#: src/contents/ui/pages/invoice/InvoiceDetails.qml:53
+#: src/contents/ui/pages/invoice/InvoiceDetails_Draft.qml:61
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:585
+msgid "Reference Number"
+msgstr "Numéro de référence"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:1006
+#: src/contents/ui/pages/sale/SaleDetails.qml:1006
+msgid "Sale created successfully"
+msgstr "Vente créée avec succès"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:1032
+#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:1132
+#: src/contents/ui/pages/sale/SaleDetails.qml:1032
+msgid "Receipt generation failed: %1"
+msgstr "Échec de la génération du reçu : %1"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:1039
+#: src/contents/ui/pages/sale/SaleDetails.qml:1039
+msgid "Convert Quote to Sale"
+msgstr "Convertir le devis en vente"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:1040
+#: src/contents/ui/pages/sale/SaleDetails.qml:1040
+msgid ""
+"This will convert the quote to a sale and reduce product inventory. Are you "
+"sure?"
+msgstr ""
+"Cela convertira le devis en vente et réduira l'inventaire des produits. Êtes-v"
+"ous "
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:1060
+#: src/contents/ui/pages/sale/SaleDetails.qml:1060
+msgid "Quote successfully converted to sale"
+msgstr "Devis converti en vente avec succès"
+
+#: src/contents/ui/pages/quote/QuoteDetails.qml:1071
+#: src/contents/ui/pages/sale/SaleDetails.qml:1071
+msgid "Failed to convert quote: %1"
+msgstr "Échec de la conversion du devis : %1"
+
+#: src/contents/ui/pages/quote/ProductSelectorDialog.qml:15
+#: src/contents/ui/pages/sale/ProductSelectorDialog.qml:15
+#: src/contents/ui/pages/purchase/ProductSelectorDialog.qml:15
+msgid "Select Products"
+msgstr "Sélectionner des produits"
+
+#: src/contents/ui/pages/quote/ProductSelectorDialog.qml:46
+#: src/contents/ui/pages/sale/ProductSelectorDialog.qml:46
+#: src/contents/ui/pages/purchase/ProductSelectorDialog.qml:46
+#: src/contents/ui/pages/product/ProductDetails.qml:811
+msgid "Create Product"
+msgstr "Créer un produit"
+
+#: src/contents/ui/pages/quote/ProductSelectorDialog.qml:154
+#: src/contents/ui/pages/quote/Quote.qml:389
+#: src/contents/ui/pages/cashTransaction/CashTransaction.qml:317
+#: src/contents/ui/pages/sale/ProductSelectorDialog.qml:154
+#: src/contents/ui/pages/sale/Sale.qml:389
+#: src/contents/ui/pages/invoice/Invoice.qml:330
+#: src/contents/ui/pages/purchase/ProductSelectorDialog.qml:154
+#: src/contents/ui/pages/purchase/Purchase.qml:288
+#: src/contents/ui/pages/product/Products.qml:262
+msgctxt "@title:column"
+msgid "Reference"
+msgstr "Référence"
+
+#: src/contents/ui/pages/quote/ProductSelectorDialog.qml:179
+#: src/contents/ui/pages/cashTransaction/CashTransaction.qml:369
+#: src/contents/ui/pages/sale/ProductSelectorDialog.qml:179
+#: src/contents/ui/pages/cashsource/CashSource.qml:266
+#: src/contents/ui/pages/purchase/ProductSelectorDialog.qml:179
+#: src/contents/ui/pages/product/Products.qml:287
+msgctxt "@title:column"
+msgid "Description"
+msgstr "Description"
+
+#: src/contents/ui/pages/quote/ProductSelectorDialog.qml:190
+#: src/contents/ui/pages/sale/ProductSelectorDialog.qml:190
+#: src/contents/ui/pages/purchase/ProductSelectorDialog.qml:190
+#: src/contents/ui/pages/product/Products.qml:298
+msgctxt "@title:column"
+msgid "Price"
+msgstr "Prix"
+
+#: src/contents/ui/pages/quote/ProductSelectorDialog.qml:202
+#: src/contents/ui/pages/sale/ProductSelectorDialog.qml:202
+#: src/contents/ui/pages/purchase/ProductSelectorDialog.qml:202
+#: src/contents/ui/pages/product/Products.qml:310
+msgctxt "@title:column"
+msgid "Quantity"
+msgstr "Quantité"
+
+#: src/contents/ui/pages/quote/ProductSelectorDialog.qml:221
+#: src/contents/ui/pages/sale/ProductSelectorDialog.qml:221
+#: src/contents/ui/pages/purchase/ProductSelectorDialog.qml:221
+#: src/contents/ui/pages/product/Products.qml:329
+msgctxt "@title:column"
+msgid "minStock"
+msgstr "Stock"
+
+#: src/contents/ui/pages/quote/ProductSelectorDialog.qml:232
+#: src/contents/ui/pages/sale/ProductSelectorDialog.qml:232
+#: src/contents/ui/pages/purchase/ProductSelectorDialog.qml:232
+#: src/contents/ui/pages/product/Products.qml:340
+msgctxt "@title:column"
+msgid "Unit"
+msgstr "Unité"
+
+#: src/contents/ui/pages/quote/ProductSelectorDialog.qml:347
+#: src/contents/ui/pages/sale/ProductSelectorDialog.qml:347
+#: src/contents/ui/pages/purchase/ProductSelectorDialog.qml:347
+msgid "Add Selected"
+msgstr "Ajouter la sélection"
+
+#: src/contents/ui/pages/quote/ProductSelectorDialog.qml:377
+#: src/contents/ui/pages/sale/ProductSelectorDialog.qml:377
+#: src/contents/ui/pages/invoice/InvoiceDetails.qml:198
+#: src/contents/ui/pages/invoice/ViewPdfDialog.qml:54
+#: src/contents/ui/pages/purchase/ProductSelectorDialog.qml:377
+#: src/contents/ui/pages/product/ProductDetails.qml:701
+msgid "Close"
+msgstr "Fermer"
+
+# Should I continue with the next set of translations?
+#: src/contents/ui/pages/quote/Quote.qml:14
+#: src/contents/ui/pages/sale/Sale.qml:14
+msgctxt "@title:group"
+msgid "Sales"
+msgstr "Ventes"
+
+#: src/contents/ui/pages/quote/Quote.qml:28
+#: src/contents/ui/pages/sale/Sale.qml:28
+msgid "Sales Summary"
+msgstr "Résumé des ventes"
+
+#: src/contents/ui/pages/quote/Quote.qml:36
+#: src/contents/ui/pages/sale/Sale.qml:36
+#: src/contents/ui/pages/dashboard/Dashboard.qml:103
+#: src/contents/ui/pages/client/ClientStatisticsDialog.qml:215
+msgid "Total Sales"
+msgstr "Total des ventes"
+
+#: src/contents/ui/pages/quote/Quote.qml:41
+#: src/contents/ui/pages/sale/Sale.qml:41
+#: src/contents/ui/pages/invoice/AddPaymentDialog.qml:27
+#: src/contents/ui/pages/invoice/Invoice.qml:125
+#: src/contents/ui/pages/invoice/InvoiceDetails.qml:122
+#: src/contents/ui/pages/invoice/InvoiceDetails_Draft.qml:140
+#: src/contents/ui/pages/invoice/InvoiceSummaryCard.qml:43
+#: src/contents/ui/pages/purchase/Purchase.qml:40
+msgid "Total Amount"
+msgstr "Montant total"
+
+#: src/contents/ui/pages/quote/Quote.qml:46
+#: src/contents/ui/pages/sale/Sale.qml:46
+#: src/contents/ui/pages/invoice/Invoice.qml:130
+#: src/contents/ui/pages/purchase/Purchase.qml:45
+msgid "Total Paid"
+msgstr "Total payé"
+
+#: src/contents/ui/pages/quote/Quote.qml:55
+#: src/contents/ui/pages/sale/Sale.qml:55
+#: src/contents/ui/pages/purchase/Purchase.qml:54
+msgid "Status Breakdown"
+msgstr "Répartition par statut"
+
+#: src/contents/ui/pages/quote/Quote.qml:62
+#: src/contents/ui/pages/sale/Sale.qml:62
+msgid "%1 sales"
+msgstr "%1 ventes"
+
+#: src/contents/ui/pages/quote/Quote.qml:71
+#: src/contents/ui/pages/sale/Sale.qml:71
+msgid "Top Clients"
+msgstr "Meilleurs clients"
+
+#: src/contents/ui/pages/quote/Quote.qml:77
+#: src/contents/ui/pages/quote/Quote.qml:402
+#: src/contents/ui/pages/sale/Sale.qml:77
+#: src/contents/ui/pages/sale/Sale.qml:402
+#: src/contents/ui/pages/invoice/InvoiceDetails.qml:97
+#: src/contents/ui/pages/purchase/Purchase.qml:300
+msgid "Anonymous"
+msgstr "Anonyme"
+
+#: src/contents/ui/pages/quote/Quote.qml:78
+#: src/contents/ui/pages/sale/Sale.qml:78
+msgid "%1 sales, Total: %2"
+msgstr "%1 ventes, Total : %2"
+
+#: src/contents/ui/pages/quote/Quote.qml:89
+#: src/contents/ui/pages/sale/Sale.qml:89
+#: src/contents/ui/pages/dashboard/Dashboard.qml:244
+msgid "Top Products"
+msgstr "Meilleurs produits"
+
+#: src/contents/ui/pages/quote/Quote.qml:96
+#: src/contents/ui/pages/sale/Sale.qml:96
+msgid "Sold: %1, Total: %2"
+msgstr "Vendu : %1, Total : %2"
+
+#: src/contents/ui/pages/quote/Quote.qml:116
+#: src/contents/ui/pages/sale/Sale.qml:116
+msgid "Filter Sales"
+msgstr "Filtrer les ventes"
+
+# Should I continue with the next set of translations?
+#: src/contents/ui/pages/quote/Quote.qml:127
+#: src/contents/ui/pages/sale/Sale.qml:127
+#: src/contents/ui/components/VNavigationTabBar.qml:301
+msgid "Sales"
+msgstr "Ventes"
+
+#: src/contents/ui/pages/quote/Quote.qml:128
+#: src/contents/ui/pages/sale/Sale.qml:128
+#: src/contents/ui/components/VNavigationTabBar.qml:306
+msgid "Quotes"
+msgstr "Devis"
+
+#: src/contents/ui/pages/quote/Quote.qml:150
+#: src/contents/ui/pages/sale/Sale.qml:150
+#: src/contents/ui/pages/invoice/InvoiceSummaryCard.qml:38
+#: src/contents/ui/pages/purchase/Purchase.qml:120
+msgid "Payment Status"
+msgstr "Statut du paiement"
+
+#: src/contents/ui/pages/quote/Quote.qml:154
+#: src/contents/ui/pages/sale/Sale.qml:154
+#: src/contents/ui/pages/client/ClientSalesDialog.qml:116
+#: src/contents/ui/pages/purchase/Purchase.qml:124
+#: src/contents/ui/pages/purchase/Purchase.qml:338
+msgid "Unpaid"
+msgstr "Non payé"
+
+#: src/contents/ui/pages/quote/Quote.qml:155
+#: src/contents/ui/pages/sale/Sale.qml:155
+#: src/contents/ui/pages/client/ClientSalesDialog.qml:115
+#: src/contents/ui/pages/purchase/Purchase.qml:125
+#: src/contents/ui/pages/purchase/Purchase.qml:337
+msgid "Partial"
+msgstr "Partiel"
+
+#: src/contents/ui/pages/quote/Quote.qml:165
+#: src/contents/ui/pages/cashTransaction/CashTransaction.qml:123
+#: src/contents/ui/pages/sale/Sale.qml:165
+#: src/contents/ui/pages/invoice/Invoice.qml:63
+#: src/contents/ui/pages/purchase/Purchase.qml:146
+msgid "Start Date"
+msgstr "Date de début"
+
+#: src/contents/ui/pages/quote/Quote.qml:172
+#: src/contents/ui/pages/cashTransaction/CashTransaction.qml:137
+#: src/contents/ui/pages/sale/Sale.qml:172
+#: src/contents/ui/pages/invoice/Invoice.qml:78
+#: src/contents/ui/pages/purchase/Purchase.qml:158
+msgid "End Date"
+msgstr "Date de fin"
+
+#: src/contents/ui/pages/quote/Quote.qml:218
+#: src/contents/ui/pages/sale/Sale.qml:218
+msgid "New"
+msgstr "Nouveau"
+
+#: src/contents/ui/pages/quote/Quote.qml:275
+#: src/contents/ui/pages/sale/Sale.qml:275
+msgid "No sales matching '%1'"
+msgstr "Aucune vente correspondant à '%1'"
+
+#: src/contents/ui/pages/quote/Quote.qml:276
+#: src/contents/ui/pages/sale/Sale.qml:276
+msgid "No sales found"
+msgstr "Aucune vente trouvée"
+
+#: src/contents/ui/pages/quote/Quote.qml:277
+#: src/contents/ui/pages/sale/Sale.qml:277
+msgid "Create a new sale to get started"
+msgstr "Créez une nouvelle vente pour commencer"
+
+#: src/contents/ui/pages/quote/Quote.qml:397
+#: src/contents/ui/pages/sale/Sale.qml:397
+msgctxt "@title:column"
+msgid "Client"
+msgstr "Client"
+
+#: src/contents/ui/pages/quote/Quote.qml:433
+#: src/contents/ui/pages/sale/Sale.qml:433
+#: src/contents/ui/pages/purchase/Purchase.qml:330
+msgctxt "@title:column"
+msgid "Payment"
+msgstr "Paiement"
+
+#: src/contents/ui/pages/quote/Quote.qml:459
+#: src/contents/ui/pages/sale/Sale.qml:459
+#: src/contents/ui/pages/invoice/Invoice.qml:381
+#: src/contents/ui/pages/purchase/Purchase.qml:355
+msgctxt "@title:column"
+msgid "Total"
+msgstr "Total"
+
+#: src/contents/ui/pages/quote/Quote.qml:470
+#: src/contents/ui/pages/sale/Sale.qml:470
+#: src/contents/ui/pages/purchase/Purchase.qml:366
+msgctxt "@title:column"
+msgid "Paid"
+msgstr "Payé"
+
+#: src/contents/ui/pages/quote/Quote.qml:492
+#: src/contents/ui/pages/sale/Sale.qml:492
+msgctxt "@title:column"
+msgid "Sale Date"
+msgstr "Date de vente"
+
+#: src/contents/ui/pages/quote/Quote.qml:582
+#: src/contents/ui/pages/sale/Sale.qml:582
+msgid "Delete Sale"
+msgstr "Supprimer la vente"
+
+#: src/contents/ui/pages/quote/Quote.qml:583
+#: src/contents/ui/pages/sale/Sale.qml:583
+msgid "Are you sure you want to delete the selected sale(s)?"
+msgstr "Êtes-vous sûr de vouloir supprimer la/les vente(s) sélectionnée(s) ?"
+
+#: src/contents/ui/pages/quote/QuoteGenerationDialog.qml:11
+#: src/contents/ui/pages/sale/InvoiceGenerationDialog.qml:11
+msgid "Generate Quote"
+msgstr "Générer un devis"
+
+#: src/contents/ui/pages/quote/QuoteGenerationDialog.qml:11
+#: src/contents/ui/pages/sale/InvoiceGenerationDialog.qml:11
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:471
+msgid "Generate Invoice"
+msgstr "Générer la facture"
+
+#: src/contents/ui/pages/quote/QuoteGenerationDialog.qml:34
+#: src/contents/ui/pages/sale/InvoiceGenerationDialog.qml:34
+msgid "Generate Quote Document"
+msgstr "Générer un document de devis"
+
+#: src/contents/ui/pages/quote/QuoteGenerationDialog.qml:35
+#: src/contents/ui/pages/sale/InvoiceGenerationDialog.qml:35
+msgid "Generate Invoice Document"
+msgstr "Générer le document de facture"
+
+#: src/contents/ui/pages/quote/QuoteGenerationDialog.qml:40
+#: src/contents/ui/pages/sale/InvoiceGenerationDialog.qml:40
+msgid "Use Default Settings"
+msgstr "Utiliser les paramètres par défaut"
+
+#: src/contents/ui/pages/quote/QuoteGenerationDialog.qml:42
+#: src/contents/ui/pages/sale/InvoiceGenerationDialog.qml:42
+msgid "Use the default document settings"
+msgstr "Utiliser les paramètres de document par défaut"
+
+#: src/contents/ui/pages/quote/QuoteGenerationDialog.qml:56
+#: src/contents/ui/pages/sale/InvoiceGenerationDialog.qml:56
+msgid "Document Options"
+msgstr "Options du document"
+
+#: src/contents/ui/pages/quote/QuoteGenerationDialog.qml:61
+#: src/contents/ui/pages/sale/InvoiceGenerationDialog.qml:61
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:83
+msgid "Show Client Information"
+msgstr "Afficher les informations du client"
+
+#: src/contents/ui/pages/quote/QuoteGenerationDialog.qml:67
+#: src/contents/ui/pages/sale/InvoiceGenerationDialog.qml:67
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:93
+msgid "Show Amount in Words"
+msgstr "Afficher le montant en lettres"
+
+#: src/contents/ui/pages/quote/QuoteGenerationDialog.qml:73
+#: src/contents/ui/pages/sale/InvoiceGenerationDialog.qml:73
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:103
+msgid "Show Payment Methods"
+msgstr "Afficher les méthodes de paiement"
+
+#: src/contents/ui/pages/quote/QuoteGenerationDialog.qml:79
+#: src/contents/ui/pages/sale/InvoiceGenerationDialog.qml:79
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:114
+msgid "Show Tax Numbers"
+msgstr "Afficher les numéros fiscaux"
+
+#: src/contents/ui/pages/quote/QuoteGenerationDialog.qml:85
+#: src/contents/ui/pages/sale/InvoiceGenerationDialog.qml:85
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:125
+msgid "Show Notes"
+msgstr "Afficher les notes"
+
+#: src/contents/ui/pages/quote/QuoteGenerationDialog.qml:90
+#: src/contents/ui/pages/sale/InvoiceGenerationDialog.qml:90
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:136
+msgid "Show Thanks Message"
+msgstr "Afficher le message de remerciement"
+
+#: src/contents/ui/pages/quote/QuoteGenerationDialog.qml:96
+#: src/contents/ui/pages/sale/InvoiceGenerationDialog.qml:96
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:147
+msgid "Show Terms & Conditions"
+msgstr "Afficher les conditions générales"
+
+#: src/contents/ui/pages/quote/QuoteGenerationDialog.qml:102
+#: src/contents/ui/pages/sale/InvoiceGenerationDialog.qml:102
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:168
+msgid "Show Logo"
+msgstr "Afficher le logo"
+
+#: src/contents/ui/pages/quote/QuoteGenerationDialog.qml:112
+#: src/contents/ui/pages/sale/InvoiceGenerationDialog.qml:112
+msgid "Generate Document"
+msgstr "Générer le document"
+
+#: src/contents/ui/pages/quote/QuoteGenerationDialog.qml:176
+#: src/contents/ui/pages/sale/InvoiceGenerationDialog.qml:176
+msgid "Document generated successfully"
+msgstr "Document généré avec succès"
+
+#: src/contents/ui/pages/quote/QuoteGenerationDialog.qml:188
+#: src/contents/ui/pages/sale/InvoiceGenerationDialog.qml:188
+#: src/contents/ui/updater/UpdaterDialog.qml:77
+msgid "Error: %1"
+msgstr "Erreur : %1"
 
 #: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:14
 msgid "Transaction Details"
 msgstr "Détails de la transaction"
-
-#: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:22
-#: src/contents/ui/pages/sale/SaleDetails.qml:624
-#: src/contents/ui/pages/invoice/AddPaymentDialog.qml:77
-#: src/contents/ui/pages/invoice/InvoiceDetails.qml:53
-#: src/contents/ui/pages/invoice/InvoiceDetails_Draft.qml:61
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:582
-msgid "Reference Number"
-msgstr "Numéro de référence"
 
 #: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:27
 #: src/contents/ui/pages/invoice/InvoiceSummaryCard.qml:23
@@ -673,26 +1448,11 @@ msgstr "Numéro de référence"
 msgid "Date"
 msgstr "Date"
 
-#: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:32
-#: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:76
-#: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:129
-msgid "Type"
-msgstr "Type"
-
 #: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:37
 #: src/contents/ui/pages/cashTransaction/CashTransaction.qml:111
 #: src/contents/ui/pages/cashTransaction/CashTransaction.qml:337
 msgid "Withdrawal"
 msgstr "Retrait"
-
-#: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:44
-#: src/contents/ui/pages/sale/SaleDetails.qml:607
-#: src/contents/ui/pages/cashsource/TransactionDialog.qml:31
-#: src/contents/ui/pages/cashsource/TransferDialog.qml:113
-#: src/contents/ui/pages/client/ClientPaymentsDialog.qml:66
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:566
-msgid "Amount"
-msgstr "Montant"
 
 #: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:49
 msgid "Category"
@@ -721,14 +1481,6 @@ msgstr "Compte source"
 #: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:68
 msgid "Account"
 msgstr "Compte"
-
-#: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:79
-#: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:132
-#: src/contents/ui/pages/cashsource/CashSource.qml:206
-#: src/contents/ui/pages/cashsource/CashSourceDetails.qml:104
-#: src/contents/ui/pages/invoice/AddPaymentDialog.qml:66
-msgid "Cash"
-msgstr "Espèces"
 
 #: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:80
 #: src/contents/ui/pages/cashTransaction/CashTransactionDetails.qml:133
@@ -817,20 +1569,6 @@ msgstr "Filtrer les transactions"
 msgid "Transaction Type"
 msgstr "Type de transaction"
 
-#: src/contents/ui/pages/cashTransaction/CashTransaction.qml:123
-#: src/contents/ui/pages/sale/Sale.qml:154
-#: src/contents/ui/pages/invoice/Invoice.qml:63
-#: src/contents/ui/pages/purchase/Purchase.qml:146
-msgid "Start Date"
-msgstr "Date de début"
-
-#: src/contents/ui/pages/cashTransaction/CashTransaction.qml:137
-#: src/contents/ui/pages/sale/Sale.qml:161
-#: src/contents/ui/pages/invoice/Invoice.qml:78
-#: src/contents/ui/pages/purchase/Purchase.qml:158
-msgid "End Date"
-msgstr "Date de fin"
-
 #: src/contents/ui/pages/cashTransaction/CashTransaction.qml:143
 msgid "Minimum Amount"
 msgstr "Montant minimum"
@@ -860,17 +1598,6 @@ msgstr "Aucune transaction trouvée"
 msgid "Transactions will appear here"
 msgstr "Les transactions apparaîtront ici"
 
-#: src/contents/ui/pages/cashTransaction/CashTransaction.qml:317
-#: src/contents/ui/pages/sale/ProductSelectorDialog.qml:154
-#: src/contents/ui/pages/sale/Sale.qml:299
-#: src/contents/ui/pages/invoice/Invoice.qml:330
-#: src/contents/ui/pages/purchase/ProductSelectorDialog.qml:154
-#: src/contents/ui/pages/purchase/Purchase.qml:288
-#: src/contents/ui/pages/product/Products.qml:262
-msgctxt "@title:column"
-msgid "Reference"
-msgstr "Référence"
-
 #: src/contents/ui/pages/cashTransaction/CashTransaction.qml:327
 #: src/contents/ui/pages/cashsource/CashSource.qml:198
 msgctxt "@title:column"
@@ -890,17 +1617,7 @@ msgctxt "@title:column"
 msgid "Amount"
 msgstr "Montant"
 
-#: src/contents/ui/pages/cashTransaction/CashTransaction.qml:369
-#: src/contents/ui/pages/sale/ProductSelectorDialog.qml:179
-#: src/contents/ui/pages/cashsource/CashSource.qml:266
-#: src/contents/ui/pages/purchase/ProductSelectorDialog.qml:179
-#: src/contents/ui/pages/product/Products.qml:287
-msgctxt "@title:column"
-msgid "Description"
-msgstr "Description"
-
 #: src/contents/ui/pages/cashTransaction/CashTransaction.qml:380
-#: src/contents/ui/pages/sale/Sale.qml:402
 #: src/contents/ui/pages/invoice/Invoice.qml:394
 #: src/contents/ui/pages/purchase/Purchase.qml:388
 msgctxt "@title:column"
@@ -928,60 +1645,9 @@ msgid "Set Default:"
 msgstr "Définir par défaut :"
 
 #: src/contents/ui/pages/quickSalePage/CashSourceSettings.qml:49
-#: src/contents/ui/pages/quickSalePage/FavoriteProductsSettings.qml:437
 #: src/contents/ui/pages/cashsource/CashSourceDetails.qml:205
 msgid "Set as Default"
 msgstr "Définir par défaut"
-
-#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:174
-#: src/contents/ui/pages/sale/SaleDetails.qml:288
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:232
-msgid "Package"
-msgstr "Paquet"
-
-#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:180
-#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:373
-#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:389
-#: src/contents/ui/pages/sale/SaleDetails.qml:293
-#: src/contents/ui/pages/invoice/InvoiceDetails_Draft.qml:293
-#: src/contents/ui/pages/invoice/InvoiceItemDialog.qml:32
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:237
-#: src/contents/ui/pages/product/ProductDetails.qml:228
-msgid "Quantity"
-msgstr "Quantité"
-
-#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:186
-#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:441
-#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:457
-#: src/contents/ui/pages/sale/SaleDetails.qml:299
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:243
-#: src/contents/ui/pages/product/ProductDetails.qml:265
-msgid "Price"
-msgstr "Prix"
-
-#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:192
-#: src/contents/ui/pages/sale/SaleDetails.qml:304
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:248
-msgid "Tax Rate"
-msgstr "Taux de TVA"
-
-#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:198
-#: src/contents/ui/pages/sale/SaleDetails.qml:180
-#: src/contents/ui/pages/sale/SaleDetails.qml:309
-#: src/contents/ui/pages/invoice/InvoiceDetails_Draft.qml:313
-#: src/contents/ui/pages/invoice/InvoiceItemDialog.qml:52
-#: src/contents/ui/pages/client/ClientSalesDialog.qml:78
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:125
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:253
-msgid "Total"
-msgstr "Total"
-
-#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:231
-#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:239
-#: src/contents/ui/pages/sale/SaleDetails.qml:341
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:285
-msgid "Piece (1)"
-msgstr "Pièce (1)"
 
 #: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:402
 msgid "Maximum quantity reached"
@@ -992,20 +1658,9 @@ msgstr "Quantité maximale atteinte"
 msgid "tax Rate"
 msgstr "Taux de TVA"
 
-#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:547
-#: src/contents/ui/pages/sale/SaleDetails.qml:483
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:427
-msgid "No products added"
-msgstr "Aucun produit ajouté"
-
 #: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:548
 msgid "Search products above to add them to the sale"
 msgstr "Recherchez des produits ci-dessus pour les ajouter à la vente"
-
-#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:569
-#: src/contents/ui/pages/sale/SaleDetails.qml:81
-msgid "Assign to Client"
-msgstr "Attribuer au client"
 
 #: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:651
 msgid "Sale Notes"
@@ -1017,7 +1672,7 @@ msgstr "Remise :"
 
 #: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:687
 #: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:703
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:118
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:121
 msgid "Discount"
 msgstr "Remise"
 
@@ -1049,11 +1704,6 @@ msgstr "Quantité maximale atteinte pour %1"
 msgid "Sale Completed!"
 msgstr "Vente terminée !"
 
-#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:1132
-#: src/contents/ui/pages/sale/SaleDetails.qml:931
-msgid "Receipt generation failed: %1"
-msgstr "Échec de la génération du reçu : %1"
-
 #: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:1139
 msgid "Sale Settings"
 msgstr "Paramètres de vente"
@@ -1062,28 +1712,21 @@ msgstr "Paramètres de vente"
 msgid "Auto Payment"
 msgstr "Paiement automatique"
 
-#: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:1150
-#: src/contents/ui/pages/sale/SaleDetails.qml:517
-msgid "Print Receipt"
-msgstr "Imprimer le reçu"
-
 #: src/contents/ui/pages/quickSalePage/QuickSaleTabContent.qml:1154
 msgid "Make Sale Completed"
 msgstr "Marquer la vente comme terminée"
 
 #: src/contents/ui/pages/quickSalePage/QuickSalePage.qml:13
-#: src/contents/ui/components/VNavigationTabBar.qml:22
+#: src/contents/ui/components/VNavigationTabBar.qml:248
 msgid "Quick Sale"
 msgstr "Vente rapide"
 
 #: src/contents/ui/pages/quickSalePage/QuickSalePage.qml:30
-#: src/contents/ui/components/VNavigationTabBar.qml:77
+#: src/contents/ui/components/VNavigationTabBar.qml:327
 msgid "Settings"
 msgstr "Paramètres"
 
 #: src/contents/ui/pages/quickSalePage/QuickSalePage.qml:35
-#: src/contents/ui/pages/sale/SaleDetails.qml:14
-#: src/contents/ui/pages/sale/Sale.qml:207
 msgid "New Sale"
 msgstr "Nouvelle vente"
 
@@ -1189,11 +1832,6 @@ msgstr "Source de trésorerie par défaut"
 msgid "Current Default: %1"
 msgstr "Par défaut actuellement : %1"
 
-#: src/contents/ui/pages/quickSalePage/FavoriteProductsSettings.qml:447
-#: src/contents/ui/components/DSearchableComboBoxCashSource.qml:190
-msgid "No cash sources available"
-msgstr "Aucune source de trésorerie disponible"
-
 #: src/contents/ui/pages/quickSalePage/FavoriteProductsSettings.qml:463
 #: src/contents/ui/pages/product/CategoriesSettings.qml:184
 msgid "Delete Category"
@@ -1255,325 +1893,6 @@ msgstr "Nouvelle catégorie"
 msgid "Category created successfully"
 msgstr "Catégorie créée avec succès"
 
-#: src/contents/ui/pages/sale/ProductSelectorDialog.qml:15
-#: src/contents/ui/pages/purchase/ProductSelectorDialog.qml:15
-msgid "Select Products"
-msgstr "Sélectionner des produits"
-
-#: src/contents/ui/pages/sale/ProductSelectorDialog.qml:46
-#: src/contents/ui/pages/purchase/ProductSelectorDialog.qml:46
-#: src/contents/ui/pages/product/ProductDetails.qml:811
-msgid "Create Product"
-msgstr "Créer un produit"
-
-#: src/contents/ui/pages/sale/ProductSelectorDialog.qml:190
-#: src/contents/ui/pages/purchase/ProductSelectorDialog.qml:190
-#: src/contents/ui/pages/product/Products.qml:298
-msgctxt "@title:column"
-msgid "Price"
-msgstr "Prix"
-
-#: src/contents/ui/pages/sale/ProductSelectorDialog.qml:202
-#: src/contents/ui/pages/purchase/ProductSelectorDialog.qml:202
-#: src/contents/ui/pages/product/Products.qml:310
-msgctxt "@title:column"
-msgid "Quantity"
-msgstr "Quantité"
-
-#: src/contents/ui/pages/sale/ProductSelectorDialog.qml:221
-#: src/contents/ui/pages/purchase/ProductSelectorDialog.qml:221
-#: src/contents/ui/pages/product/Products.qml:329
-msgctxt "@title:column"
-msgid "minStock"
-msgstr "Stock"
-
-#: src/contents/ui/pages/sale/ProductSelectorDialog.qml:232
-#: src/contents/ui/pages/purchase/ProductSelectorDialog.qml:232
-#: src/contents/ui/pages/product/Products.qml:340
-msgctxt "@title:column"
-msgid "Unit"
-msgstr "Unité"
-
-#: src/contents/ui/pages/sale/ProductSelectorDialog.qml:347
-#: src/contents/ui/pages/purchase/ProductSelectorDialog.qml:347
-msgid "Add Selected"
-msgstr "Ajouter la sélection"
-
-#: src/contents/ui/pages/sale/ProductSelectorDialog.qml:377
-#: src/contents/ui/pages/invoice/InvoiceDetails.qml:198
-#: src/contents/ui/pages/invoice/ViewPdfDialog.qml:54
-#: src/contents/ui/pages/purchase/ProductSelectorDialog.qml:377
-#: src/contents/ui/pages/product/ProductDetails.qml:701
-msgid "Close"
-msgstr "Fermer"
-
-#: src/contents/ui/pages/sale/SaleDetails.qml:14
-msgid "Edit Sale"
-msgstr "Modifier la vente"
-
-#: src/contents/ui/pages/sale/SaleDetails.qml:57
-msgid "Sale Details"
-msgstr "Détails de la vente"
-
-#: src/contents/ui/pages/sale/SaleDetails.qml:60
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:49
-msgid "Products"
-msgstr "Produits"
-
-#: src/contents/ui/pages/sale/SaleDetails.qml:136
-msgid "Sale Date"
-msgstr "Date de vente"
-
-#: src/contents/ui/pages/sale/SaleDetails.qml:144
-#: src/contents/ui/pages/invoice/InvoiceDetails.qml:77
-#: src/contents/ui/pages/invoice/InvoiceDetails_Draft.qml:108
-#: src/contents/ui/pages/invoice/InvoiceSummaryCard.qml:28
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:92
-msgid "Due Date"
-msgstr "Date d'échéance"
-
-#: src/contents/ui/pages/sale/SaleDetails.qml:158
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:103
-msgid "Totals"
-msgstr "Totaux"
-
-#: src/contents/ui/pages/sale/SaleDetails.qml:162
-#: src/contents/ui/pages/invoice/InvoiceDetails.qml:107
-#: src/contents/ui/pages/invoice/InvoiceDetails_Draft.qml:135
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:107
-msgid "Subtotal"
-msgstr "Sous-total"
-
-#: src/contents/ui/pages/sale/SaleDetails.qml:167
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:112
-msgid "Tax"
-msgstr "TVA"
-
-#: src/contents/ui/pages/sale/SaleDetails.qml:217
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:161
-msgid "Sale Items"
-msgstr "Articles de la vente"
-
-#: src/contents/ui/pages/sale/SaleDetails.qml:222
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:166
-msgid "Add Products"
-msgstr "Ajouter des produits"
-
-#: src/contents/ui/pages/sale/SaleDetails.qml:484
-msgid "Click 'Add Products' to select products for this sale"
-msgstr ""
-"Cliquez sur 'Ajouter des produits' pour sélectionner des produits pour cette "
-"vente"
-
-#: src/contents/ui/pages/sale/SaleDetails.qml:503
-msgid "Options"
-msgstr "OptionsModifier la source de trésorerie"
-
-#: src/contents/ui/pages/sale/SaleDetails.qml:510
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:468
-msgid "Generate Invoice"
-msgstr "Générer la facture"
-
-#: src/contents/ui/pages/sale/SaleDetails.qml:524
-#: src/contents/ui/pages/sale/SaleDetails.qml:583
-#: src/contents/ui/pages/sale/SaleDetails.qml:637
-#: src/contents/ui/pages/invoice/AddPaymentDialog.qml:12
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:461
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:547
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:601
-msgid "Add Payment"
-msgstr "Ajouter un paiement"
-
-#: src/contents/ui/pages/sale/SaleDetails.qml:538
-msgid "Tax : "
-msgstr "TVA : "
-
-#: src/contents/ui/pages/sale/SaleDetails.qml:544
-msgid "Total : "
-msgstr "Total : "
-
-#: src/contents/ui/pages/sale/SaleDetails.qml:555
-#: src/contents/ui/pages/cashsource/CashSourceDetails.qml:233
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:442
-msgid "Save Changes"
-msgstr "Enregistrer les modifications"
-
-#: src/contents/ui/pages/sale/SaleDetails.qml:555
-msgid "Create Sale"
-msgstr "Créer une vente"
-
-#: src/contents/ui/pages/sale/SaleDetails.qml:564
-#: src/contents/ui/pages/cashsource/CashSourceDetails.qml:250
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:451
-msgid "Create & Add Another"
-msgstr "Créer et ajouter un autre"
-
-#: src/contents/ui/pages/sale/SaleDetails.qml:599
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:558
-msgid "Cash Source"
-msgstr "Source de trésorerie"
-
-#: src/contents/ui/pages/sale/SaleDetails.qml:907
-msgid "Sale created successfully"
-msgstr "Vente créée avec succès"
-
-# Should I continue with the next set of translations?
-#: src/contents/ui/pages/sale/Sale.qml:14
-msgctxt "@title:group"
-msgid "Sales"
-msgstr "Ventes"
-
-#: src/contents/ui/pages/sale/Sale.qml:28
-msgid "Sales Summary"
-msgstr "Résumé des ventes"
-
-#: src/contents/ui/pages/sale/Sale.qml:36
-#: src/contents/ui/pages/dashboard/Dashboard.qml:84
-#: src/contents/ui/pages/client/ClientStatisticsDialog.qml:215
-msgid "Total Sales"
-msgstr "Total des ventes"
-
-#: src/contents/ui/pages/sale/Sale.qml:41
-#: src/contents/ui/pages/invoice/AddPaymentDialog.qml:27
-#: src/contents/ui/pages/invoice/Invoice.qml:125
-#: src/contents/ui/pages/invoice/InvoiceDetails.qml:122
-#: src/contents/ui/pages/invoice/InvoiceDetails_Draft.qml:140
-#: src/contents/ui/pages/invoice/InvoiceSummaryCard.qml:43
-#: src/contents/ui/pages/purchase/Purchase.qml:40
-msgid "Total Amount"
-msgstr "Montant total"
-
-#: src/contents/ui/pages/sale/Sale.qml:46
-#: src/contents/ui/pages/invoice/Invoice.qml:130
-#: src/contents/ui/pages/purchase/Purchase.qml:45
-msgid "Total Paid"
-msgstr "Total payé"
-
-#: src/contents/ui/pages/sale/Sale.qml:55
-#: src/contents/ui/pages/purchase/Purchase.qml:54
-msgid "Status Breakdown"
-msgstr "Répartition par statut"
-
-#: src/contents/ui/pages/sale/Sale.qml:62
-msgid "%1 sales"
-msgstr "%1 ventes"
-
-#: src/contents/ui/pages/sale/Sale.qml:71
-msgid "Top Clients"
-msgstr "Meilleurs clients"
-
-#: src/contents/ui/pages/sale/Sale.qml:77
-#: src/contents/ui/pages/sale/Sale.qml:312
-#: src/contents/ui/pages/invoice/InvoiceDetails.qml:97
-#: src/contents/ui/pages/purchase/Purchase.qml:300
-msgid "Anonymous"
-msgstr "Anonyme"
-
-#: src/contents/ui/pages/sale/Sale.qml:78
-msgid "%1 sales, Total: %2"
-msgstr "%1 ventes, Total : %2"
-
-#: src/contents/ui/pages/sale/Sale.qml:89
-#: src/contents/ui/pages/dashboard/Dashboard.qml:435
-msgid "Top Products"
-msgstr "Meilleurs produits"
-
-#: src/contents/ui/pages/sale/Sale.qml:96
-msgid "Sold: %1, Total: %2"
-msgstr "Vendu : %1, Total : %2"
-
-#: src/contents/ui/pages/sale/Sale.qml:116
-msgid "Filter Sales"
-msgstr "Filtrer les ventes"
-
-# Should I continue with the next set of translations?
-#: src/contents/ui/pages/sale/Sale.qml:128
-#: src/contents/ui/pages/sale/Sale.qml:327
-#: src/contents/ui/pages/cashsource/CashSource.qml:249
-#: src/contents/ui/pages/purchase/Purchase.qml:108
-#: src/contents/ui/pages/purchase/Purchase.qml:314
-msgid "Pending"
-msgstr "En attente"
-
-#: src/contents/ui/pages/sale/Sale.qml:129
-#: src/contents/ui/pages/sale/Sale.qml:325
-#: src/contents/ui/pages/purchase/Purchase.qml:109
-#: src/contents/ui/pages/purchase/Purchase.qml:312
-msgid "Completed"
-msgstr "Terminé"
-
-#: src/contents/ui/pages/sale/Sale.qml:130
-#: src/contents/ui/pages/sale/Sale.qml:326
-#: src/contents/ui/pages/invoice/Invoice.qml:52
-#: src/contents/ui/pages/purchase/Purchase.qml:110
-#: src/contents/ui/pages/purchase/Purchase.qml:313
-msgid "Cancelled"
-msgstr "Annulé"
-
-#: src/contents/ui/pages/sale/Sale.qml:139
-#: src/contents/ui/pages/invoice/InvoiceSummaryCard.qml:38
-#: src/contents/ui/pages/purchase/Purchase.qml:120
-msgid "Payment Status"
-msgstr "Statut du paiement"
-
-#: src/contents/ui/pages/sale/Sale.qml:143
-#: src/contents/ui/pages/client/ClientSalesDialog.qml:116
-#: src/contents/ui/pages/purchase/Purchase.qml:124
-#: src/contents/ui/pages/purchase/Purchase.qml:338
-msgid "Unpaid"
-msgstr "Non payé"
-
-#: src/contents/ui/pages/sale/Sale.qml:144
-#: src/contents/ui/pages/client/ClientSalesDialog.qml:115
-#: src/contents/ui/pages/purchase/Purchase.qml:125
-#: src/contents/ui/pages/purchase/Purchase.qml:337
-msgid "Partial"
-msgstr "Partiel"
-
-#: src/contents/ui/pages/sale/Sale.qml:264
-msgid "No sales matching '%1'"
-msgstr "Aucune vente correspondant à '%1'"
-
-#: src/contents/ui/pages/sale/Sale.qml:265
-msgid "No sales found"
-msgstr "Aucune vente trouvée"
-
-#: src/contents/ui/pages/sale/Sale.qml:266
-msgid "Create a new sale to get started"
-msgstr "Créez une nouvelle vente pour commencer"
-
-#: src/contents/ui/pages/sale/Sale.qml:307
-msgctxt "@title:column"
-msgid "Client"
-msgstr "Client"
-
-#: src/contents/ui/pages/sale/Sale.qml:343
-#: src/contents/ui/pages/purchase/Purchase.qml:330
-msgctxt "@title:column"
-msgid "Payment"
-msgstr "Paiement"
-
-#: src/contents/ui/pages/sale/Sale.qml:369
-#: src/contents/ui/pages/invoice/Invoice.qml:381
-#: src/contents/ui/pages/purchase/Purchase.qml:355
-msgctxt "@title:column"
-msgid "Total"
-msgstr "Total"
-
-#: src/contents/ui/pages/sale/Sale.qml:380
-#: src/contents/ui/pages/purchase/Purchase.qml:366
-msgctxt "@title:column"
-msgid "Paid"
-msgstr "Payé"
-
-#: src/contents/ui/pages/sale/Sale.qml:472
-msgid "Delete Sale"
-msgstr "Supprimer la vente"
-
-#: src/contents/ui/pages/sale/Sale.qml:473
-msgid "Are you sure you want to delete the selected sale(s)?"
-msgstr "Êtes-vous sûr de vouloir supprimer la/les vente(s) sélectionnée(s) ?"
-
 #: src/contents/ui/pages/NoPage.qml:17
 msgid "No Internet Connection"
 msgstr "Pas de connexion Internet"
@@ -1601,6 +1920,7 @@ msgid "App"
 msgstr "Application"
 
 #: src/contents/ui/pages/AboutApp.qml:24
+#: src/contents/ui/pages/settings/AboutSettingsPage.qml:59
 msgid "DIM"
 msgstr "DIM"
 
@@ -1609,20 +1929,309 @@ msgid "Version"
 msgstr "Version"
 
 #: src/contents/ui/pages/AboutApp.qml:36 src/contents/ui/pages/AboutApp.qml:54
+#: src/contents/ui/pages/settings/AboutSettingsPage.qml:66
+#: src/contents/ui/pages/settings/AboutSettingsPage.qml:84
 msgid "Home page"
 msgstr "Page d'accueil"
 
 #: src/contents/ui/pages/AboutApp.qml:44
+#: src/contents/ui/pages/settings/AboutSettingsPage.qml:74
 msgid "Team"
 msgstr "Équipe"
 
 #: src/contents/ui/pages/AboutApp.qml:48
+#: src/contents/ui/pages/settings/AboutSettingsPage.qml:78
 msgid "Dervox "
 msgstr "Dervox "
 
 #: src/contents/ui/pages/Welcome.qml:34
 msgid "Hello World!"
 msgstr "Bonjour le monde !"
+
+#: src/contents/ui/pages/settings/AboutSettingsPage.qml:11
+msgctxt "@title"
+msgid "About DIM"
+msgstr "À propos de DIM"
+
+#: src/contents/ui/pages/settings/AboutSettingsPage.qml:14
+msgctxt "@title:group"
+msgid "Updates"
+msgstr "Mises à jour"
+
+#: src/contents/ui/pages/settings/AboutSettingsPage.qml:23
+msgctxt "@action:button"
+msgid "Update Available: %1"
+msgstr "Mise à jour disponible : %1"
+
+#: src/contents/ui/pages/settings/AboutSettingsPage.qml:24
+msgctxt "@action:button"
+msgid "Check for Updates"
+msgstr "Vérifier les mises à jour"
+
+#: src/contents/ui/pages/settings/AboutSettingsPage.qml:27
+msgid "A new version is available to install"
+msgstr "Une nouvelle version est disponible à installer"
+
+#: src/contents/ui/pages/settings/AboutSettingsPage.qml:28
+msgid "Your current version: %1"
+msgstr "Votre version actuelle : %1"
+
+#: src/contents/ui/pages/settings/AboutSettingsPage.qml:53
+#: src/contents/ui/pages/Settings.qml:40
+#: src/contents/ui/components/VNavigationTabBar.qml:60
+msgctxt "@title:group"
+msgid "About"
+msgstr "À propos"
+
+#: src/contents/ui/pages/settings/ConfigPage.qml:9
+msgctxt "@title:window"
+msgid "Settings"
+msgstr "Paramètres"
+
+#: src/contents/ui/pages/settings/AccountsSettingsPage.qml:10
+msgctxt "@title"
+msgid "Account Settings"
+msgstr "Paramètres du compte"
+
+#: src/contents/ui/pages/settings/AccountsSettingsPage.qml:49
+msgctxt "@title:group"
+msgid "Account Settings"
+msgstr "Paramètres du compte"
+
+#: src/contents/ui/pages/settings/AccountsSettingsPage.qml:61
+#: src/contents/ui/pages/settings/AccountsSettingsPage.qml:69
+msgid "Current plan: "
+msgstr "Plan actuel : "
+
+#: src/contents/ui/pages/settings/AccountsSettingsPage.qml:392
+msgid "Expired on : "
+msgstr "Expiré le :"
+
+#: src/contents/ui/pages/settings/GeneralSettingsPage.qml:9
+msgctxt "@title"
+msgid "General Settings"
+msgstr "Paramètres généraux"
+
+#: src/contents/ui/pages/settings/GeneralSettingsPage.qml:12
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:160
+msgctxt "@title:group"
+msgid "Appearance"
+msgstr "Apparence"
+
+#: src/contents/ui/pages/settings/GeneralSettingsPage.qml:18
+msgctxt "@label:listbox"
+msgid "Current Color Scheme"
+msgstr "Schéma de couleur actuel"
+
+#: src/contents/ui/pages/settings/GeneralSettingsPage.qml:21
+msgctxt "@label:listbox"
+msgid "No color schemes available"
+msgstr "Aucun schéma de couleur disponible"
+
+#: src/contents/ui/pages/settings/GeneralSettingsPage.qml:33
+msgid "Scale UI"
+msgstr "Échelle de l'interface"
+
+#: src/contents/ui/pages/settings/GeneralSettingsPage.qml:74
+msgid "Scale Change"
+msgstr "Changement d'échelle"
+
+#: src/contents/ui/pages/settings/GeneralSettingsPage.qml:75
+msgid ""
+"The application needs to restart to apply the new scale. Do you want to "
+"restart now?"
+msgstr ""
+"L'application doit redémarrer pour appliquer la nouvelle échelle. Voulez-"
+"vous redémarrer maintenant ?"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:13
+msgctxt "@title"
+msgid "Document Settings"
+msgstr "Paramètres du document"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:23
+msgid "Reset to Defaults"
+msgstr "Réinitialiser aux valeurs par défaut"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:31
+msgid "Save Settings"
+msgstr "Enregistrer les paramètres"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:44
+msgid "Reset Settings"
+msgstr "Réinitialiser les paramètres"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:45
+msgid "Are you sure you want to reset all document settings to defaults?"
+msgstr ""
+"Êtes-vous sûr de vouloir réinitialiser tous les paramètres du document aux val"
+"eurs par défaut ?"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:75
+msgctxt "@title:group"
+msgid "Document Content"
+msgstr "Contenu du document"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:85
+msgid "Display client details (name, address, contact info)"
+msgstr "Afficher les détails du client (nom, adresse, coordonnées)"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:95
+msgid "Display the total amount written in words"
+msgstr "Afficher le montant total écrit en toutes lettres"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:105
+msgid "Display payment methods used for this transaction"
+msgstr "Afficher les méthodes de paiement utilisées pour cette transaction"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:116
+msgid "Display tax identification numbers (RC, NIF..)"
+msgstr "Afficher les numéros d'identification fiscale (RC, NIF...)"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:127
+msgid "Display additional notes on documents"
+msgstr "Afficher des notes supplémentaires sur les documents"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:138
+msgid "Display additional Thanks Message on documents"
+msgstr "Afficher un message de remerciement supplémentaire sur les documents"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:149
+msgid "Display terms and conditions on documents"
+msgstr "Afficher les conditions générales sur les documents"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:170
+msgid "Display company logo on documents"
+msgstr "Afficher le logo de l'entreprise sur les documents"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:183
+msgid "Theme Color:"
+msgstr "Couleur du thème :"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:208
+msgid "Select Theme Color"
+msgstr "Sélectionner la couleur du thème"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:224
+msgctxt "@title:group"
+msgid "Default Text"
+msgstr "Texte par défaut"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:232
+msgid "Default Notes"
+msgstr "Notes par défaut"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:234
+msgid "Enter default notes to appear on invoices"
+msgstr "Saisir les notes par défaut à afficher sur les factures"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:243
+msgid "Default Thanks Message"
+msgstr "Message de remerciement par défaut"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:245
+msgid "Enter default Thanks Message to appear on invoices"
+msgstr ""
+"Saisir le message de remerciement par défaut à afficher sur les factures"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:254
+msgid "Default Terms & Conditions"
+msgstr "Conditions générales par défaut"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:256
+msgid "Enter default terms to appear on documents"
+msgstr "Saisir les conditions par défaut à afficher sur les documents"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:265
+msgid "Footer Text"
+msgstr "Texte de pied de page"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:267
+msgid "Use %teamName%, %teamEmail%, %teamPhone% as variables"
+msgstr "Utilisez %teamName%, %teamEmail%, %teamPhone% comme variables"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:278
+msgctxt "@title:group"
+msgid "Document Numbering"
+msgstr "Numérotation des documents"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:287
+msgid "Invoice Prefix"
+msgstr "Préfixe de facture"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:289
+msgid "e.g. INV-"
+msgstr "ex. FAC-"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:298
+msgid "Quote Prefix"
+msgstr "Préfixe de devis"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:300
+msgid "e.g. QUOTE-"
+msgstr "ex. DEVIS-"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:334
+msgid "Document Preview"
+msgstr "Aperçu du document"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:350
+msgid "Preview as Quote"
+msgstr "Aperçu en tant que devisc"
+
+#: src/contents/ui/pages/settings/DocumentSettingsPage.qml:359
+msgid "Refresh Preview"
+msgstr "Actualiser l'aperçu"
+
+#: src/contents/ui/pages/settings/LanguageAndLocalization.qml:12
+msgctxt "@title"
+msgid "Language & Localization"
+msgstr "Langue et localisation"
+
+#: src/contents/ui/pages/settings/LanguageAndLocalization.qml:54
+msgctxt "@title:group"
+msgid "Language & Localization"
+msgstr "Langue et localisation"
+
+#: src/contents/ui/pages/settings/LanguageAndLocalization.qml:62
+#: src/contents/ui/pages/team/TeamDialog.qml:91
+msgid "Language"
+msgstr "Langue"
+
+#: src/contents/ui/pages/settings/LanguageAndLocalization.qml:89
+#: src/contents/ui/pages/team/TeamDialog.qml:125
+msgid "Language setting affects invoices and documents"
+msgstr "Le paramètre de langue affecte les factures et les documents"
+
+#: src/contents/ui/pages/settings/LanguageAndLocalization.qml:90
+#: src/contents/ui/pages/team/TeamDialog.qml:126
+msgid "Choose the language for this team's documents"
+msgstr "Choisissez la langue pour les documents de cette équipe"
+
+#: src/contents/ui/pages/settings/LanguageAndLocalization.qml:125
+#: src/contents/ui/pages/team/TeamDialog.qml:227
+msgid "Team language updated successfully"
+msgstr "Détails de l'équipe mis à jour avec succès"
+
+#: src/contents/ui/pages/settings/TeamSettingsPage.qml:12
+msgctxt "@title"
+msgid "Company Settings"
+msgstr "Paramètres de l'entreprise"
+
+#: src/contents/ui/pages/settings/TeamSettingsPage.qml:89
+msgctxt "@title:group"
+msgid "Company Profile"
+msgstr "Profil de l'entreprise"
+
+#: src/contents/ui/pages/settings/TeamSettingsPage.qml:104
+#: src/contents/ui/pages/team/TeamDialog.qml:63
+msgid "Team Name"
+msgstr "Nom de l'équipe"
+
+#: src/contents/ui/pages/settings/TeamSettingsPage.qml:198
+#: src/contents/ui/pages/team/TeamDialog.qml:195
+msgid "Team details updated successfully"
+msgstr "Détails de l'équipe mis à jour avec succès"
 
 #: src/contents/ui/pages/cashsource/CashSource.qml:12
 msgctxt "@title:group"
@@ -1707,10 +2316,6 @@ msgstr "Saisir le nom de la source de trésorerie"
 #: src/contents/ui/pages/cashsource/CashSourceDetails.qml:102
 msgid "Select the type of cash source"
 msgstr "Sélectionner le type de source de trésorerie"
-
-#: src/contents/ui/pages/cashsource/CashSourceDetails.qml:106
-msgid "Other"
-msgstr "Autre"
 
 #: src/contents/ui/pages/cashsource/CashSourceDetails.qml:117
 msgid "Initial Balance"
@@ -1906,235 +2511,208 @@ msgstr "Fichiers image (*.jpg *.jpeg *.png)"
 msgid "Team Details"
 msgstr "Détails de l'équipe"
 
-#: src/contents/ui/pages/team/TeamDialog.qml:63
-msgid "Team Name"
-msgstr "Nom de l'équipe"
-
-#: src/contents/ui/pages/team/TeamDialog.qml:91
-msgid "Language"
-msgstr "Langue"
-
-#: src/contents/ui/pages/team/TeamDialog.qml:125
-msgid "Language setting affects invoices and documents"
-msgstr "Le paramètre de langue affecte les factures et les documents"
-
-#: src/contents/ui/pages/team/TeamDialog.qml:126
-msgid "Choose the language for this team's documents"
-msgstr "Choisissez la langue pour les documents de cette équipe"
-
-#: src/contents/ui/pages/team/TeamDialog.qml:195
-msgid "Team details updated successfully"
-msgstr "Détails de l'équipe mis à jour avec succès"
-
-#: src/contents/ui/pages/team/TeamDialog.qml:227
-msgid "Team language updated successfully"
-msgstr "Détails de l'équipe mis à jour avec succès"
-
-#: src/contents/ui/pages/dashboard/DateRangeSelector.qml:27
+#: src/contents/ui/pages/dashboard/DateRangeSelector.qml:36
 msgid "Today"
 msgstr "Aujourd'hui"
 
-#: src/contents/ui/pages/dashboard/DateRangeSelector.qml:28
+#: src/contents/ui/pages/dashboard/DateRangeSelector.qml:37
 msgid "Past 24h"
 msgstr "Dernières 24h"
 
-#: src/contents/ui/pages/dashboard/DateRangeSelector.qml:29
+#: src/contents/ui/pages/dashboard/DateRangeSelector.qml:38
 msgid "Week"
 msgstr "Semaine"
 
-#: src/contents/ui/pages/dashboard/DateRangeSelector.qml:30
+#: src/contents/ui/pages/dashboard/DateRangeSelector.qml:39
 msgid "Month"
 msgstr "Mois"
 
-#: src/contents/ui/pages/dashboard/DateRangeSelector.qml:31
+#: src/contents/ui/pages/dashboard/DateRangeSelector.qml:40
 msgid "Year"
 msgstr "Année"
 
-#: src/contents/ui/pages/dashboard/LineChartCard.qml:59
+#: src/contents/ui/pages/dashboard/LineChartCard.qml:64
 msgid "Mon"
 msgstr "Lun"
 
-#: src/contents/ui/pages/dashboard/LineChartCard.qml:59
+#: src/contents/ui/pages/dashboard/LineChartCard.qml:64
 msgid "Tue"
 msgstr "Mar"
 
-#: src/contents/ui/pages/dashboard/LineChartCard.qml:59
+#: src/contents/ui/pages/dashboard/LineChartCard.qml:64
 msgid "Wed"
 msgstr "Mer"
 
-#: src/contents/ui/pages/dashboard/LineChartCard.qml:59
+#: src/contents/ui/pages/dashboard/LineChartCard.qml:64
 msgid "Thu"
 msgstr "Jeu"
 
-#: src/contents/ui/pages/dashboard/LineChartCard.qml:59
+#: src/contents/ui/pages/dashboard/LineChartCard.qml:64
 msgid "Fri"
 msgstr "Ven"
 
-#: src/contents/ui/pages/dashboard/LineChartCard.qml:59
+#: src/contents/ui/pages/dashboard/LineChartCard.qml:64
 msgid "Sat"
 msgstr "Sam"
 
-#: src/contents/ui/pages/dashboard/LineChartCard.qml:59
+#: src/contents/ui/pages/dashboard/LineChartCard.qml:64
 msgid "Sun"
 msgstr "Dim"
 
-#: src/contents/ui/pages/dashboard/LineChartCard.qml:61
+#: src/contents/ui/pages/dashboard/LineChartCard.qml:66
 msgid "W 1"
 msgstr "Se 1"
 
-#: src/contents/ui/pages/dashboard/LineChartCard.qml:61
+#: src/contents/ui/pages/dashboard/LineChartCard.qml:66
 msgid "W 2"
 msgstr "Se 2"
 
-#: src/contents/ui/pages/dashboard/LineChartCard.qml:61
+#: src/contents/ui/pages/dashboard/LineChartCard.qml:66
 msgid "W 3"
 msgstr "Se 3"
 
-#: src/contents/ui/pages/dashboard/LineChartCard.qml:61
+#: src/contents/ui/pages/dashboard/LineChartCard.qml:66
 msgid "W 4"
 msgstr "Se 4"
 
-#: src/contents/ui/pages/dashboard/LineChartCard.qml:63
+#: src/contents/ui/pages/dashboard/LineChartCard.qml:68
 msgid "Jan"
 msgstr "Jan"
 
-#: src/contents/ui/pages/dashboard/LineChartCard.qml:63
+#: src/contents/ui/pages/dashboard/LineChartCard.qml:68
 msgid "Mar"
 msgstr "Mar"
 
-#: src/contents/ui/pages/dashboard/LineChartCard.qml:63
+#: src/contents/ui/pages/dashboard/LineChartCard.qml:68
 msgid "May"
 msgstr "Mai"
 
-#: src/contents/ui/pages/dashboard/LineChartCard.qml:63
+#: src/contents/ui/pages/dashboard/LineChartCard.qml:68
 msgid "Jul"
 msgstr "Juil"
 
-#: src/contents/ui/pages/dashboard/LineChartCard.qml:63
+#: src/contents/ui/pages/dashboard/LineChartCard.qml:68
 msgid "Sep"
 msgstr "Sep"
 
-#: src/contents/ui/pages/dashboard/LineChartCard.qml:63
+#: src/contents/ui/pages/dashboard/LineChartCard.qml:68
 msgid "Nov"
 msgstr "Nov"
 
-#: src/contents/ui/pages/dashboard/LineChartCard.qml:359
+#: src/contents/ui/pages/dashboard/LineChartCard.qml:296
 msgid "Showing all-time data"
 msgstr "Affichage des données de tous les temps"
 
-#: src/contents/ui/pages/dashboard/PieChartCard.qml:102
+#: src/contents/ui/pages/dashboard/PieChartCard.qml:217
 msgid "No data available"
 msgstr "Aucune donnée disponible"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:12
-#: src/contents/ui/components/VNavigationTabBar.qml:17
+#: src/contents/ui/pages/dashboard/Dashboard.qml:11
+#: src/contents/ui/components/VNavigationTabBar.qml:243
 msgid "Dashboard"
 msgstr "Tableau de bord"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:63
+#: src/contents/ui/pages/dashboard/Dashboard.qml:78
 msgid "Showing data from %1 to %2"
 msgstr "Affichage des données du %1 au %2"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:86
+#: src/contents/ui/pages/dashboard/Dashboard.qml:105
+#: src/contents/ui/pages/dashboard/Dashboard.qml:131
 msgid "All-time: %1 DH"
 msgstr "Total cumulé : %1 DH"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:93
+#: src/contents/ui/pages/dashboard/Dashboard.qml:112
 msgid "Total Orders"
 msgstr "Total des commandes"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:95
+#: src/contents/ui/pages/dashboard/Dashboard.qml:114
 msgid "All-time: %1"
 msgstr "Total : %1"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:101
+#: src/contents/ui/pages/dashboard/Dashboard.qml:120
 msgid "Low Stock"
 msgstr "Stock faible"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:103
+#: src/contents/ui/pages/dashboard/Dashboard.qml:122
 msgid "Items need attention"
 msgstr "Articles nécessitant attention"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:110
+#: src/contents/ui/pages/dashboard/Dashboard.qml:129
 msgid "Revenue"
 msgstr "Revenus"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:112
-msgid "All-time:  %1 DH"
-msgstr "Total : %1 DH"
-
-#: src/contents/ui/pages/dashboard/Dashboard.qml:349
+#: src/contents/ui/pages/dashboard/Dashboard.qml:153
 msgid "Sales Trend"
 msgstr "Tendance des ventes"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:354
+#: src/contents/ui/pages/dashboard/Dashboard.qml:158
 msgid "Today's sales"
 msgstr "Ventes du jour"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:355
-#: src/contents/ui/pages/dashboard/Dashboard.qml:378
+#: src/contents/ui/pages/dashboard/Dashboard.qml:159
+#: src/contents/ui/pages/dashboard/Dashboard.qml:182
 msgid "Last 24 hours"
 msgstr "Dernières 24 heures"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:356
+#: src/contents/ui/pages/dashboard/Dashboard.qml:160
 msgid "Weekly sales"
 msgstr "Ventes hebdomadaires"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:357
+#: src/contents/ui/pages/dashboard/Dashboard.qml:161
 msgid "Monthly sales"
 msgstr "Ventes mensuelles"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:358
+#: src/contents/ui/pages/dashboard/Dashboard.qml:162
 msgid "Yearly sales"
 msgstr "Ventes hebdomadaires"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:359
+#: src/contents/ui/pages/dashboard/Dashboard.qml:163
 msgid "All-time sales"
 msgstr "Ventes totales"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:360
-#: src/contents/ui/pages/dashboard/Dashboard.qml:363
+#: src/contents/ui/pages/dashboard/Dashboard.qml:164
+#: src/contents/ui/pages/dashboard/Dashboard.qml:167
 msgid "Sales over time"
 msgstr "Ventes dans le temps"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:372
+#: src/contents/ui/pages/dashboard/Dashboard.qml:176
 msgid "Purchase Trend"
 msgstr "Tendance des achats"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:377
+#: src/contents/ui/pages/dashboard/Dashboard.qml:181
 msgid "Today's purchases"
 msgstr "Achats du jour"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:379
+#: src/contents/ui/pages/dashboard/Dashboard.qml:183
 msgid "Weekly purchases"
 msgstr "Achats hebdomadaires"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:380
+#: src/contents/ui/pages/dashboard/Dashboard.qml:184
 msgid "Monthly purchases"
 msgstr "Achats mensuels"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:381
+#: src/contents/ui/pages/dashboard/Dashboard.qml:185
 msgid "Yearly purchases"
 msgstr "Achats hebdomadaires"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:382
+#: src/contents/ui/pages/dashboard/Dashboard.qml:186
 msgid "All-time purchases"
 msgstr "Achats totaux"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:383
-#: src/contents/ui/pages/dashboard/Dashboard.qml:386
+#: src/contents/ui/pages/dashboard/Dashboard.qml:187
+#: src/contents/ui/pages/dashboard/Dashboard.qml:190
 msgid "Purchases over time"
 msgstr "Achats dans le temps"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:397
+#: src/contents/ui/pages/dashboard/Dashboard.qml:199
 msgid "Customer Distribution"
 msgstr "Répartition des clients"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:398
+#: src/contents/ui/pages/dashboard/Dashboard.qml:200
 msgid "Top customers by spending"
 msgstr "Meilleurs clients par dépenses"
 
-#: src/contents/ui/pages/dashboard/Dashboard.qml:442
+#: src/contents/ui/pages/dashboard/Dashboard.qml:252
 msgid "Top Customers"
 msgstr "Meilleurs clients"
 
@@ -2156,23 +2734,6 @@ msgstr "Source du paiement"
 #: src/contents/ui/components/NumPad.qml:42
 msgid "Payment Amount"
 msgstr "Montant du paiement"
-
-#: src/contents/ui/pages/invoice/AddPaymentDialog.qml:64
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:589
-msgid "Payment Method"
-msgstr "Méthode de paiement"
-
-#: src/contents/ui/pages/invoice/AddPaymentDialog.qml:67
-msgid "Bank Transfer"
-msgstr "Virement bancaire"
-
-#: src/contents/ui/pages/invoice/AddPaymentDialog.qml:68
-msgid "Check"
-msgstr "Chèque"
-
-#: src/contents/ui/pages/invoice/AddPaymentDialog.qml:69
-msgid "Credit Card"
-msgstr "Carte de crédit"
 
 #: src/contents/ui/pages/invoice/AddPaymentDialog.qml:78
 msgid "Payment reference number"
@@ -2485,7 +3046,7 @@ msgid "Printing failed"
 msgstr "Échec de l'impression"
 
 #: src/contents/ui/pages/invoice/ViewPdfDialog.qml:80
-#: src/contents/ui/components/PaginationBar.qml:22
+#: src/contents/ui/components/PaginationBar.qml:24
 msgid "Page %1 of %2"
 msgstr "Page %1 sur %2"
 
@@ -2581,65 +3142,142 @@ msgstr "Historique des ventes - %1"
 msgid "No sales records found"
 msgstr "Aucun enregistrement de vente trouvé"
 
-#: src/contents/ui/pages/client/ClientDetails.qml:167
+#: src/contents/ui/pages/client/ClientDetails.qml:54
+#: src/contents/ui/pages/product/ProductDetails.qml:140
+msgid "Basic Info"
+msgstr "Informations de base"
+
+#: src/contents/ui/pages/client/ClientDetails.qml:57
+msgid "Tax Information"
+msgstr "Informations fiscales"
+
+#: src/contents/ui/pages/client/ClientDetails.qml:60
+msgid "Additional Info"
+msgstr "Informations supplémentaires"
+
+#: src/contents/ui/pages/client/ClientDetails.qml:124
+msgid "IF Number"
+msgstr "Numéro IF"
+
+#: src/contents/ui/pages/client/ClientDetails.qml:130
+msgid "RC Number"
+msgstr "Numéro RC"
+
+#: src/contents/ui/pages/client/ClientDetails.qml:136
+msgid "CNSS Number"
+msgstr "Numéro CNSS"
+
+#: src/contents/ui/pages/client/ClientDetails.qml:148
+msgid "TP Number"
+msgstr "Numéro TP"
+
+#: src/contents/ui/pages/client/ClientDetails.qml:154
+msgid "NIS Number"
+msgstr "Numéro NIS"
+
+#: src/contents/ui/pages/client/ClientDetails.qml:160
+msgid "NIF Number"
+msgstr "Numéro NIF"
+
+#: src/contents/ui/pages/client/ClientDetails.qml:166
+msgid "AI Number"
+msgstr "Numéro d'AI"
+
+#: src/contents/ui/pages/client/ClientDetails.qml:260
 msgid "Sales History"
 msgstr "Historique des ventes"
 
-#: src/contents/ui/pages/client/ClientDetails.qml:178
+#: src/contents/ui/pages/client/ClientDetails.qml:271
 msgid "Payments"
 msgstr "Paiements"
 
-#: src/contents/ui/pages/client/ClientDetails.qml:189
+#: src/contents/ui/pages/client/ClientDetails.qml:282
 msgid "Statistics"
 msgstr "Statistiques"
 
-#: src/contents/ui/pages/client/ClientDetails.qml:266
-#: src/contents/ui/pages/client/Client.qml:404
+#: src/contents/ui/pages/client/ClientDetails.qml:381
+#: src/contents/ui/pages/client/Client.qml:1266
 msgid "Client created successfully"
 msgstr "Client créé avec succès"
 
-#: src/contents/ui/pages/client/ClientDetails.qml:282
+#: src/contents/ui/pages/client/ClientDetails.qml:397
 msgid "Client %1 updated successfully"
 msgstr "Client %1 mis à jour avec succès"
 
-#: src/contents/ui/pages/client/ClientDetails.qml:292
+#: src/contents/ui/pages/client/ClientDetails.qml:407
 msgid "Client %1 deleted successfully"
 msgstr "Client %1 supprimé avec succès"
 
-#: src/contents/ui/pages/client/Client.qml:14
+#: src/contents/ui/pages/client/Client.qml:15
 msgctxt "@title:group"
 msgid "Clients"
 msgstr "Clients"
 
-#: src/contents/ui/pages/client/Client.qml:28
+#: src/contents/ui/pages/client/Client.qml:298
 msgid "No clients found matching '%1'"
 msgstr "Aucun client trouvé correspondant à '%1'"
 
-#: src/contents/ui/pages/client/Client.qml:29
+#: src/contents/ui/pages/client/Client.qml:299
 msgid "There are no clients. Please add a new client."
 msgstr "Aucun client. Veuillez ajouter un nouveau client."
 
-#: src/contents/ui/pages/client/Client.qml:38
-msgid "New Client"
-msgstr "Nouveau client"
-
-#: src/contents/ui/pages/client/Client.qml:144
+#: src/contents/ui/pages/client/Client.qml:318
 msgid "Search clients..."
 msgstr "Rechercher des clients..."
 
-#: src/contents/ui/pages/client/Client.qml:385
+#: src/contents/ui/pages/client/Client.qml:355
+msgid "New Client"
+msgstr "Nouveau client"
+
+#: src/contents/ui/pages/client/Client.qml:373
+msgid "Sort"
+msgstr "Trier"
+
+#: src/contents/ui/pages/client/Client.qml:377
+msgid "Name (A-Z)"
+msgstr "Nom (A-Z)"
+
+#: src/contents/ui/pages/client/Client.qml:409
+msgid "Name (Z-A)"
+msgstr "Nom (Z-A)"
+
+#: src/contents/ui/pages/client/Client.qml:441
+msgid "Balance (Low to High)"
+msgstr "Solde (Bas à Élevé)"
+
+#: src/contents/ui/pages/client/Client.qml:473
+msgid "Balance (High to Low)"
+msgstr "Solde (Élevé à Bas)"
+
+#: src/contents/ui/pages/client/Client.qml:541
+msgid "List View"
+msgstr "Vue en liste"
+
+#: src/contents/ui/pages/client/Client.qml:541
+msgid "Table View"
+msgstr "Vue en tableau"
+
+#: src/contents/ui/pages/client/Client.qml:902
+msgid "Edit Client"
+msgstr "Modifier le client"
+
+#: src/contents/ui/pages/client/Client.qml:920
+msgid "View Statistics"
+msgstr "Voir les statistiques"
+
+#: src/contents/ui/pages/client/Client.qml:1247
 msgid "Delete Client"
 msgstr "Supprimer le client"
 
-#: src/contents/ui/pages/client/Client.qml:386
+#: src/contents/ui/pages/client/Client.qml:1248
 msgid "Are you sure you want to delete the selected client(s)?"
 msgstr "Êtes-vous sûr de vouloir supprimer le(s) client(s) sélectionné(s) ?"
 
-#: src/contents/ui/pages/client/Client.qml:400
+#: src/contents/ui/pages/client/Client.qml:1262
 msgid "Client deleted successfully"
 msgstr "Client supprimé avec succès"
 
-#: src/contents/ui/pages/client/Client.qml:407
+#: src/contents/ui/pages/client/Client.qml:1269
 msgid "Client updated successfully"
 msgstr "Client mis à jour avec succès"
 
@@ -2683,94 +3321,31 @@ msgctxt "@action:button"
 msgid "Logout"
 msgstr "Déconnexion"
 
-#: src/contents/ui/pages/Settings.qml:15
-msgctxt "@title"
+#: src/contents/ui/pages/Settings.qml:10
+msgctxt "@action:button"
 msgid "Settings"
 msgstr "Paramètres"
 
-#: src/contents/ui/pages/Settings.qml:19
-msgid "Team Settings"
-msgstr "Paramètres d'équipe"
-
-#: src/contents/ui/pages/Settings.qml:26
-msgctxt "@title:group"
+#: src/contents/ui/pages/Settings.qml:16
+msgctxt "@action:button"
 msgid "General"
 msgstr "Général"
 
-#: src/contents/ui/pages/Settings.qml:37
-msgctxt "@label:listbox"
-msgid "Current Color Scheme"
-msgstr "Schéma de couleur actuel"
+#: src/contents/ui/pages/Settings.qml:23
+msgctxt "@action:button"
+msgid "Company Settings"
+msgstr "Paramètres de l'entreprise"
 
-#: src/contents/ui/pages/Settings.qml:40
-msgctxt "@label:listbox"
-msgid "No color schemes available"
-msgstr "Aucun schéma de couleur disponible"
-
-#: src/contents/ui/pages/Settings.qml:74
-msgid "Scale UI"
-msgstr "Échelle de l'interface"
-
-#: src/contents/ui/pages/Settings.qml:112
-msgctxt "@title:group"
+#: src/contents/ui/pages/Settings.qml:30
+msgctxt "@action:button"
 msgid "Accounts"
 msgstr "Comptes"
 
-# Should I continue with the next set of translations?
-#: src/contents/ui/pages/Settings.qml:118
-msgctxt "@info:whatsthis"
-msgid "Online Account Settings"
-msgstr "Paramètres des produits favoris"
-
-#: src/contents/ui/pages/Settings.qml:124
-msgctxt "@info:credit"
-msgid "Admin"
-msgstr "Administrateur"
-
-#: src/contents/ui/pages/Settings.qml:133
+#: src/contents/ui/pages/Settings.qml:37
+#: src/contents/ui/components/VNavigationTabBar.qml:57
 msgctxt "@action:button"
-msgid "Profile information"
-msgstr "Informations supplémentaires"
-
-#: src/contents/ui/pages/Settings.qml:166
-msgctxt "@title:group"
-msgid "DIM"
-msgstr "DIM"
-
-#: src/contents/ui/pages/Settings.qml:176
-msgctxt "@action:button"
-msgid "Update Available: %1"
-msgstr "Mise à jour disponible : %1"
-
-#: src/contents/ui/pages/Settings.qml:177
-msgctxt "@action:button"
-msgid "Check for Updates"
-msgstr "Vérifier les mises à jour"
-
-#: src/contents/ui/pages/Settings.qml:180
-msgid "A new version is available to install"
-msgstr "Une nouvelle version est disponible à installer"
-
-#: src/contents/ui/pages/Settings.qml:181
-msgid "Your current version: %1"
-msgstr "Votre version actuelle : %1"
-
-#: src/contents/ui/pages/Settings.qml:227
-msgctxt "@action:button"
-msgid "About"
-msgstr "À propos"
-
-#: src/contents/ui/pages/Settings.qml:248
-msgid "Scale Change"
-msgstr "Changement d'échelle"
-
-#: src/contents/ui/pages/Settings.qml:249
-msgid ""
-"The application needs to restart to apply the new scale. Do you want to "
-"restart now?"
-msgstr ""
-"L'application doit redémarrer pour appliquer la nouvelle échelle. Voulez-"
-"vous redémarrer maintenant ?"
+msgid "About DIM"
+msgstr "À propos de DIM"
 
 #: src/contents/ui/pages/purchase/PurchaseDetails.qml:12
 msgid "Edit Purchase"
@@ -2785,21 +3360,21 @@ msgstr "Nouvel achat"
 msgid "Purchase Details"
 msgstr "Détails de l'achat"
 
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:84
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:87
 msgid "Purchase Date"
 msgstr "Date d'achat"
 
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:428
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:431
 msgid "Click 'Add Products' to select products for this purchase"
 msgstr ""
 "Cliquez sur 'Ajouter des produits' pour sélectionner des produits pour cet "
 "achat"
 
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:442
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:445
 msgid "Create Purchase"
 msgstr "Créer un achat"
 
-#: src/contents/ui/pages/purchase/PurchaseDetails.qml:871
+#: src/contents/ui/pages/purchase/PurchaseDetails.qml:874
 msgid "Purchase created successfully"
 msgstr "Achat créé avec succès"
 
@@ -2952,10 +3527,6 @@ msgstr "Modifier l'image du produit"
 #: src/contents/ui/pages/product/ProductImageEditor.qml:266
 msgid "Failed to save image"
 msgstr "Échec de l'enregistrement de l'image"
-
-#: src/contents/ui/pages/product/ProductDetails.qml:140
-msgid "Basic Info"
-msgstr "Informations de base"
 
 #: src/contents/ui/pages/product/ProductDetails.qml:144
 msgid "Pricing & Stock"
@@ -3165,10 +3736,6 @@ msgstr "Vous avez la dernière version : %1"
 msgid "Update downloaded successfully!"
 msgstr "Mise à jour téléchargée avec succès !"
 
-#: src/contents/ui/updater/UpdaterDialog.qml:77
-msgid "Error: %1"
-msgstr "Erreur : %1"
-
 #: src/contents/ui/updater/UpdaterDialog.qml:82
 msgid "Retry"
 msgstr "Réessayer"
@@ -3213,7 +3780,8 @@ msgstr "Êtes-vous sûr de vouloir annuler le téléchargement ?"
 #: src/contents/ui/updater/UpdaterDialog.qml:334
 msgid "The download will be aborted and you'll need to restart it later."
 msgstr ""
-"Le téléchargement sera interrompu et vous devrez le redémarrer ultérieurement."
+"Le téléchargement sera interrompu et vous devrez le redémarrer "
+"ultérieurement."
 
 #: src/contents/ui/updater/UpdateProgressDialog.qml:8
 msgid "Installing Update"
@@ -3241,8 +3809,8 @@ msgid ""
 "A new version (%1) of the application is available. Would you like to update "
 "now?"
 msgstr ""
-"Une nouvelle version (%1) de l'application est disponible. Souhaitez-vous mett"
-"re à jour ?"
+"Une nouvelle version (%1) de l'application est disponible. Souhaitez-vous "
+"mettre à jour ?"
 
 #: src/contents/ui/updater/AutoUpdateCheck.qml:92
 msgid "Key changes: %1"
@@ -3270,46 +3838,90 @@ msgstr ""
 msgid "No cash source found matching '%1'"
 msgstr "Aucune source de trésorerie trouvée correspondant à '%1'"
 
+#: src/contents/ui/components/DSearchableComboBoxCashSource.qml:190
+msgid "No cash sources available"
+msgstr "Aucune source de trésorerie disponible"
+
 #: src/contents/ui/components/DSearchableComboBoxCashSource.qml:205
 msgid "Load More... (Page %1 of %2)"
 msgstr "Charger plus... (Page %1 sur %2)"
 
-#: src/contents/ui/components/VNavigationTabBar.qml:27
+#: src/contents/ui/components/VNavigationTabBar.qml:22
+msgctxt "@action:button"
+msgid "Appearance"
+msgstr "Apparence"
+
+#: src/contents/ui/components/VNavigationTabBar.qml:29
+msgctxt "@action:button"
+msgid "Accounts & Subscriptions"
+msgstr "Comptes et abonnements"
+
+#: src/contents/ui/components/VNavigationTabBar.qml:36
+msgctxt "@action:button"
+msgid "Company information"
+msgstr "Informations sur l'entreprise"
+
+#: src/contents/ui/components/VNavigationTabBar.qml:43
+msgctxt "@action:button"
+msgid "Language & Localization"
+msgstr "Langue et localisation"
+
+#: src/contents/ui/components/VNavigationTabBar.qml:50
+msgctxt "@action:button"
+msgid "Document Settings"
+msgstr "Paramètres du document"
+
+#: src/contents/ui/components/VNavigationTabBar.qml:239
+msgid "Main"
+msgstr "Principal"
+
+#: src/contents/ui/components/VNavigationTabBar.qml:255
+msgid "Finance"
+msgstr "Finance"
+
+#: src/contents/ui/components/VNavigationTabBar.qml:259
 msgid "Cashier"
 msgstr "Caissier"
 
-#: src/contents/ui/components/VNavigationTabBar.qml:32
+#: src/contents/ui/components/VNavigationTabBar.qml:264
 msgid "Cash Transaction"
 msgstr "Transaction en espèces"
 
-#: src/contents/ui/components/VNavigationTabBar.qml:37
+#: src/contents/ui/components/VNavigationTabBar.qml:269
 msgid "Invoices"
 msgstr "Factures"
 
-#: src/contents/ui/components/VNavigationTabBar.qml:42
+#: src/contents/ui/components/VNavigationTabBar.qml:276
+msgid "Inventory"
+msgstr "Inventaire"
+
+#: src/contents/ui/components/VNavigationTabBar.qml:280
 msgid "Stock"
 msgstr "Stock"
 
-#: src/contents/ui/components/VNavigationTabBar.qml:47
-msgid "Activity Log"
-msgstr "Journal d'activité"
-
-# Should I continue with the next set of translations?
-#: src/contents/ui/components/VNavigationTabBar.qml:52
-msgid "Sales"
-msgstr "Ventes"
-
-#: src/contents/ui/components/VNavigationTabBar.qml:57
+#: src/contents/ui/components/VNavigationTabBar.qml:285
 msgid "Purchases"
 msgstr "Achats"
 
-#: src/contents/ui/components/VNavigationTabBar.qml:62
+#: src/contents/ui/components/VNavigationTabBar.qml:292
+msgid "Business"
+msgstr "Entreprise"
+
+#: src/contents/ui/components/VNavigationTabBar.qml:296
+msgid "Activity Log"
+msgstr "Journal d'activité"
+
+#: src/contents/ui/components/VNavigationTabBar.qml:311
 msgid "Clients"
 msgstr "Clients"
 
-#: src/contents/ui/components/VNavigationTabBar.qml:67
+#: src/contents/ui/components/VNavigationTabBar.qml:316
 msgid "Suppliers"
 msgstr "Fournisseurs"
+
+#: src/contents/ui/components/VNavigationTabBar.qml:323
+msgid "System"
+msgstr "Système"
 
 #: src/contents/ui/components/DSearchableComboBoxClient.qml:40
 msgid "Enter Name , Email ..."
@@ -3391,6 +4003,54 @@ msgstr "Aucun produit disponible"
 #: src/contents/ui/components/DSearchableComboBox.qml:223
 msgid "Load More ..."
 msgstr "Charger plus ..."
+
+#~ msgid "Edit Sale"
+#~ msgstr "Modifier la vente"
+
+#~ msgid "Sale Details"
+#~ msgstr "Détails de la vente"
+
+#~ msgid "Create Sale"
+#~ msgstr "Créer une vente"
+
+#~ msgid "All-time:  %1 DH"
+#~ msgstr "Total : %1 DH"
+
+#~ msgctxt "@title"
+#~ msgid "Settings"
+#~ msgstr "Paramètres"
+
+#~ msgid "Team Settings"
+#~ msgstr "Paramètres d'équipe"
+
+#~ msgctxt "@title:group"
+#~ msgid "General"
+#~ msgstr "Général"
+
+#~ msgctxt "@title:group"
+#~ msgid "Accounts"
+#~ msgstr "Comptes"
+
+# Should I continue with the next set of translations?
+#~ msgctxt "@info:whatsthis"
+#~ msgid "Online Account Settings"
+#~ msgstr "Paramètres des produits favoris"
+
+#~ msgctxt "@info:credit"
+#~ msgid "Admin"
+#~ msgstr "Administrateur"
+
+#~ msgctxt "@action:button"
+#~ msgid "Profile information"
+#~ msgstr "Informations supplémentaires"
+
+#~ msgctxt "@title:group"
+#~ msgid "DIM"
+#~ msgstr "DIM"
+
+#~ msgctxt "@action:button"
+#~ msgid "About"
+#~ msgstr "À propos"
 
 #~ msgid "Add Supplier"
 #~ msgstr "Ajouter un fournisseur"
@@ -3537,9 +4197,6 @@ msgstr "Charger plus ..."
 
 #~ msgid "View Sales History"
 #~ msgstr "Voir l'historique des ventes"
-
-#~ msgid "View Statistics"
-#~ msgstr "Voir les statistiques"
 
 #~ msgid "Yes"
 #~ msgstr "Oui"

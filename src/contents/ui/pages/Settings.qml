@@ -20,7 +20,7 @@ Controls.Button {
         },
         {
             moduleId: "team",
-            text: i18nc("@action:button", "Team Settings"),
+            text: i18nc("@action:button", "Company Settings"),
             icon: { name: "gnumeric-group" },
             pageUrl: "qrc:/qt/qml/com/dervox/dim/contents/ui/pages/settings/TeamSettingsPage.qml",
             category: ""

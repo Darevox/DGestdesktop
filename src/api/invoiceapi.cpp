@@ -19,12 +19,15 @@ Invoice InvoiceApi::invoiceFromJson(const QJsonObject &json) const
     invoice.id = json["id"_L1].toInt();
     invoice.team_id = json["team_id"_L1].toInt();
     invoice.reference_number = json["reference_number"_L1].toString();
+    invoice.type = json["type"_L1].toString();  // New field
     invoice.invoiceable_type = json["invoiceable_type"_L1].toString();
     invoice.invoiceable_id = json["invoiceable_id"_L1].toInt();
     invoice.total_amount = json["total_amount"_L1].toString().toDouble();
     invoice.tax_amount = json["tax_amount"_L1].toString().toDouble();
     invoice.discount_amount = json["discount_amount"_L1].toString().toDouble();
     invoice.status = json["status"_L1].toString();
+    invoice.payment_status = json["payment_status"_L1].toString();  // New field
+    invoice.is_email_sent = json["is_email_sent"_L1].toBool();      // New field
     invoice.issue_date = QDateTime::fromString(json["issue_date"_L1].toString(), Qt::ISODate);
     invoice.due_date = QDateTime::fromString(json["due_date"_L1].toString(), Qt::ISODate);
     invoice.notes = json["notes"_L1].toString();
@@ -68,12 +71,15 @@ QJsonObject InvoiceApi::invoiceToJson(const Invoice &invoice) const
     QJsonObject json;
     json["team_id"_L1] = invoice.team_id;
     json["reference_number"_L1] = invoice.reference_number;
+    json["type"_L1] = invoice.type;  // New field
     json["invoiceable_type"_L1] = invoice.invoiceable_type;
     json["invoiceable_id"_L1] = invoice.invoiceable_id;
     json["total_amount"_L1] = invoice.total_amount;
     json["tax_amount"_L1] = invoice.tax_amount;
     json["discount_amount"_L1] = invoice.discount_amount;
     json["status"_L1] = invoice.status;
+    json["payment_status"_L1] = invoice.payment_status;  // New field
+    json["is_email_sent"_L1] = invoice.is_email_sent;    // New field
     json["issue_date"_L1] = invoice.issue_date.toString(Qt::ISODate);
     json["due_date"_L1] = invoice.due_date.toString(Qt::ISODate);
     json["notes"_L1] = invoice.notes;
@@ -186,8 +192,8 @@ PaginatedInvoices InvoiceApi::paginatedInvoicesFromJson(const QJsonObject &json)
 }
 
 QFuture<void> InvoiceApi::getInvoices(const QString &search, const QString &sortBy,
-                                     const QString &sortDirection, int page,
-                                     const QString &status, const QString &paymentStatus,
+                                      const QString &sortDirection, int page,
+                                      const QString &status, const QString &paymentStatus,
                                       const QDateTime &startDate,
                                       const QDateTime &endDate
                                       )
@@ -217,7 +223,7 @@ QFuture<void> InvoiceApi::getInvoices(const QString &search, const QString &sort
     }
 
     QNetworkRequest request = createRequest(path);
-        request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(m_token).toUtf8());
 
     auto future = makeRequest<QJsonObject>([=]() {
         return m_netManager->get(request);
@@ -227,7 +233,7 @@ QFuture<void> InvoiceApi::getInvoices(const QString &search, const QString &sort
             Q_EMIT invoicesReceived(paginatedInvoices);
         } else {
             Q_EMIT errorInvoicesReceived(response.error->message, response.error->status,
-                                     QJsonDocument(response.error->details).toJson());
+                                         QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -249,7 +255,7 @@ QFuture<void> InvoiceApi::getInvoice(int id)
             Q_EMIT invoiceReceived(invoiceToVariantMap(invoice));
         } else {
             Q_EMIT errorInvoiceReceived(response.error->message, response.error->status,
-                                    QJsonDocument(response.error->details).toJson());
+                                        QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -274,7 +280,7 @@ QFuture<void> InvoiceApi::createInvoice(const Invoice &invoice)
             Q_EMIT invoiceCreated(createdInvoice);
         } else {
             Q_EMIT errorInvoiceCreated(response.error->message, response.error->status,
-                                   QJsonDocument(response.error->details).toJson());
+                                       QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -299,7 +305,7 @@ QFuture<void> InvoiceApi::updateInvoice(int id, const Invoice &invoice)
             Q_EMIT invoiceUpdated(updatedInvoice);
         } else {
             Q_EMIT errorInvoiceUpdated(response.error->message, response.error->status,
-                                   QJsonDocument(response.error->details).toJson());
+                                       QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -320,7 +326,7 @@ QFuture<void> InvoiceApi::deleteInvoice(int id)
             Q_EMIT invoiceDeleted(id);
         } else {
             Q_EMIT errorInvoiceDeleted(response.error->message, response.error->status,
-                                   QJsonDocument(response.error->details).toJson());
+                                       QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -344,13 +350,35 @@ QFuture<void> InvoiceApi::addPayment(int id, const InvoicePayment &payment)
             Q_EMIT paymentAdded(response.data->value("payment"_L1).toObject().toVariantMap());
         } else {
             Q_EMIT errorPaymentAdded(response.error->message, response.error->status,
-                                 QJsonDocument(response.error->details).toJson());
+                                     QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
 
     return future.then([=]() {});
 }
+QFuture<void> InvoiceApi::markAsEmailSent(int id)
+{
+    setLoading(true);
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/invoices/%1/mark-email-sent").arg(id));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(getToken()).toUtf8());
+
+    auto future = makeRequest<QJsonObject>([=]() {
+        return m_netManager->post(request, QByteArray());
+    }).then([=](JsonResponse response) {
+        if (response.success) {
+            Invoice invoice = invoiceFromJson(response.data->value("invoice"_L1).toObject());
+            Q_EMIT invoiceMarkedAsEmailSent(invoiceToVariantMap(invoice));
+        } else {
+            Q_EMIT errorInvoiceMarkedAsEmailSent(response.error->message, response.error->status,
+                                        QJsonDocument(response.error->details).toJson());
+        }
+        setLoading(false);
+    });
+
+    return future.then([=]() {});
+}
+
 QFuture<QByteArray> InvoiceApi::generatePdf(int id)
 {
     setLoading(true);
@@ -387,7 +415,7 @@ QFuture<QByteArray> InvoiceApi::generatePdf(int id)
                     qDebug() << "PDF saved to:" << fileUrl;
                     Q_EMIT pdfGenerated(fileUrl);
                     promise->addResult(pdfData);
-                     setLoading(false);
+                    setLoading(false);
                 } else {
                     Q_EMIT errorPdfGenerated("Failed to save PDF"_L1, file.errorString());
                     promise->addResult(QByteArray());
@@ -496,7 +524,7 @@ QFuture<void> InvoiceApi::sendToClient(int id)
             Q_EMIT invoiceSent(response.data->value("result"_L1).toObject().toVariantMap());
         } else {
             Q_EMIT errorInvoiceSent(response.error->message, response.error->status,
-                                QJsonDocument(response.error->details).toJson());
+                                    QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -518,7 +546,7 @@ QFuture<void> InvoiceApi::markAsSent(int id)
             Q_EMIT invoiceMarkedAsSent(invoiceToVariantMap(invoice));
         } else {
             Q_EMIT errorInvoiceMarkedAsSent(response.error->message, response.error->status,
-                                        QJsonDocument(response.error->details).toJson());
+                                            QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -540,7 +568,7 @@ QFuture<void> InvoiceApi::markAsPaid(int id)
             Q_EMIT invoiceMarkedAsPaid(invoiceToVariantMap(invoice));
         } else {
             Q_EMIT errorInvoiceMarkedAsPaid(response.error->message, response.error->status,
-                                        QJsonDocument(response.error->details).toJson());
+                                            QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });
@@ -566,7 +594,7 @@ QFuture<void> InvoiceApi::getSummary(const QString &period)
             Q_EMIT summaryReceived(response.data->value("summary"_L1).toObject().toVariantMap());
         } else {
             Q_EMIT errorSummaryReceived(response.error->message, response.error->status,
-                                    QJsonDocument(response.error->details).toJson());
+                                        QJsonDocument(response.error->details).toJson());
         }
         setLoading(false);
     });

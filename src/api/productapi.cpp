@@ -3,6 +3,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QUrlQuery>
+#include <qstandardpaths.h>
 
 namespace NetworkApi {
 using namespace Qt::StringLiterals;
@@ -713,7 +714,197 @@ QFuture<void> ProductApi::removeProductImage(int productId)
 
     return future.then([=]() {});
 }
+QFuture<QByteArray> ProductApi::generateProductBarcode(int productId, const QString &barcodeType, const QVariantMap &options)
+{
+    setLoading(true);
 
+    // Build the JSON data with all parameters
+    QJsonObject jsonData;
+    jsonData["product_id"_L1] = productId;
+    jsonData["barcode_type"_L1] = barcodeType;
+
+    // Extract display options
+    jsonData["show_team_name"_L1] = options.value(QStringLiteral("showTeamName"), false).toBool();
+    jsonData["show_price"_L1] = options.value(QStringLiteral("showPrice"), false).toBool();
+    jsonData["show_product_name"_L1] = options.value(QStringLiteral("showProductName"), false).toBool();
+    jsonData["show_content"_L1] = options.value(QStringLiteral("showContent"), false).toBool();
+    jsonData["paper_width"_L1] = options.value(QStringLiteral("paperWidth"), 80).toInt();
+    jsonData["paper_height"_L1] = options.value(QStringLiteral("paperHeight"), 30).toInt();
+
+    // Prepare the request
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/barcodes/generate"));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(getToken()).toUtf8());
+
+    auto promise = std::make_shared<QPromise<QByteArray>>();
+
+    // Make the POST request
+    m_currentReply = m_netManager->post(request, QJsonDocument(jsonData).toJson());
+
+    connect(m_currentReply, &QNetworkReply::finished, this, [this, promise]() {
+        setLoading(false);
+
+        if (m_currentReply->error() == QNetworkReply::NoError) {
+            QString contentType = m_currentReply->header(QNetworkRequest::ContentTypeHeader).toString();
+
+            if (contentType.contains("application/pdf"_L1)) {
+                QByteArray pdfData = m_currentReply->readAll();
+
+                // Extract dimension metadata from response headers
+                int paperWidthMM = m_currentReply->rawHeader(QStringLiteral("X-Paper-Width")).toInt();
+                int paperHeightMM = m_currentReply->rawHeader(QStringLiteral("X-Paper-Height")).toInt();
+
+                // Save to app's data location
+                QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+                QDir().mkpath(QStringLiteral("%1/pdfs").arg(appDataPath));
+
+                QString fileName = QStringLiteral("barcode-%1.pdf").arg(QDateTime::currentMSecsSinceEpoch());
+                QString filePath = QStringLiteral("%1/pdfs/%2").arg(appDataPath, fileName);
+
+                QFile file(filePath);
+                if (file.open(QIODevice::WriteOnly)) {
+                    file.write(pdfData);
+                    file.close();
+
+                    // Ensure we create a proper URL using QUrl
+                    QUrl fileUrl = QUrl::fromLocalFile(filePath);
+                    QString fileUrlString = fileUrl.toString();
+
+                    qDebug() << "Barcode PDF saved to:" << fileUrlString;
+                    qDebug() << "PDF dimensions: Width=" << paperWidthMM << "mm, Height=" << paperHeightMM << "mm";
+
+                    // Create dimensioned URL with metadata
+                    QUrl pdfUrl(fileUrlString);
+                    QUrlQuery urlQuery;
+                    urlQuery.addQueryItem(QStringLiteral("paperWidth"), QString::number(paperWidthMM));
+                    urlQuery.addQueryItem(QStringLiteral("paperHeight"), QString::number(paperHeightMM));
+                    pdfUrl.setQuery(urlQuery);
+
+                    // Emit signal with dimensioned URL
+                    Q_EMIT barcodeGenerated(pdfUrl.toString());
+                    promise->addResult(pdfData);
+                    setLoading(false);
+                } else {
+                    Q_EMIT errorBarcodeGenerated(QStringLiteral("Failed to save PDF"), file.errorString());
+                    promise->addResult(QByteArray());
+                }
+            } else if (contentType.contains("application/json"_L1)) {
+                // Handle error response
+                QJsonDocument jsonResponse = QJsonDocument::fromJson(m_currentReply->readAll());
+                QJsonObject jsonObject = jsonResponse.object();
+                QString errorMessage = jsonObject["message"_L1].toString();
+                Q_EMIT errorBarcodeGenerated(QStringLiteral("Error"), errorMessage);
+                promise->addResult(QByteArray());
+            }
+        } else {
+            Q_EMIT errorBarcodeGenerated(QStringLiteral("Network Error"), m_currentReply->errorString());
+            promise->addResult(QByteArray());
+        }
+
+        promise->finish();
+        m_currentReply->deleteLater();
+        m_currentReply = nullptr;
+    });
+
+    return promise->future();
+}
+
+QFuture<QByteArray> ProductApi::generateCustomBarcode(const QString &content, const QString &barcodeType, const QString &customName, const QString &customPrice, const QVariantMap &options)
+{
+    setLoading(true);
+
+    // Build the JSON data with all parameters
+    QJsonObject jsonData;
+    jsonData["content"_L1] = content;
+    jsonData["barcode_type"_L1] = barcodeType;
+    jsonData["custom_name"_L1] = customName;
+    jsonData["custom_price"_L1] = customPrice;
+
+    // Extract display options
+    jsonData["show_team_name"_L1] = options.value(QStringLiteral("showTeamName"), false).toBool();
+    jsonData["show_price"_L1] = options.value(QStringLiteral("showPrice"), false).toBool();
+    jsonData["show_product_name"_L1] = options.value(QStringLiteral("showProductName"), false).toBool();
+    jsonData["show_content"_L1] = options.value(QStringLiteral("showContent"), false).toBool();
+    jsonData["paper_width"_L1] = options.value(QStringLiteral("paperWidth"), 80).toInt();
+    jsonData["paper_height"_L1] = options.value(QStringLiteral("paperHeight"), 30).toInt();
+
+    // Prepare the request
+    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/barcodes/generate"));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json"));
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(getToken()).toUtf8());
+
+    auto promise = std::make_shared<QPromise<QByteArray>>();
+
+    // Make the POST request
+    m_currentReply = m_netManager->post(request, QJsonDocument(jsonData).toJson());
+
+    connect(m_currentReply, &QNetworkReply::finished, this, [this, promise]() {
+        setLoading(false);
+
+        if (m_currentReply->error() == QNetworkReply::NoError) {
+            QString contentType = m_currentReply->header(QNetworkRequest::ContentTypeHeader).toString();
+
+            if (contentType.contains("application/pdf"_L1)) {
+                QByteArray pdfData = m_currentReply->readAll();
+
+                // Extract dimension metadata from response headers
+                int paperWidthMM = m_currentReply->rawHeader(QStringLiteral("X-Paper-Width")).toInt();
+                int paperHeightMM = m_currentReply->rawHeader(QStringLiteral("X-Paper-Height")).toInt();
+
+                // Save to app's data location
+                QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+                QDir().mkpath(QStringLiteral("%1/pdfs").arg(appDataPath));
+
+                QString fileName = QStringLiteral("barcode-%1.pdf").arg(QDateTime::currentMSecsSinceEpoch());
+                QString filePath = QStringLiteral("%1/pdfs/%2").arg(appDataPath, fileName);
+
+                QFile file(filePath);
+                if (file.open(QIODevice::WriteOnly)) {
+                    file.write(pdfData);
+                    file.close();
+
+                    // Ensure we create a proper URL using QUrl
+                    QUrl fileUrl = QUrl::fromLocalFile(filePath);
+                    QString fileUrlString = fileUrl.toString();
+
+                    qDebug() << "Barcode PDF saved to:" << fileUrlString;
+                    qDebug() << "PDF dimensions: Width=" << paperWidthMM << "mm, Height=" << paperHeightMM << "mm";
+
+                    // Create dimensioned URL with metadata
+                    QUrl pdfUrl(fileUrlString);
+                    QUrlQuery urlQuery;
+                    urlQuery.addQueryItem(QStringLiteral("paperWidth"), QString::number(paperWidthMM));
+                    urlQuery.addQueryItem(QStringLiteral("paperHeight"), QString::number(paperHeightMM));
+                    pdfUrl.setQuery(urlQuery);
+
+                    // Emit signal with dimensioned URL
+                    Q_EMIT barcodeGenerated(pdfUrl.toString());
+                    promise->addResult(pdfData);
+                    setLoading(false);
+                } else {
+                    Q_EMIT errorBarcodeGenerated(QStringLiteral("Failed to save PDF"), file.errorString());
+                    promise->addResult(QByteArray());
+                }
+            } else if (contentType.contains("application/json"_L1)) {
+                // Handle error response
+                QJsonDocument jsonResponse = QJsonDocument::fromJson(m_currentReply->readAll());
+                QJsonObject jsonObject = jsonResponse.object();
+                QString errorMessage = jsonObject["message"_L1].toString();
+                Q_EMIT errorBarcodeGenerated(QStringLiteral("Error"), errorMessage);
+                promise->addResult(QByteArray());
+            }
+        } else {
+            Q_EMIT errorBarcodeGenerated(QStringLiteral("Network Error"), m_currentReply->errorString());
+            promise->addResult(QByteArray());
+        }
+
+        promise->finish();
+        m_currentReply->deleteLater();
+        m_currentReply = nullptr;
+    });
+
+    return promise->future();
+}
 
 QString ProductApi::getToken() const {
     QString token=m_settings.value("auth/token").toString();

@@ -33,7 +33,7 @@ ListView {
         },
         {
             moduleId: "team",
-            text: i18nc("@action:button", "Team information"),
+            text: i18nc("@action:button", "Company information"),
             icon: { name: "gnumeric-group" },
             pageUrl: "qrc:/qt/qml/com/dervox/dim/contents/ui/pages/settings/TeamSettingsPage.qml",
             category: "Team Settings"
@@ -51,6 +51,13 @@ ListView {
             icon: { name: "document-properties" },
             pageUrl: "qrc:/qt/qml/com/dervox/dim/contents/ui/pages/settings/DocumentSettingsPage.qml",
             category: "Invoice & Receipt"
+        },
+        {
+            moduleId: "print",
+            text: i18nc("@action:button", " Receipt Printer"),
+            icon: { name: "document-print" },
+            pageUrl: "qrc:/qt/qml/com/dervox/dim/contents/ui/pages/settings/ReceiptSettingsPage.qml",
+            category: "Printing"
         },
         {
             moduleId: "about",
@@ -304,7 +311,7 @@ ListView {
                     },
                     {
                         name: i18n("Quotes"),
-                        icon: "view-financial-account-savings",
+                        icon: "view-financial-account-edit-symbolic",
                         pathPage: "Quote"
                     },
                     {

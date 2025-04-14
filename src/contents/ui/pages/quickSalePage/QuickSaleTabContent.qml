@@ -557,7 +557,11 @@ Item {
             Layout.fillHeight: true
             Kirigami.Card {
                 Layout.fillWidth: true
-
+                background: Rectangle {
+                    color: Qt.lighter(Kirigami.Theme.backgroundColor,1.2)
+                    border.width: 0
+                    radius: Kirigami.Units.smallSpacing
+                }
                 contentItem: ColumnLayout {
                     // Client Selection
                     // RowLayout {
@@ -716,7 +720,11 @@ Item {
             // Totals card
             Kirigami.Card {
                 Layout.fillWidth: true
-
+                background: Rectangle {
+                    color: Qt.lighter(Kirigami.Theme.backgroundColor,1.2)
+                    border.width: 0
+                    radius: Kirigami.Units.smallSpacing
+                }
                 contentItem: ColumnLayout {
                     Layout.margins : Kirigami.Units.smallSpacing
                     RowLayout {
@@ -754,6 +762,11 @@ Item {
             Kirigami.Card {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                background: Rectangle {
+                    color: Qt.lighter(Kirigami.Theme.backgroundColor,1.2)
+                    border.width: 0
+                    radius: Kirigami.Units.smallSpacing
+                }
                 contentItem: ColumnLayout{
                     // Enhanced NumPad
                     Layout.margins : Kirigami.Units.smallSpacing
@@ -1120,20 +1133,51 @@ Item {
         function onSaleMapCreated(sale) {
             // Now sale is a JavaScript object with properties
             if (printReceiptCheckBox.checked) {
-                saleApi.generateReceipt(sale.id)
+                // Load printer settings for paper dimensions
+                let printerSettings = printerHelper.loadPrinterConfig("ReceiptPrinting");
 
+                if (Object.keys(printerSettings).length > 0 &&
+                    "paperWidth" in printerSettings) {
+
+                    let heightMode = printerSettings.autoHeight ? "auto" : "fixed";
+                    let heightValue = printerSettings.customHeight || 800;
+
+                    // Use the saved width and height settings
+                    saleApi.generateReceipt(
+                        sale.id,
+                        printerSettings.paperWidth,
+                        heightMode,
+                        heightValue
+                    );
+                } else {
+                    // Use defaults
+                    saleApi.generateReceipt(sale.id);
+                }
             }
         }
+
         function onReceiptGenerated(pdfUrl) {
-            printerHelper.printPdf(pdfUrl)
+            // Get settings but override directPrint to be always true
+            let printerSettings = printerHelper.loadPrinterConfig("ReceiptPrinting");
+
+            // Force directPrint to be true
+            printerSettings.directPrint = true;
+
+            // Save the modified settings temporarily
+            printerHelper.savePrinterConfig("ReceiptPrintingTemp", printerSettings);
+
+            // Use the temp config with forced direct printing
+            printerHelper.printReceiptWithConfig(pdfUrl, "ReceiptPrintingTemp");
         }
+
         function onErrorReceiptGenerated(title, message) {
             applicationWindow().showPassiveNotification(
-                        i18n("Receipt generation failed: %1", message),
-                        "long"
-                        )
+                i18n("Receipt generation failed: %1", message),
+                "long"
+            );
         }
     }
+
     Kirigami.Dialog {
         id: saleSettingsDialog
         title: i18n("Sale Settings")

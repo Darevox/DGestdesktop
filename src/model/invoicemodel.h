@@ -31,18 +31,23 @@ public:
         IdRole = Qt::UserRole + 1,
         TeamIdRole,
         ReferenceNumberRole,
+        TypeRole,               // New role
         InvoiceableTypeRole,
         InvoiceableIdRole,
         TotalAmountRole,
         TaxAmountRole,
         DiscountAmountRole,
         StatusRole,
+        PaymentStatusRole,      // New role
+        IsEmailSentRole,        // New role
         IssueDateRole,
         DueDateRole,
         NotesRole,
         MetaDataRole,
         ItemsRole,
-        CheckedRole
+        CheckedRole,
+        IsQuoteRole,            // New role
+        IsInvoiceRole           // New role
     };
     Q_ENUM(InvoiceRoles)
 
@@ -83,7 +88,7 @@ public:
     Q_INVOKABLE void markAsSent(int id);
     Q_INVOKABLE void markAsPaid(int id);
     Q_INVOKABLE void getSummary(const QString &period = QStringLiteral("month"));
-
+    Q_INVOKABLE void markAsEmailSent(int id);
     // Selection methods
     Q_INVOKABLE void setChecked(int row, bool checked);
     Q_INVOKABLE QVariantList getCheckedInvoiceIds() const;
@@ -122,7 +127,8 @@ Q_SIGNALS:
     void hasCheckedItemsChanged();
     void rowCountChanged();
     void startDateChanged();
-       void endDateChanged();
+    void endDateChanged();
+    void invoiceMarkedAsEmailSent();
 private Q_SLOTS:
     void handleInvoicesReceived(const PaginatedInvoices &invoices);
     void handleInvoiceError(const QString &message, ApiStatus status);
@@ -135,7 +141,7 @@ private Q_SLOTS:
     void handleInvoiceMarkedAsSent(const QVariantMap &invoice);
     void handleInvoiceMarkedAsPaid(const QVariantMap &invoice);
     void handleSummaryReceived(const QVariantMap &summary);
-
+    void handleInvoiceMarkedAsEmailSent(const QVariantMap &invoice);
 private:
     InvoiceApi* m_api;
     QList<Invoice> m_invoices;

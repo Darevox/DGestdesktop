@@ -11,7 +11,7 @@ import "."
 
 Kirigami.Dialog {
     id: saleDialog
-    title: dialogSaleId > 0 ? i18n("Edit %1", currentSale?.type) : i18n("New %1",typeCombo.currentText)
+    title: dialogSaleId > 0 ? i18n("Edit Quote") : i18n("New Quote")
     //  preferredWidth: Kirigami.Units.gridUnit * 60
     padding: Kirigami.Units.largeSpacing
     width: Kirigami.Units.gridUnit * 50
@@ -60,7 +60,7 @@ Kirigami.Dialog {
             visible:!saleApi.isLoading
 
             QQC2.TabButton {
-                text: i18n("%1 Details",typeCombo.currentText)
+                text: i18n("Quote Details")
             }
             QQC2.TabButton {
                 text: i18n("Products")
@@ -139,27 +139,27 @@ Kirigami.Dialog {
                             valueRole: "value"
                             currentIndex: 0
                         }
-                        FormCard.FormComboBoxDelegate {
-                            id: typeCombo
-                            text: i18n("Type")
-                            model: [
-                                { text: i18n("Sale"), value: "sale" },
-                                { text: i18n("Quote"), value: "quote" }
-                            ]
-                            textRole: "text"
-                            valueRole: "value"
-                            currentIndex: 0
-                            enabled: !isEditing // Can't change type after creation
+                        // FormCard.FormComboBoxDelegate {
+                        //     id: typeCombo
+                        //     text: i18n("Type")
+                        //     model: [
+                        //         { text: i18n("Sale"), value: "sale" },
+                        //         { text: i18n("Quote"), value: "quote" }
+                        //     ]
+                        //     textRole: "text"
+                        //     valueRole: "value"
+                        //     currentIndex: 0
+                        //     enabled: !isEditing // Can't change type after creation
 
-                            onCurrentValueChanged: {
-                                // Show info message when selecting quote
-                                if (currentValue === "quote") {
-                                    quoteInfoMessage.visible = true
-                                } else {
-                                    quoteInfoMessage.visible = false
-                                }
-                            }
-                        }
+                        //     onCurrentValueChanged: {
+                        //         // Show info message when selecting quote
+                        //         if (currentValue === "quote") {
+                        //             quoteInfoMessage.visible = true
+                        //         } else {
+                        //             quoteInfoMessage.visible = false
+                        //         }
+                        //     }
+                        // }
                         // FormCard.FormComboBoxDelegate {
                         //     id: cashSourceField
                         //     text: i18n("Cash Source")
@@ -173,7 +173,7 @@ Kirigami.Dialog {
                             id: saleDateField
                             dateTimeDisplay:FormCard.FormDateTimeDelegate.DateTimeDisplay.Date
 
-                            text: i18n("Sale Date")
+                            text: i18n("Quote Date")
                             value: new Date()
                         }
 
@@ -294,8 +294,6 @@ Kirigami.Dialog {
                                     productModelFetch.setSortField("name") // Reset sort field after search
                                 }
                             }
-
-
 
                         }
                         // Selected products list
@@ -489,7 +487,6 @@ Kirigami.Dialog {
                                         }
                                     }
 
-
                                     QQC2.SpinBox {
                                         Layout.preferredWidth:  Kirigami.Units.gridUnit  * 5
                                         value: model.taxRate
@@ -607,7 +604,7 @@ Kirigami.Dialog {
 
     customFooterActions: [
         Kirigami.Action {
-            text: isEditing ? i18n("Save Changes") : i18n("Create %1",typeCombo.currentText)
+            text: isEditing ? i18n("Save Changes") : i18n("Create Quote")
             icon.name: isEditing ? "document-save" : "list-add"
             enabled: !quoteModel.loading //&& validateForm()
             onTriggered: {
@@ -879,7 +876,7 @@ Kirigami.Dialog {
             due_date: hasClientCheckbox.checked ? dueDateField.value.toISOString() : null,
             status: statusCombo.currentValue || statusCombo.currentText,
             notes: notesField.text || "",
-            type: !isEditing ? typeCombo.currentValue : undefined, // Only include type when creating new
+            type: "quote", //!isEditing ? typeCombo.currentValue : undefined, // Only include type when creating new
             items: items
         };
 
@@ -947,17 +944,17 @@ Kirigami.Dialog {
         statusCombo.currentIndex = statusIndex !== -1 ? statusIndex : 0
 
         // Set document type
-        if (sale.type) {
-            let typeIndex = typeCombo.model.findIndex(item => item.value === sale.type)
-            typeCombo.currentIndex = typeIndex !== -1 ? typeIndex : 0
+        // if (sale.type) {
+        //     let typeIndex = typeCombo.model.findIndex(item => item.value === sale.type)
+        //     typeCombo.currentIndex = typeIndex !== -1 ? typeIndex : 0
 
-            // Show the quote info message if it's a quote
-            quoteInfoMessage.visible = sale.type === "quote"
-        } else {
-            // Default to sale for backward compatibility
-            typeCombo.currentIndex = 0
-            quoteInfoMessage.visible = false
-        }
+        //     // Show the quote info message if it's a quote
+        //     quoteInfoMessage.visible = sale.type === "quote"
+        // } else {
+        //     // Default to sale for backward compatibility
+        //     typeCombo.currentIndex = 0
+        //     quoteInfoMessage.visible = false
+        // }
 
         // Clear and reload items
         selectedProductsModel.clear();

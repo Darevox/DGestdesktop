@@ -14,7 +14,11 @@ Kirigami.AbstractCard {
 
     // Add minimum width for desktop to ensure it's not too small
     Layout.minimumWidth: Kirigami.Units.gridUnit * 15
-
+    background: Rectangle {
+        color: Qt.lighter(Kirigami.Theme.backgroundColor,1.2)
+        border.width: 0
+        radius: Kirigami.Units.smallSpacing
+    }
     // Adaptive layout properties
     property bool isNarrow: width < Kirigami.Units.gridUnit * 20
 
@@ -172,7 +176,7 @@ Kirigami.AbstractCard {
                     }
 
                     colorSource: Charts.SingleValueSource { value: card.chartColor }
-                    fillOpacity: 0.2
+                    fillOpacity: 0.3
                     smooth: true
 
                     Behavior on opacity {

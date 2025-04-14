@@ -15,7 +15,15 @@ Kirigami.ScrollablePage {
     property bool isSmall: width >= Kirigami.Units.gridUnit * 20 && width < Kirigami.Units.gridUnit * 35   // Updated range
     property bool isTiny: width < Kirigami.Units.gridUnit * 20    // Unchanged
     property bool isMobile: Kirigami.Settings.isMobile || isTiny  // Unchanged
+    header: Kirigami.ApplicationHeaderStyle.None
+    Kirigami.Theme.colorSet: Kirigami.Theme.View
 
+    Kirigami.Theme.inherit: false
+    background: Rectangle {
+        color: Qt.darker(Kirigami.Theme.backgroundColor, 1.1)
+        border.width: 0
+        radius: Kirigami.Units.smallSpacing
+    }
     // Calculate columns dynamically
     property int statsCardsColumns: isTiny ? 1 : (isSmall ? 2 : (isMedium ? 3 : 4))
     property int chartCardsColumns: isTiny ? 1 : (isSmall ? 1 : (isMedium ? 2 : (isLarge ? 3 : 2)))
@@ -34,7 +42,11 @@ Kirigami.ScrollablePage {
             Layout.fillWidth: true
             Layout.leftMargin: Kirigami.Units.largeSpacing
             Layout.rightMargin: Kirigami.Units.largeSpacing
-
+            background: Rectangle {
+                color: Qt.lighter(Kirigami.Theme.backgroundColor,1.2)
+                border.width: 0
+                radius: Kirigami.Units.smallSpacing
+            }
             contentItem: ColumnLayout {
                 spacing: Kirigami.Units.smallSpacing
                 width: parent.width
@@ -257,7 +269,11 @@ Kirigami.ScrollablePage {
             Layout.leftMargin: Kirigami.Units.largeSpacing
             Layout.rightMargin: Kirigami.Units.largeSpacing
             implicitHeight: Kirigami.Units.gridUnit * 4
-
+            background: Rectangle {
+                color: Qt.lighter(Kirigami.Theme.backgroundColor,1.2)
+                border.width: 0
+                radius: Kirigami.Units.smallSpacing
+            }
             contentItem: Item {
                 width: parent.width
                 height: Kirigami.Units.gridUnit * 4
@@ -297,7 +313,11 @@ Kirigami.ScrollablePage {
                 delegate: Kirigami.Card {
                     Layout.fillWidth: true
                     implicitHeight: Kirigami.Units.gridUnit * 7
-
+                    background: Rectangle {
+                        color: Qt.lighter(Kirigami.Theme.backgroundColor,1.2)
+                        border.width: 0
+                        radius: Kirigami.Units.smallSpacing
+                    }
                     contentItem: Item {
                         anchors.fill: parent
 
@@ -358,6 +378,11 @@ Kirigami.ScrollablePage {
             Repeater {
                 model: 2
                 delegate: Kirigami.Card {
+                    background: Rectangle {
+                        color: Qt.lighter(Kirigami.Theme.backgroundColor,1.2)
+                        border.width: 0
+                        radius: Kirigami.Units.smallSpacing
+                    }
                     Layout.fillWidth: true
                     implicitHeight: Kirigami.Units.gridUnit * 16
 
@@ -426,7 +451,11 @@ Kirigami.ScrollablePage {
             Kirigami.Card {
                 Layout.fillWidth: true
                 implicitHeight: Kirigami.Units.gridUnit * 16
-
+                background: Rectangle {
+                    color: Qt.lighter(Kirigami.Theme.backgroundColor,1.2)
+                    border.width: 0
+                    radius: Kirigami.Units.smallSpacing
+                }
                 contentItem: Item {
                     anchors.fill: parent
 
@@ -534,6 +563,11 @@ Kirigami.ScrollablePage {
             Repeater {
                 model: 2
                 delegate: Kirigami.Card {
+                    background: Rectangle {
+                        color: Qt.lighter(Kirigami.Theme.backgroundColor,1.2)
+                        border.width: 0
+                        radius: Kirigami.Units.smallSpacing
+                    }
                     Layout.fillWidth: true
                     implicitHeight: Kirigami.Units.gridUnit * 18
 

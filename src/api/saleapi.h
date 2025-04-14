@@ -108,7 +108,8 @@ public:
     // Additional operations
     Q_INVOKABLE QFuture<void> addPayment(int id, const Payment &payment);
     Q_INVOKABLE QFuture<void> generateInvoice(int id, const QVariantMap &config = QVariantMap());
-    Q_INVOKABLE QFuture<QByteArray> generateReceipt(int id);
+    Q_INVOKABLE QFuture<QByteArray> generateReceipt(int id, int paperWidthMM = 80, const QString &heightMode = QStringLiteral("auto"), int maxHeight = 800);
+    Q_INVOKABLE QFuture<QByteArray> generateTestReceipt(int paperWidthMM, const QString &heightMode, int maxHeight);
     Q_INVOKABLE QFuture<void> getSummary(const QString &period = QStringLiteral("month"));
 
     // Token management

@@ -14,6 +14,7 @@ public:
 
     // Additional methods specific to quotes could be added here, such as:
     void refresh() override;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 public Q_SLOTS:
     // Additional slots specific to quotes could be added here
 

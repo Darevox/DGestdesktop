@@ -536,10 +536,28 @@ QFuture<void> SaleApi::convertToSale(int id)
     return future.then([=]() {});
 }
 
-QFuture<QByteArray> SaleApi::generateReceipt(int id)
+QFuture<QByteArray> SaleApi::generateReceipt(int id, int paperWidthMM, const QString &heightMode, int maxHeight)
 {
     setLoading(true);
-    QNetworkRequest request = createRequest(QStringLiteral("/api/v1/sales/%1/receipt").arg(id));
+
+    // Build the URL with query parameters for dimensions
+    QString path = QStringLiteral("/api/v1/sales/%1/receipt").arg(id);
+
+    // Add query parameters for paper dimensions
+    QUrlQuery query;
+    query.addQueryItem(QStringLiteral("paperWidth"), QString::number(paperWidthMM));
+    query.addQueryItem(QStringLiteral("heightMode"), heightMode);
+
+    if (maxHeight > 0) {
+        query.addQueryItem(QStringLiteral("maxHeight"), QString::number(maxHeight));
+    }
+
+    // Append query string to path
+    if (!query.isEmpty()) {
+        path += QStringLiteral("?") + query.toString();
+    }
+
+    QNetworkRequest request = createRequest(path);
     request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(getToken()).toUtf8());
 
     auto promise = std::make_shared<QPromise<QByteArray>>();
@@ -555,6 +573,11 @@ QFuture<QByteArray> SaleApi::generateReceipt(int id)
             if (contentType.contains("application/pdf"_L1)) {
                 QByteArray pdfData = m_currentReply->readAll();
 
+                // Extract dimension metadata from response headers
+                int paperWidthMM = m_currentReply->rawHeader(QStringLiteral("X-Paper-Width-MM")).toInt();
+                int paperHeightPt = m_currentReply->rawHeader(QStringLiteral("X-Paper-Height-PT")).toInt();
+                QByteArray heightModeBytes = m_currentReply->rawHeader(QStringLiteral("X-Height-Mode"));
+                QString heightMode = QString::fromUtf8(heightModeBytes);
                 // Save to app's data location
                 QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
                 QDir().mkpath(QStringLiteral("%1/pdfs").arg(appDataPath));
@@ -572,7 +595,18 @@ QFuture<QByteArray> SaleApi::generateReceipt(int id)
                     QString fileUrlString = fileUrl.toString();
 
                     qDebug() << "Receipt PDF saved to:" << fileUrlString;
-                    Q_EMIT receiptGenerated(fileUrlString);
+                    qDebug() << "PDF dimensions: Width=" << paperWidthMM << "mm, Height=" << paperHeightPt << "pt, Mode=" << heightMode;
+
+                    // Create dimensioned URL with metadata
+                    QUrl pdfUrl(fileUrlString);
+                    QUrlQuery urlQuery;
+                    urlQuery.addQueryItem(QStringLiteral("paperWidth"), QString::number(paperWidthMM));
+                    urlQuery.addQueryItem(QStringLiteral("paperHeight"), QString::number(paperHeightPt));
+                    urlQuery.addQueryItem(QStringLiteral("heightMode"), heightMode);
+                    pdfUrl.setQuery(urlQuery);
+
+                    // Emit signal with dimensioned URL
+                    Q_EMIT receiptGenerated(pdfUrl.toString());
                     promise->addResult(pdfData);
                     setLoading(false);
                 } else {
@@ -595,6 +629,161 @@ QFuture<QByteArray> SaleApi::generateReceipt(int id)
         promise->finish();
         m_currentReply->deleteLater();
         m_currentReply = nullptr;
+    });
+
+    return promise->future();
+}
+
+// In saleapi.h
+
+// In saleapi.cpp
+QFuture<QByteArray> SaleApi::generateTestReceipt(int paperWidthMM, const QString &heightMode, int maxHeight)
+{
+    setLoading(true);
+
+    // Build the URL for test receipt
+    QString path = QStringLiteral("/api/v1/sales/receipts/test");
+
+    // Add query parameters for paper dimensions
+    QUrlQuery query;
+    query.addQueryItem(QStringLiteral("paperWidth"), QString::number(paperWidthMM));
+    query.addQueryItem(QStringLiteral("heightMode"), heightMode);
+
+    if (maxHeight > 0) {
+        query.addQueryItem(QStringLiteral("maxHeight"), QString::number(maxHeight));
+    }
+
+    // Append query string to path
+    if (!query.isEmpty()) {
+        path += QStringLiteral("?") + query.toString();
+    }
+
+    QNetworkRequest request = createRequest(path);
+    request.setRawHeader("Authorization", QStringLiteral("Bearer %1").arg(getToken()).toUtf8());
+
+    auto promise = std::make_shared<QPromise<QByteArray>>();
+
+    // Cancel any existing operation
+    if (m_currentReply && m_currentReply->isRunning()) {
+        m_currentReply->abort();
+        m_currentReply->deleteLater();
+        m_currentReply = nullptr;
+    }
+
+    m_currentReply = m_netManager->get(request);
+
+    connect(m_currentReply, &QNetworkReply::finished, this, [this, promise]() {
+        // Create a local pointer to m_currentReply to ensure it doesn't change during the function
+        QNetworkReply *reply = m_currentReply;
+        m_currentReply = nullptr; // Set to null before any return statements
+
+        setLoading(false);
+
+        if (!reply) {
+            qWarning() << "Reply is null in finished handler";
+            Q_EMIT errorReceiptGenerated(QStringLiteral("Error"), QStringLiteral("Request was canceled"));
+            promise->addResult(QByteArray());
+            promise->finish();
+            return;
+        }
+
+        if (reply->error() == QNetworkReply::NoError) {
+            QString contentType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
+
+            if (contentType.contains(QStringLiteral("application/pdf"))) {
+                QByteArray pdfData = reply->readAll();
+
+                // Extract dimension metadata from response headers
+                int paperWidthMM = 0;
+                int paperHeightPt = 0;
+                QString heightMode;
+
+                QByteArray paperWidthBytes = reply->rawHeader(QStringLiteral("X-Paper-Width-MM"));
+                if (!paperWidthBytes.isEmpty()) {
+                    paperWidthMM = paperWidthBytes.toInt();
+                }
+
+                QByteArray paperHeightBytes = reply->rawHeader(QStringLiteral("X-Paper-Height-PT"));
+                if (!paperHeightBytes.isEmpty()) {
+                    paperHeightPt = paperHeightBytes.toInt();
+                }
+
+                QByteArray heightModeBytes = reply->rawHeader(QStringLiteral("X-Height-Mode"));
+                if (!heightModeBytes.isEmpty()) {
+                    heightMode = QString::fromUtf8(heightModeBytes);
+                }
+
+                // Save to app's data location
+                QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+                QDir().mkpath(QStringLiteral("%1/pdfs").arg(appDataPath));
+
+                QString fileName = QStringLiteral("test-receipt-%1.pdf").arg(QDateTime::currentMSecsSinceEpoch());
+                QString filePath = QStringLiteral("%1/pdfs/%2").arg(appDataPath, fileName);
+
+                QFile file(filePath);
+                if (file.open(QIODevice::WriteOnly)) {
+                    file.write(pdfData);
+                    file.close();
+
+                    // Ensure we create a proper URL using QUrl
+                    QUrl fileUrl = QUrl::fromLocalFile(filePath);
+                    QString fileUrlString = fileUrl.toString();
+
+                    qDebug() << "Test receipt PDF saved to:" << fileUrlString;
+                    qDebug() << "PDF dimensions: Width=" << paperWidthMM << "mm, Height=" << paperHeightPt << "pt, Mode=" << heightMode;
+
+                    // Create dimensioned URL with metadata
+                    QUrl pdfUrl(fileUrlString);
+                    QUrlQuery urlQuery;
+
+                    if (paperWidthMM > 0) {
+                        urlQuery.addQueryItem(QStringLiteral("paperWidth"), QString::number(paperWidthMM));
+                    }
+
+                    if (paperHeightPt > 0) {
+                        urlQuery.addQueryItem(QStringLiteral("paperHeight"), QString::number(paperHeightPt));
+                    }
+
+                    if (!heightMode.isEmpty()) {
+                        urlQuery.addQueryItem(QStringLiteral("heightMode"), heightMode);
+                    }
+
+                    if (!urlQuery.isEmpty()) {
+                        pdfUrl.setQuery(urlQuery);
+                    }
+
+                    // Emit signal with dimensioned URL
+                    Q_EMIT receiptGenerated(pdfUrl.toString());
+                    promise->addResult(pdfData);
+                } else {
+                    Q_EMIT errorReceiptGenerated(QStringLiteral("Failed to save PDF"), file.errorString());
+                    promise->addResult(QByteArray());
+                }
+            } else if (contentType.contains(QStringLiteral("application/json"))) {
+                // Handle error response
+                QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll());
+                QJsonObject jsonObject = jsonResponse.object();
+                QString errorMessage = jsonObject[QStringLiteral("message")].toString();
+                Q_EMIT errorReceiptGenerated(QStringLiteral("Error"), errorMessage);
+                promise->addResult(QByteArray());
+            } else {
+                Q_EMIT errorReceiptGenerated(QStringLiteral("Unexpected Response"),
+                                       QStringLiteral("Server returned unexpected content type: %1").arg(contentType));
+                promise->addResult(QByteArray());
+            }
+        } else {
+            // If the request was aborted by a new request, don't show an error
+            if (reply->error() == QNetworkReply::OperationCanceledError) {
+                qWarning() << "Request was canceled";
+                // Don't emit an error for canceled requests
+            } else {
+                Q_EMIT errorReceiptGenerated(QStringLiteral("Network Error"), reply->errorString());
+            }
+            promise->addResult(QByteArray());
+        }
+
+        promise->finish();
+        reply->deleteLater();
     });
 
     return promise->future();

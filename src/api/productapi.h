@@ -8,6 +8,7 @@
 #include <QHttpMultiPart>
 #include <QFile>
 #include <QFileInfo>
+#include <QDir>
 #include "../utils/favoritemanager.h"
 
 namespace NetworkApi {
@@ -57,7 +58,7 @@ class ProductApi : public AbstractApi {
     Q_OBJECT
     Q_PROPERTY(bool isLoading READ isLoading NOTIFY isLoadingChanged)
 public:
-   // explicit ProductApi(QNetworkAccessManager *netManager, QObject *parent = nullptr);
+    // explicit ProductApi(QNetworkAccessManager *netManager, QObject *parent = nullptr);
     explicit ProductApi(QObject *parent = nullptr);
     explicit ProductApi(QNetworkAccessManager *netManager, QObject *parent = nullptr);
     // Main CRUD operations
@@ -94,6 +95,16 @@ public:
     bool isLoading() const { return m_isLoading; }
 
     static void setSharedNetworkManager(QNetworkAccessManager* manager);
+
+    Q_INVOKABLE QFuture<QByteArray> generateProductBarcode(int productId,
+                                                           const QString &barcodeType,
+                                                           const QVariantMap &options);
+
+    Q_INVOKABLE QFuture<QByteArray> generateCustomBarcode(const QString &content,
+                                                          const QString &barcodeType,
+                                                          const QString &customName,
+                                                          const QString &customPrice,
+                                                          const QVariantMap &options);
 Q_SIGNALS:
     // Success signals
     void productsReceived(const PaginatedProducts &products);
@@ -106,7 +117,7 @@ Q_SIGNALS:
     void stockUpdated(const Product &product);
     void lowStockProductsReceived(const QList<Product> &products);
     void productUnitsReceived(const QList<ProductUnit> &units);
-
+    void barcodeGenerated(const QString &pdfUrl);
     // Error signals
     void productError(const QString &message, ApiStatus status,const QByteArray &details);
     void productNotFound();
@@ -128,12 +139,15 @@ Q_SIGNALS:
     void barcodeUpdated(const QJsonObject &barcode);
     void productBarcodesReceived(const QList<QJsonObject> &barcodes);
 
+    void errorBarcodeGenerated(const QString &title, const QString &message);
+
 
     void imageRemoved(int productId);
 
     void isLoadingChanged();
     void imageUploaded(const QString &imageUrl);
 private:
+    QNetworkReply* m_currentReply = nullptr;
     Product productFromJson(const QJsonObject &json) const;
     ProductUnit productUnitFromJson(const QJsonObject &json) const;
     QJsonObject productToJson(const Product &product) const;
@@ -153,7 +167,7 @@ private:
     static QNetworkAccessManager* netManager;
     static void ensureSharedNetworkManager();
 
-        FavoriteManager* m_favoriteManager;
+    FavoriteManager* m_favoriteManager;
 };
 
 } // namespace NetworkApi

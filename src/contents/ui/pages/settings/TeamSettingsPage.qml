@@ -9,7 +9,7 @@ import "../team/"
 
 FormCard.FormCardPage {
     id: teamSettingsPage
-    title: i18nc("@title", "Team Settings")
+    title: i18nc("@title", "Company Settings")
 
     property int teamId: 0
     property var teamData: ({})
@@ -86,7 +86,7 @@ FormCard.FormCardPage {
         enabled: !isLoading
 
         FormCard.FormHeader {
-            title: i18nc("@title:group", "Team Profile")
+            title: i18nc("@title:group", "Company Profile")
         }
 
         FormCard.FormCard {

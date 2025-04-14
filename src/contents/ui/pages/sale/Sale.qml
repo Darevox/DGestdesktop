@@ -119,18 +119,18 @@ Kirigami.Page {
             FormCard.FormCard {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 24
-                FormCard.FormComboBoxDelegate {
-                    id: typeField
-                    text: i18n("Type")
-                    model: [
-                        { text: i18n("All"), value: "" },
-                        { text: i18n("Sales"), value: "sale" },
-                        { text: i18n("Quotes"), value: "quote" }
-                    ]
-                    textRole: "text"
-                    valueRole: "value"
-                    onCurrentValueChanged: saleModel.setType(currentValue)
-                }
+                // FormCard.FormComboBoxDelegate {
+                //     id: typeField
+                //     text: i18n("Type")
+                //     model: [
+                //         { text: i18n("All"), value: "" },
+                //         { text: i18n("Sales"), value: "sale" },
+                //         { text: i18n("Quotes"), value: "quote" }
+                //     ]
+                //     textRole: "text"
+                //     valueRole: "value"
+                //     onCurrentValueChanged: saleModel.setType(currentValue)
+                // }
                 FormCard.FormComboBoxDelegate {
                     id: statusField
                     text: i18n("Status")
@@ -142,6 +142,7 @@ Kirigami.Page {
                     ]
                     textRole: "text"
                     valueRole: "value"
+                    currentIndex: 0
                     onCurrentValueChanged: saleModel.setStatus(currentValue)
                 }
 
@@ -156,6 +157,7 @@ Kirigami.Page {
                     ]
                     textRole: "text"
                     valueRole: "value"
+                    currentIndex: 0
                     onCurrentValueChanged: saleModel.setPaymentStatus(currentValue)
                 }
 
@@ -500,7 +502,7 @@ Kirigami.Page {
                             return Qt.formatDateTime(date, "yyyy-MM-dd");
                         }
                         horizontalAlignment: Text.AlignRight
-                       // font.family: "Monospace"
+                        // font.family: "Monospace"
                     }
                     headerDelegate: TableHeaderLabel {}
                 }
@@ -599,6 +601,6 @@ Kirigami.Page {
     Component.onCompleted: {
         saleModel.setApi(saleApi)
         clientModel.setApi(clientApi)
-      //  saleModel.setType("sale")
+        //  saleModel.setType("sale")
     }
 }

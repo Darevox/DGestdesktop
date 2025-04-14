@@ -335,16 +335,24 @@ Kirigami.Page {
                 },
 
                 Tables.HeaderComponent {
-                    title: i18nc("@title:column", "Invoiceable")
-                    textRole: "invoiceableType"
-                    role: InvoiceRoles.InvoiceableTypeRole
-                    width: root.width * 0.16
-                    itemDelegate: QQC2.Label {
+                    title: i18nc("@title:column", "Type")
+                    textRole: "type"
+                    role: InvoiceRoles.TypeRole
+                    width: root.width * 0.10
+
+                    itemDelegate: DStatusBadge {
                         text: {
                             switch(modelData) {
-                                case "App\\Models\\Sale": return "Sale #" + model.invoiceableId
-                                case "App\\Models\\Purchase": return "Purchase #" + model.invoiceableId
-                                //   default: return "Sale #"  + model.invoiceableId
+                                case "quote": return i18n("Quote")
+                                case "invoice": return i18n("Invoice")
+                                default: return modelData || ""
+                            }
+                        }
+                        textColor: {
+                            switch(modelData) {
+                                case "quote": return Kirigami.Theme.neutralTextColor
+                                case "invoice": return Kirigami.Theme.positiveTextColor
+                                default: return Kirigami.Theme.textColor
                             }
                         }
                     }
@@ -374,6 +382,18 @@ Kirigami.Page {
                                 default: return Kirigami.Theme.textColor
                             }
                         }
+                    }
+                    headerDelegate: TableHeaderLabel {}
+                },
+                Tables.HeaderComponent {
+                    title: i18nc("@title:column", "Email Sent")
+                    textRole: "isEmailSent"
+                    role: InvoiceRoles.IsEmailSentRole
+                    width: root.width * 0.08
+
+                    itemDelegate: DStatusBadge {
+                        text: modelData ? i18n("Sent") : i18n("Not Sent")
+                        textColor: modelData ? Kirigami.Theme.positiveTextColor : Kirigami.Theme.neutralTextColor
                     }
                     headerDelegate: TableHeaderLabel {}
                 },

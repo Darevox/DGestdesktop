@@ -18,7 +18,14 @@ Kirigami.Page {
     property var sharedCurrentProductIds: []
     property bool isLoadingProducts: false
     property int currentCategoryId: 1
+    Kirigami.Theme.colorSet: Kirigami.Theme.View
 
+    Kirigami.Theme.inherit: false
+    background: Rectangle {
+        color: Qt.darker(Kirigami.Theme.backgroundColor, 1.1)
+        border.width: 0
+        radius: Kirigami.Units.smallSpacing
+    }
     Component.onCompleted: {
         addNewSaleTab()
         loadFavoriteProducts()

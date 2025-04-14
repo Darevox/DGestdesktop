@@ -27,12 +27,15 @@ struct Invoice {
     int id;
     int team_id;
     QString reference_number;
+    QString type;                 // New field: 'invoice' or 'quote'
     QString invoiceable_type;
     int invoiceable_id;
     double total_amount;
     double tax_amount;
     double discount_amount;
     QString status;
+    QString payment_status;       // New separate field for payment status
+    bool is_email_sent;           // New field for email sent status
     QDateTime issue_date;
     QDateTime due_date;
     QString notes;
@@ -42,10 +45,7 @@ struct Invoice {
 
     // Helper methods for UI compatibility
     QString getPaymentStatus() const {
-        if (status == QStringLiteral("paid")) return QStringLiteral("paid");
-        double paidAmount = meta_data.value(QStringLiteral("paid_amount"), 0.0).toDouble();
-        if (paidAmount > 0) return QStringLiteral("partial");
-        return QStringLiteral("unpaid");
+        return payment_status;
     }
 
     double getPaidAmount() const {
@@ -70,6 +70,15 @@ struct Invoice {
 
     QString getTermsConditions() const {
         return meta_data.value(QStringLiteral("terms_conditions"), QString()).toString();
+    }
+
+    // New helper methods
+    bool isQuote() const {
+        return type == QStringLiteral("quote");
+    }
+
+    bool isInvoice() const {
+        return type == QStringLiteral("invoice");
     }
 };
 
@@ -105,7 +114,7 @@ public:
                                           const QString &paymentStatus = QString(),
                                           const QDateTime &startDate = QDateTime(),
                                           const QDateTime &endDate = QDateTime()
-                                            );
+            );
 
     Q_INVOKABLE QFuture<void> getInvoice(int id);
     Q_INVOKABLE QFuture<void> createInvoice(const Invoice &invoice);
@@ -119,7 +128,7 @@ public:
     Q_INVOKABLE QFuture<void> markAsSent(int id);
     Q_INVOKABLE QFuture<void> markAsPaid(int id);
     Q_INVOKABLE QFuture<void> getSummary(const QString &period = QStringLiteral("month"));
-
+    Q_INVOKABLE QFuture<void> markAsEmailSent(int id);
     // Token management
     Q_INVOKABLE QString getToken() const;
     Q_INVOKABLE void saveToken(const QString &token);
@@ -140,6 +149,8 @@ Q_SIGNALS:
     void invoiceMarkedAsPaid(const QVariantMap &invoice);
     void summaryReceived(const QVariantMap &summary);
 
+    void invoiceMarkedAsEmailSent(const QVariantMap &invoice);
+
     // Error signals
     void errorInvoicesReceived(const QString &message, ApiStatus status, const QByteArray &details);
     void errorInvoiceReceived(const QString &message, ApiStatus status, const QByteArray &details);
@@ -152,6 +163,7 @@ Q_SIGNALS:
     void errorInvoiceMarkedAsSent(const QString &message, ApiStatus status, const QByteArray &details);
     void errorInvoiceMarkedAsPaid(const QString &message, ApiStatus status, const QByteArray &details);
     void errorSummaryReceived(const QString &message, ApiStatus status, const QByteArray &details);
+    void errorInvoiceMarkedAsEmailSent(const QString &message, ApiStatus status, const QByteArray &details);
 
     void isLoadingChanged();
 

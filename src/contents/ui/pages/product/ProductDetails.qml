@@ -1075,7 +1075,7 @@ Kirigami.Dialog {
         id: barcodeDialogLoader
         active: false
         asynchronous: true
-        sourceComponent: Barcode{}
+        sourceComponent: BarcodeDialog{}
         property string contentEditText: ""
         property string priceText: ""
         property int productId: -1

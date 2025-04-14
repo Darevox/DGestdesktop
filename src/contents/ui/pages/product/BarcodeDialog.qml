@@ -5,11 +5,10 @@ import org.kde.kirigami as Kirigami
 import org.kde.kirigamiaddons.formcard as FormCard
 import com.dervox.BarcodeModel 1.0
 import "../../components"
-import "."
 
 Kirigami.Dialog {
     id: barcodeDialog
-    title: "Barcode"
+    title: i18n("Barcodes")
     height: Kirigami.Units.gridUnit * 25
     width: Kirigami.Units.gridUnit * 25
     standardButtons: Kirigami.Dialog.NoButton
@@ -21,7 +20,14 @@ Kirigami.Dialog {
 
     customFooterActions: [
         Kirigami.Action {
-            text: i18n("Cancel")
+            text: i18n("Add")
+            icon.name: "list-add-symbolic"
+            onTriggered: {
+                addDialog.open()
+            }
+        },
+        Kirigami.Action {
+            text: i18n("Close")
             icon.name: "dialog-cancel"
             onTriggered: {
                 barcodeDialog.close()
@@ -29,29 +35,15 @@ Kirigami.Dialog {
         }
     ]
 
-
     contentItem: ColumnLayout {
         spacing: Kirigami.Units.smallSpacing
         Kirigami.InlineMessage {
-            id:inlineMsgBarcode
+            id: inlineMsgBarcode
             Layout.fillWidth: true
             text: "Hey! Let me tell you something positive!"
             showCloseButton: true
             type: Kirigami.MessageType.Positive
             visible: false
-        }
-        RowLayout {
-            Layout.fillWidth: true
-            Item {
-                Layout.fillWidth: true
-            }
-            QQC2.ToolButton {
-                icon.name: "list-add-symbolic"
-                text: i18n("Add")
-                onClicked:{
-                    addDialog.open()
-                }
-            }
         }
 
         QQC2.ScrollView {
@@ -116,17 +108,14 @@ Kirigami.Dialog {
                             id: printButton
                             icon.name: "document-print"
                             onClicked: {
-                                let barCodeProduct = model.barcode
-                                console.log("Row Clicked:", index, "Barcode:", barCodeProduct)
-                                barcodePrint.contentEditText = barCodeProduct
-                                barcodePrint.open()
+                                openBarcodePrintDialog(model.barcode);
                             }
                         }
                         QQC2.ToolButton {
                             id: editButton
                             icon.name: "cell_edit"
                             onClicked: {
-                                editDialog.barcodeIDToEdit=model.id
+                                editDialog.barcodeIDToEdit = model.id
                                 editDialog.barcodeToEdit = model.barcode
                                 editDialog.open()
                             }
@@ -152,22 +141,45 @@ Kirigami.Dialog {
                     }
 
                     onDoubleClicked: {
-                        let barCodeProduct = model.barcode
-                        console.log("Row Clicked:", index, "Barcode:", barCodeProduct)
-                        barcodePrint.contentEditText = barCodeProduct
-                        barcodePrint.open()
+                        openBarcodePrintDialog(model.barcode);
                     }
                 }
             }
         }
     }
 
+    // Function to open the barcode print dialog with the right parameters
+    function openBarcodePrintDialog(barcodeContent) {
+        // Try to get price and name from product
+        let productPrice = "";
+        let productName = "";
+
+        // If we're in product details, get price and name from there
+        if (applicationWindow().activePage) {
+            if (applicationWindow().activePage.priceField) {
+                productPrice = applicationWindow().activePage.priceField.text;
+            }
+            if (applicationWindow().activePage.nameField) {
+                productName = applicationWindow().activePage.nameField.text;
+            }
+        }
+
+        barcodePrint.productId = productId;
+        barcodePrint.contentEditText = barcodeContent;
+        barcodePrint.priceText = productPrice;
+        barcodePrint.productNameText = productName;
+        barcodePrint.open();
+
+        // Automatically generate barcode when opening
+        barcodePrint.generateOnOpen = true;
+    }
+
     Kirigami.PromptDialog {
         id: addDialog
-        title: "New Barcode"
+        title: i18n("New Barcode")
         standardButtons: Kirigami.Dialog.NoButton
         Kirigami.InlineMessage {
-            id:inlineMsgAddDialog
+            id: inlineMsgAddDialog
             Layout.fillWidth: true
             text: "Hey! Let me tell you something positive!"
             showCloseButton: true
@@ -179,7 +191,7 @@ Kirigami.Dialog {
                 text: i18n("Create Barcode")
                 icon.name: "dialog-ok"
                 onTriggered: {
-                    productApi.addProductBarcode(productId,barcodeText.text)
+                    productApi.addProductBarcode(productId, barcodeText.text)
                 }
             },
             Kirigami.Action {
@@ -192,7 +204,7 @@ Kirigami.Dialog {
         ]
         ColumnLayout {
             QQC2.TextField {
-                id:barcodeText
+                id: barcodeText
                 Layout.fillWidth: true
                 placeholderText: i18n("Barcode…")
             }
@@ -200,26 +212,26 @@ Kirigami.Dialog {
         Connections {
             target: productApi
             function onErrorBarcodeAdded(message, status, details) {
-                inlineMsgAddDialog.text= details
-                inlineMsgAddDialog.visible=true
-                inlineMsgAddDialog.type= Kirigami.MessageType.Error
+                inlineMsgAddDialog.text = details
+                inlineMsgAddDialog.visible = true
+                inlineMsgAddDialog.type = Kirigami.MessageType.Error
             }
         }
-        onOpened:{
-            barcodeText.text=""
-            inlineMsgAddDialog.text=""
-            inlineMsgAddDialog.visible=false
-
+        onOpened: {
+            barcodeText.text = ""
+            inlineMsgAddDialog.text = ""
+            inlineMsgAddDialog.visible = false
         }
     }
+
     Kirigami.PromptDialog {
         id: editDialog
-        title: "Edit Barcode"
+        title: i18n("Edit Barcode")
         standardButtons: Kirigami.Dialog.NoButton
         property string barcodeToEdit: ""
         property int barcodeIDToEdit: 0
         Kirigami.InlineMessage {
-            id:inlineMsgEditDialog
+            id: inlineMsgEditDialog
             Layout.fillWidth: true
             text: "Hey! Let me tell you something positive!"
             showCloseButton: true
@@ -232,7 +244,6 @@ Kirigami.Dialog {
                 icon.name: "dialog-ok"
                 onTriggered: {
                     productApi.updateProductBarcode(productId, editDialog.barcodeIDToEdit, barcodeTextToEdit.text)
-
                 }
             },
             Kirigami.Action {
@@ -245,38 +256,34 @@ Kirigami.Dialog {
         ]
         ColumnLayout {
             QQC2.TextField {
-                id:barcodeTextToEdit
-                text:editDialog.barcodeToEdit
+                id: barcodeTextToEdit
+                text: editDialog.barcodeToEdit
                 Layout.fillWidth: true
             }
         }
         Connections {
             target: productApi
             function onErrorBarcodeUpdated(message, status, details) {
-                inlineMsgEditDialog.text= details
-                inlineMsgEditDialog.visible=true
-                inlineMsgEditDialog.type= Kirigami.MessageType.Error
+                inlineMsgEditDialog.text = details
+                inlineMsgEditDialog.visible = true
+                inlineMsgEditDialog.type = Kirigami.MessageType.Error
             }
         }
-        onOpened:{
-
-            inlineMsgEditDialog.text=""
-            inlineMsgEditDialog.visible=false
-
+        onOpened: {
+            inlineMsgEditDialog.text = ""
+            inlineMsgEditDialog.visible = false
         }
     }
+
     Kirigami.PromptDialog {
         id: deleteDialog
-
-
         property int barcodeToDelete: -1
         title: i18n("Delete Barcode")
         subtitle: i18n("Are you sure you'd like to delete this barcode?")
         standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
         onAccepted: {
-            productApi.removeProductBarcode(productId,barcodeToDelete)
+            productApi.removeProductBarcode(productId, barcodeToDelete)
         }
-
     }
 
     onProductIdChanged: {
@@ -290,37 +297,37 @@ Kirigami.Dialog {
     Connections {
         target: productApi
         function onErrorProductBarcodesReceived(message, status, details) {
-            inlineMsgBarcode.text= details
-            inlineMsgBarcode.visible=true
-            inlineMsgBarcode.type= Kirigami.MessageType.Error
+            inlineMsgBarcode.text = details
+            inlineMsgBarcode.visible = true
+            inlineMsgBarcode.type = Kirigami.MessageType.Error
         }
         function onErrorBarcodeRemoved(message, status, details) {
-            inlineMsgBarcode.text= details
-            inlineMsgBarcode.visible=true
-            inlineMsgBarcode.type= Kirigami.MessageType.Error
+            inlineMsgBarcode.text = details
+            inlineMsgBarcode.visible = true
+            inlineMsgBarcode.type = Kirigami.MessageType.Error
         }
         function onBarcodeAdded() {
             addDialog.close()
-            inlineMsgBarcode.text= i18n("Barcode Created successfully")
-            inlineMsgBarcode.visible=true
-            inlineMsgBarcode.type= Kirigami.MessageType.Positive
+            inlineMsgBarcode.text = i18n("Barcode Created successfully")
+            inlineMsgBarcode.visible = true
+            inlineMsgBarcode.type = Kirigami.MessageType.Positive
             barcodeModel.refresh()
         }
         function onBarcodeRemoved() {
-            inlineMsgBarcode.text= i18n("Barcode Deleted successfully")
-            inlineMsgBarcode.visible=true
-            inlineMsgBarcode.type= Kirigami.MessageType.Positive
+            inlineMsgBarcode.text = i18n("Barcode Deleted successfully")
+            inlineMsgBarcode.visible = true
+            inlineMsgBarcode.type = Kirigami.MessageType.Positive
             barcodeModel.refresh()
         }
         function onBarcodeUpdated() {
             editDialog.close()
-            inlineMsgBarcode.text= i18n("Barcode Updated successfully")
-            inlineMsgBarcode.visible=true
-            inlineMsgBarcode.type= Kirigami.MessageType.Positive
+            inlineMsgBarcode.text = i18n("Barcode Updated successfully")
+            inlineMsgBarcode.visible = true
+            inlineMsgBarcode.type = Kirigami.MessageType.Positive
             barcodeModel.refresh()
         }
-
     }
+
     BarcodePrint {
         id: barcodePrint
     }

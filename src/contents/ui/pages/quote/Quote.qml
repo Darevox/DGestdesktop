@@ -11,7 +11,7 @@ import com.dervox.SaleModel 1.0
 
 Kirigami.Page {
     id: root
-    title: i18nc("@title:group", "Sales")
+    title:i18n("Quotes")
 
     topPadding: 10
     leftPadding: 10
@@ -429,32 +429,32 @@ Kirigami.Page {
                     }
                     headerDelegate: TableHeaderLabel {}
                 },
-                Tables.HeaderComponent {
-                    title: i18nc("@title:column", "Payment")
-                    textRole: "payment_status"
-                    role: SaleRoles.PaymentStatusRole
-                    width: root.width * 0.15
+                // Tables.HeaderComponent {
+                //     title: i18nc("@title:column", "Payment")
+                //     textRole: "payment_status"
+                //     role: SaleRoles.PaymentStatusRole
+                //     width: root.width * 0.15
 
-                    itemDelegate: DStatusBadge {
-                        text: {
-                            switch(modelData) {
-                                case "partial": return "Partial"
-                                case "unpaid": return "Unpaid"
-                                case "paid": return "Paid"
-                                default: return modelData || ""
-                            }
-                        }
-                        textColor: {
-                            switch(modelData) {
-                                case "partial": return Kirigami.Theme.neutralTextColor
-                                case "paid": return Kirigami.Theme.positiveTextColor
-                                case "unpaid": return Kirigami.Theme.negativeTextColor
-                                default: return Kirigami.Theme.textColor
-                            }
-                        }
-                    }
-                    headerDelegate: TableHeaderLabel {}
-                },
+                //     itemDelegate: DStatusBadge {
+                //         text: {
+                //             switch(modelData) {
+                //                 case "partial": return "Partial"
+                //                 case "unpaid": return "Unpaid"
+                //                 case "paid": return "Paid"
+                //                 default: return modelData || ""
+                //             }
+                //         }
+                //         textColor: {
+                //             switch(modelData) {
+                //                 case "partial": return Kirigami.Theme.neutralTextColor
+                //                 case "paid": return Kirigami.Theme.positiveTextColor
+                //                 case "unpaid": return Kirigami.Theme.negativeTextColor
+                //                 default: return Kirigami.Theme.textColor
+                //             }
+                //         }
+                //     }
+                //     headerDelegate: TableHeaderLabel {}
+                // },
                 Tables.HeaderComponent {
                     title: i18nc("@title:column", "Total")
                     textRole: "total_amount"
@@ -466,33 +466,33 @@ Kirigami.Page {
                     }
                     headerDelegate: TableHeaderLabel {}
                 },
+                // Tables.HeaderComponent {
+                //     title: i18nc("@title:column", "Paid")
+                //     textRole: "paid_amount"
+                //     role: SaleRoles.PaidAmountRole
+                //     width: root.width * 0.10
+                //     itemDelegate: QQC2.Label {
+                //         text: Number(modelData || 0).toLocaleString(Qt.locale(), 'f', 2)
+                //         horizontalAlignment: Text.AlignRight
+                //         color: {
+                //             if (model.paidAmount === 0) {
+                //                 return Kirigami.Theme.negativeTextColor;  // Not paid
+                //             } else if (model.paidAmount === model.totalAmount) {
+                //                 return Kirigami.Theme.positiveTextColor;  // Fully paid
+                //             } else if (model.paidAmount < model.totalAmount) {
+                //                 return Kirigami.Theme.neutralTextColor;   // Partially paid
+                //             }
+                //             return Kirigami.Theme.textColor;  // Default color
+                //         }
+                //         font.bold: model.paidAmount > 0  // Optional: make non-zero amounts bold
+                //     }
+                //     headerDelegate: TableHeaderLabel {}
+                // },
                 Tables.HeaderComponent {
-                    title: i18nc("@title:column", "Paid")
-                    textRole: "paid_amount"
-                    role: SaleRoles.PaidAmountRole
-                    width: root.width * 0.10
-                    itemDelegate: QQC2.Label {
-                        text: Number(modelData || 0).toLocaleString(Qt.locale(), 'f', 2)
-                        horizontalAlignment: Text.AlignRight
-                        color: {
-                            if (model.paidAmount === 0) {
-                                return Kirigami.Theme.negativeTextColor;  // Not paid
-                            } else if (model.paidAmount === model.totalAmount) {
-                                return Kirigami.Theme.positiveTextColor;  // Fully paid
-                            } else if (model.paidAmount < model.totalAmount) {
-                                return Kirigami.Theme.neutralTextColor;   // Partially paid
-                            }
-                            return Kirigami.Theme.textColor;  // Default color
-                        }
-                        font.bold: model.paidAmount > 0  // Optional: make non-zero amounts bold
-                    }
-                    headerDelegate: TableHeaderLabel {}
-                },
-                Tables.HeaderComponent {
-                    title: i18nc("@title:column", "Sale Date")
+                    title: i18nc("@title:column", "Quote Date")
                     textRole: "sale_date"
                     role: SaleRoles.SaleDateRole
-                    width: root.width * 0.15
+                    width: root.width * 0.40
                     itemDelegate: QQC2.Label {
                         text: {
                             // Assuming createdAt is a valid date string or timestamp

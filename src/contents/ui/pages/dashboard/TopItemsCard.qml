@@ -13,7 +13,11 @@ Kirigami.AbstractCard {
     property var model: []
     property string iconCard: ""
     property color accentColor: Kirigami.Theme.highlightColor
-
+    background: Rectangle {
+       color: Qt.lighter(Kirigami.Theme.backgroundColor,1.2)
+        border.width: 0
+        radius: Kirigami.Units.smallSpacing
+    }
     contentItem: ColumnLayout {
         spacing: Kirigami.Units.largeSpacing
         anchors.fill: parent

@@ -214,6 +214,8 @@ Kirigami.Page {
                 // )
                 applicationWindow().loadGlobalDrawer()
                 applicationWindow().loadHeader()
+                // applicationWindow().pageStack.clear()
+                // applicationWindow().pageStack.push(Qt.createComponent("com.dervox.dim", "Dashboard"))
             }
         }
     }

@@ -8,6 +8,7 @@ Kirigami.ScrollablePage {
 
     implicitWidth: Kirigami.Units.gridUnit * 20
 
+
     leftPadding: 0
     rightPadding: 0
     bottomPadding: 0

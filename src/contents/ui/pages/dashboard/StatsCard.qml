@@ -12,14 +12,17 @@ Kirigami.AbstractCard {
 
     // Check if card is narrow
     property bool isNarrow: width < Kirigami.Units.gridUnit * 15
-
+    background: Rectangle {
+        color: Qt.lighter(Kirigami.Theme.backgroundColor,1.2)
+        border.width: 0
+        radius: Kirigami.Units.smallSpacing
+    }
     property string title: ""
     property string value: ""
     property string subtitle: ""
     property string iconCard: ""
     property color valueColor: Kirigami.Theme.textColor
-
-    contentItem: Item {
+     contentItem: Item {
         anchors.fill: parent
 
         // Choose layout based on width

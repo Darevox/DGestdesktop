@@ -11,7 +11,7 @@ import "."
 
 Kirigami.Dialog {
     id: saleDialog
-    title: dialogSaleId > 0 ? i18n("Edit %1", currentSale?.type) : i18n("New %1",typeCombo.currentText)
+    title: dialogSaleId > 0 ? i18n("Edit Sale") : i18n("New Sale")
     //  preferredWidth: Kirigami.Units.gridUnit * 60
     padding: Kirigami.Units.largeSpacing
     width: Kirigami.Units.gridUnit * 50
@@ -60,7 +60,7 @@ Kirigami.Dialog {
             visible:!saleApi.isLoading
 
             QQC2.TabButton {
-                text: i18n("%1 Details",typeCombo.currentText)
+                text: i18n("Sale Details")
             }
             QQC2.TabButton {
                 text: i18n("Products")
@@ -139,27 +139,27 @@ Kirigami.Dialog {
                             valueRole: "value"
                             currentIndex: 0
                         }
-                        FormCard.FormComboBoxDelegate {
-                            id: typeCombo
-                            text: i18n("Type")
-                            model: [
-                                { text: i18n("Sale"), value: "sale" },
-                                { text: i18n("Quote"), value: "quote" }
-                            ]
-                            textRole: "text"
-                            valueRole: "value"
-                            currentIndex: 0
-                            enabled: !isEditing // Can't change type after creation
+                        // FormCard.FormComboBoxDelegate {
+                        //     id: typeCombo
+                        //     text: i18n("Type")
+                        //     model: [
+                        //         { text: i18n("Sale"), value: "sale" },
+                        //         { text: i18n("Quote"), value: "quote" }
+                        //     ]
+                        //     textRole: "text"
+                        //     valueRole: "value"
+                        //     currentIndex: 0
+                        //     enabled: !isEditing // Can't change type after creation
 
-                            onCurrentValueChanged: {
-                                // Show info message when selecting quote
-                                if (currentValue === "quote") {
-                                    quoteInfoMessage.visible = true
-                                } else {
-                                    quoteInfoMessage.visible = false
-                                }
-                            }
-                        }
+                        //     onCurrentValueChanged: {
+                        //         // Show info message when selecting quote
+                        //         if (currentValue === "quote") {
+                        //             quoteInfoMessage.visible = true
+                        //         } else {
+                        //             quoteInfoMessage.visible = false
+                        //         }
+                        //     }
+                        // }
                         // FormCard.FormComboBoxDelegate {
                         //     id: cashSourceField
                         //     text: i18n("Cash Source")
@@ -573,7 +573,12 @@ Kirigami.Dialog {
                     icon.name: "document-print"
                     visible:  isEditing && currentSale?.type === "sale"
                     enabled: !saleModel.loading
-                    onClicked: saleApi.generateReceipt(dialogSaleId)
+                    //onClicked: saleApi.generateReceipt(dialogSaleId)
+                    onClicked: {
+                        // Instead of directly printing, show our receipt dialog
+                        receiptPrintDialogLoader.saleId = dialogSaleId;
+                        receiptPrintDialogLoader.active = true;
+                    }
                 }
                 QQC2.Button {
                     text: i18n("Add Payment")
@@ -607,7 +612,7 @@ Kirigami.Dialog {
 
     customFooterActions: [
         Kirigami.Action {
-            text: isEditing ? i18n("Save Changes") : i18n("Create %1",typeCombo.currentText)
+            text: isEditing ? i18n("Save Changes") : i18n("Create Sale")
             icon.name: isEditing ? "document-save" : "list-add"
             enabled: !saleModel.loading //&& validateForm()
             onTriggered: {
@@ -879,7 +884,7 @@ Kirigami.Dialog {
             due_date: hasClientCheckbox.checked ? dueDateField.value.toISOString() : null,
             status: statusCombo.currentValue || statusCombo.currentText,
             notes: notesField.text || "",
-            type: !isEditing ? typeCombo.currentValue : undefined, // Only include type when creating new
+            type: "sale",
             items: items
         };
 
@@ -946,18 +951,18 @@ Kirigami.Dialog {
         let statusIndex = statusCombo.model.findIndex(item => item.value === sale.status)
         statusCombo.currentIndex = statusIndex !== -1 ? statusIndex : 0
 
-        // Set document type
-        if (sale.type) {
-            let typeIndex = typeCombo.model.findIndex(item => item.value === sale.type)
-            typeCombo.currentIndex = typeIndex !== -1 ? typeIndex : 0
+        // // Set document type
+        // if (sale.type) {
+        //     let typeIndex = typeCombo.model.findIndex(item => item.value === sale.type)
+        //     typeCombo.currentIndex = typeIndex !== -1 ? typeIndex : 0
 
-            // Show the quote info message if it's a quote
-            quoteInfoMessage.visible = sale.type === "quote"
-        } else {
-            // Default to sale for backward compatibility
-            typeCombo.currentIndex = 0
-            quoteInfoMessage.visible = false
-        }
+        //     // Show the quote info message if it's a quote
+        //     quoteInfoMessage.visible = sale.type === "quote"
+        // } else {
+        //     // Default to sale for backward compatibility
+        //     typeCombo.currentIndex = 0
+        //     quoteInfoMessage.visible = false
+        // }
 
         // Clear and reload items
         selectedProductsModel.clear();
@@ -1024,15 +1029,31 @@ Kirigami.Dialog {
             updateRemainingAmount()
             loadData(sale)
         }
+        // function onReceiptGenerated(pdfUrl) {
+        //     printerHelper.printPdfWithPreview(pdfUrl)
+        // }
         function onReceiptGenerated(pdfUrl) {
-            printerHelper.printPdfWithPreview(pdfUrl)
+            if (receiptPrintDialogLoader.active && receiptPrintDialogLoader.item) {
+                // Set the URL directly on the dialog item, not through a property binding
+                receiptPrintDialogLoader.item.pdfUrl = pdfUrl;
+            }
+            // else {
+            //     // Legacy direct print method
+            //     printerHelper.printPdfWithPreview(pdfUrl);
+            // }
         }
+
+
         function onErrorReceiptGenerated(title, message) {
             applicationWindow().showPassiveNotification(
                         i18n("Receipt generation failed: %1", message),
                         "long"
                         )
         }
+    }
+    Component {
+        id: receiptPDFViewerComponent
+        ReceiptPDFViewer { }
     }
     Kirigami.PromptDialog {
         id: convertConfirmDialog
@@ -1102,6 +1123,29 @@ Kirigami.Dialog {
             item.open()
         }
     }
+    Loader {
+        id: receiptPrintDialogLoader
+        active: false
+        property int saleId: -1
+
+        sourceComponent: ReceiptPrintDialog {
+            id: receiptDialog
+            saleId: receiptPrintDialogLoader.saleId
+
+            // Don't call requestNewPdf() here, we'll let the dialog handle it
+            // when it's created through its Component.onCompleted handler
+
+            onClosed: {
+                receiptPrintDialogLoader.active = false;
+            }
+        }
+
+        onLoaded: {
+            item.open();
+            // No need to manually call generateReceipt here, dialog will handle it
+        }
+    }
+
 
 
     Component.onCompleted: {

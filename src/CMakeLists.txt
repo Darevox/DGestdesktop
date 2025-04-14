@@ -55,7 +55,7 @@ set(DIM_QML_PAGES
     # Product pages
     contents/ui/pages/product/Products.qml
     contents/ui/pages/product/ProductDetails.qml
-    contents/ui/pages/product/Barcode.qml
+    contents/ui/pages/product/BarcodeDialog.qml
     contents/ui/pages/product/BarcodePrint.qml
     contents/ui/pages/product/ProductImageEditor.qml
     contents/ui/pages/product/ImageFileDialog.qml
@@ -89,6 +89,8 @@ set(DIM_QML_PAGES
     contents/ui/pages/sale/SaleDetails.qml
     contents/ui/pages/sale/ProductSelectorDialog.qml
     contents/ui/pages/sale/InvoiceGenerationDialog.qml
+        contents/ui/pages/sale/ReceiptPrintDialog.qml
+            contents/ui/pages/sale/ReceiptPDFViewer.qml
     # Quote pages
     contents/ui/pages/quote/Quote.qml
     contents/ui/pages/quote/QuoteDetails.qml
@@ -129,6 +131,8 @@ set(DIM_QML_PAGES
     contents/ui/pages/settings/LanguageAndLocalization.qml
     contents/ui/pages/settings/DocumentSettingsPage.qml
     contents/ui/pages/settings/DocumentPreview.qml
+    contents/ui/pages/settings/ReceiptSettingsPage.qml
+
 
 )
 
